@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Listening Quiz Prototype</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+body { background: #d8dde6; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 24px; }
+.quiz-wrap { background: #e8ecf2; width: 100%; max-width: 900px; min-height: 600px; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.12); position: relative; }
+.top-bar { background: #3d4f72; color: white; padding: 10px 20px; display: flex; align-items: center; justify-content: space-between; }
+.top-bar-title { font-size: 15px; font-weight: 500; flex: 1; text-align: center; }
+.top-bar-btn { background: #2ec4b6; color: white; border: none; padding: 6px 14px; border-radius: 6px; font-size: 12px; cursor: pointer; }
+.top-bar-btn.submit { background: #1a73e8; margin-left: 8px; }
+.progress-bar-wrap { background: white; padding: 8px 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0e4ee; }
+.progress-left { font-size: 12px; color: #666; display: flex; align-items: center; gap: 8px; }
+.progress-left strong { color: #111; font-weight: 600; }
+.progress-dot { width: 10px; height: 10px; border-radius: 50%; background: #4caf50; }
+.progress-right { font-size: 12px; color: #666; display: flex; align-items: center; gap: 12px; }
+.timer { color: #1a73e8; font-weight: 500; }
+.content-area { flex: 1; padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+.part-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e0e4ee; }
+.part-label { font-size: 16px; font-weight: 500; color: #111; margin-bottom: 14px; }
+.audio-player { background: #f4f6f9; border-radius: 8px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; }
+.audio-btn { width: 28px; height: 28px; border: none; border-radius: 50%; background: #888; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; }
+.audio-btn.playing { background: #3d4f72; }
+.audio-time { font-size: 12px; color: #666; white-space: nowrap; min-width: 72px; }
+.audio-track { flex: 1; height: 4px; background: #dde1ea; border-radius: 4px; position: relative; cursor: pointer; }
+.audio-fill { height: 100%; background: #3d4f72; border-radius: 4px; transition: width 0.5s linear; }
+.audio-vol { font-size: 14px; color: #666; cursor: pointer; flex-shrink: 0; }
+.question-section { padding-top: 4px; }
+.q-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+.q-label { font-size: 15px; font-weight: 500; color: #111; }
+.q-nav { display: flex; gap: 6px; }
+.q-nav-btn { width: 30px; height: 30px; border: none; border-radius: 6px; background: #f0a500; color: white; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center; }
+.q-nav-btn:disabled { background: #dde1ea; color: #aaa; cursor: default; }
+.q-answer { display: flex; align-items: center; gap: 10px; }
+.q-answer label { font-size: 13px; color: #666; white-space: nowrap; }
+.q-select { padding: 7px 32px 7px 12px; border-radius: 6px; border: 1px solid #c8ccd8; font-size: 14px; background: white; color: #111; min-width: 140px; cursor: pointer; appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M2 4l4 4 4-4' stroke='%23888' fill='none' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+.transition-hint { font-size: 11px; color: #999; margin-top: 8px; }
+.auto-advance { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #555; }
+.countdown-ring { position: relative; width: 32px; height: 32px; }
+.countdown-ring svg { transform: rotate(-90deg); }
+.countdown-num { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: #3d4f72; }
+.answered-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; background: #e8f5e9; color: #2e7d32; padding: 4px 10px; border-radius: 999px; margin-left: 8px; }
+.bottom-nav { background: white; padding: 10px 16px; border-top: 1px solid #e0e4ee; overflow-x: auto; }
+.part-row { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
+.part-tag { font-size: 11px; font-weight: 600; color: #111; padding: 0 6px; }
+.part-divider { width: 2px; height: 24px; background: #3d4f72; border-radius: 2px; margin: 0 4px; }
+.q-dot { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #dde1ea; font-size: 11px; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; color: #666; background: white; transition: all 0.15s; }
+.q-dot.active { background: #1a73e8; color: white; border-color: #1a73e8; }
+.q-dot.answered { background: #1a73e8; color: white; border-color: #1a73e8; opacity: 0.6; }
+.toast { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(61,79,114,0.92); color: white; padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 500; opacity: 0; transition: opacity 0.3s; pointer-events: none; white-space: nowrap; z-index: 100; }
+.toast.show { opacity: 1; }
+</style>
+</head>
+<body>
+<div class="quiz-wrap">
+
+  <div class="top-bar">
+    <div style="display:flex;gap:6px;">
+      <button class="top-bar-btn">Save &amp; Exit</button>
+    </div>
+    <div class="top-bar-title">Listening — Test 3</div>
+    <div style="display:flex;gap:6px;">
+      <button class="top-bar-btn submit">Submit Quiz</button>
+    </div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <div class="progress-left">
+      <strong>PROGRESS</strong>
+      <span id="prog-text">0/100 (0%)</span>
+      <div class="progress-dot"></div>
+    </div>
+    <div class="progress-right">
+      <span style="color:#1a73e8;cursor:pointer;font-size:12px;">ⓘ Instruction</span>
+      <span class="timer" id="timer-display">40:51</span>
+    </div>
+  </div>
+
+  <div class="content-area">
+    <div class="part-card">
+      <div class="part-label" id="part-label">Part 2</div>
+
+      <div class="audio-player">
+        <button class="audio-btn playing" id="play-btn" onclick="togglePlay()">⏸</button>
+        <span class="audio-time" id="audio-time">0:26 / 8:40</span>
+        <div class="audio-track" onclick="seekAudio(event, this)">
+          <div class="audio-fill" id="audio-fill" style="width:5%"></div>
+        </div>
+        <span class="audio-vol">🔊</span>
+      </div>
+
+      <div class="question-section" style="margin-top:16px;">
+        <div class="q-header">
+          <div style="display:flex;align-items:center;">
+            <span class="q-label" id="q-label">Question 25</span>
+            <span class="answered-badge" id="answered-badge" style="display:none;">✓ Answered</span>
+          </div>
+          <div class="q-nav">
+            <button class="q-nav-btn" id="prev-btn" onclick="navigate(-1)">‹</button>
+            <button class="q-nav-btn" id="next-btn" onclick="navigate(1)">›</button>
+          </div>
+        </div>
+
+        <div class="q-answer">
+          <label>Select option to answer</label>
+          <select class="q-select" id="answer-select" onchange="onAnswer(this.value)">
+            <option value="">Select Answer</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+            <option value="D">D</option>
+          </select>
+        </div>
+
+        <div class="auto-advance" id="auto-advance-ui" style="margin-top:12px;display:none;">
+          <div class="countdown-ring">
+            <svg width="32" height="32" viewBox="0 0 32 32">
+              <circle cx="16" cy="16" r="13" fill="none" stroke="#e0e4ee" stroke-width="3"/>
+              <circle cx="16" cy="16" r="13" fill="none" stroke="#3d4f72" stroke-width="3"
+                stroke-dasharray="81.7" id="ring-progress" stroke-dashoffset="0" stroke-linecap="round"/>
+            </svg>
+            <div class="countdown-num" id="countdown-num">2</div>
+          </div>
+          <span>Moving to next question…</span>
+        </div>
+
+        <div class="transition-hint" id="transition-hint" style="margin-top:8px;display:block;">
+          Answer to move to the next question automatically
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="part-row" id="nav-row"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const parts = [
+  { label: 'PART 1', questions: [1,2,3,4,5,6] },
+  { label: 'PART 2', questions: [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27] },
+  { label: 'PART 3', questions: [28,29,30,31,32,33,34,35,36,37,38,39,40] },
+];
+
+const allQuestions = [];
+parts.forEach((p, pi) => p.questions.forEach(q => allQuestions.push({ q, part: pi })));
+const answers = {};
+let currentIdx = allQuestions.findIndex(x => x.q === 25);
+let countdownTimer = null;
+let audioPlaying = true;
+let audioSec = 26;
+const audioDuration = 520;
+let timerSec = 40*60 + 51;
+
+function render() {
+  const cur = allQuestions[currentIdx];
+  document.getElementById('q-label').textContent = 'Question ' + cur.q;
+  document.getElementById('part-label').textContent = 'Part ' + (cur.part + 1);
+  const sel = document.getElementById('answer-select');
+  sel.value = answers[cur.q] || '';
+  const badge = document.getElementById('answered-badge');
+  badge.style.display = answers[cur.q] ? 'inline-flex' : 'none';
+  document.getElementById('prev-btn').disabled = currentIdx === 0;
+  document.getElementById('next-btn').disabled = currentIdx === allQuestions.length - 1;
+  const prog = Object.keys(answers).length;
+  document.getElementById('prog-text').textContent = prog + '/100 (' + Math.round(prog) + '%)';
+  renderNav();
+  cancelCountdown();
+}
+
+function renderNav() {
+  const row = document.getElementById('nav-row');
+  row.innerHTML = '';
+  let lastPart = -1;
+  allQuestions.forEach((item, idx) => {
+    if (item.part !== lastPart) {
+      if (lastPart !== -1) {
+        const div = document.createElement('div'); div.className = 'part-divider'; row.appendChild(div);
+      }
+      const tag = document.createElement('div'); tag.className = 'part-tag'; tag.textContent = parts[item.part].label;
+      row.appendChild(tag);
+      lastPart = item.part;
+    }
+    const dot = document.createElement('div');
+    dot.className = 'q-dot' + (idx === currentIdx ? ' active' : (answers[item.q] ? ' answered' : ''));
+    dot.textContent = item.q;
+    dot.onclick = () => jumpTo(idx);
+    row.appendChild(dot);
+  });
+}
+
+function jumpTo(idx) {
+  const fromPart = allQuestions[currentIdx].part;
+  const toPart = allQuestions[idx].part;
+  cancelCountdown();
+  if (fromPart === toPart && Math.abs(idx - currentIdx) > 1) {
+    showToast('Tip: Answer questions in order within a Part');
+  }
+  currentIdx = idx;
+  render();
+}
+
+function navigate(dir) {
+  cancelCountdown();
+  const next = currentIdx + dir;
+  if (next >= 0 && next < allQuestions.length) { currentIdx = next; render(); }
+}
+
+function onAnswer(val) {
+  if (!val) return;
+  const cur = allQuestions[currentIdx];
+  answers[cur.q] = val;
+  document.getElementById('transition-hint').style.display = 'none';
+  startCountdown();
+}
+
+function startCountdown() {
+  cancelCountdown();
+  const ui = document.getElementById('auto-advance-ui');
+  ui.style.display = 'flex';
+  let rem = 2;
+  const ring = document.getElementById('ring-progress');
+  const num = document.getElementById('countdown-num');
+  const circumference = 81.7;
+  ring.style.strokeDashoffset = 0;
+  num.textContent = rem;
+  countdownTimer = setInterval(() => {
+    rem -= 0.1;
+    ring.style.strokeDashoffset = circumference * (1 - Math.max(rem, 0) / 2);
+    num.textContent = Math.ceil(rem);
+    if (rem <= 0) {
+      clearInterval(countdownTimer);
+      countdownTimer = null;
+      ui.style.display = 'none';
+      if (currentIdx < allQuestions.length - 1) { currentIdx++; render(); }
+    }
+  }, 100);
+}
+
+function cancelCountdown() {
+  if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+  document.getElementById('auto-advance-ui').style.display = 'none';
+  document.getElementById('transition-hint').style.display = 'block';
+}
+
+function togglePlay() {
+  audioPlaying = !audioPlaying;
+  const btn = document.getElementById('play-btn');
+  btn.textContent = audioPlaying ? '⏸' : '▶';
+  btn.className = 'audio-btn' + (audioPlaying ? ' playing' : '');
+}
+
+function seekAudio(e, el) {
+  const rect = el.getBoundingClientRect();
+  const pct = (e.clientX - rect.left) / rect.width;
+  audioSec = Math.round(pct * audioDuration);
+  updateAudioDisplay();
+}
+
+function updateAudioDisplay() {
+  document.getElementById('audio-fill').style.width = (audioSec / audioDuration * 100).toFixed(1) + '%';
+  const m = Math.floor(audioSec/60), s = audioSec%60;
+  const dm = Math.floor(audioDuration/60), ds = audioDuration%60;
+  document.getElementById('audio-time').textContent =
+    m+':'+(s<10?'0':'')+s+' / '+dm+':'+(ds<10?'0':'')+ds;
+}
+
+setInterval(() => {
+  if (audioPlaying && audioSec < audioDuration) { audioSec++; updateAudioDisplay(); }
+}, 1000);
+
+setInterval(() => {
+  if (timerSec > 0) timerSec--;
+  const m = Math.floor(timerSec/60), s = timerSec%60;
+  document.getElementById('timer-display').textContent = m+':'+(s<10?'0':'')+s;
+}, 1000);
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+render();
+updateAudioDisplay();
+</script>
+</body>
+</html>
