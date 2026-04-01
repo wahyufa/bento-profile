@@ -531,113 +531,174 @@
     }
 
     /* ── RESULT STEP ── */
-    .result-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-bottom: 16px;
-    }
-    .result-badge {
-      border-radius: 10px;
-      padding: 14px 16px;
-      text-align: center;
-    }
-    .result-badge.mark {
-      background: #f0faf4;
-      border: 1.5px solid #b6e8ce;
-    }
-    .result-badge.mark .val {
-      font-size: 26px;
-      font-weight: 700;
-      color: #2eaa6e;
-    }
-    .result-badge.mark .lbl {
-      font-size: 11px;
-      color: #68b892;
-      margin-top: 2px;
-    }
-    .result-badge.accuracy {
-      background: #f5f3ff;
-      border: 1.5px solid #cec9f8;
-    }
-    .result-badge.accuracy .val {
-      font-size: 26px;
-      font-weight: 700;
-      color: #5b4fe9;
-    }
-    .result-badge.accuracy .lbl {
-      font-size: 11px;
-      color: #9b8ff0;
-      margin-top: 2px;
+    .modal.wide { width: 600px; }
+    #step-result .modal-body {
+      max-height: 68vh;
+      overflow-y: auto;
+      padding: 20px 24px;
     }
 
-    .remark-section { margin-bottom: 4px; }
-    .remark-label {
+    /* Student answer with highlights */
+    .res-section-label {
       font-size: 12px;
       font-weight: 700;
       color: #888;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
+      letter-spacing: 0.05em;
       margin-bottom: 8px;
     }
-    .remark-box {
-      background: #fafafa;
-      border: 1px solid #eee;
-      border-radius: 8px;
-      padding: 14px 16px;
+    .student-answer-display {
       font-size: 14px;
+      color: #222;
+      line-height: 2;
+      margin-bottom: 6px;
+      position: relative;
+    }
+    /* Highlight spans */
+    .hl {
+      border-radius: 4px;
+      padding: 2px 4px;
+      cursor: pointer;
+      position: relative;
+      transition: opacity 0.12s;
+    }
+    .hl:hover { opacity: 0.82; }
+    .hl.correct  { background: #c8f0e4; color: #0e7a52; }
+    .hl.partial  { background: #fde8c8; color: #a85200; }
+    .hl.wrong    { background: #fde0e0; color: #b80000; }
+    .hl.active   { outline: 2px solid currentColor; outline-offset: 1px; }
+
+    /* Tooltip popover */
+    .hl-tooltip {
+      display: none;
+      position: absolute;
+      z-index: 200;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 12px;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.14);
+      padding: 14px 16px;
+      width: 280px;
+      font-size: 13px;
       color: #333;
-      line-height: 1.7;
+      line-height: 1.55;
+      top: calc(100% + 8px);
+      left: 0;
+    }
+    .hl-tooltip.open { display: block; }
+    .hl-tooltip-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid #f0a030;
+      color: #f0a030;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .hl-tooltip-hint {
+      display: block;
+      margin-top: 10px;
+      font-size: 11px;
+      color: #aaa;
+      font-style: italic;
     }
 
-    /* Highlight types */
-    .hl-good {
-      background: #d4f5e4;
-      color: #1a7a4a;
-      border-radius: 3px;
-      padding: 1px 3px;
+    /* Marks given row */
+    .marks-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 14px 0;
+      font-size: 13px;
+      color: #444;
     }
-    .hl-missing {
-      background: #fde8d8;
-      color: #b85000;
-      border-radius: 3px;
-      padding: 1px 3px;
-    }
-    .hl-wrong {
-      background: #fde0e0;
-      color: #b80000;
-      border-radius: 3px;
-      padding: 1px 3px;
-      text-decoration: line-through;
+    .marks-row .mark-label { font-weight: 500; }
+    .mark-val-box {
+      border: 1.5px solid #dde0ea;
+      border-radius: 6px;
+      padding: 5px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #333;
+      min-width: 36px;
+      text-align: center;
     }
 
-    .legend {
+    /* Model answer */
+    .model-answer-block { margin-bottom: 14px; }
+    .model-answer-text {
+      font-size: 14px;
+      font-weight: 700;
+      color: #12a37a;
+      line-height: 1.6;
+    }
+
+    /* Remarks */
+    .remarks-block { margin-bottom: 6px; }
+    .remarks-heading {
+      font-size: 14px;
+      font-weight: 700;
+      color: #222;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .remarks-textarea {
+      width: 100%;
+      border: 1px solid #dde0ea;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #444;
+      line-height: 1.65;
+      resize: none;
+      font-family: inherit;
+      background: #fff;
+      min-height: 90px;
+    }
+
+    /* Marks obtained footer row */
+    .marks-obtained-row {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid #eee;
+      font-size: 14px;
+      font-weight: 700;
+      color: #222;
+    }
+
+    /* Legend */
+    .hl-legend {
       display: flex;
       gap: 14px;
-      margin-top: 10px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
     }
-    .legend-item {
+    .hl-legend-item {
       display: flex;
       align-items: center;
       gap: 5px;
       font-size: 11px;
       color: #666;
     }
-    .legend-dot {
-      width: 10px;
-      height: 10px;
+    .hl-dot {
+      width: 10px; height: 10px;
       border-radius: 2px;
     }
-    .legend-dot.good    { background: #d4f5e4; border: 1px solid #a0d9bc; }
-    .legend-dot.missing { background: #fde8d8; border: 1px solid #f0b88a; }
-    .legend-dot.wrong   { background: #fde0e0; border: 1px solid #f0a0a0; }
+    .hl-dot.correct { background: #c8f0e4; border: 1px solid #8ed8be; }
+    .hl-dot.partial { background: #fde8c8; border: 1px solid #f0c080; }
+    .hl-dot.wrong   { background: #fde0e0; border: 1px solid #f0a0a0; }
 
-    .result-footer-btns {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
-    }
+    /* Reuse hl-* for history remark display */
+    .hl-good    { background: #c8f0e4; color: #0e7a52; border-radius: 3px; padding: 1px 3px; }
+    .hl-missing { background: #fde8c8; color: #a85200; border-radius: 3px; padding: 1px 3px; }
+    .hl-wrong-text { background: #fde0e0; color: #b80000; border-radius: 3px; padding: 1px 3px; }
+
     .btn-retry {
       background: #fff;
       border: 1.5px solid #7c6ff7;
@@ -873,32 +934,43 @@
     <div id="step-result">
       <div class="modal-body">
 
-        <!-- Scores -->
-        <div class="result-grid">
-          <div class="result-badge mark">
-            <div class="val" id="res-mark">—</div>
-            <div class="lbl">Mark Obtained</div>
-          </div>
-          <div class="result-badge accuracy">
-            <div class="val" id="res-accuracy">—</div>
-            <div class="lbl">Accuracy</div>
-          </div>
+        <!-- Student Answer with highlights -->
+        <div class="res-section-label">Student Answer</div>
+        <div class="hl-legend">
+          <div class="hl-legend-item"><div class="hl-dot correct"></div> Correct</div>
+          <div class="hl-legend-item"><div class="hl-dot partial"></div> Partially correct / missing</div>
+          <div class="hl-legend-item"><div class="hl-dot wrong"></div> Incorrect</div>
+        </div>
+        <div class="student-answer-display" id="res-student-answer">
+          <!-- rendered by JS -->
         </div>
 
-        <!-- Remark -->
-        <div class="remark-section">
-          <div class="remark-label">Remark &amp; Feedback</div>
-          <div class="remark-box" id="res-remark"></div>
-          <div class="legend">
-            <div class="legend-item"><div class="legend-dot good"></div> Correct</div>
-            <div class="legend-item"><div class="legend-dot missing"></div> Missing info</div>
-            <div class="legend-item"><div class="legend-dot wrong"></div> Incorrect</div>
-          </div>
+        <!-- Marks given -->
+        <div class="marks-row">
+          <span class="mark-label">(Marks Given:</span>
+          <span class="mark-val-box" id="res-mark-val">—</span>
+          <span>)</span>
         </div>
+
+        <!-- Model answer -->
+        <div class="model-answer-block">
+          <div class="res-section-label" style="margin-bottom:4px;">Model answer :</div>
+          <div class="model-answer-text" id="res-model-answer"></div>
+        </div>
+
+        <!-- Remarks -->
+        <div class="remarks-block">
+          <div class="remarks-heading">Remarks ✨</div>
+          <textarea class="remarks-textarea" id="res-remark" readonly></textarea>
+        </div>
+
+        <!-- Marks obtained -->
+        <div class="marks-obtained-row" id="res-marks-obtained"></div>
+
       </div>
       <div class="modal-footer" style="justify-content:space-between;align-items:center;">
-        <button class="btn-retry" onclick="goBackInput()">← Try Another Answer</button>
-        <button class="btn-done" onclick="closeModal()">Done</button>
+        <button class="btn-retry" id="btn-retry">← Try Another Answer</button>
+        <button class="btn-done" id="btn-done-result">Done</button>
       </div>
     </div>
 
@@ -915,25 +987,51 @@
     "People travel more because it is fun and they want to see new places."
   ];
 
+  const MODEL_ANSWER = "Traveling has become easier because of affordable flights, online booking services, and budget accommodations.";
+
+  /*
+    segments: array of { text, type, tooltip }
+    type: 'correct' | 'partial' | 'wrong' | 'plain'
+    tooltip: string or null
+  */
   const RESULTS = [
     {
-      mark: "2 / 2", accuracy: "100%", scoreLevel: "high",
-      remark: `The student's answer is <span class="hl-good">excellent and complete</span>. They correctly identified <span class="hl-good">affordable flights</span>, <span class="hl-good">online booking services</span>, and <span class="hl-good">budget accommodations</span> as the key reasons — matching all required points from the model answer.`
+      scoreLevel: "high", markNum: 2, markTotal: 2,
+      segments: [
+        { text: "Traveling has become easier because of", type: "plain", tooltip: null },
+        { text: " affordable flights,", type: "correct", tooltip: "Correct! 'Affordable flights' is the first key reason from the passage. Full marks for this point." },
+        { text: " online booking services,", type: "correct", tooltip: "Correct! 'Online booking services' is the second key reason. Well mentioned." },
+        { text: " and budget accommodations.", type: "correct", tooltip: "Correct! 'Budget accommodations' is the third key reason. All required points covered." }
+      ],
+      remark: "Excellent work! You correctly identified all three key reasons why traveling has become easier today — affordable flights, online booking services, and budget accommodations. Your answer is complete, well-structured, and directly matches the model answer. Keep it up!"
     },
     {
-      mark: "1 / 2", accuracy: "60%", scoreLevel: "mid",
-      remark: `The student correctly mentioned <span class="hl-good">cheaper flights</span> and <span class="hl-good">online hotel booking</span>, which are valid points. However, the answer is <span class="hl-missing">missing budget accommodations</span> as a separate reason. A more complete answer would include all three factors from the passage.`
+      scoreLevel: "mid", markNum: 1, markTotal: 2,
+      segments: [
+        { text: "Traveling is easier now because", type: "plain", tooltip: null },
+        { text: " flights are cheaper", type: "correct", tooltip: "Good! This refers to 'affordable flights', which is a valid point from the passage." },
+        { text: " and you can book hotels online.", type: "partial", tooltip: "Partially correct. You mention online booking, but 'budget accommodations' as a separate reason is missing from your answer. The passage distinguishes online booking services from budget accommodations." }
+      ],
+      remark: "You correctly identified that flights are cheaper and that hotels can be booked online, which are valid points. However, your answer is missing 'budget accommodations' as a separate, standalone reason. A complete answer would include all three factors mentioned in the passage: affordable flights, online booking services, and budget accommodations."
     },
     {
-      mark: "0 / 2", accuracy: "0%", scoreLevel: "low",
-      remark: `The student's response — "<span class="hl-wrong">it is fun and they want to see new places</span>" — does not address the question. The question asks <em>why</em> traveling has become <em>easier</em>, not why people enjoy it. <span class="hl-missing">No relevant points were mentioned</span> (affordable flights, online booking, budget accommodations).`
+      scoreLevel: "low", markNum: 0, markTotal: 2,
+      segments: [
+        { text: "People travel more because", type: "plain", tooltip: null },
+        { text: " it is fun", type: "wrong", tooltip: "Incorrect. The question asks why traveling has become easier, not why people enjoy it. 'It is fun' does not address any reason from the passage." },
+        { text: " and they want to see new places.", type: "wrong", tooltip: "Incorrect. This describes personal motivation, not why traveling has become easier. No points from the passage are referenced (affordable flights, online booking, budget accommodations)." }
+      ],
+      remark: "Your answer does not address the question. The question asks why traveling has become easier (e.g., cheaper flights, online booking, budget accommodations), not why people choose to travel. Please re-read the passage carefully and focus on the specific reasons the author gives for why modern travel is more accessible."
     }
   ];
 
-  /* History store */
+  /* ══════════════════════════════════════
+     STATE
+  ══════════════════════════════════════ */
   let checkHistory = [];
   let currentSampleIndex = -1;
   let lastResult = null;
+  let activeTooltipEl = null;
 
   /* ══════════════════════════════════════
      CONTEXT PILL TOGGLE
@@ -957,7 +1055,6 @@
     document.getElementById('student-answer').value = '';
     document.getElementById('char-count').textContent = '0 characters';
     document.getElementById('btn-check').disabled = true;
-    /* reset context pill */
     ctxOpen = false;
     document.getElementById('ctx-full').classList.remove('open');
     document.getElementById('ctx-preview').style.display = 'block';
@@ -966,6 +1063,7 @@
 
   function closeModal() {
     document.getElementById('modal').classList.remove('open');
+    closeActiveTooltip();
   }
 
   function handleOverlayClick(e) {
@@ -976,6 +1074,8 @@
     document.getElementById('step-input').style.display   = step === 'input'   ? 'block' : 'none';
     document.getElementById('step-loading').style.display = step === 'loading' ? 'block' : 'none';
     document.getElementById('step-result').style.display  = step === 'result'  ? 'block' : 'none';
+    /* widen modal for result */
+    document.getElementById('modal-box').classList.toggle('wide', step === 'result');
   }
 
   function fillSample(i) {
@@ -996,46 +1096,111 @@
     setTimeout(() => {
       const result = currentSampleIndex >= 0
         ? RESULTS[currentSampleIndex]
-        : { mark: "1 / 2", accuracy: "50%", scoreLevel: "mid",
-            remark: `The student's answer contains <span class="hl-good">some relevant points</span> but is <span class="hl-missing">missing key details</span> from the model answer such as specific examples from the passage.` };
+        : {
+            scoreLevel: "mid", markNum: 1, markTotal: 2,
+            segments: [
+              { text: studentAnswer, type: "partial", tooltip: "Your answer contains some relevant points but is missing key details from the model answer." }
+            ],
+            remark: "Your answer contains some relevant points but is missing key details from the model answer. Consider referencing specific reasons mentioned in the passage."
+          };
 
       lastResult = { ...result, studentAnswer, timestamp: new Date() };
-
-      document.getElementById('res-mark').textContent     = result.mark;
-      document.getElementById('res-accuracy').textContent = result.accuracy;
-      document.getElementById('res-remark').innerHTML     = result.remark;
-
-      const score = parseFloat(result.accuracy);
-      document.getElementById('res-mark').style.color =
-        score >= 80 ? '#2eaa6e' : score >= 40 ? '#e07b00' : '#d63b3b';
-
+      renderResult(result);
       showStep('result');
     }, 1800);
   }
 
+  function renderResult(result) {
+    /* Student answer with highlights */
+    const container = document.getElementById('res-student-answer');
+    container.innerHTML = '';
+    closeActiveTooltip();
+
+    result.segments.forEach((seg, idx) => {
+      if (seg.type === 'plain' || !seg.tooltip) {
+        container.appendChild(document.createTextNode(seg.text));
+        return;
+      }
+      const wrapper = document.createElement('span');
+      wrapper.style.position = 'relative';
+      wrapper.style.display = 'inline';
+
+      const span = document.createElement('span');
+      span.className = 'hl ' + seg.type;
+      span.textContent = seg.text;
+      span.dataset.idx = idx;
+
+      /* Tooltip */
+      const tip = document.createElement('div');
+      tip.className = 'hl-tooltip';
+      tip.innerHTML = `
+        <div class="hl-tooltip-icon">i</div>
+        <div>${seg.tooltip}</div>
+        <span class="hl-tooltip-hint">(Click the highlighted text to see detail feedback)</span>`;
+
+      span.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (tip.classList.contains('open')) {
+          closeActiveTooltip();
+        } else {
+          closeActiveTooltip();
+          tip.classList.add('open');
+          span.classList.add('active');
+          activeTooltipEl = { tip, span };
+        }
+      });
+
+      wrapper.appendChild(span);
+      wrapper.appendChild(tip);
+      container.appendChild(wrapper);
+    });
+
+    /* Marks given */
+    document.getElementById('res-mark-val').textContent = result.markNum;
+
+    /* Model answer */
+    document.getElementById('res-model-answer').textContent = MODEL_ANSWER;
+
+    /* Remark */
+    document.getElementById('res-remark').value = result.remark;
+
+    /* Marks obtained */
+    document.getElementById('res-marks-obtained').textContent =
+      `Marks obtained : ${result.markNum} Mark${result.markNum !== 1 ? 's' : ''}`;
+  }
+
+  function closeActiveTooltip() {
+    if (activeTooltipEl) {
+      activeTooltipEl.tip.classList.remove('open');
+      activeTooltipEl.span.classList.remove('active');
+      activeTooltipEl = null;
+    }
+  }
+
+  /* Close tooltip when clicking outside */
+  document.addEventListener('click', closeActiveTooltip);
+
   function goBackInput() {
+    if (lastResult) {
+      checkHistory.unshift(lastResult);
+      updateHistoryBadge();
+    }
+    lastResult = null;
+    closeActiveTooltip();
     showStep('input');
   }
 
   function saveThenClose() {
     if (lastResult) {
-      checkHistory.unshift(lastResult); /* newest first */
+      checkHistory.unshift(lastResult);
       updateHistoryBadge();
     }
     closeModal();
   }
 
-  /* Override Done button to save history */
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelector('#step-result .btn-done').onclick = saveThenClose;
-    document.querySelector('#step-result .btn-retry').onclick = () => {
-      if (lastResult) {
-        checkHistory.unshift(lastResult);
-        updateHistoryBadge();
-      }
-      lastResult = null;
-      goBackInput();
-    };
+    document.getElementById('btn-done-result').onclick = saveThenClose;
+    document.getElementById('btn-retry').onclick = goBackInput;
   });
 
   function updateHistoryBadge() {
@@ -1085,6 +1250,7 @@
     const items = checkHistory.map((item, i) => {
       const chipClass = item.scoreLevel === 'high' ? 'mark-high'
                       : item.scoreLevel === 'mid'  ? 'mark-mid' : 'mark-low';
+      const markStr = `${item.markNum} / ${item.markTotal}`;
       return `
         <div class="history-item" id="hitem-${i}" onclick="toggleHistoryItem(${i})">
           <div class="history-item-header">
@@ -1093,14 +1259,13 @@
               <div class="history-student-answer">${escapeHtml(item.studentAnswer)}</div>
             </div>
             <div class="history-item-scores">
-              <span class="score-chip ${chipClass}">${item.mark}</span>
-              <span class="score-chip accuracy">${item.accuracy}</span>
+              <span class="score-chip ${chipClass}">${markStr}</span>
               <span class="expand-arrow">▼</span>
             </div>
           </div>
           <div class="history-remark">
-            <div class="history-remark-label">Remark &amp; Feedback</div>
-            ${item.remark}
+            <div class="history-remark-label">Remarks</div>
+            ${escapeHtml(item.remark)}
           </div>
         </div>`;
     }).join('');
