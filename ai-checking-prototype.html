@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Question Editor — AI Checking Answer Prototype</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f0f2f5;
+      color: #222;
+    }
+
+    /* ── TOP NAV ── */
+    .topbar {
+      background: #eef0f5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 28px;
+      border-bottom: 1px solid #dde0ea;
+    }
+    .topbar-back {
+      color: #5b5ea6;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .topbar-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #2d2f7a;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .topbar-title .arrow {
+      color: #9ea0c0;
+      cursor: pointer;
+      font-size: 18px;
+    }
+    .btn-save {
+      background: #00bcd4;
+      color: #fff;
+      border: none;
+      border-radius: 24px;
+      padding: 10px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-save:hover { background: #00a5bb; }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      height: calc(100vh - 57px);
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 200px;
+      background: #fff;
+      border-right: 1px solid #dde0ea;
+      overflow-y: auto;
+      padding: 12px 10px;
+      flex-shrink: 0;
+    }
+    .q-card {
+      border: 1.5px solid #dde0ea;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      background: #fff;
+    }
+    .q-card.active {
+      border-color: #5b5ea6;
+      background: #f5f5ff;
+    }
+    .q-card .q-label {
+      font-weight: 700;
+      color: #2d2f7a;
+      font-size: 14px;
+      margin-bottom: 4px;
+    }
+    .q-card .q-text {
+      font-size: 12px;
+      color: #555;
+      line-height: 1.4;
+    }
+
+    /* ── MAIN CONTENT ── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 28px 40px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    .question-text {
+      font-size: 15px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .correct-answer-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #2eaa6e;
+      margin-bottom: 6px;
+    }
+    .correct-answer-text {
+      font-size: 14px;
+      color: #2eaa6e;
+      line-height: 1.6;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid #eee;
+      margin: 20px 0;
+    }
+
+    /* ── AI CHECKING BUTTONS ── */
+    .ai-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn-ai-check {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1.5px solid #7c6ff7;
+      color: #5b4fe9;
+      border-radius: 8px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, box-shadow 0.15s;
+    }
+    .btn-ai-check:hover {
+      background: #f3f1ff;
+      box-shadow: 0 0 0 3px #e4e0fc;
+    }
+    .btn-ai-history {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #fff;
+      border: 1.5px solid #dde0ea;
+      color: #666;
+      border-radius: 8px;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      position: relative;
+    }
+    .btn-ai-history:hover {
+      background: #f5f5f5;
+      border-color: #bbb;
+    }
+    .history-badge {
+      background: #5b4fe9;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      border-radius: 10px;
+      padding: 1px 6px;
+      min-width: 18px;
+      text-align: center;
+      display: none;
+    }
+    .history-badge.visible { display: inline-block; }
+
+    /* ── CONTEXT PILL (collapsible) ── */
+    .context-pill {
+      background: #f0f0ff;
+      border: 1px solid #dddaff;
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: #555;
+      line-height: 1.5;
+    }
+    .context-pill strong { color: #2d2f7a; }
+    .context-section { margin-bottom: 6px; }
+    .context-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+    .context-toggle-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #5b4fe9;
+    }
+    .context-toggle-arrow {
+      font-size: 11px;
+      color: #9b8ff0;
+      transition: transform 0.18s;
+    }
+    .context-toggle-arrow.open { transform: rotate(180deg); }
+    .context-preview {
+      font-size: 12px;
+      color: #777;
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .context-full {
+      display: none;
+      margin-top: 8px;
+      font-size: 12px;
+      color: #444;
+      line-height: 1.6;
+      border-top: 1px solid #dddaff;
+      padding-top: 8px;
+    }
+    .context-full.open { display: block; }
+    /* correct answer always visible */
+    .context-answer {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #dddaff;
+      font-size: 12px;
+      color: #555;
+      line-height: 1.5;
+    }
+
+    /* ── HISTORY MODAL ── */
+    .hmodal {
+      background: #fff;
+      border-radius: 16px;
+      width: 560px;
+      max-width: 95vw;
+      max-height: 88vh;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      animation: slideUp 0.22s ease;
+    }
+    .hmodal-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0;
+    }
+    .history-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: #bbb;
+    }
+    .history-empty .empty-icon { font-size: 36px; margin-bottom: 10px; }
+    .history-empty p { font-size: 13px; }
+
+    /* History list */
+    .history-list { padding: 8px 0; }
+    .history-item {
+      border-bottom: 1px solid #f0f0f0;
+      padding: 14px 24px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .history-item:last-child { border-bottom: none; }
+    .history-item:hover { background: #fafafa; }
+    .history-item.expanded { background: #f9f8ff; }
+
+    .history-item-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .history-item-left { flex: 1; min-width: 0; }
+    .history-item-meta {
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 4px;
+    }
+    .history-student-answer {
+      font-size: 13px;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .history-item.expanded .history-student-answer {
+      white-space: normal;
+      overflow: visible;
+    }
+    .history-item-scores {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+      align-items: center;
+    }
+    .score-chip {
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .score-chip.mark-high   { background: #e8faf1; color: #2eaa6e; }
+    .score-chip.mark-mid    { background: #fff3e0; color: #e07b00; }
+    .score-chip.mark-low    { background: #fdeaea; color: #d63b3b; }
+    .score-chip.accuracy    { background: #f0f0ff; color: #5b4fe9; }
+
+    /* Expanded remark */
+    .history-remark {
+      display: none;
+      margin-top: 12px;
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      color: #333;
+      line-height: 1.7;
+    }
+    .history-item.expanded .history-remark { display: block; }
+    .history-remark-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+    .expand-arrow {
+      font-size: 11px;
+      color: #bbb;
+      transition: transform 0.18s;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .history-item.expanded .expand-arrow { transform: rotate(180deg); }
+
+    .hmodal-footer {
+      padding: 14px 24px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn-clear-history {
+      background: none;
+      border: none;
+      color: #d63b3b;
+      font-size: 12px;
+      cursor: pointer;
+      padding: 0;
+    }
+    .btn-clear-history:hover { text-decoration: underline; }
+    .btn-clear-history:disabled { color: #ccc; cursor: default; }
+
+    /* ── MODAL OVERLAY ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(30,30,60,0.35);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 16px;
+      width: 540px;
+      max-width: 95vw;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+      overflow: hidden;
+      animation: slideUp 0.22s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+    }
+    .modal-header-left h2 {
+      font-size: 17px;
+      font-weight: 700;
+      color: #2d2f7a;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .modal-header-left p {
+      font-size: 12px;
+      color: #888;
+      margin-top: 4px;
+    }
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      color: #aaa;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+    }
+    .modal-close:hover { color: #555; }
+
+    .modal-body { padding: 20px 24px; }
+
+    /* Step: input */
+    #step-input { display: block; }
+    #step-loading { display: none; }
+    #step-result { display: none; }
+
+    .field-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+    textarea.student-input {
+      width: 100%;
+      border: 1.5px solid #dde0ea;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 14px;
+      color: #333;
+      resize: vertical;
+      min-height: 90px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    textarea.student-input:focus { border-color: #7c6ff7; }
+
+    .char-hint {
+      font-size: 11px;
+      color: #aaa;
+      margin-top: 4px;
+      text-align: right;
+    }
+
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-secondary {
+      background: #fff;
+      border: 1.5px solid #dde0ea;
+      color: #555;
+      border-radius: 8px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-secondary:hover { background: #f5f5f5; }
+
+    .btn-primary {
+      background: #5b4fe9;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s;
+    }
+    .btn-primary:hover { background: #4a3fd4; }
+    .btn-primary:disabled {
+      background: #c0baf0;
+      cursor: not-allowed;
+    }
+
+    /* ── LOADING STEP ── */
+    .loading-wrap {
+      text-align: center;
+      padding: 32px 0;
+    }
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #eee;
+      border-top-color: #5b4fe9;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 14px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-wrap p {
+      font-size: 13px;
+      color: #888;
+    }
+
+    /* ── RESULT STEP ── */
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .result-badge {
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: center;
+    }
+    .result-badge.mark {
+      background: #f0faf4;
+      border: 1.5px solid #b6e8ce;
+    }
+    .result-badge.mark .val {
+      font-size: 26px;
+      font-weight: 700;
+      color: #2eaa6e;
+    }
+    .result-badge.mark .lbl {
+      font-size: 11px;
+      color: #68b892;
+      margin-top: 2px;
+    }
+    .result-badge.accuracy {
+      background: #f5f3ff;
+      border: 1.5px solid #cec9f8;
+    }
+    .result-badge.accuracy .val {
+      font-size: 26px;
+      font-weight: 700;
+      color: #5b4fe9;
+    }
+    .result-badge.accuracy .lbl {
+      font-size: 11px;
+      color: #9b8ff0;
+      margin-top: 2px;
+    }
+
+    .remark-section { margin-bottom: 4px; }
+    .remark-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 8px;
+    }
+    .remark-box {
+      background: #fafafa;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 14px;
+      color: #333;
+      line-height: 1.7;
+    }
+
+    /* Highlight types */
+    .hl-good {
+      background: #d4f5e4;
+      color: #1a7a4a;
+      border-radius: 3px;
+      padding: 1px 3px;
+    }
+    .hl-missing {
+      background: #fde8d8;
+      color: #b85000;
+      border-radius: 3px;
+      padding: 1px 3px;
+    }
+    .hl-wrong {
+      background: #fde0e0;
+      color: #b80000;
+      border-radius: 3px;
+      padding: 1px 3px;
+      text-decoration: line-through;
+    }
+
+    .legend {
+      display: flex;
+      gap: 14px;
+      margin-top: 10px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: #666;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+    }
+    .legend-dot.good    { background: #d4f5e4; border: 1px solid #a0d9bc; }
+    .legend-dot.missing { background: #fde8d8; border: 1px solid #f0b88a; }
+    .legend-dot.wrong   { background: #fde0e0; border: 1px solid #f0a0a0; }
+
+    .result-footer-btns {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+    .btn-retry {
+      background: #fff;
+      border: 1.5px solid #7c6ff7;
+      color: #5b4fe9;
+      border-radius: 8px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-retry:hover { background: #f3f1ff; }
+    .btn-done {
+      background: #5b4fe9;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 22px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-done:hover { background: #4a3fd4; }
+
+    /* sample answers */
+    .sample-wrap {
+      margin-top: 12px;
+    }
+    .sample-label {
+      font-size: 11px;
+      color: #aaa;
+      margin-bottom: 6px;
+    }
+    .sample-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .chip {
+      background: #f0f0ff;
+      border: 1px solid #cec9f8;
+      color: #5b4fe9;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+    .chip:hover { background: #e4e0fc; }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topbar">
+  <a class="topbar-back" href="#">← Back To Question List</a>
+  <div class="topbar-title">
+    <span class="arrow">‹</span>
+    Question Counter 19600
+    <span class="arrow">›</span>
+  </div>
+  <button class="btn-save">Save Question</button>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="q-card active">
+      <div class="q-label">QA</div>
+      <div class="q-text">Why has traveling become easier for people today compared to the past?</div>
+    </div>
+    <div class="q-card">
+      <div class="q-label">QB</div>
+      <div class="q-text">What are some benefits of traveling mentioned in the passage?</div>
+    </div>
+    <div class="q-card">
+      <div class="q-label">QC</div>
+      <div class="q-text">How can practicing a foreign language while traveling be more effective than studying in a classroom?</div>
+    </div>
+    <div class="q-card">
+      <div class="q-label">QD</div>
+      <div class="q-text">What challenges might tourists face when visiting other countries?</div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <div class="card">
+      <div class="question-text">
+        Why has traveling become easier for people today compared to the past?
+      </div>
+
+      <div class="correct-answer-label">Correct answer :</div>
+      <div class="correct-answer-text">
+        Traveling has become easier because of affordable flights, online booking services, and budget accommodations.
+      </div>
+
+      <hr class="divider" />
+
+      <!-- AI BUTTONS -->
+      <div class="ai-btn-group">
+        <button class="btn-ai-check" onclick="openModal()">
+          <span class="icon">✦</span>
+          AI Checking Answer
+        </button>
+        <button class="btn-ai-history" onclick="openHistory()">
+          🕓 View Check History
+          <span class="history-badge" id="history-badge">0</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- rest of question editor below (truncated for prototype) -->
+    <div class="card">
+      <div style="font-size:14px;font-weight:600;color:#333;margin-bottom:16px;">
+        Primary English <span style="font-weight:400;color:#888;">(Singapore)</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <span style="font-size:13px;color:#555;">Level</span>
+        <select style="border:1.5px solid #dde0ea;border-radius:6px;padding:7px 12px;font-size:13px;color:#333;">
+          <option>Primary 1</option>
+          <option>Primary 2</option>
+          <option>Primary 3</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     HISTORY MODAL
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="history-modal" onclick="handleHistoryOverlay(event)">
+  <div class="hmodal" id="history-box">
+
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <h2>🕓 AI Check History</h2>
+        <p>All simulations run for this question</p>
+      </div>
+      <button class="modal-close" onclick="closeHistory()">✕</button>
+    </div>
+
+    <div class="hmodal-body" id="history-list-wrap">
+      <!-- populated by JS -->
+    </div>
+
+    <div class="hmodal-footer">
+      <button class="btn-clear-history" id="btn-clear" onclick="clearHistory()" disabled>
+        Clear all history
+      </button>
+      <button class="btn-done" onclick="closeHistory()">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MODAL
+════════════════════════════════════════════ -->
+<div class="modal-overlay" id="modal" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal-box">
+
+    <div class="modal-header">
+      <div class="modal-header-left">
+        <h2>✦ AI Checking Answer</h2>
+        <p>Simulate how AI will evaluate a student's response</p>
+      </div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+
+    <!-- STEP 1: INPUT -->
+    <div id="step-input">
+      <div class="modal-body">
+
+        <!-- Context (collapsible question, always-visible answer) -->
+        <div class="context-pill">
+          <div class="context-section">
+            <div class="context-toggle" onclick="toggleContext()">
+              <span class="context-toggle-label">📄 Question</span>
+              <span class="context-toggle-arrow" id="ctx-arrow">▼</span>
+            </div>
+            <div class="context-preview" id="ctx-preview">
+              Why has traveling become easier for people today compared to the past?
+            </div>
+            <div class="context-full" id="ctx-full">
+              Why has traveling become easier for people today compared to the past?
+            </div>
+          </div>
+          <div class="context-answer">
+            <strong>Correct Answer:</strong> Traveling has become easier because of affordable flights, online booking services, and budget accommodations.
+          </div>
+        </div>
+
+        <div class="field-label">Student's Answer</div>
+        <textarea
+          class="student-input"
+          id="student-answer"
+          placeholder="Type a student answer to simulate..."
+          oninput="onAnswerInput(this)"
+        ></textarea>
+        <div class="char-hint" id="char-count">0 characters</div>
+
+        <!-- Sample answers for quick testing -->
+        <div class="sample-wrap">
+          <div class="sample-label">Try a sample answer:</div>
+          <div class="sample-chips">
+            <span class="chip" onclick="fillSample(0)">Perfect answer</span>
+            <span class="chip" onclick="fillSample(1)">Partially correct</span>
+            <span class="chip" onclick="fillSample(2)">Wrong answer</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal()">Cancel</button>
+        <button class="btn-primary" id="btn-check" onclick="runCheck()" disabled>
+          ✦ Check Answer
+        </button>
+      </div>
+    </div>
+
+    <!-- STEP 2: LOADING -->
+    <div id="step-loading">
+      <div class="modal-body">
+        <div class="loading-wrap">
+          <div class="spinner"></div>
+          <p>AI is evaluating the student's answer…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: RESULT -->
+    <div id="step-result">
+      <div class="modal-body">
+
+        <!-- Scores -->
+        <div class="result-grid">
+          <div class="result-badge mark">
+            <div class="val" id="res-mark">—</div>
+            <div class="lbl">Mark Obtained</div>
+          </div>
+          <div class="result-badge accuracy">
+            <div class="val" id="res-accuracy">—</div>
+            <div class="lbl">Accuracy</div>
+          </div>
+        </div>
+
+        <!-- Remark -->
+        <div class="remark-section">
+          <div class="remark-label">Remark &amp; Feedback</div>
+          <div class="remark-box" id="res-remark"></div>
+          <div class="legend">
+            <div class="legend-item"><div class="legend-dot good"></div> Correct</div>
+            <div class="legend-item"><div class="legend-dot missing"></div> Missing info</div>
+            <div class="legend-item"><div class="legend-dot wrong"></div> Incorrect</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer" style="justify-content:space-between;align-items:center;">
+        <button class="btn-retry" onclick="goBackInput()">← Try Another Answer</button>
+        <button class="btn-done" onclick="closeModal()">Done</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  /* ══════════════════════════════════════
+     DATA
+  ══════════════════════════════════════ */
+  const SAMPLES = [
+    "Traveling has become easier because of affordable flights, online booking services, and budget accommodations.",
+    "Traveling is easier now because flights are cheaper and you can book hotels online.",
+    "People travel more because it is fun and they want to see new places."
+  ];
+
+  const RESULTS = [
+    {
+      mark: "2 / 2", accuracy: "100%", scoreLevel: "high",
+      remark: `The student's answer is <span class="hl-good">excellent and complete</span>. They correctly identified <span class="hl-good">affordable flights</span>, <span class="hl-good">online booking services</span>, and <span class="hl-good">budget accommodations</span> as the key reasons — matching all required points from the model answer.`
+    },
+    {
+      mark: "1 / 2", accuracy: "60%", scoreLevel: "mid",
+      remark: `The student correctly mentioned <span class="hl-good">cheaper flights</span> and <span class="hl-good">online hotel booking</span>, which are valid points. However, the answer is <span class="hl-missing">missing budget accommodations</span> as a separate reason. A more complete answer would include all three factors from the passage.`
+    },
+    {
+      mark: "0 / 2", accuracy: "0%", scoreLevel: "low",
+      remark: `The student's response — "<span class="hl-wrong">it is fun and they want to see new places</span>" — does not address the question. The question asks <em>why</em> traveling has become <em>easier</em>, not why people enjoy it. <span class="hl-missing">No relevant points were mentioned</span> (affordable flights, online booking, budget accommodations).`
+    }
+  ];
+
+  /* History store */
+  let checkHistory = [];
+  let currentSampleIndex = -1;
+  let lastResult = null;
+
+  /* ══════════════════════════════════════
+     CONTEXT PILL TOGGLE
+  ══════════════════════════════════════ */
+  let ctxOpen = false;
+  function toggleContext() {
+    ctxOpen = !ctxOpen;
+    document.getElementById('ctx-full').classList.toggle('open', ctxOpen);
+    document.getElementById('ctx-preview').style.display = ctxOpen ? 'none' : 'block';
+    document.getElementById('ctx-arrow').classList.toggle('open', ctxOpen);
+  }
+
+  /* ══════════════════════════════════════
+     AI CHECK MODAL
+  ══════════════════════════════════════ */
+  function openModal() {
+    document.getElementById('modal').classList.add('open');
+    showStep('input');
+    currentSampleIndex = -1;
+    lastResult = null;
+    document.getElementById('student-answer').value = '';
+    document.getElementById('char-count').textContent = '0 characters';
+    document.getElementById('btn-check').disabled = true;
+    /* reset context pill */
+    ctxOpen = false;
+    document.getElementById('ctx-full').classList.remove('open');
+    document.getElementById('ctx-preview').style.display = 'block';
+    document.getElementById('ctx-arrow').classList.remove('open');
+  }
+
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+  }
+
+  function handleOverlayClick(e) {
+    if (e.target === document.getElementById('modal')) closeModal();
+  }
+
+  function showStep(step) {
+    document.getElementById('step-input').style.display   = step === 'input'   ? 'block' : 'none';
+    document.getElementById('step-loading').style.display = step === 'loading' ? 'block' : 'none';
+    document.getElementById('step-result').style.display  = step === 'result'  ? 'block' : 'none';
+  }
+
+  function fillSample(i) {
+    currentSampleIndex = i;
+    const ta = document.getElementById('student-answer');
+    ta.value = SAMPLES[i];
+    onAnswerInput(ta);
+  }
+
+  function onAnswerInput(el) {
+    document.getElementById('char-count').textContent = el.value.length + ' characters';
+    document.getElementById('btn-check').disabled = el.value.trim().length < 5;
+  }
+
+  function runCheck() {
+    const studentAnswer = document.getElementById('student-answer').value.trim();
+    showStep('loading');
+    setTimeout(() => {
+      const result = currentSampleIndex >= 0
+        ? RESULTS[currentSampleIndex]
+        : { mark: "1 / 2", accuracy: "50%", scoreLevel: "mid",
+            remark: `The student's answer contains <span class="hl-good">some relevant points</span> but is <span class="hl-missing">missing key details</span> from the model answer such as specific examples from the passage.` };
+
+      lastResult = { ...result, studentAnswer, timestamp: new Date() };
+
+      document.getElementById('res-mark').textContent     = result.mark;
+      document.getElementById('res-accuracy').textContent = result.accuracy;
+      document.getElementById('res-remark').innerHTML     = result.remark;
+
+      const score = parseFloat(result.accuracy);
+      document.getElementById('res-mark').style.color =
+        score >= 80 ? '#2eaa6e' : score >= 40 ? '#e07b00' : '#d63b3b';
+
+      showStep('result');
+    }, 1800);
+  }
+
+  function goBackInput() {
+    showStep('input');
+  }
+
+  function saveThenClose() {
+    if (lastResult) {
+      checkHistory.unshift(lastResult); /* newest first */
+      updateHistoryBadge();
+    }
+    closeModal();
+  }
+
+  /* Override Done button to save history */
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('#step-result .btn-done').onclick = saveThenClose;
+    document.querySelector('#step-result .btn-retry').onclick = () => {
+      if (lastResult) {
+        checkHistory.unshift(lastResult);
+        updateHistoryBadge();
+      }
+      lastResult = null;
+      goBackInput();
+    };
+  });
+
+  function updateHistoryBadge() {
+    const badge = document.getElementById('history-badge');
+    const count = checkHistory.length;
+    badge.textContent = count;
+    badge.classList.toggle('visible', count > 0);
+  }
+
+  /* ══════════════════════════════════════
+     HISTORY MODAL
+  ══════════════════════════════════════ */
+  function openHistory() {
+    renderHistoryList();
+    document.getElementById('history-modal').classList.add('open');
+  }
+
+  function closeHistory() {
+    document.getElementById('history-modal').classList.remove('open');
+  }
+
+  function handleHistoryOverlay(e) {
+    if (e.target === document.getElementById('history-modal')) closeHistory();
+  }
+
+  function formatTime(date) {
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000);
+    if (diff < 60)  return 'Just now';
+    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderHistoryList() {
+    const wrap = document.getElementById('history-list-wrap');
+    document.getElementById('btn-clear').disabled = checkHistory.length === 0;
+
+    if (checkHistory.length === 0) {
+      wrap.innerHTML = `
+        <div class="history-empty">
+          <div class="empty-icon">🕓</div>
+          <p>No checks run yet.<br/>Use "AI Checking Answer" to simulate a student response.</p>
+        </div>`;
+      return;
+    }
+
+    const items = checkHistory.map((item, i) => {
+      const chipClass = item.scoreLevel === 'high' ? 'mark-high'
+                      : item.scoreLevel === 'mid'  ? 'mark-mid' : 'mark-low';
+      return `
+        <div class="history-item" id="hitem-${i}" onclick="toggleHistoryItem(${i})">
+          <div class="history-item-header">
+            <div class="history-item-left">
+              <div class="history-item-meta">#${checkHistory.length - i} &nbsp;·&nbsp; ${formatTime(item.timestamp)}</div>
+              <div class="history-student-answer">${escapeHtml(item.studentAnswer)}</div>
+            </div>
+            <div class="history-item-scores">
+              <span class="score-chip ${chipClass}">${item.mark}</span>
+              <span class="score-chip accuracy">${item.accuracy}</span>
+              <span class="expand-arrow">▼</span>
+            </div>
+          </div>
+          <div class="history-remark">
+            <div class="history-remark-label">Remark &amp; Feedback</div>
+            ${item.remark}
+          </div>
+        </div>`;
+    }).join('');
+
+    wrap.innerHTML = `<div class="history-list">${items}</div>`;
+  }
+
+  function toggleHistoryItem(i) {
+    document.getElementById(`hitem-${i}`).classList.toggle('expanded');
+  }
+
+  function clearHistory() {
+    if (!confirm('Clear all check history for this question?')) return;
+    checkHistory = [];
+    updateHistoryBadge();
+    renderHistoryList();
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+</body>
+</html>
