@@ -135,13 +135,7 @@
       margin: 20px 0;
     }
 
-    /* ── AI CHECKING BUTTONS ── */
-    .ai-btn-group {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    /* ── AI CHECKING BUTTON ── */
     .btn-ai-check {
       display: inline-flex;
       align-items: center;
@@ -160,37 +154,83 @@
       background: #f3f1ff;
       box-shadow: 0 0 0 3px #e4e0fc;
     }
-    .btn-ai-history {
-      display: inline-flex;
-      align-items: center;
-      gap: 7px;
-      background: #fff;
-      border: 1.5px solid #dde0ea;
-      color: #666;
-      border-radius: 8px;
-      padding: 9px 16px;
-      font-size: 13px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s, border-color 0.15s;
-      position: relative;
-    }
-    .btn-ai-history:hover {
-      background: #f5f5f5;
-      border-color: #bbb;
-    }
-    .history-badge {
-      background: #5b4fe9;
-      color: #fff;
-      font-size: 10px;
-      font-weight: 700;
-      border-radius: 10px;
-      padding: 1px 6px;
-      min-width: 18px;
-      text-align: center;
+
+    /* ── INLINE HISTORY ── */
+    .inline-history {
+      margin-top: 20px;
       display: none;
     }
-    .history-badge.visible { display: inline-block; }
+    .inline-history.has-items { display: block; }
+    .inline-history-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .inline-history-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #222;
+    }
+    .btn-clear-all {
+      background: none;
+      border: none;
+      font-size: 12px;
+      color: #bbb;
+      cursor: pointer;
+      padding: 0;
+    }
+    .btn-clear-all:hover { color: #d63b3b; }
+
+    .inline-history-list { border-top: 1px solid #eee; }
+    .inline-history-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .item-answer {
+      flex: 1;
+      font-size: 14px;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .item-mark-badge {
+      background: #f5b800;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      border-radius: 20px;
+      padding: 4px 12px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .item-mark-badge.zero { background: #f5b800; }
+    .item-actions {
+      display: flex;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .item-action-btn {
+      background: none;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      width: 28px;
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 13px;
+      transition: background 0.12s;
+    }
+    .item-action-btn.view   { color: #3b82f6; border-color: #bfdbfe; }
+    .item-action-btn.view:hover { background: #eff6ff; }
+    .item-action-btn.delete { color: #d63b3b; border-color: #fca5a5; }
+    .item-action-btn.delete:hover { background: #fdeaea; }
 
     /* ── CONTEXT PILL (collapsible) ── */
     .context-pill {
@@ -250,133 +290,6 @@
       color: #555;
       line-height: 1.5;
     }
-
-    /* ── HISTORY MODAL ── */
-    .hmodal {
-      background: #fff;
-      border-radius: 16px;
-      width: 560px;
-      max-width: 95vw;
-      max-height: 88vh;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      animation: slideUp 0.22s ease;
-    }
-    .hmodal-body {
-      flex: 1;
-      overflow-y: auto;
-      padding: 0;
-    }
-    .history-empty {
-      text-align: center;
-      padding: 48px 24px;
-      color: #bbb;
-    }
-    .history-empty .empty-icon { font-size: 36px; margin-bottom: 10px; }
-    .history-empty p { font-size: 13px; }
-
-    /* History list */
-    .history-list { padding: 8px 0; }
-    .history-item {
-      border-bottom: 1px solid #f0f0f0;
-      padding: 14px 24px;
-      cursor: pointer;
-      transition: background 0.12s;
-    }
-    .history-item:last-child { border-bottom: none; }
-    .history-item:hover { background: #fafafa; }
-    .history-item.expanded { background: #f9f8ff; }
-
-    .history-item-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .history-item-left { flex: 1; min-width: 0; }
-    .history-item-meta {
-      font-size: 11px;
-      color: #aaa;
-      margin-bottom: 4px;
-    }
-    .history-student-answer {
-      font-size: 13px;
-      color: #333;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .history-item.expanded .history-student-answer {
-      white-space: normal;
-      overflow: visible;
-    }
-    .history-item-scores {
-      display: flex;
-      gap: 8px;
-      flex-shrink: 0;
-      align-items: center;
-    }
-    .score-chip {
-      border-radius: 6px;
-      padding: 4px 10px;
-      font-size: 12px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .score-chip.mark-high   { background: #e8faf1; color: #2eaa6e; }
-    .score-chip.mark-mid    { background: #fff3e0; color: #e07b00; }
-    .score-chip.mark-low    { background: #fdeaea; color: #d63b3b; }
-    .score-chip.accuracy    { background: #f0f0ff; color: #5b4fe9; }
-
-    /* Expanded remark */
-    .history-remark {
-      display: none;
-      margin-top: 12px;
-      background: #fafafa;
-      border: 1px solid #eee;
-      border-radius: 8px;
-      padding: 12px 14px;
-      font-size: 13px;
-      color: #333;
-      line-height: 1.7;
-    }
-    .history-item.expanded .history-remark { display: block; }
-    .history-remark-label {
-      font-size: 11px;
-      font-weight: 700;
-      color: #aaa;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 6px;
-    }
-    .expand-arrow {
-      font-size: 11px;
-      color: #bbb;
-      transition: transform 0.18s;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-    .history-item.expanded .expand-arrow { transform: rotate(180deg); }
-
-    .hmodal-footer {
-      padding: 14px 24px;
-      border-top: 1px solid #eee;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .btn-clear-history {
-      background: none;
-      border: none;
-      color: #d63b3b;
-      font-size: 12px;
-      cursor: pointer;
-      padding: 0;
-    }
-    .btn-clear-history:hover { text-decoration: underline; }
-    .btn-clear-history:disabled { color: #ccc; cursor: default; }
 
     /* ── MODAL OVERLAY ── */
     .modal-overlay {
@@ -535,7 +448,7 @@
     #step-result .modal-body {
       max-height: 68vh;
       overflow-y: auto;
-      padding: 20px 24px;
+      padding: 24px 28px;
     }
 
     /* Student answer with highlights */
@@ -550,86 +463,53 @@
     .student-answer-display {
       font-size: 14px;
       color: #222;
-      line-height: 2;
-      margin-bottom: 6px;
+      line-height: 2.1;
+      margin-bottom: 0;
       position: relative;
     }
     /* Highlight spans */
     .hl {
       border-radius: 4px;
-      padding: 2px 4px;
-      cursor: pointer;
+      padding: 2px 5px;
       position: relative;
-      transition: opacity 0.12s;
     }
-    .hl:hover { opacity: 0.82; }
     .hl.correct  { background: #c8f0e4; color: #0e7a52; }
     .hl.partial  { background: #fde8c8; color: #a85200; }
     .hl.wrong    { background: #fde0e0; color: #b80000; }
-    .hl.active   { outline: 2px solid currentColor; outline-offset: 1px; }
-
-    /* Tooltip popover */
-    .hl-tooltip {
-      display: none;
-      position: absolute;
-      z-index: 200;
-      background: #fff;
-      border: 1px solid #e8e8e8;
-      border-radius: 12px;
-      box-shadow: 0 6px 28px rgba(0,0,0,0.14);
-      padding: 14px 16px;
-      width: 280px;
-      font-size: 13px;
-      color: #333;
-      line-height: 1.55;
-      top: calc(100% + 8px);
-      left: 0;
+    /* Feedback list (always visible) */
+    .feedback-list {
+      margin-top: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid #f0f0f0;
     }
-    .hl-tooltip.open { display: block; }
-    .hl-tooltip-icon {
+    .feedback-list-item {
+      display: flex;
+      gap: 12px;
+      font-size: 13px;
+      color: #555;
+      line-height: 1.6;
+      align-items: flex-start;
+    }
+    .feedback-list-tag {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      border: 2px solid #f0a030;
-      color: #f0a030;
-      font-size: 12px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-    .hl-tooltip-hint {
-      display: block;
-      margin-top: 10px;
+      border-radius: 4px;
+      padding: 3px 10px;
       font-size: 11px;
-      color: #aaa;
-      font-style: italic;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 1px;
     }
-
-    /* Marks given row */
-    .marks-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin: 14px 0;
-      font-size: 13px;
-      color: #444;
-    }
-    .marks-row .mark-label { font-weight: 500; }
-    .mark-val-box {
-      border: 1.5px solid #dde0ea;
-      border-radius: 6px;
-      padding: 5px 14px;
-      font-size: 13px;
-      font-weight: 700;
-      color: #333;
-      min-width: 36px;
-      text-align: center;
-    }
+    .feedback-list-tag.correct { background: #c8f0e4; color: #0e7a52; }
+    .feedback-list-tag.partial { background: #fde8c8; color: #a85200; }
+    .feedback-list-tag.wrong   { background: #fde0e0; color: #b80000; }
 
     /* Model answer */
-    .model-answer-block { margin-bottom: 14px; }
+    .model-answer-block { margin-bottom: 20px; }
     .model-answer-text {
       font-size: 14px;
       font-weight: 700;
@@ -664,8 +544,8 @@
 
     /* Marks obtained footer row */
     .marks-obtained-row {
-      margin-top: 16px;
-      padding-top: 14px;
+      margin-top: 20px;
+      padding-top: 16px;
       border-top: 1px solid #eee;
       font-size: 14px;
       font-weight: 700;
@@ -799,17 +679,10 @@
 
       <hr class="divider" />
 
-      <!-- AI BUTTONS -->
-      <div class="ai-btn-group">
-        <button class="btn-ai-check" onclick="openModal()">
-          <span class="icon">✦</span>
-          AI Checking Answer
-        </button>
-        <button class="btn-ai-history" onclick="openHistory()">
-          🕓 View Check History
-          <span class="history-badge" id="history-badge">0</span>
-        </button>
-      </div>
+      <button class="btn-ai-check" onclick="openModal()">
+        <span>✦</span>
+        AI Checking Answer
+      </button>
     </div>
 
     <!-- rest of question editor below (truncated for prototype) -->
@@ -830,28 +703,38 @@
 </div>
 
 <!-- ═══════════════════════════════════════════
-     HISTORY MODAL
+     DETAIL MODAL (view history item)
 ════════════════════════════════════════════ -->
-<div class="modal-overlay" id="history-modal" onclick="handleHistoryOverlay(event)">
-  <div class="hmodal" id="history-box">
-
+<div class="modal-overlay" id="detail-modal" onclick="handleDetailOverlay(event)" style="z-index:200;">
+  <div class="modal wide" id="detail-box">
     <div class="modal-header">
       <div class="modal-header-left">
-        <h2>🕓 AI Check History</h2>
-        <p>All simulations run for this question</p>
+        <h2>✦ Check Detail</h2>
+        <p id="detail-timestamp"></p>
       </div>
-      <button class="modal-close" onclick="closeHistory()">✕</button>
+      <button class="modal-close" onclick="closeDetail()">✕</button>
     </div>
-
-    <div class="hmodal-body" id="history-list-wrap">
-      <!-- populated by JS -->
+    <div class="modal-body" style="max-height:68vh;overflow-y:auto;">
+      <div class="model-answer-block">
+        <div class="res-section-label" style="margin-bottom:4px;">Model answer :</div>
+        <div class="model-answer-text" id="detail-model-answer"></div>
+      </div>
+      <div class="res-section-label">Student Answer</div>
+      <div class="hl-legend">
+        <div class="hl-legend-item"><div class="hl-dot correct"></div> Correct</div>
+        <div class="hl-legend-item"><div class="hl-dot partial"></div> Partially correct / missing</div>
+        <div class="hl-legend-item"><div class="hl-dot wrong"></div> Incorrect</div>
+      </div>
+      <div class="student-answer-display" id="detail-student-answer"></div>
+      <div class="feedback-list" id="detail-feedback-list"></div>
+      <div class="remarks-block" style="margin-top:16px;">
+        <div class="remarks-heading">Remarks ✨</div>
+        <textarea class="remarks-textarea" id="detail-remark" readonly></textarea>
+      </div>
+      <div class="marks-obtained-row" id="detail-marks-obtained"></div>
     </div>
-
-    <div class="hmodal-footer">
-      <button class="btn-clear-history" id="btn-clear" onclick="clearHistory()" disabled>
-        Clear all history
-      </button>
-      <button class="btn-done" onclick="closeHistory()">Close</button>
+    <div class="modal-footer" style="justify-content:flex-end;">
+      <button class="btn-done" onclick="closeDetail()">Close</button>
     </div>
   </div>
 </div>
@@ -874,21 +757,9 @@
     <div id="step-input">
       <div class="modal-body">
 
-        <!-- Context (collapsible question, always-visible answer) -->
+        <!-- Context — correct answer only -->
         <div class="context-pill">
-          <div class="context-section">
-            <div class="context-toggle" onclick="toggleContext()">
-              <span class="context-toggle-label">📄 Question</span>
-              <span class="context-toggle-arrow" id="ctx-arrow">▼</span>
-            </div>
-            <div class="context-preview" id="ctx-preview">
-              Why has traveling become easier for people today compared to the past?
-            </div>
-            <div class="context-full" id="ctx-full">
-              Why has traveling become easier for people today compared to the past?
-            </div>
-          </div>
-          <div class="context-answer">
+          <div class="context-answer" style="border-top:none;margin-top:0;padding-top:0;">
             <strong>Correct Answer:</strong> Traveling has become easier because of affordable flights, online booking services, and budget accommodations.
           </div>
         </div>
@@ -904,12 +775,27 @@
 
         <!-- Sample answers for quick testing -->
         <div class="sample-wrap">
-          <div class="sample-label">Try a sample answer:</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px;">
+            <span class="sample-label" style="margin-bottom:0;">Try a sample answer:</span>
+            <span style="background:#fff3cd;border:1px solid #ffc107;color:#856404;font-size:10px;font-weight:600;border-radius:4px;padding:2px 7px;letter-spacing:0.03em;">PROTOTYPE ONLY</span>
+          </div>
+          <p style="font-size:11px;color:#aaa;margin-bottom:8px;line-height:1.5;">Select one to auto-fill the field above and preview a sample AI result — useful for demoing the flow without typing manually. This will not be included in the actual implementation.</p>
           <div class="sample-chips">
             <span class="chip" onclick="fillSample(0)">Perfect answer</span>
             <span class="chip" onclick="fillSample(1)">Partially correct</span>
             <span class="chip" onclick="fillSample(2)">Wrong answer</span>
+            <span class="chip" onclick="fillSample(3)">Long mixed answer</span>
           </div>
+        </div>
+
+        <!-- Check History (inside modal) -->
+        <div class="inline-history" id="inline-history">
+          <hr style="border:none;border-top:1px solid #eee;margin:16px 0 14px;" />
+          <div class="inline-history-header">
+            <span class="inline-history-title">Check History</span>
+            <button class="btn-clear-all" onclick="clearAllHistory()">Clear all</button>
+          </div>
+          <div class="inline-history-list" id="inline-history-list"></div>
         </div>
       </div>
       <div class="modal-footer">
@@ -934,6 +820,12 @@
     <div id="step-result">
       <div class="modal-body">
 
+        <!-- Model answer (top) -->
+        <div class="model-answer-block">
+          <div class="res-section-label" style="margin-bottom:4px;">Model answer :</div>
+          <div class="model-answer-text" id="res-model-answer"></div>
+        </div>
+
         <!-- Student Answer with highlights -->
         <div class="res-section-label">Student Answer</div>
         <div class="hl-legend">
@@ -941,25 +833,13 @@
           <div class="hl-legend-item"><div class="hl-dot partial"></div> Partially correct / missing</div>
           <div class="hl-legend-item"><div class="hl-dot wrong"></div> Incorrect</div>
         </div>
-        <div class="student-answer-display" id="res-student-answer">
-          <!-- rendered by JS -->
-        </div>
+        <div class="student-answer-display" id="res-student-answer"></div>
 
-        <!-- Marks given -->
-        <div class="marks-row">
-          <span class="mark-label">(Marks Given:</span>
-          <span class="mark-val-box" id="res-mark-val">—</span>
-          <span>)</span>
-        </div>
-
-        <!-- Model answer -->
-        <div class="model-answer-block">
-          <div class="res-section-label" style="margin-bottom:4px;">Model answer :</div>
-          <div class="model-answer-text" id="res-model-answer"></div>
-        </div>
+        <!-- Feedback list — always visible -->
+        <div class="feedback-list" id="feedback-list"></div>
 
         <!-- Remarks -->
-        <div class="remarks-block">
+        <div class="remarks-block" style="margin-top:24px;">
           <div class="remarks-heading">Remarks ✨</div>
           <textarea class="remarks-textarea" id="res-remark" readonly></textarea>
         </div>
@@ -984,7 +864,8 @@
   const SAMPLES = [
     "Traveling has become easier because of affordable flights, online booking services, and budget accommodations.",
     "Traveling is easier now because flights are cheaper and you can book hotels online.",
-    "People travel more because it is fun and they want to see new places."
+    "People travel more because it is fun and they want to see new places.",
+    "Traveling today is much more accessible than before. Affordable plane tickets have made it possible for more people to fly across the world. Online platforms and booking websites have also simplified the process of making travel reservations from home. Social media plays a big role too, because travelers can now discover and share destinations easily. Budget-friendly lodging options have also contributed, and improved public transportation infrastructure has helped make local travel easier as well."
   ];
 
   const MODEL_ANSWER = "Traveling has become easier because of affordable flights, online booking services, and budget accommodations.";
@@ -1022,27 +903,39 @@
         { text: " and they want to see new places.", type: "wrong", tooltip: "Incorrect. This describes personal motivation, not why traveling has become easier. No points from the passage are referenced (affordable flights, online booking, budget accommodations)." }
       ],
       remark: "Your answer does not address the question. The question asks why traveling has become easier (e.g., cheaper flights, online booking, budget accommodations), not why people choose to travel. Please re-read the passage carefully and focus on the specific reasons the author gives for why modern travel is more accessible."
+    },
+    {
+      scoreLevel: "mid", markNum: 1, markTotal: 2,
+      segments: [
+        { text: "Traveling today is much more accessible than before. ", type: "plain", tooltip: null },
+        { text: "Affordable plane tickets", type: "correct", tooltip: "Correct! This directly refers to 'affordable flights', one of the three key reasons in the passage." },
+        { text: " have made it possible for more people to fly across the world.", type: "plain", tooltip: null },
+        { text: " Online platforms and booking websites", type: "correct", tooltip: "Correct! This corresponds to 'online booking services' — a valid and well-explained point from the passage." },
+        { text: " have also simplified the process of making travel reservations from home.", type: "plain", tooltip: null },
+        { text: " Social media plays a big role too, because travelers can now discover and share destinations easily.", type: "wrong", tooltip: "Incorrect. Social media is not mentioned in the passage as a reason why traveling has become easier. Avoid adding information not supported by the text." },
+        { text: " Budget-friendly lodging", type: "partial", tooltip: "Partially correct. This is close to 'budget accommodations', but your phrasing is vague. Be more specific — name it clearly as 'budget accommodations' to score full credit." },
+        { text: " options have also contributed, and", type: "plain", tooltip: null },
+        { text: " improved public transportation infrastructure", type: "wrong", tooltip: "Incorrect. Improved transportation infrastructure is not one of the reasons stated in the passage. Stick to the three reasons explicitly mentioned: affordable flights, online booking services, and budget accommodations." },
+        { text: " has helped make local travel easier as well.", type: "plain", tooltip: null }
+      ],
+      remark: "Your answer shows a good understanding of some key points — affordable flights and online booking services are correctly identified. However, you introduced information not found in the passage (social media, public transportation), which weakens your response. The mention of budget-friendly lodging is close but lacks precision. Focus on the three specific reasons from the passage and avoid adding unsupported details."
     }
   ];
 
   /* ══════════════════════════════════════
      STATE
   ══════════════════════════════════════ */
-  let checkHistory = [];
+  /* Pre-populate 1 sample history entry for demo */
+  let checkHistory = [
+    {
+      ...RESULTS[1],
+      studentAnswer: SAMPLES[1],
+      timestamp: new Date(Date.now() - 4 * 60000)
+    }
+  ];
   let currentSampleIndex = -1;
   let lastResult = null;
-  let activeTooltipEl = null;
 
-  /* ══════════════════════════════════════
-     CONTEXT PILL TOGGLE
-  ══════════════════════════════════════ */
-  let ctxOpen = false;
-  function toggleContext() {
-    ctxOpen = !ctxOpen;
-    document.getElementById('ctx-full').classList.toggle('open', ctxOpen);
-    document.getElementById('ctx-preview').style.display = ctxOpen ? 'none' : 'block';
-    document.getElementById('ctx-arrow').classList.toggle('open', ctxOpen);
-  }
 
   /* ══════════════════════════════════════
      AI CHECK MODAL
@@ -1055,15 +948,13 @@
     document.getElementById('student-answer').value = '';
     document.getElementById('char-count').textContent = '0 characters';
     document.getElementById('btn-check').disabled = true;
-    ctxOpen = false;
-    document.getElementById('ctx-full').classList.remove('open');
-    document.getElementById('ctx-preview').style.display = 'block';
-    document.getElementById('ctx-arrow').classList.remove('open');
+    renderInlineHistory();
   }
 
   function closeModal() {
     document.getElementById('modal').classList.remove('open');
-    closeActiveTooltip();
+    clearActiveHighlight();
+    document.getElementById('feedback-list').innerHTML = '';
   }
 
   function handleOverlayClick(e) {
@@ -1111,55 +1002,35 @@
   }
 
   function renderResult(result) {
-    /* Student answer with highlights */
+    /* Model answer */
+    document.getElementById('res-model-answer').textContent = MODEL_ANSWER;
+
+    /* Student answer — highlights, no interaction */
     const container = document.getElementById('res-student-answer');
     container.innerHTML = '';
-    closeActiveTooltip();
-
-    result.segments.forEach((seg, idx) => {
+    result.segments.forEach((seg) => {
       if (seg.type === 'plain' || !seg.tooltip) {
         container.appendChild(document.createTextNode(seg.text));
         return;
       }
-      const wrapper = document.createElement('span');
-      wrapper.style.position = 'relative';
-      wrapper.style.display = 'inline';
-
       const span = document.createElement('span');
       span.className = 'hl ' + seg.type;
       span.textContent = seg.text;
-      span.dataset.idx = idx;
-
-      /* Tooltip */
-      const tip = document.createElement('div');
-      tip.className = 'hl-tooltip';
-      tip.innerHTML = `
-        <div class="hl-tooltip-icon">i</div>
-        <div>${seg.tooltip}</div>
-        <span class="hl-tooltip-hint">(Click the highlighted text to see detail feedback)</span>`;
-
-      span.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if (tip.classList.contains('open')) {
-          closeActiveTooltip();
-        } else {
-          closeActiveTooltip();
-          tip.classList.add('open');
-          span.classList.add('active');
-          activeTooltipEl = { tip, span };
-        }
-      });
-
-      wrapper.appendChild(span);
-      wrapper.appendChild(tip);
-      container.appendChild(wrapper);
+      container.appendChild(span);
     });
 
-    /* Marks given */
-    document.getElementById('res-mark-val').textContent = result.markNum;
-
-    /* Model answer */
-    document.getElementById('res-model-answer').textContent = MODEL_ANSWER;
+    /* Feedback list — always visible */
+    const list = document.getElementById('feedback-list');
+    list.innerHTML = '';
+    const tagLabels = { correct: 'Correct', partial: 'Partially correct', wrong: 'Incorrect' };
+    result.segments
+      .filter(s => s.type !== 'plain' && s.tooltip)
+      .forEach((seg) => {
+        const row = document.createElement('div');
+        row.className = 'feedback-list-item';
+        row.innerHTML = `<span class="feedback-list-tag ${seg.type}">${tagLabels[seg.type]}</span><span>${seg.tooltip}</span>`;
+        list.appendChild(row);
+      });
 
     /* Remark */
     document.getElementById('res-remark').value = result.remark;
@@ -1169,31 +1040,25 @@
       `Marks obtained : ${result.markNum} Mark${result.markNum !== 1 ? 's' : ''}`;
   }
 
-  function closeActiveTooltip() {
-    if (activeTooltipEl) {
-      activeTooltipEl.tip.classList.remove('open');
-      activeTooltipEl.span.classList.remove('active');
-      activeTooltipEl = null;
-    }
+  function clearActiveHighlight() {
+    document.querySelectorAll('.hl.active').forEach(el => el.classList.remove('active'));
   }
-
-  /* Close tooltip when clicking outside */
-  document.addEventListener('click', closeActiveTooltip);
 
   function goBackInput() {
     if (lastResult) {
       checkHistory.unshift(lastResult);
-      updateHistoryBadge();
+      renderInlineHistory();
     }
     lastResult = null;
-    closeActiveTooltip();
+    clearActiveHighlight();
+    document.getElementById('feedback-list').innerHTML = '';
     showStep('input');
   }
 
   function saveThenClose() {
     if (lastResult) {
       checkHistory.unshift(lastResult);
-      updateHistoryBadge();
+      renderInlineHistory();
     }
     closeModal();
   }
@@ -1203,85 +1068,93 @@
     document.getElementById('btn-retry').onclick = goBackInput;
   });
 
-  function updateHistoryBadge() {
-    const badge = document.getElementById('history-badge');
-    const count = checkHistory.length;
-    badge.textContent = count;
-    badge.classList.toggle('visible', count > 0);
-  }
-
   /* ══════════════════════════════════════
-     HISTORY MODAL
+     INLINE HISTORY
   ══════════════════════════════════════ */
-  function openHistory() {
-    renderHistoryList();
-    document.getElementById('history-modal').classList.add('open');
-  }
-
-  function closeHistory() {
-    document.getElementById('history-modal').classList.remove('open');
-  }
-
-  function handleHistoryOverlay(e) {
-    if (e.target === document.getElementById('history-modal')) closeHistory();
-  }
-
-  function formatTime(date) {
-    const now = new Date();
-    const diff = Math.floor((now - date) / 1000);
-    if (diff < 60)  return 'Just now';
-    if (diff < 3600) return Math.floor(diff / 60) + 'm ago';
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-  }
-
-  function renderHistoryList() {
-    const wrap = document.getElementById('history-list-wrap');
-    document.getElementById('btn-clear').disabled = checkHistory.length === 0;
+  function renderInlineHistory() {
+    const wrap = document.getElementById('inline-history-list');
+    const container = document.getElementById('inline-history');
 
     if (checkHistory.length === 0) {
-      wrap.innerHTML = `
-        <div class="history-empty">
-          <div class="empty-icon">🕓</div>
-          <p>No checks run yet.<br/>Use "AI Checking Answer" to simulate a student response.</p>
-        </div>`;
+      container.classList.remove('has-items');
       return;
     }
+    container.classList.add('has-items');
 
-    const items = checkHistory.map((item, i) => {
-      const chipClass = item.scoreLevel === 'high' ? 'mark-high'
-                      : item.scoreLevel === 'mid'  ? 'mark-mid' : 'mark-low';
-      const markStr = `${item.markNum} / ${item.markTotal}`;
+    wrap.innerHTML = checkHistory.map((item, i) => {
+      const markLabel = `${item.markNum} mark${item.markNum !== 1 ? 's' : ''}`;
       return `
-        <div class="history-item" id="hitem-${i}" onclick="toggleHistoryItem(${i})">
-          <div class="history-item-header">
-            <div class="history-item-left">
-              <div class="history-item-meta">#${checkHistory.length - i} &nbsp;·&nbsp; ${formatTime(item.timestamp)}</div>
-              <div class="history-student-answer">${escapeHtml(item.studentAnswer)}</div>
-            </div>
-            <div class="history-item-scores">
-              <span class="score-chip ${chipClass}">${markStr}</span>
-              <span class="expand-arrow">▼</span>
-            </div>
-          </div>
-          <div class="history-remark">
-            <div class="history-remark-label">Remarks</div>
-            ${escapeHtml(item.remark)}
+        <div class="inline-history-item">
+          <span class="item-answer" title="${escapeHtml(item.studentAnswer)}">${escapeHtml(item.studentAnswer)}</span>
+          <span class="item-mark-badge">${markLabel}</span>
+          <div class="item-actions">
+            <button class="item-action-btn view" title="View detail" onclick="openDetail(${i})">👁</button>
+            <button class="item-action-btn delete" title="Delete" onclick="deleteHistoryItem(${i})">🗑</button>
           </div>
         </div>`;
     }).join('');
-
-    wrap.innerHTML = `<div class="history-list">${items}</div>`;
   }
 
-  function toggleHistoryItem(i) {
-    document.getElementById(`hitem-${i}`).classList.toggle('expanded');
+  function deleteHistoryItem(i) {
+    if (!confirm('Delete this check result?')) return;
+    checkHistory.splice(i, 1);
+    renderInlineHistory();
   }
 
-  function clearHistory() {
+  function clearAllHistory() {
     if (!confirm('Clear all check history for this question?')) return;
     checkHistory = [];
-    updateHistoryBadge();
-    renderHistoryList();
+    renderInlineHistory();
+  }
+
+  /* ══════════════════════════════════════
+     DETAIL MODAL
+  ══════════════════════════════════════ */
+  function openDetail(i) {
+    const item = checkHistory[i];
+    document.getElementById('detail-timestamp').textContent =
+      item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('detail-model-answer').textContent = MODEL_ANSWER;
+    document.getElementById('detail-remark').value = item.remark;
+    document.getElementById('detail-marks-obtained').textContent =
+      `Marks obtained : ${item.markNum} Mark${item.markNum !== 1 ? 's' : ''}`;
+
+    /* Student answer — highlights only, no interaction */
+    const container = document.getElementById('detail-student-answer');
+    container.innerHTML = '';
+    item.segments.forEach((seg) => {
+      if (seg.type === 'plain' || !seg.tooltip) {
+        container.appendChild(document.createTextNode(seg.text));
+        return;
+      }
+      const span = document.createElement('span');
+      span.className = 'hl ' + seg.type;
+      span.textContent = seg.text;
+      container.appendChild(span);
+    });
+
+    /* Feedback list — always visible */
+    const list = document.getElementById('detail-feedback-list');
+    list.innerHTML = '';
+    const tagLabels = { correct: 'Correct', partial: 'Partially correct', wrong: 'Incorrect' };
+    item.segments
+      .filter(s => s.type !== 'plain' && s.tooltip)
+      .forEach((seg) => {
+        const row = document.createElement('div');
+        row.className = 'feedback-list-item';
+        row.innerHTML = `<span class="feedback-list-tag ${seg.type}">${tagLabels[seg.type]}</span><span>${seg.tooltip}</span>`;
+        list.appendChild(row);
+      });
+
+    document.getElementById('detail-modal').classList.add('open');
+  }
+
+  function closeDetail() {
+    document.getElementById('detail-modal').classList.remove('open');
+  }
+
+  function handleDetailOverlay(e) {
+    if (e.target === document.getElementById('detail-modal')) closeDetail();
   }
 
   function escapeHtml(str) {
