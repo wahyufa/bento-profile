@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOEIC SmartPrep — Onboarding v2</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #EEF3F8;
+      color: #1A2340;
+      min-height: 100vh;
+    }
+
+    /* ─── NAVBAR ─── */
+    .navbar {
+      background: #fff;
+      border-bottom: 1px solid #E8EDF3;
+      padding: 0 32px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .navbar-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 15px;
+      color: #1A2340;
+    }
+    .logo-icon {
+      width: 36px; height: 36px;
+      background: #17B1EF;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 18px;
+    }
+    .navbar-nav { display: flex; gap: 28px; list-style: none; }
+    .navbar-nav a {
+      text-decoration: none; font-size: 14px;
+      color: #6B7A99; font-weight: 500; padding-bottom: 4px;
+    }
+    .navbar-nav a.active { color: #17B1EF; border-bottom: 2px solid #17B1EF; }
+    .navbar-right { display: flex; align-items: center; gap: 16px; }
+    .credit-badge {
+      background: #FFF8E6; border: 1px solid #FFD966;
+      border-radius: 20px; padding: 5px 12px;
+      font-size: 13px; font-weight: 600; color: #B8860B;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #E0E7EF;
+      display: flex; align-items: center; justify-content: center; font-size: 18px;
+    }
+
+    /* ─── DASHBOARD LAYOUT ─── */
+    .dashboard {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 20px;
+      padding: 24px 32px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+
+    /* welcome */
+    .welcome-card {
+      display: flex; align-items: center; gap: 14px;
+      padding: 16px 20px; margin-bottom: 16px;
+    }
+    .avatar-lg {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: #E0E7EF; display: flex; align-items: center;
+      justify-content: center; font-size: 24px; flex-shrink: 0;
+    }
+    .welcome-card h2 { font-size: 18px; font-weight: 700; }
+    .welcome-card p { font-size: 13px; color: #6B7A99; margin-top: 2px; }
+
+    /* stats */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 10px; margin-bottom: 16px;
+    }
+    .stat-card {
+      border-radius: 12px; padding: 14px 16px;
+      display: flex; flex-direction: column;
+    }
+    .stat-card.blue { background: #EAF6FE; }
+    .stat-card.orange { background: #FFF3E8; }
+    .stat-card.green { background: #EAFAF1; }
+    .stat-val { font-size: 22px; font-weight: 700; }
+    .stat-label { font-size: 11px; color: #6B7A99; margin-top: 2px; }
+
+    /* quest */
+    .quest-card { margin-bottom: 16px; }
+    .quest-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+    .quest-header h3 { font-size: 14px; font-weight: 700; }
+    .quest-timer { font-size: 12px; color: #E85D4A; font-weight: 600; }
+    .quest-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 10px 0; border-bottom: 1px solid #F0F4F8;
+      font-size: 13px; color: #444;
+    }
+    .quest-item:last-child { border-bottom: none; }
+    .quest-pts { font-size: 12px; color: #17B1EF; font-weight: 600; }
+    .claim-btn {
+      width: 100%; margin-top: 14px; padding: 11px;
+      border-radius: 10px; background: #D6F0FC; color: #17B1EF;
+      border: none; cursor: pointer; font-weight: 600; font-size: 14px;
+    }
+
+    /* right col */
+    .right-col { display: flex; flex-direction: column; gap: 16px; }
+    .section-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 14px;
+    }
+    .section-header h3 { font-size: 15px; font-weight: 700; }
+    .see-all { font-size: 13px; color: #17B1EF; text-decoration: none; font-weight: 500; }
+
+    /* ─── EMPTY STATE ─── */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 28px 20px;
+      gap: 10px;
+      background: #F7FBFF;
+      border-radius: 12px;
+      border: 1.5px dashed #C8DFF0;
+      text-align: center;
+    }
+    .empty-state-icon {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #EAF6FE;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+    }
+    .empty-state h4 { font-size: 14px; font-weight: 700; color: #1A2340; }
+    .empty-state p { font-size: 13px; color: #6B7A99; line-height: 1.5; max-width: 280px; }
+    .empty-cta {
+      margin-top: 4px;
+      padding: 9px 20px;
+      background: #17B1EF; color: #fff;
+      border: none; border-radius: 8px;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+
+    /* ─── PERFORMANCE EMPTY ─── */
+    .perf-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 160px;
+      gap: 8px;
+      color: #A0AEBE;
+      font-size: 13px;
+    }
+    .perf-empty span { font-size: 28px; }
+
+    /* papers grid */
+    .papers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .paper-card { border-radius: 12px; border: 1.5px solid #E8EDF3; padding: 16px; }
+    .paper-card h4 { font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+    .paper-meta { font-size: 12px; color: #6B7A99; margin-bottom: 12px; line-height: 1.8; }
+    .start-btn {
+      width: 100%; padding: 10px; border-radius: 8px;
+      background: #17B1EF; color: #fff; border: none;
+      cursor: pointer; font-weight: 600; font-size: 13px;
+    }
+
+    /* performance chart placeholder */
+    .perf-card-row {
+      display: grid; grid-template-columns: 1fr 160px; gap: 12px;
+    }
+    .perf-score-box {
+      border-radius: 12px; border: 1.5px solid #E8EDF3;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 100%;
+    }
+    .perf-score-val { font-size: 32px; font-weight: 800; color: #1A2340; }
+    .perf-score-label { font-size: 12px; color: #6B7A99; margin-top: 4px; }
+
+    /* ─── WELCOME MODAL ─── */
+    .modal-backdrop {
+      position: fixed; inset: 0;
+      background: rgba(15, 23, 42, 0.6);
+      z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      backdrop-filter: blur(4px);
+    }
+    .modal-backdrop.hidden { display: none; }
+    .welcome-modal {
+      background: #fff;
+      border-radius: 24px;
+      width: 480px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+    .modal-header {
+      background: linear-gradient(135deg, #2D3561 0%, #1A6EA8 100%);
+      padding: 32px 32px 24px;
+      text-align: center;
+    }
+    .modal-mascot {
+      width: 72px; height: 72px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 50%;
+      margin: 0 auto 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+    }
+    .modal-header h1 { color: #fff; font-size: 21px; font-weight: 800; margin-bottom: 6px; }
+    .modal-header p { color: rgba(255,255,255,0.7); font-size: 13px; }
+
+    .modal-slides { overflow: hidden; position: relative; height: 190px; }
+    .modal-slide {
+      position: absolute; inset: 0;
+      padding: 24px 32px;
+      opacity: 0; transform: translateX(40px);
+      transition: all 0.35s ease;
+      pointer-events: none;
+    }
+    .modal-slide.active { opacity: 1; transform: translateX(0); pointer-events: all; }
+    .modal-slide.exit { opacity: 0; transform: translateX(-40px); }
+    .slide-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; margin-bottom: 10px;
+    }
+    .slide-icon.blue { background: #EAF6FE; }
+    .slide-icon.yellow { background: #FFF8E6; }
+    .slide-icon.green { background: #EAFAF1; }
+    .modal-slide h3 { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+    .modal-slide p { font-size: 13px; color: #6B7A99; line-height: 1.6; }
+
+    .modal-footer {
+      padding: 0 32px 28px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .modal-dots { display: flex; gap: 6px; }
+    .modal-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #D1D9E6; transition: all 0.3s;
+    }
+    .modal-dot.active { background: #17B1EF; width: 22px; border-radius: 4px; }
+    .modal-footer-btns { display: flex; gap: 10px; }
+    .btn-modal-skip {
+      padding: 10px 16px; background: none; border: 1.5px solid #E0E7EF;
+      border-radius: 10px; font-size: 14px; font-weight: 600; color: #6B7A99; cursor: pointer;
+    }
+    .btn-modal-next {
+      padding: 10px 22px; background: #17B1EF; border: none;
+      border-radius: 10px; font-size: 14px; font-weight: 600; color: #fff;
+      cursor: pointer; min-width: 120px;
+    }
+
+    /* ─── SPOTLIGHT TOUR ─── */
+    .spotlight-hole {
+      position: fixed;
+      border-radius: 14px;
+      box-shadow: 0 0 0 9999px rgba(15, 23, 42, 0.75);
+      z-index: 101;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
+    }
+    .spotlight-tooltip {
+      position: fixed;
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px 24px;
+      width: 310px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      z-index: 102;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tooltip-step {
+      font-size: 11px; font-weight: 700; color: #17B1EF;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .tooltip-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: #1A2340; }
+    .tooltip-body { font-size: 13px; color: #6B7A99; line-height: 1.6; margin-bottom: 16px; }
+    .tooltip-actions { display: flex; justify-content: space-between; align-items: center; }
+    .tt-dots { display: flex; gap: 5px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #D1D9E6; }
+    .dot.active { background: #17B1EF; width: 18px; border-radius: 3px; }
+    .tooltip-btns { display: flex; gap: 8px; }
+    .btn-tt-skip {
+      padding: 8px 14px; background: none; border: 1.5px solid #E0E7EF;
+      border-radius: 8px; font-size: 13px; font-weight: 600; color: #6B7A99; cursor: pointer;
+    }
+    .btn-tt-next {
+      padding: 8px 18px; background: #17B1EF; border: none;
+      border-radius: 8px; font-size: 13px; font-weight: 600; color: #fff; cursor: pointer;
+    }
+
+    /* ─── GUIDE FAB ─── */
+    .guide-fab {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #17B1EF; color: #fff; border: none; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(23,177,239,0.45);
+      font-size: 22px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 50; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .guide-fab:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(23,177,239,0.55); }
+    .guide-fab-label {
+      position: fixed; bottom: 34px; right: 92px;
+      background: #1A2340; color: #fff;
+      font-size: 12px; font-weight: 600; padding: 6px 12px;
+      border-radius: 8px; white-space: nowrap; z-index: 50;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .guide-fab:hover ~ .guide-fab-label { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <div class="navbar-logo">
+    <div class="logo-icon">🤖</div>
+    <span>TOEIC SmartPrep</span>
+  </div>
+  <ul class="navbar-nav">
+    <li><a href="toeic-onboarding-v2.html" class="active">Dashboard</a></li>
+    <li><a href="toeic-paper.html">Paper</a></li>
+    <li><a href="toeic-performance.html">Performance</a></li>
+    <li><a href="toeic-leaderboard.html">Leaderboard</a></li>
+  </ul>
+  <div class="navbar-right">
+    <div class="credit-badge" id="credit-badge">🪙 Credit Balance: 10</div>
+    <span style="font-size:13px;color:#6B7A99;">EN</span>
+    <div class="avatar">👤</div>
+  </div>
+</nav>
+
+<!-- DASHBOARD -->
+<div class="dashboard">
+
+  <!-- LEFT -->
+  <div>
+    <div class="card welcome-card">
+      <div class="avatar-lg">👤</div>
+      <div>
+        <h2>Welcome, historia</h2>
+        <p>Ready to practice today?</p>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card blue"><span class="stat-val">0</span><span class="stat-label">Points</span></div>
+      <div class="stat-card orange"><span class="stat-val">0</span><span class="stat-label">Streak</span></div>
+      <div class="stat-card green"><span class="stat-val">50</span><span class="stat-label">Rank</span></div>
+    </div>
+
+    <div class="card quest-card" id="quest-card">
+      <div class="quest-header">
+        <h3>📋 Quest</h3>
+        <span class="quest-timer">⏰ 7 day(s) left</span>
+      </div>
+      <div class="quest-item"><span>Use 1 credit balance</span><span class="quest-pts">0/1 ↑ 20</span></div>
+      <div class="quest-item"><span>Complete a mock paper 3 days in a row</span><span class="quest-pts">0/3 ↑ 15</span></div>
+      <div class="quest-item"><span>Complete 1 set of mock test</span><span class="quest-pts">0/1 ↑ 25</span></div>
+      <p style="font-size:12px;color:#6B7A99;text-align:center;margin-top:12px;">Complete your quests to earn more points!</p>
+      <button class="claim-btn">Claim Points</button>
+    </div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-col">
+
+    <!-- Performance Journey — empty state -->
+    <div class="card" id="perf-journey">
+      <div class="section-header">
+        <h3>Performance Journey</h3>
+        <select style="font-size:13px;border:1px solid #E8EDF3;border-radius:8px;padding:4px 8px;color:#6B7A99;">
+          <option>Listening and Reading</option>
+        </select>
+      </div>
+      <div class="perf-card-row">
+        <div class="perf-empty">
+          <span>📈</span>
+          <strong style="color:#6B7A99;font-size:13px;">No data yet</strong>
+          <p style="font-size:12px;text-align:center;max-width:200px;">Complete your first test to start tracking your progress here.</p>
+        </div>
+        <div class="perf-score-box">
+          <span class="perf-score-val">0%</span>
+          <span class="perf-score-label">Overall Score</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Continue — empty state -->
+    <div class="card" id="continue-section">
+      <div class="section-header">
+        <h3>Continue from where you left off</h3>
+      </div>
+      <div class="empty-state">
+        <div class="empty-state-icon">🎯</div>
+        <h4>No tests in progress</h4>
+        <p>You haven't started a test yet. Pick a paper below and begin your TOEIC journey!</p>
+        <button class="empty-cta" onclick="window.location.href='toeic-paper.html'">
+          Browse Papers →
+        </button>
+      </div>
+    </div>
+
+    <!-- Available Papers -->
+    <div class="card" id="available-papers">
+      <div class="section-header">
+        <h3>Available Paper</h3>
+        <a href="#" class="see-all">See all</a>
+      </div>
+      <div class="papers-grid">
+        <div class="paper-card">
+          <h4>TOEIC Listening + Reading SET 1</h4>
+          <div class="paper-meta">🕐 120 Minutes<br/>💬 200 Questions</div>
+          <button class="start-btn" onclick="window.location.href='toeic-paper-detail.html'">Start Test</button>
+        </div>
+        <div class="paper-card">
+          <h4>TOEIC Listening + Reading SET 2</h4>
+          <div class="paper-meta">🕐 120 Minutes<br/>💬 200 Questions</div>
+          <button class="start-btn" onclick="window.location.href='toeic-paper-detail.html'">Start Test</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- WELCOME MODAL -->
+<div class="modal-backdrop" id="welcome-modal">
+  <div class="welcome-modal">
+    <div class="modal-header">
+      <div class="modal-mascot">🤖</div>
+      <h1>Welcome to TOEIC SmartPrep!</h1>
+      <p>A quick tour to get you started</p>
+    </div>
+
+    <div class="modal-slides">
+      <div class="modal-slide active" data-slide="0">
+        <div class="slide-icon blue">📚</div>
+        <h3>Practice TOEIC anytime, anywhere</h3>
+        <p>Access full mock exams across all TOEIC sections and track your progress with detailed analytics.</p>
+      </div>
+      <div class="modal-slide" data-slide="1">
+        <div class="slide-icon yellow">🪙</div>
+        <h3>How credits work</h3>
+        <p>Each credit unlocks <strong>one full attempt</strong> at a test SET. Complete all tests in that SET before enrolling again. Need more credits? Contact us anytime.</p>
+      </div>
+      <div class="modal-slide" data-slide="2">
+        <div class="slide-icon green">🚀</div>
+        <h3>Ready to take your first test?</h3>
+        <p>Go to <strong>Paper</strong>, choose a SET, click <strong>Enroll</strong> to use a credit, then hit <strong>Start Test</strong>. We'll show you around after this!</p>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="modal-dots" id="modal-dots">
+        <div class="modal-dot active"></div>
+        <div class="modal-dot"></div>
+        <div class="modal-dot"></div>
+      </div>
+      <div class="modal-footer-btns">
+        <button class="btn-modal-skip" id="btn-modal-skip">Skip</button>
+        <button class="btn-modal-next" id="btn-modal-next">Next →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- SPOTLIGHT -->
+<div class="spotlight-hole" id="spotlight-hole" style="display:none;"></div>
+<div class="spotlight-tooltip" id="spotlight-tooltip" style="display:none;">
+  <div class="tooltip-step" id="tt-step"></div>
+  <div class="tooltip-title" id="tt-title"></div>
+  <div class="tooltip-body" id="tt-body"></div>
+  <div class="tooltip-actions">
+    <div class="tt-dots" id="tt-dots"></div>
+    <div class="tooltip-btns">
+      <button class="btn-tt-skip" id="btn-tour-skip">End tour</button>
+      <button class="btn-tt-next" id="btn-tour-next">Next →</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- GUIDE FAB -->
+<button class="guide-fab" id="guide-fab">?</button>
+<div class="guide-fab-label">Take a tour</div>
+
+
+<script>
+  /* ── MODAL ── */
+  const modal = document.getElementById('welcome-modal');
+  const slides = document.querySelectorAll('.modal-slide');
+  const modalDots = document.querySelectorAll('.modal-dot');
+  const btnModalNext = document.getElementById('btn-modal-next');
+  const btnModalSkip = document.getElementById('btn-modal-skip');
+  let curSlide = 0;
+
+  function goToSlide(n) {
+    slides[curSlide].classList.remove('active');
+    slides[curSlide].classList.add('exit');
+    setTimeout(() => slides[curSlide].classList.remove('exit'), 350);
+    modalDots[curSlide].classList.remove('active');
+    curSlide = n;
+    slides[curSlide].classList.add('active');
+    modalDots[curSlide].classList.add('active');
+    btnModalNext.textContent = curSlide === slides.length - 1 ? "Let's go! 🚀" : 'Next →';
+  }
+
+  btnModalNext.addEventListener('click', () => {
+    curSlide < slides.length - 1 ? goToSlide(curSlide + 1) : closeModal();
+  });
+  btnModalSkip.addEventListener('click', closeModal);
+
+  function closeModal() {
+    modal.classList.add('hidden');
+    setTimeout(startTour, 500);
+  }
+
+
+  /* ── TOUR ── */
+  const tourSteps = [
+    {
+      targetId: 'credit-badge',
+      title: 'Your Credit Balance',
+      body: 'Each credit unlocks one full attempt at a test SET. Complete all tests in the SET before enrolling again. Top up anytime by contacting us.',
+      position: 'bottom',
+    },
+    {
+      targetId: 'perf-journey',
+      title: 'Performance Journey',
+      body: "Track your scores over time across all test attempts. Once you complete your first test, your progress chart and overall score will appear here.",
+      position: 'bottom',
+    },
+    {
+      targetId: 'continue-section',
+      title: 'Continue Where You Left Off',
+      body: "Tests you've started but not finished will show up here so you can pick up right where you stopped.",
+      position: 'top',
+    },
+    {
+      targetId: 'quest-card',
+      title: 'Daily Quests',
+      body: 'Complete quests to earn points and climb the leaderboard. New quests reset every 7 days.',
+      position: 'right',
+    },
+    {
+      targetId: 'available-papers',
+      title: 'Start Here',
+      body: 'These are your available test sets. Choose one, enroll with a credit, and begin. Your analytics will populate once you finish.',
+      position: 'top',
+    },
+    {
+      targetId: null,
+      title: "You're all set! 🎉",
+      body: "That's everything you need to know. Head to Paper, pick a SET, and start your TOEIC journey. Good luck!",
+      position: 'center',
+    },
+  ];
+
+  const hole = document.getElementById('spotlight-hole');
+  const tooltip = document.getElementById('spotlight-tooltip');
+  const ttStep = document.getElementById('tt-step');
+  const ttTitle = document.getElementById('tt-title');
+  const ttBody = document.getElementById('tt-body');
+  const ttDots = document.getElementById('tt-dots');
+  const btnTourSkip = document.getElementById('btn-tour-skip');
+  const btnTourNext = document.getElementById('btn-tour-next');
+  let tourIdx = 0;
+  let tourActive = false;
+
+  function startTour() {
+    tourActive = true;
+    tourIdx = 0;
+    hole.style.display = 'block';
+    tooltip.style.display = 'block';
+    renderStep();
+  }
+
+  function renderStep() {
+    const step = tourSteps[tourIdx];
+    ttDots.innerHTML = tourSteps.map((_, i) =>
+      `<div class="dot ${i === tourIdx ? 'active' : ''}"></div>`
+    ).join('');
+    ttStep.textContent = `Step ${tourIdx + 1} of ${tourSteps.length}`;
+    ttTitle.textContent = step.title;
+    ttBody.textContent = step.body;
+    btnTourNext.textContent = tourIdx === tourSteps.length - 1 ? 'Finish ✓' : 'Next →';
+
+    if (step.targetId) {
+      const el = document.getElementById(step.targetId);
+      el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      setTimeout(() => {
+        const rect = el.getBoundingClientRect();
+        const pad = 10;
+        hole.style.cssText = `
+          display: block;
+          top: ${rect.top - pad}px;
+          left: ${rect.left - pad}px;
+          width: ${rect.width + pad * 2}px;
+          height: ${rect.height + pad * 2}px;
+          opacity: 1;
+          border-radius: 14px;
+          box-shadow: 0 0 0 9999px rgba(15,23,42,0.75);
+          position: fixed;
+          z-index: 101;
+          pointer-events: none;
+          transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+        `;
+        positionTooltip(rect, step.position, pad);
+      }, 150);
+    } else {
+      hole.style.opacity = '0';
+      tooltip.style.top = '50%';
+      tooltip.style.left = '50%';
+      tooltip.style.transform = 'translate(-50%, -50%)';
+    }
+  }
+
+  function positionTooltip(rect, pos, pad) {
+    const tw = 310, th = 220, gap = 14;
+    tooltip.style.transform = 'none';
+    if (pos === 'bottom') {
+      tooltip.style.top = (rect.bottom + pad + gap) + 'px';
+      tooltip.style.left = Math.min(rect.left, window.innerWidth - tw - 16) + 'px';
+    } else if (pos === 'top') {
+      tooltip.style.top = Math.max(8, rect.top - pad - th - gap) + 'px';
+      tooltip.style.left = Math.min(rect.left, window.innerWidth - tw - 16) + 'px';
+    } else if (pos === 'right') {
+      tooltip.style.top = Math.min(rect.top, window.innerHeight - th - 16) + 'px';
+      tooltip.style.left = (rect.right + pad + gap) + 'px';
+    } else {
+      tooltip.style.top = '50%';
+      tooltip.style.left = '50%';
+      tooltip.style.transform = 'translate(-50%, -50%)';
+    }
+  }
+
+  btnTourNext.addEventListener('click', () => {
+    if (tourIdx < tourSteps.length - 1) { tourIdx++; renderStep(); }
+    else endTour();
+  });
+  btnTourSkip.addEventListener('click', endTour);
+
+  function endTour() {
+    tourActive = false;
+    hole.style.display = 'none';
+    tooltip.style.display = 'none';
+  }
+
+  document.getElementById('guide-fab').addEventListener('click', () => {
+    if (!tourActive) startTour();
+  });
+</script>
+</body>
+</html>

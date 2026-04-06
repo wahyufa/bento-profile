@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TOEIC SmartPrep — Performance</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #F4F6F9;
+      color: #1A2340;
+      min-height: 100vh;
+    }
+
+    /* NAVBAR */
+    .navbar {
+      background: #fff;
+      border-bottom: 1px solid #E8EDF3;
+      padding: 0 40px;
+      height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 10;
+    }
+    .navbar-logo {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 15px; color: #1A2340; text-decoration: none;
+    }
+    .logo-icon {
+      width: 38px; height: 38px; background: #17B1EF;
+      border-radius: 8px; display: flex; align-items: center;
+      justify-content: center; color: #fff; font-size: 18px;
+    }
+    .navbar-nav { display: flex; gap: 28px; list-style: none; }
+    .navbar-nav a {
+      text-decoration: none; font-size: 14px;
+      color: #6B7A99; font-weight: 500; padding-bottom: 4px;
+    }
+    .navbar-nav a.active { color: #17B1EF; border-bottom: 2px solid #17B1EF; }
+    .navbar-right { display: flex; align-items: center; gap: 16px; }
+    .credit-badge {
+      background: #FFF8E6; border: 1px solid #FFD966;
+      border-radius: 20px; padding: 5px 14px;
+      font-size: 13px; font-weight: 600; color: #B8860B;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .avatar {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: #E0E7EF; display: flex; align-items: center;
+      justify-content: center; font-size: 18px;
+    }
+
+    /* GO BACK */
+    .go-back {
+      padding: 12px 40px;
+      background: #F4F6F9;
+    }
+    .go-back a {
+      font-size: 14px; color: #17B1EF; font-weight: 600;
+      text-decoration: none; display: flex; align-items: center; gap: 6px;
+    }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(90deg, #2DC99A 0%, #1DAA82 100%);
+      padding: 28px 40px;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero h1 { font-size: 22px; font-weight: 800; color: #fff; position: relative; }
+
+    /* FILTER BAR */
+    .filter-bar {
+      display: flex; justify-content: center; gap: 12px;
+      padding: 20px 40px 0; background: #fff;
+    }
+    .filter-select {
+      display: flex; align-items: center; gap: 8px;
+      border: 1.5px solid #E8EDF3; border-radius: 10px;
+      padding: 9px 14px; font-size: 13px; color: #1A2340;
+      font-weight: 500; background: #fff; cursor: pointer;
+      font-family: inherit;
+    }
+    .filter-select select {
+      border: none; outline: none; font-size: 13px;
+      color: #1A2340; font-family: inherit; cursor: pointer;
+      background: transparent;
+    }
+
+    /* TABS */
+    .perf-tabs {
+      display: flex; justify-content: center; gap: 0;
+      border-bottom: 2px solid #E8EDF3;
+      background: #fff; padding: 0 40px;
+      margin-top: 4px;
+    }
+    .perf-tab {
+      padding: 14px 28px; font-size: 14px; font-weight: 600;
+      color: #6B7A99; cursor: pointer;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .perf-tab.active { color: #17B1EF; border-bottom-color: #17B1EF; }
+
+    /* CONTENT */
+    .content { padding: 28px 40px; }
+
+    /* ── QUICK INSIGHTS ── */
+    .qi-layout {
+      display: grid; grid-template-columns: 320px 1fr; gap: 24px;
+    }
+
+    /* score card */
+    .score-card {
+      background: #fff; border-radius: 16px;
+      padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .score-avatar {
+      width: 72px; height: 72px; border-radius: 50%;
+      background: #E0E7EF; margin: 0 auto 16px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 36px;
+    }
+    .score-row {
+      display: flex; justify-content: space-between;
+      padding: 12px 0; border-bottom: 1px solid #F0F4F8;
+      font-size: 14px;
+    }
+    .score-row:last-of-type { border-bottom: none; }
+    .score-row .label { font-weight: 600; }
+    .score-row .val { color: #6B7A99; font-size: 13px; }
+    .score-row .val.no-data { color: #A0AEBE; font-style: italic; }
+    .score-row .val.score { color: #E85D4A; font-weight: 700; }
+    .see-full {
+      display: block; text-align: center; margin-top: 16px;
+      font-size: 13px; font-weight: 600; color: #17B1EF;
+      text-decoration: none; cursor: pointer;
+    }
+
+    /* radar chart */
+    .chart-card {
+      background: #fff; border-radius: 16px;
+      padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .chart-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .chart-header h3 { font-size: 16px; font-weight: 700; }
+    .download-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 9px 16px; background: #17B1EF; color: #fff;
+      border: none; border-radius: 10px; font-size: 13px;
+      font-weight: 600; cursor: pointer;
+    }
+    .radar-wrap {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .radar-empty {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 10px; padding: 20px 0;
+    }
+    .radar-empty-icon { font-size: 36px; }
+    .radar-empty p { font-size: 13px; color: #A0AEBE; text-align: center; max-width: 220px; line-height: 1.6; }
+
+    /* SVG radar */
+    .radar-svg { width: 300px; height: 300px; }
+    .radar-label { font-size: 12px; font-weight: 600; fill: #6B7A99; font-family: 'Inter', sans-serif; }
+    .radar-axis { font-size: 10px; fill: #C0C9D8; font-family: 'Inter', sans-serif; }
+    .radar-legend {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: #6B7A99; margin-top: 12px;
+    }
+    .legend-box { width: 14px; height: 14px; border-radius: 3px; background: #F0B429; }
+
+    /* ── FULL ANALYTICS ── */
+    .fa-layout {
+      display: grid; grid-template-columns: 240px 1fr; gap: 24px;
+    }
+
+    /* legend */
+    .fa-legend {
+      display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .legend-pill {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600;
+    }
+    .legend-badge {
+      display: flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+    }
+    .legend-badge.strong { background: #2DC99A; color: #fff; }
+    .legend-badge.improving { background: #F0B429; color: #fff; }
+    .legend-badge.to-improve { background: #E85D4A; color: #fff; }
+    .legend-range { font-size: 12px; color: #6B7A99; }
+
+    /* sidebar nav */
+    .fa-nav {
+      background: #fff; border-radius: 16px;
+      padding: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      height: fit-content;
+    }
+    .fa-nav-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 16px; border-radius: 10px;
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .fa-nav-item:hover { background: #F7FBFF; }
+    .fa-nav-item.active { color: #17B1EF; background: #EAF6FE; }
+    .fa-nav-item .chevron { color: #C0C9D8; font-size: 12px; }
+    .fa-nav-item.active .chevron { color: #17B1EF; }
+
+    /* section panel */
+    .fa-panel {
+      background: #fff; border-radius: 16px;
+      padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .fa-panel-header {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 20px;
+    }
+    .fa-panel-header h2 { font-size: 24px; font-weight: 800; }
+    .section-summary {
+      display: flex; align-items: center; gap: 10px;
+      padding: 14px 16px; border-radius: 12px;
+      background: #F7F9FC; margin-bottom: 16px;
+    }
+    .section-star { font-size: 24px; }
+    .section-name { font-size: 15px; font-weight: 700; flex: 1; }
+    .section-score { font-size: 13px; color: #A0AEBE; font-weight: 600; }
+
+    /* part rows */
+    .part-row {
+      padding: 16px; border-radius: 12px; margin-bottom: 8px;
+      background: #F7F9FC;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .part-info h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .part-info p { font-size: 12px; color: #A0AEBE; }
+    .part-score { font-size: 13px; color: #A0AEBE; font-weight: 600; font-style: italic; }
+    .part-score.has-data { color: #1A2340; font-style: normal; font-weight: 700; }
+
+    /* empty CTA */
+    .empty-cta-bar {
+      margin-top: 24px; padding: 18px 20px;
+      background: #EAF6FE; border-radius: 14px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .empty-cta-bar p { font-size: 13px; color: #1A2340; line-height: 1.5; }
+    .empty-cta-bar p strong { font-weight: 700; }
+    .cta-btn {
+      padding: 10px 20px; background: #17B1EF; color: #fff;
+      border: none; border-radius: 10px; font-size: 13px;
+      font-weight: 600; cursor: pointer; white-space: nowrap;
+      text-decoration: none;
+    }
+
+    /* ── SPOTLIGHT TOUR ── */
+    .spotlight-hole {
+      position: fixed; border-radius: 14px;
+      box-shadow: 0 0 0 9999px rgba(15,23,42,0.75);
+      z-index: 101; pointer-events: none;
+      transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .spotlight-tooltip {
+      position: fixed; background: #fff; border-radius: 16px;
+      padding: 20px 24px; width: 310px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+      z-index: 102; transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+    }
+    .tooltip-step {
+      font-size: 11px; font-weight: 700; color: #17B1EF;
+      text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px;
+    }
+    .tooltip-title { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: #1A2340; }
+    .tooltip-body { font-size: 13px; color: #6B7A99; line-height: 1.6; margin-bottom: 16px; }
+    .tooltip-actions { display: flex; justify-content: space-between; align-items: center; }
+    .tt-dots { display: flex; gap: 5px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: #D1D9E6; }
+    .dot.active { background: #17B1EF; width: 18px; border-radius: 3px; }
+    .tooltip-btns { display: flex; gap: 8px; }
+    .btn-tt-skip {
+      padding: 8px 14px; background: none; border: 1.5px solid #E0E7EF;
+      border-radius: 8px; font-size: 13px; font-weight: 600; color: #6B7A99; cursor: pointer;
+    }
+    .btn-tt-next {
+      padding: 8px 18px; background: #17B1EF; border: none;
+      border-radius: 8px; font-size: 13px; font-weight: 600; color: #fff; cursor: pointer;
+    }
+    .guide-fab {
+      position: fixed; bottom: 28px; right: 28px;
+      width: 52px; height: 52px; border-radius: 50%;
+      background: #17B1EF; color: #fff; border: none; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(23,177,239,0.45);
+      font-size: 22px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      z-index: 50; transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .guide-fab:hover { transform: scale(1.08); }
+    .guide-fab-label {
+      position: fixed; bottom: 34px; right: 92px;
+      background: #1A2340; color: #fff;
+      font-size: 12px; font-weight: 600; padding: 6px 12px;
+      border-radius: 8px; white-space: nowrap; z-index: 50;
+      opacity: 0; pointer-events: none; transition: opacity 0.2s;
+    }
+    .guide-fab:hover ~ .guide-fab-label { opacity: 1; }
+  </style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar">
+  <a href="toeic-onboarding-v2.html" class="navbar-logo">
+    <div class="logo-icon">🤖</div>
+    <span>TOEIC SmartPrep</span>
+  </a>
+  <ul class="navbar-nav">
+    <li><a href="toeic-onboarding-v2.html">Dashboard</a></li>
+    <li><a href="toeic-paper.html">Paper</a></li>
+    <li><a href="toeic-performance.html" class="active">Performance</a></li>
+    <li><a href="toeic-leaderboard.html">Leaderboard</a></li>
+  </ul>
+  <div class="navbar-right">
+    <div class="credit-badge">🪙 Credit Balance: 10</div>
+    <span style="font-size:13px;color:#6B7A99;">EN</span>
+    <div class="avatar">👤</div>
+  </div>
+</nav>
+
+<!-- GO BACK -->
+<div class="go-back">
+  <a href="toeic-onboarding-v2.html">‹ Go Back</a>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Report: historia</h1>
+</div>
+
+<!-- FILTER BAR -->
+<div class="filter-bar" id="tour-filters" style="background:#fff; padding-top:20px; padding-bottom:0;">
+  <div class="filter-select">📅 <select><option>All Time</option><option>Last 30 Days</option><option>Last 7 Days</option></select></div>
+  <div class="filter-select"><select><option>All Papers</option><option>L&R SET 1</option><option>L&R SET 2</option></select></div>
+  <div class="filter-select"><select><option>TOEIC Score</option><option>Percentage</option></select></div>
+</div>
+
+<!-- TABS -->
+<div class="perf-tabs" id="tour-tabs" style="background:#fff;">
+  <div class="perf-tab active" id="tab-qi" onclick="switchTab('qi')">Quick Insights</div>
+  <div class="perf-tab" id="tab-fa" onclick="switchTab('fa')">Full Analytics</div>
+</div>
+
+<!-- ── QUICK INSIGHTS ── -->
+<div class="content" id="panel-qi">
+  <div class="qi-layout">
+
+    <!-- Score card -->
+    <div class="score-card" id="tour-score-card">
+      <div class="score-avatar">👤</div>
+      <div class="score-row"><span class="label">Listening</span><span class="val no-data">No Data Available</span></div>
+      <div class="score-row"><span class="label">Reading</span><span class="val no-data">No Data Available</span></div>
+      <div class="score-row"><span class="label">Writing</span><span class="val no-data">No Data Available</span></div>
+      <div class="score-row"><span class="label">Speaking</span><span class="val no-data">No Data Available</span></div>
+      <div class="score-row"><span class="label">Overall Score</span><span class="val no-data">No Data Available</span></div>
+      <a class="see-full" onclick="switchTab('fa')">See Full Analytics</a>
+    </div>
+
+    <!-- Radar chart -->
+    <div class="chart-card" id="tour-radar">
+      <div class="chart-header">
+        <h3>Overview</h3>
+        <button class="download-btn">⬇ Download Report</button>
+      </div>
+      <div class="radar-wrap">
+        <!-- SVG radar -->
+        <svg class="radar-svg" viewBox="0 0 300 300">
+          <!-- grid lines -->
+          <polygon points="150,30 270,110 230,250 70,250 30,110" fill="none" stroke="#E8EDF3" stroke-width="1"/>
+          <polygon points="150,62 242,122 210,222 90,222 58,122" fill="none" stroke="#E8EDF3" stroke-width="1"/>
+          <polygon points="150,94 214,134 190,194 110,194 86,134" fill="none" stroke="#E8EDF3" stroke-width="1"/>
+          <polygon points="150,126 186,146 170,166 130,166 114,146" fill="none" stroke="#E8EDF3" stroke-width="1"/>
+          <!-- axes -->
+          <line x1="150" y1="150" x2="150" y2="30" stroke="#E8EDF3" stroke-width="1"/>
+          <line x1="150" y1="150" x2="270" y2="110" stroke="#E8EDF3" stroke-width="1"/>
+          <line x1="150" y1="150" x2="230" y2="250" stroke="#E8EDF3" stroke-width="1"/>
+          <line x1="150" y1="150" x2="70" y2="250" stroke="#E8EDF3" stroke-width="1"/>
+          <line x1="150" y1="150" x2="30" y2="110" stroke="#E8EDF3" stroke-width="1"/>
+          <!-- data point (empty — center) -->
+          <circle cx="150" cy="150" r="4" fill="#F0B429"/>
+          <!-- labels -->
+          <text x="150" y="22" text-anchor="middle" class="radar-label">Listening</text>
+          <text x="278" y="114" text-anchor="start" class="radar-label">Reading</text>
+          <text x="238" y="262" text-anchor="middle" class="radar-label">Speaking</text>
+          <text x="62" y="262" text-anchor="middle" class="radar-label">Writing</text>
+          <text x="18" y="114" text-anchor="end" class="radar-label">—</text>
+          <!-- scale -->
+          <text x="155" y="34" class="radar-axis">495</text>
+          <text x="155" y="66" class="radar-axis">400</text>
+          <text x="155" y="98" class="radar-axis">300</text>
+          <text x="155" y="130" class="radar-axis">200</text>
+        </svg>
+        <div class="radar-legend">
+          <div class="legend-box"></div>
+          Strand Performance (TOEIC Score)
+        </div>
+        <!-- Empty state hint -->
+        <div style="margin-top:16px;padding:14px 18px;background:#F7FBFF;border-radius:12px;text-align:center;">
+          <p style="font-size:12px;color:#A0AEBE;line-height:1.6;">Complete a test to see your performance plotted here across all TOEIC skills.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Empty CTA -->
+  <div class="empty-cta-bar" style="margin-top:24px;">
+    <p><strong>No test data yet.</strong> Complete at least one test SET to unlock your performance insights and analytics.</p>
+    <a href="toeic-paper.html" class="cta-btn">Browse Papers →</a>
+  </div>
+</div>
+
+<!-- ── FULL ANALYTICS ── -->
+<div class="content" id="panel-fa" style="display:none;">
+
+  <!-- Legend -->
+  <div class="fa-legend" id="tour-legend">
+    <div class="legend-pill"><div class="legend-badge strong">⭐⭐ STRONG</div><span class="legend-range">75%–100%</span></div>
+    <div class="legend-pill"><div class="legend-badge improving">⭐ IMPROVING</div><span class="legend-range">51%–74%</span></div>
+    <div class="legend-pill"><div class="legend-badge to-improve">★ TO IMPROVE</div><span class="legend-range">0%–50%</span></div>
+  </div>
+
+  <div class="fa-layout">
+
+    <!-- Sidebar nav -->
+    <div class="fa-nav" id="tour-fa-nav">
+      <div class="fa-nav-item active" onclick="setSection('listening')">Listening <span class="chevron">›</span></div>
+      <div class="fa-nav-item" onclick="setSection('reading')">Reading <span class="chevron">›</span></div>
+      <div class="fa-nav-item" onclick="setSection('writing')">Writing <span class="chevron">›</span></div>
+      <div class="fa-nav-item" onclick="setSection('speaking')">Speaking <span class="chevron">›</span></div>
+    </div>
+
+    <!-- Panel -->
+    <div class="fa-panel" id="tour-fa-panel">
+      <div class="fa-panel-header">
+        <h2 id="section-title">Listening</h2>
+        <button class="download-btn">⬇ Download Report</button>
+      </div>
+
+      <div class="section-summary">
+        <span class="section-star">★</span>
+        <span class="section-name" id="section-name">Listening</span>
+        <span class="section-score">No Data</span>
+      </div>
+
+      <div id="parts-list">
+        <!-- injected by JS -->
+      </div>
+
+      <div class="empty-cta-bar">
+        <p><strong>No data yet.</strong> Complete a Listening test to see your part-by-part breakdown.</p>
+        <a href="toeic-paper.html" class="cta-btn">Start a Test →</a>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- SPOTLIGHT (before script) -->
+<div class="spotlight-hole" id="spotlight-hole" style="display:none;"></div>
+<div class="spotlight-tooltip" id="spotlight-tooltip" style="display:none;">
+  <div class="tooltip-step" id="tt-step"></div>
+  <div class="tooltip-title" id="tt-title"></div>
+  <div class="tooltip-body" id="tt-body"></div>
+  <div class="tooltip-actions">
+    <div class="tt-dots" id="tt-dots"></div>
+    <div class="tooltip-btns">
+      <button class="btn-tt-skip" id="btn-tour-skip">End tour</button>
+      <button class="btn-tt-next" id="btn-tour-next">Next →</button>
+    </div>
+  </div>
+</div>
+<button class="guide-fab" id="guide-fab">?</button>
+<div class="guide-fab-label">Take a tour</div>
+
+<script>
+  /* ── TAB SWITCH ── */
+  function switchTab(tab) {
+    document.getElementById('tab-qi').classList.toggle('active', tab === 'qi');
+    document.getElementById('tab-fa').classList.toggle('active', tab === 'fa');
+    document.getElementById('panel-qi').style.display = tab === 'qi' ? 'block' : 'none';
+    document.getElementById('panel-fa').style.display = tab === 'fa' ? 'block' : 'none';
+  }
+
+  /* ── SECTION NAV ── */
+  const sections = {
+    listening: {
+      title: 'Listening',
+      parts: [
+        { name: 'Part 1: Photographs', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 2: Question-Response', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 3: Short Conversations', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 4: Short Talks', sub: "You've attempted 0 out of 0 questions" },
+      ]
+    },
+    reading: {
+      title: 'Reading',
+      parts: [
+        { name: 'Part 5: Incomplete Sentences', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 6: Text Completion', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 7: Reading Comprehension', sub: "You've attempted 0 out of 0 questions" },
+      ]
+    },
+    writing: {
+      title: 'Writing',
+      parts: [
+        { name: 'Part 1: Write a Sentence', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 2: Respond to a Written Request', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 3: Write an Opinion Essay', sub: "You've attempted 0 out of 0 questions" },
+      ]
+    },
+    speaking: {
+      title: 'Speaking',
+      parts: [
+        { name: 'Part 1: Read a Text Aloud', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 2: Describe a Picture', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 3: Respond to Questions', sub: "You've attempted 0 out of 0 questions" },
+        { name: 'Part 4: Express an Opinion', sub: "You've attempted 0 out of 0 questions" },
+      ]
+    },
+  };
+
+  let activeSection = 'listening';
+
+  function setSection(key) {
+    activeSection = key;
+    const s = sections[key];
+    document.getElementById('section-title').textContent = s.title;
+    document.getElementById('section-name').textContent = s.title;
+    document.querySelectorAll('.fa-nav-item').forEach((el, i) => {
+      el.classList.toggle('active', ['listening','reading','writing','speaking'][i] === key);
+    });
+    document.getElementById('parts-list').innerHTML = s.parts.map(p => `
+      <div class="part-row">
+        <div class="part-info">
+          <h4>${p.name}</h4>
+          <p>${p.sub}</p>
+        </div>
+        <div class="part-score">No Data Available</div>
+      </div>
+    `).join('');
+    // Update empty CTA text
+    document.querySelector('.empty-cta-bar p').innerHTML = `<strong>No data yet.</strong> Complete a ${s.title} test to see your part-by-part breakdown.`;
+  }
+
+  setSection('listening');
+
+  /* ── SPOTLIGHT TOUR ── */
+  const tourSteps = [
+    {
+      targetId: 'tour-filters',
+      title: 'Filter Your Results',
+      body: 'Narrow your performance data by time range, specific paper SET, or score type (TOEIC Score or Percentage).',
+      position: 'bottom',
+    },
+    {
+      targetId: 'tour-tabs',
+      title: 'Quick Insights & Full Analytics',
+      body: 'Quick Insights gives you an at-a-glance overview with a radar chart. Full Analytics breaks down your performance part by part.',
+      position: 'bottom',
+    },
+    {
+      targetId: 'tour-score-card',
+      title: 'Your Skill Scores',
+      body: 'See your scores across all TOEIC skills — Listening, Reading, Writing, and Speaking. Scores appear here after you complete a test.',
+      position: 'right',
+    },
+    {
+      targetId: 'tour-radar',
+      title: 'Performance Radar',
+      body: 'This chart visualises your strengths and weaknesses across all skills. The further each point extends, the stronger your performance.',
+      position: 'left',
+    },
+    {
+      targetId: null,
+      title: 'Dive Deeper with Full Analytics',
+      body: 'Switch to Full Analytics to see a part-by-part breakdown for each skill — ideal for identifying exactly where to focus your practice.',
+      position: 'center',
+    },
+  ];
+
+  const hole = document.getElementById('spotlight-hole');
+  const tooltip = document.getElementById('spotlight-tooltip');
+  const ttStep = document.getElementById('tt-step');
+  const ttTitle = document.getElementById('tt-title');
+  const ttBody = document.getElementById('tt-body');
+  const ttDots = document.getElementById('tt-dots');
+  const btnTourSkip = document.getElementById('btn-tour-skip');
+  const btnTourNext = document.getElementById('btn-tour-next');
+  let tourIdx = 0;
+  let tourActive = false;
+
+  function startTour() {
+    switchTab('qi'); // always start tour on Quick Insights
+    tourActive = true;
+    tourIdx = 0;
+    hole.style.display = 'block';
+    tooltip.style.display = 'block';
+    renderStep();
+  }
+
+  function renderStep() {
+    const step = tourSteps[tourIdx];
+    if (step.beforeStep) step.beforeStep();
+
+    ttDots.innerHTML = tourSteps.map((_, i) =>
+      `<div class="dot ${i === tourIdx ? 'active' : ''}"></div>`
+    ).join('');
+    ttStep.textContent = `Step ${tourIdx + 1} of ${tourSteps.length}`;
+    ttTitle.textContent = step.title;
+    ttBody.textContent = step.body;
+    btnTourNext.textContent = tourIdx === tourSteps.length - 1 ? 'Finish ✓' : 'Next →';
+
+    if (!step.targetId) {
+      hole.style.opacity = '0';
+      tooltip.style.top = '50%';
+      tooltip.style.left = '50%';
+      tooltip.style.transform = 'translate(-50%, -50%)';
+      return;
+    }
+
+    const el = document.getElementById(step.targetId);
+    if (!el) return;
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    setTimeout(() => {
+      const rect = el.getBoundingClientRect();
+      const pad = 10;
+      hole.style.cssText = `
+        display: block; position: fixed; z-index: 101; pointer-events: none;
+        top: ${rect.top - pad}px; left: ${rect.left - pad}px;
+        width: ${rect.width + pad * 2}px; height: ${rect.height + pad * 2}px;
+        border-radius: 14px; opacity: 1;
+        box-shadow: 0 0 0 9999px rgba(15,23,42,0.75);
+        transition: all 0.4s cubic-bezier(0.4,0,0.2,1);
+      `;
+      positionTooltip(rect, step.position, pad);
+    }, 150);
+  }
+
+  function positionTooltip(rect, pos, pad) {
+    const tw = 310, th = 230, gap = 14;
+    tooltip.style.transform = 'none';
+    if (pos === 'bottom') {
+      tooltip.style.top = (rect.bottom + pad + gap) + 'px';
+      tooltip.style.left = Math.min(rect.left, window.innerWidth - tw - 16) + 'px';
+    } else if (pos === 'top') {
+      tooltip.style.top = Math.max(8, rect.top - pad - th - gap) + 'px';
+      tooltip.style.left = Math.min(rect.left, window.innerWidth - tw - 16) + 'px';
+    } else if (pos === 'right') {
+      tooltip.style.top = Math.min(rect.top, window.innerHeight - th - 16) + 'px';
+      tooltip.style.left = (rect.right + pad + gap) + 'px';
+    } else if (pos === 'left') {
+      tooltip.style.top = Math.min(rect.top, window.innerHeight - th - 16) + 'px';
+      tooltip.style.left = Math.max(8, rect.left - tw - gap - pad) + 'px';
+    } else {
+      tooltip.style.top = '50%'; tooltip.style.left = '50%';
+      tooltip.style.transform = 'translate(-50%, -50%)';
+    }
+  }
+
+  btnTourNext.addEventListener('click', () => {
+    if (tourIdx < tourSteps.length - 1) { tourIdx++; renderStep(); }
+    else endTour();
+  });
+  btnTourSkip.addEventListener('click', endTour);
+
+  function endTour() {
+    tourActive = false;
+    hole.style.display = 'none';
+    tooltip.style.display = 'none';
+  }
+
+  document.getElementById('guide-fab').addEventListener('click', () => {
+    if (!tourActive) startTour();
+  });
+
+  // Auto-start
+  setTimeout(startTour, 600);
+</script>
+</body>
+</html>
