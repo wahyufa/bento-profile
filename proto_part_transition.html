@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototype — Part Transition</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+html,body{height:100%;overflow:hidden;background:#e8ecf2}
+.qw{height:100vh;display:flex;flex-direction:column}
+
+/* TOP BAR */
+.top-bar{background:#3d4f72;color:white;padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.top-title{font-size:16px;font-weight:600;flex:1;text-align:center}
+.tb-btn{border:none;padding:7px 18px;border-radius:6px;font-size:13px;cursor:pointer;color:white;font-weight:500}
+
+/* PROGRESS */
+.prog-row{background:white;padding:0 20px;height:40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #dde1ea;flex-shrink:0}
+.prog-left{display:flex;align-items:center;gap:10px;font-size:12px;color:#444}
+.prog-label{font-weight:700;color:#111;font-size:12px}
+.prog-bar-wrap{width:80px;height:8px;background:#e0e4ee;border-radius:4px;overflow:hidden}
+.prog-bar-fill{height:100%;background:#4caf50;border-radius:4px}
+.timer{color:#1a73e8;font-weight:600;font-size:13px}
+.inst-btn{color:#1a73e8;cursor:pointer;font-size:13px}
+
+/* CARD */
+.content-wrap{flex:1;display:flex;flex-direction:column;overflow:hidden;padding:16px 0}
+.center-col{width:100%;max-width:1100px;margin:0 auto;padding:0 24px;flex:1;display:flex;flex-direction:column;overflow:hidden}
+.part-card{background:white;border-radius:12px;flex:1;display:flex;flex-direction:column;overflow:hidden;border:1px solid #dde1ea;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+.part-header{padding:16px 24px 0;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.part-label{font-size:17px;font-weight:700;color:#111}
+.nav-arrows{display:flex;gap:8px}
+.arrow-btn{display:flex;align-items:center;gap:5px;padding:7px 14px;border-radius:6px;border:none;font-size:13px;font-weight:600;color:white;background:#f0a500;white-space:nowrap;opacity:0.4;cursor:default}
+.two-col{flex:1;display:flex;overflow:hidden}
+.col-left{flex:1;display:flex;flex-direction:column;gap:10px;overflow:hidden;padding:14px 16px 16px 24px;border-right:1px solid #f0f2f6}
+.col-right{flex:1;display:flex;flex-direction:column;gap:14px;padding:14px 24px 16px 16px}
+
+/* AUDIO */
+.audio-player{background:#f4f6f9;border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.audio-play-btn{width:30px;height:30px;border-radius:50%;background:#3d4f72;border:none;display:flex;align-items:center;justify-content:center;color:white;font-size:12px;flex-shrink:0}
+.audio-time{font-size:12px;color:#666;white-space:nowrap;min-width:76px}
+.audio-track{flex:1;height:4px;background:#dde1ea;border-radius:4px}
+.audio-progress{height:100%;background:#3d4f72;border-radius:4px}
+
+/* IMG */
+.question-img{flex:1;border-radius:8px;object-fit:cover;width:100%;min-height:0;display:block;filter:grayscale(100%)}
+.q-num-label{font-size:16px;font-weight:700;color:#111}
+.choices{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.choice{display:flex;align-items:center;gap:12px;padding:10px 16px;border-radius:8px;border:1.5px solid #e0e4ee;background:white}
+.ch-radio{width:18px;height:18px;border-radius:50%;border:2px solid #c8ccd8;background:white;flex-shrink:0}
+.choice.selected{border-color:#1a73e8;background:#edf3ff}
+.choice.selected .ch-radio{border-color:#1a73e8;background:#1a73e8}
+.choice.selected .ch-radio::after{content:'';display:block;width:8px;height:8px;border-radius:50%;background:white;margin:auto;margin-top:3px}
+.ch-label{font-size:14px;font-weight:600;color:#111}
+
+/* BOTTOM NAV */
+.bottom-nav{background:white;border-top:1px solid #dde1ea;padding:8px 0;flex-shrink:0}
+.nav-row{display:flex;align-items:center;gap:3px;white-space:nowrap;padding:0 24px;max-width:1100px;margin:0 auto}
+.part-sep{font-size:11px;font-weight:700;color:#3d4f72;padding:0 6px;flex-shrink:0}
+.part-divider{width:2px;height:22px;background:#3d4f72;border-radius:2px;margin:0 3px;flex-shrink:0}
+.q-dot{width:26px;height:26px;border-radius:50%;border:1.5px solid #dde1ea;font-size:11px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:#666;background:white}
+.q-dot.active{background:#1a73e8;color:white;border-color:#1a73e8}
+.q-dot.done{background:#1a73e8;color:white;border-color:#1a73e8;opacity:0.55}
+.q-dot.locked{opacity:0.28;cursor:not-allowed;pointer-events:none}
+
+/* MODAL BACKDROP */
+.modal-backdrop{position:fixed;inset:0;background:rgba(20,30,60,0.52);display:flex;align-items:center;justify-content:center;z-index:400;backdrop-filter:blur(2px)}
+.modal-box{background:white;border-radius:18px;padding:32px 36px;max-width:420px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.2);display:flex;flex-direction:column;gap:16px;animation:popIn .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.9) translateY(12px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-icon-wrap{width:56px;height:56px;border-radius:50%;background:#e8f0fe;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.modal-icon-wrap svg{width:28px;height:28px}
+.modal-header{display:flex;align-items:center;gap:14px}
+.modal-title{font-size:17px;font-weight:700;color:#111}
+.modal-sub{font-size:14px;color:#555;line-height:1.65}
+.modal-progress-wrap{display:flex;flex-direction:column;gap:6px}
+.modal-progress-bar{width:100%;height:5px;background:#e0e4ee;border-radius:4px;overflow:hidden}
+.modal-progress-fill{height:100%;background:#1a73e8;border-radius:4px;width:0}
+.modal-countdown{font-size:12px;color:#1a73e8;font-weight:600;text-align:center}
+.modal-actions{display:flex;gap:10px}
+.btn-blue{flex:1;background:#1a73e8;color:white;border:none;padding:11px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer}
+.btn-blue:hover{background:#1557b0}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;right:24px;background:white;border-radius:10px;padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,0.14);border:1px solid #e8ecf2;min-width:220px;transform:translateY(16px);opacity:1;z-index:500;animation:slideUp .3s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.toast-title{font-size:14px;font-weight:700;color:#111;margin-bottom:3px}
+.toast-msg{font-size:13px;color:#666}
+</style>
+</head>
+<body>
+<div class="qw">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <button class="tb-btn" style="background:#2ec4b6">Save &amp; Exit</button>
+    <div class="top-title">Listening — Test 1</div>
+    <button class="tb-btn" style="background:#1a73e8">Submit Quiz</button>
+  </div>
+
+  <!-- PROGRESS -->
+  <div class="prog-row">
+    <div class="prog-left">
+      <span class="prog-label">PROGRESS</span>
+      <span>6/100 (6%)</span>
+      <div class="prog-bar-wrap"><div class="prog-bar-fill" style="width:6%"></div></div>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px">
+      <span class="inst-btn">ⓘ Instruction</span>
+      <span class="timer">🕐 43:10</span>
+    </div>
+  </div>
+
+  <!-- CARD -->
+  <div class="content-wrap">
+    <div class="center-col">
+      <div class="part-card">
+        <div class="part-header">
+          <div class="part-label">Part 1</div>
+          <div class="nav-arrows">
+            <button class="arrow-btn">‹ Previous</button>
+            <button class="arrow-btn">Next ›</button>
+          </div>
+        </div>
+        <div class="two-col">
+          <div class="col-left">
+            <div class="audio-player">
+              <div class="audio-play-btn">⏸</div>
+              <span class="audio-time">3:40 / 3:40</span>
+              <div class="audio-track"><div class="audio-progress" style="width:100%"></div></div>
+              <span style="font-size:15px;color:#888">🔊</span>
+            </div>
+            <img class="question-img"
+              src="https://licatnlvxiwfnadsqdbe.supabase.co/storage/v1/object/public/question-assets/image/1772007488786-53tutl.png"
+              alt="Question image">
+          </div>
+          <div class="col-right">
+            <div class="q-num-label">Question 6</div>
+            <div class="choices">
+              <div class="choice"><div class="ch-radio"></div><span class="ch-label">A</span></div>
+              <div class="choice"><div class="ch-radio"></div><span class="ch-label">B</span></div>
+              <div class="choice selected"><div class="ch-radio"></div><span class="ch-label">C</span></div>
+              <div class="choice"><div class="ch-radio"></div><span class="ch-label">D</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <div class="bottom-nav">
+    <div class="nav-row">
+      <div class="part-sep">PART 1</div>
+      <div class="q-dot done">1</div>
+      <div class="q-dot done">2</div>
+      <div class="q-dot done">3</div>
+      <div class="q-dot done">4</div>
+      <div class="q-dot done">5</div>
+      <div class="q-dot active">6</div>
+      <div class="part-divider"></div>
+      <div class="part-sep">PART 2</div>
+      <div class="q-dot locked">7</div>
+      <div class="q-dot locked">8</div>
+      <div class="q-dot locked">9</div>
+      <div class="q-dot locked">10</div>
+      <div class="q-dot locked">11</div>
+      <div class="q-dot locked">12</div>
+      <div class="part-divider"></div>
+      <div class="part-sep">PART 3</div>
+      <div class="q-dot locked">32</div>
+      <div class="q-dot locked">33</div>
+      <div class="q-dot locked">34</div>
+    </div>
+  </div>
+</div>
+
+<!-- SAVED TOAST -->
+<div class="toast">
+  <div class="toast-title">Saved</div>
+  <div class="toast-msg">Your answer has been saved automatically.</div>
+</div>
+
+<!-- PART TRANSITION MODAL -->
+<div class="modal-backdrop" id="modal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-icon-wrap">
+        <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="14" cy="14" r="12" stroke="#1a73e8" stroke-width="1.5" opacity="0.3"/>
+          <polygon points="11,9 21,14 11,19" fill="#1a73e8"/>
+        </svg>
+      </div>
+      <div class="modal-title">Part 1 Complete</div>
+    </div>
+    <div class="modal-sub">
+      Audio for <strong>Part 1</strong> has finished. All questions are now locked.
+      You will be moved to <strong>Part 2</strong> automatically.
+    </div>
+    <div class="modal-progress-wrap">
+      <div class="modal-progress-bar">
+        <div class="modal-progress-fill" id="prog-fill"></div>
+      </div>
+      <div class="modal-countdown" id="countdown">Moving to Part 2 in 5s…</div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-blue" onclick="moveNow()">Move to Part 2 Now →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let sec = 5;
+const fill = document.getElementById('prog-fill');
+const cd   = document.getElementById('countdown');
+
+// start progress bar
+setTimeout(() => {
+  fill.style.transition = 'width 5s linear';
+  fill.style.width = '100%';
+}, 80);
+
+const timer = setInterval(() => {
+  sec--;
+  cd.textContent = sec > 0 ? 'Moving to Part 2 in ' + sec + 's\u2026' : 'Moving now\u2026';
+  if (sec <= 0) { clearInterval(timer); moveNow(); }
+}, 1000);
+
+function moveNow() {
+  clearInterval(timer);
+  document.getElementById('modal').remove();
+  // show a toast confirming move
+  document.querySelector('.toast').remove();
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = '<div class="toast-title">✓ Now on Part 2</div><div class="toast-msg">Good luck with Part 2!</div>';
+  document.body.appendChild(t);
+  setTimeout(() => t.style.opacity = '0', 2000);
+  setTimeout(() => t.remove(), 2400);
+}
+</script>
+</body>
+</html>

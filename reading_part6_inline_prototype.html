@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reading Part 6 Inline Prototype</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; }
+    :root{
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --line:#dde6f1;
+      --ink:#12263f;
+      --muted:#616161;
+      --brand:#6c7fb0;
+      --brand-dark:#576892;
+      --accent:#17a8ff;
+      --accent-soft:#eef7ff;
+      --success:#2bb673;
+      --warning:#ffb000;
+    }
+    html,body{height:100%;background:var(--bg);color:var(--ink);overflow:hidden}
+    body{display:flex;flex-direction:column}
+    .top-bar{
+      height:68px;
+      background:
+        linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px),
+        linear-gradient(180deg, #7488bb 0%, #687cad 100%);
+      background-size:32px 32px, 32px 32px, auto;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 24px;
+      color:#fff;
+      flex-shrink:0;
+    }
+    .top-title{font-size:22px;font-weight:800;letter-spacing:-0.2px}
+    .top-actions{display:flex;gap:12px}
+    .top-btn{
+      border:none;
+      border-radius:12px;
+      background:#1db0ff;
+      color:#fff;
+      padding:14px 18px;
+      font-size:13px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 8px 20px rgba(0,0,0,0.08);
+    }
+    .prog-row{
+      height:52px;
+      background:#fff;
+      border-bottom:1px solid var(--line);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:0 24px;
+      flex-shrink:0;
+    }
+    .prog-left{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted)}
+    .prog-label{font-size:12px;font-weight:800;color:var(--ink)}
+    .prog-bar{width:210px;height:8px;border-radius:999px;background:#e8edf4;overflow:hidden}
+    .prog-fill{height:100%;width:22%;background:var(--success)}
+    .prog-right{display:flex;align-items:center;gap:16px;font-size:13px}
+    .inst-btn,.timer{color:#149cf7;font-weight:700}
+    .page-wrap{
+      flex:1;
+      overflow:auto;
+      padding:28px 24px 120px;
+    }
+    .shell{
+      max-width:1280px;
+      margin:0 auto;
+    }
+    .reading-card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:18px;
+      overflow:hidden;
+      box-shadow:0 10px 30px rgba(18,38,63,0.06);
+    }
+    .card-head{
+      padding:20px 24px 16px;
+      border-bottom:1px solid #eef2f7;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+    .part-label{font-size:17px;font-weight:800;color:var(--ink)}
+    .head-controls{display:flex;gap:8px}
+    .nav-btn{
+      height:34px;border:none;border-radius:8px;background:var(--warning);
+      color:#fff;font-size:14px;line-height:1;cursor:pointer;
+      font-weight:700;padding:0 12px;display:flex;align-items:center;gap:6px
+    }
+    .content-grid{min-height:620px}
+    .article-pane{
+      padding:24px;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          #fff 0,
+          #fff 23px,
+          #f5f8fb 24px
+        );
+    }
+    .article-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:18px;
+    }
+    .article-title{font-size:18px;font-weight:800;color:var(--ink)}
+    .article-meta{font-size:12px;font-weight:700;color:#738198}
+    .article-copy{display:flex;flex-direction:column;gap:18px}
+    .article-copy p{font-size:15px;line-height:2.05;color:var(--muted)}
+    .inline-select{
+      min-width:170px;
+      max-width:240px;
+      margin:0 0 0 6px;
+      padding:7px 38px 7px 14px;
+      border-radius:12px;
+      border:1.5px solid #cfe0ef;
+      background:#fff;
+      color:var(--ink);
+      font-size:14px;
+      font-weight:600;
+      vertical-align:baseline;
+      outline:none;
+      appearance:none;
+      -webkit-appearance:none;
+      background-image:
+        linear-gradient(45deg, transparent 50%, #6f87a4 50%),
+        linear-gradient(135deg, #6f87a4 50%, transparent 50%);
+      background-position:
+        calc(100% - 18px) calc(50% - 2px),
+        calc(100% - 12px) calc(50% - 2px);
+      background-size:6px 6px, 6px 6px;
+      background-repeat:no-repeat;
+      transition:border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+    }
+    .blank-inline{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin:0 6px;
+      vertical-align:baseline;
+    }
+    .blank-no{
+      font-size:14px;
+      font-weight:700;
+      color:#12263f;
+      white-space:nowrap;
+    }
+    .inline-select:hover{border-color:#9ec8ec}
+    .inline-select:focus{border-color:#149cf7;box-shadow:0 0 0 4px rgba(20,156,247,.10)}
+    .inline-select.filled{background-color:#edf7ff;border-color:#149cf7}
+    .footer-nav{
+      position:fixed;
+      left:0;right:0;bottom:0;
+      background:#fff;
+      border-top:1px solid var(--line);
+      padding:12px 18px;
+      overflow:auto;
+    }
+    .footer-row{display:flex;align-items:center;gap:10px;min-width:max-content}
+    .footer-part{font-size:13px;font-weight:800;color:var(--ink);padding-right:6px}
+    .footer-dot{
+      width:34px;height:34px;border-radius:50%;
+      border:1.5px solid #d5dfeb;background:#fff;color:#738198;
+      display:flex;align-items:center;justify-content:center;
+      font-size:13px;font-weight:700;cursor:pointer
+    }
+    .footer-dot.active{background:#149cf7;border-color:#149cf7;color:#fff}
+    .footer-dot.done{background:#edf9f2;border-color:#9ed3b6;color:#20724d}
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div style="width:148px"></div>
+    <div class="top-title">Reading - Test 4</div>
+    <div class="top-actions">
+      <button class="top-btn">Save &amp; Exit</button>
+      <button class="top-btn">Submit Quiz</button>
+    </div>
+  </div>
+
+  <div class="prog-row">
+    <div class="prog-left">
+      <span class="prog-label">PROGRESS</span>
+      <span>22/100 (22%)</span>
+      <div class="prog-bar"><div class="prog-fill"></div></div>
+    </div>
+    <div class="prog-right">
+      <span class="inst-btn">Instruction</span>
+      <span class="timer">31:42</span>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <div class="shell">
+      <div class="reading-card">
+        <div class="card-head">
+          <div class="part-label">Part 6: Text Completion</div>
+          <div class="head-controls">
+            <button class="nav-btn">&#8249; Previous</button>
+            <button class="nav-btn">Next &#8250;</button>
+          </div>
+        </div>
+
+        <div class="content-grid">
+          <div class="article-pane">
+            <div class="article-head" style="display:block;margin-bottom:22px">
+              <div class="article-meta" style="font-size:14px;color:#12263f;font-weight:700">Questions 131-134 refer to the following email.</div>
+            </div>
+            <div class="article-copy">
+              <p style="line-height:1.75">
+                <strong style="color:#12263f">To:</strong> All Staff<br>
+                <strong style="color:#12263f">From:</strong> Management<br>
+                <strong style="color:#12263f">Date:</strong> October 12<br>
+                <strong style="color:#12263f">Subject:</strong> Office Renovation Schedule
+              </p>
+              <p>
+                This email is to inform you that we will begin renovating the main lobby and the breakroom starting next Monday. These updates are intended to create a more modern and welcoming environment for both employees and clients. We apologize for any
+                <span class="blank-inline"><span class="blank-no">131)</span><select class="inline-select" data-blank="131">
+                  <option value="">Select Answer</option>
+                  <option value="inconvenience">inconvenience</option>
+                  <option value="equipment">equipment</option>
+                  <option value="announcement">announcement</option>
+                  <option value="permission">permission</option>
+                </select></span>
+                this may cause during the construction period. During the renovation, the main entrance will be closed. All employees are requested to enter the building through the side door located near the parking garage.
+              </p>
+              <p>
+                <span class="blank-inline"><span class="blank-no">132)</span><select class="inline-select" data-blank="132">
+                  <option value="">Select Answer</option>
+                  <option value="Please note that">Please note that</option>
+                  <option value="On the other hand">On the other hand</option>
+                  <option value="In contrast">In contrast</option>
+                  <option value="As a result of">As a result of</option>
+                </select></span>
+                Additionally, the breakroom will be inaccessible, so we have provided temporary coffee stations in the small conference room. We expect the project to be completed by the end of the month. We appreciate your
+                <span class="blank-inline"><span class="blank-no">133)</span><select class="inline-select" data-blank="133">
+                  <option value="">Select Answer</option>
+                  <option value="patience">patience</option>
+                  <option value="patent">patent</option>
+                  <option value="precision">precision</option>
+                  <option value="presence">presence</option>
+                </select></span>
+                as we work to improve our workspace. Further updates will be sent via email if the schedule
+                <span class="blank-inline"><span class="blank-no">134)</span><select class="inline-select" data-blank="134">
+                  <option value="">Select Answer</option>
+                  <option value="changes">changes</option>
+                  <option value="compares">compares</option>
+                  <option value="returns">returns</option>
+                  <option value="collects">collects</option>
+                </select></span>
+                .
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-nav">
+    <div class="footer-row">
+      <div class="footer-part">PART 5</div>
+      <div class="footer-dot">101</div>
+      <div class="footer-dot">102</div>
+      <div class="footer-dot">103</div>
+      <div class="footer-part">PART 6</div>
+      <button class="footer-dot active" data-jump="131">131</button>
+      <button class="footer-dot" data-jump="132">132</button>
+      <button class="footer-dot" data-jump="133">133</button>
+      <button class="footer-dot" data-jump="134">134</button>
+      <div class="footer-part">PART 7</div>
+      <div class="footer-dot">147</div>
+      <div class="footer-dot">148</div>
+      <div class="footer-dot">149</div>
+    </div>
+  </div>
+
+  <script>
+    const selectedAnswers = {};
+    let activeBlank = 131;
+    const blankSelects = document.querySelectorAll('.inline-select');
+    const footerJumps = document.querySelectorAll('.footer-dot[data-jump]');
+
+    function setActiveBlank(q) {
+      activeBlank = q;
+      blankSelects.forEach((select) => {
+        const n = Number(select.dataset.blank);
+        select.classList.toggle('filled', !!select.value);
+        if (n === q) {
+          select.focus();
+        }
+      });
+      footerJumps.forEach((dot) => {
+        const n = Number(dot.dataset.jump);
+        dot.classList.toggle('active', n === q);
+        dot.classList.toggle('done', !!selectedAnswers[n]);
+      });
+    }
+
+    blankSelects.forEach((select) => {
+      select.addEventListener('focus', () => setActiveBlank(Number(select.dataset.blank)));
+      select.addEventListener('change', () => {
+        const q = Number(select.dataset.blank);
+        selectedAnswers[q] = select.value;
+        select.classList.toggle('filled', !!select.value);
+        setActiveBlank(q);
+      });
+    });
+
+    footerJumps.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        setActiveBlank(Number(dot.dataset.jump));
+      });
+    });
+
+    setActiveBlank(131);
+  </script>
+</body>
+</html>
