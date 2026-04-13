@@ -1,0 +1,1913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS CBL — Improved Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --primary: #0d719a;
+  --primary-dark: #0a5a7a;
+  --primary-light: #e6f3f8;
+  --navy: #111827;
+  --text: #1f2937;
+  --muted: #6b7280;
+  --light: #9ca3af;
+  --border: #e5e7eb;
+  --bg: #f4f5f7;
+  --white: #fff;
+  --green: #16a34a;
+  --green-bg: #dcfce7;
+  --amber: #d97706;
+  --amber-bg: #fef3c7;
+  --red: #dc2626;
+  --red-bg: #fee2e2;
+  --r: 12px;
+  --rs: 8px;
+}
+
+body {
+  font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+  font-size: 14px;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ---- SCREENS ---- */
+.screen { display: none; min-height: 100vh; }
+.screen.active { display: block; }
+
+/* ---- PROTOTYPE NAV ---- */
+.proto-bar {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--navy);
+  color: white;
+  border-radius: 999px;
+  padding: 6px 4px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  z-index: 9999;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+}
+.proto-label {
+  padding: 6px 12px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.proto-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.55);
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+.proto-btn:hover { background: rgba(255,255,255,0.1); color: white; }
+.proto-btn.active { background: rgba(255,255,255,0.18); color: white; }
+
+/* ---- NAVBAR ---- */
+.navbar {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  height: 60px;
+  display: flex;
+  align-items: center;
+  padding: 0 32px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  gap: 40px;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, #f97316 0%, #1a7f8e 100%);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 800;
+  font-size: 16px;
+}
+.logo-text { line-height: 1; }
+.logo-text .brand { font-weight: 800; font-size: 15px; color: var(--navy); }
+.logo-text .by { font-size: 10px; color: var(--muted); }
+.nav-links {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+  flex: 1;
+}
+.nav-links a {
+  text-decoration: none;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 19px 0;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-links a.active { color: var(--primary); border-bottom-color: var(--amber); }
+.nav-right { display: flex; align-items: center; gap: 12px; }
+.icon-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 18px; padding: 4px; transition: color 0.15s; }
+.icon-btn:hover { color: var(--text); }
+.avatar {
+  width: 32px; height: 32px;
+  background: var(--primary);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: white; font-weight: 700; font-size: 13px;
+  cursor: pointer;
+}
+
+/* ---- BUTTONS ---- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  padding: 9px 18px;
+  border-radius: var(--rs);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer; border: none;
+  transition: all 0.15s;
+  text-decoration: none;
+  line-height: 1;
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline { background: white; color: var(--text); border: 1.5px solid var(--border); }
+.btn-outline:hover { background: var(--bg); border-color: #d1d5db; }
+.btn-ghost { background: transparent; color: var(--primary); }
+.btn-ghost:hover { background: var(--primary-light); }
+.btn-danger-outline { background: white; color: var(--red); border: 1.5px solid #fca5a5; }
+.btn-danger-outline:hover { background: var(--red-bg); border-color: var(--red); }
+.btn-full { width: 100%; }
+.btn-lg { padding: 13px 24px; font-size: 15px; border-radius: 10px; }
+.btn-sm { padding: 6px 14px; font-size: 13px; }
+
+/* ---- OVERLAY + DRAWER ---- */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 200;
+  display: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.overlay.open { display: block; opacity: 1; }
+
+.drawer {
+  position: fixed; top: 0; right: 0;
+  width: 380px; height: 100vh;
+  background: white;
+  z-index: 201;
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  overflow-y: auto;
+  display: flex; flex-direction: column;
+  box-shadow: -4px 0 24px rgba(0,0,0,0.1);
+}
+.drawer.open { transform: translateX(0); }
+.drawer-header {
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+  position: sticky; top: 0; background: white; z-index: 1;
+}
+.drawer-body { padding: 20px 24px; flex: 1; }
+
+/* ---- MODAL ---- */
+.modal-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 300;
+  display: none;
+  align-items: center; justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(2px);
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: white;
+  border-radius: var(--r);
+  width: 100%; max-width: 560px;
+  max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+  animation: modal-in 0.2s ease;
+}
+@keyframes modal-in {
+  from { opacity: 0; transform: scale(0.96) translateY(8px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+.modal-header { padding: 24px 24px 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.modal-body { padding: 20px 24px 24px; }
+.close-btn { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 18px; line-height: 1; padding: 4px; flex-shrink: 0; }
+.close-btn:hover { color: var(--text); }
+
+/* ---- SCENARIOS PAGE ---- */
+.page-content { padding: 36px 32px 80px; max-width: 1100px; margin: 0 auto; position: relative; }
+
+/* Floating Jen widget — top-right of page */
+.jen-float {
+  position: absolute;
+  top: 36px;
+  right: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  z-index: 10;
+  pointer-events: none;
+  user-select: none;
+}
+.jen-bubble {
+  background: #fbbf24;
+  border-radius: 18px;
+  padding: 9px 18px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: #1c1c1c;
+  white-space: nowrap;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(251,191,36,0.35);
+  margin-bottom: 6px;
+  letter-spacing: -0.01em;
+}
+.jen-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 8px 7px 0;
+  border-style: solid;
+  border-color: #fbbf24 transparent transparent;
+}
+.jen-float-img {
+  width: 108px;
+  height: 108px;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+  /* no border-radius — let the 3D render shape itself */
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.12));
+  margin-top: 2px;
+}
+.jen-sparkle {
+  font-size: 16px;
+  color: #fbbf24;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.page-header { margin-bottom: 20px; }
+.page-header h1 { font-size: 26px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+.page-header .subtitle { color: var(--muted); font-size: 13px; line-height: 1.6; }
+.page-header .subtitle strong { color: var(--navy); font-weight: 600; }
+
+.toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+.toolbar-right { margin-left: auto; font-size: 13px; color: var(--muted); }
+
+.scenarios-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18px;
+}
+
+/* Attempt score row inside card */
+.card-score-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--muted);
+  padding: 10px 0;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.score-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.score-pill svg { opacity: 0.7; }
+.score-pill.best { color: var(--green); }
+.score-pill.best-amber { color: var(--amber); }
+.score-pill.last { color: var(--muted); font-weight: 600; }
+.score-divider { width: 1px; height: 14px; background: var(--border); flex-shrink: 0; }
+.attempts-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.card-history-btn {
+  background: none;
+  border: 1.5px solid var(--border);
+  border-radius: var(--rs);
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+.card-history-btn:hover { background: var(--bg); color: var(--text); border-color: #d1d5db; }
+
+.scenario-card {
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: box-shadow 0.15s, transform 0.15s;
+}
+.scenario-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.09); transform: translateY(-1px); }
+.scenario-card.completed { border-color: var(--primary); border-width: 2px; }
+
+.card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.rec-label { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--primary); font-weight: 600; }
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 999px;
+  font-size: 12px; font-weight: 600;
+}
+.badge-teal { background: var(--primary-light); color: var(--primary); }
+.badge-green { background: var(--green-bg); color: var(--green); }
+.badge-amber { background: var(--amber-bg); color: var(--amber); }
+.badge-red { background: var(--red-bg); color: var(--red); }
+.badge-gray { background: #f3f4f6; color: var(--muted); }
+
+.card-title { font-size: 16px; font-weight: 700; color: var(--navy); margin-bottom: 3px; }
+.card-role { font-size: 13px; color: var(--muted); }
+.card-role span { color: var(--navy); font-weight: 600; }
+.card-desc { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+.card-meta {
+  display: flex; align-items: center; gap: 12px;
+  font-size: 12px; color: var(--muted);
+  padding: 10px 0; border-top: 1px solid var(--border);
+}
+.score-meta { font-weight: 700; }
+.score-mid { color: var(--amber); }
+.score-high { color: var(--green); }
+.score-low { color: var(--red); }
+
+.card-actions { display: flex; gap: 8px; margin-top: auto; }
+
+/* ---- CHAT SCREEN ---- */
+.chat-layout { display: flex; flex-direction: column; height: 100vh; }
+
+.chat-header {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+  height: 62px;
+  display: flex; align-items: center; gap: 14px;
+  flex-shrink: 0;
+}
+.back-link {
+  display: flex; align-items: center; gap: 5px;
+  color: var(--primary); font-weight: 600; font-size: 14px;
+  cursor: pointer; background: none; border: none; padding: 0;
+  text-decoration: none; flex-shrink: 0;
+}
+.back-link:hover { opacity: 0.8; }
+.chat-title { flex: 1; min-width: 0; }
+.chat-title h2 { font-size: 15px; font-weight: 700; color: var(--navy); }
+.chat-title .roles-line {
+  font-size: 12px; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 1px;
+}
+.header-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+
+.hbtn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 13px;
+  border-radius: var(--rs); font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  border: 1.5px solid var(--border);
+  background: white; color: var(--text);
+  transition: all 0.15s;
+}
+.hbtn:hover { background: var(--bg); }
+.hbtn.voice-on { background: var(--primary); color: white; border-color: var(--primary); }
+.hbtn-count {
+  background: var(--primary); color: white;
+  width: 18px; height: 18px; border-radius: 50%;
+  font-size: 11px; display: flex; align-items: center; justify-content: center;
+}
+.hbtn.voice-on .hbtn-count { background: rgba(255,255,255,0.25); }
+.hbtn-icon { padding: 7px 10px; }
+
+.context-strip {
+  background: #f0fbfc;
+  border-bottom: 1px solid #d1eaed;
+  padding: 7px 24px;
+  font-size: 12px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.context-info { display: flex; align-items: center; gap: 16px; color: #2d6b76; }
+.context-info strong { font-weight: 600; }
+.context-close { background: none; border: none; cursor: pointer; color: var(--muted); font-size: 13px; }
+.context-close:hover { color: var(--text); }
+
+.chat-area { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 18px; }
+
+.msg-group { display: flex; flex-direction: column; }
+.msg-group.ai { align-items: flex-start; }
+.msg-group.user { align-items: flex-end; }
+.msg-sender {
+  font-size: 11px; color: var(--muted);
+  display: flex; align-items: center; gap: 5px;
+  margin-bottom: 5px; padding: 0 4px;
+}
+.bubble {
+  max-width: 520px;
+  padding: 12px 16px;
+  border-radius: 16px;
+  font-size: 14px; line-height: 1.55;
+}
+.bubble.ai { background: white; border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 4px; }
+.bubble.user { background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+
+.audio-player {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 12px; border-radius: 999px;
+  font-size: 12px; max-width: 260px;
+  margin-top: 5px;
+}
+.audio-ai { background: white; border: 1px solid var(--border); color: var(--muted); }
+.audio-user { background: rgba(0,0,0,0.15); color: rgba(255,255,255,0.85); }
+.play-btn {
+  width: 26px; height: 26px; border-radius: 50%;
+  border: none; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.15s; font-size: 10px;
+}
+.audio-ai .play-btn { background: var(--primary); color: white; }
+.audio-ai .play-btn:hover { background: var(--primary-dark); }
+.audio-user .play-btn { background: rgba(255,255,255,0.2); color: white; }
+.audio-user .play-btn:hover { background: rgba(255,255,255,0.3); }
+.waveform {
+  flex: 1; height: 20px;
+  display: flex; align-items: center; gap: 2px;
+}
+.wv { width: 2px; border-radius: 1px; opacity: 0.45; }
+.audio-dur { white-space: nowrap; font-size: 11px; }
+.audio-lbl { font-size: 11px; opacity: 0.6; white-space: nowrap; }
+
+/* Input area */
+.chat-input-wrap { background: white; border-top: 1px solid var(--border); padding: 12px 24px 16px; flex-shrink: 0; }
+.input-row {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg); border: 1.5px solid var(--border);
+  border-radius: 999px; padding: 7px 7px 7px 14px;
+  transition: border-color 0.15s;
+}
+.input-row:focus-within { border-color: var(--primary); background: white; }
+.input-row.is-recording { border-color: var(--red); background: #fff5f5; }
+.mic-btn {
+  width: 34px; height: 34px; border-radius: 50%; border: none;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  background: var(--bg); color: var(--muted); flex-shrink: 0;
+  transition: all 0.15s;
+}
+.mic-btn:hover { background: var(--primary-light); color: var(--primary); }
+.mic-btn.rec { background: var(--red); color: white; animation: pulse 1.5s infinite; }
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.35); }
+  50% { box-shadow: 0 0 0 7px rgba(220,38,38,0); }
+}
+.text-input {
+  flex: 1; border: none; background: transparent;
+  font-size: 14px; color: var(--text); outline: none; min-width: 0;
+}
+.text-input::placeholder { color: var(--light); }
+.text-input:disabled { color: var(--red); }
+.send-btn {
+  width: 34px; height: 34px; border-radius: 50%; border: none;
+  background: var(--primary); color: white;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; transition: all 0.15s;
+}
+.send-btn:hover { background: var(--primary-dark); }
+.input-hint { text-align: center; font-size: 11px; color: var(--light); margin-top: 7px; }
+
+/* ---- PRESESSION MODAL ---- */
+.desc-box { position: relative; max-height: 78px; overflow: hidden; transition: max-height 0.3s ease; }
+.desc-box.open { max-height: 400px; }
+.desc-box:not(.open)::after {
+  content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+  height: 32px; background: linear-gradient(transparent, white);
+  pointer-events: none;
+}
+.read-more { background: none; border: none; color: var(--primary); font-size: 13px; font-weight: 500; cursor: pointer; padding: 2px 0; margin-top: 2px; }
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
+.roles-row { display: flex; gap: 10px; margin: 12px 0; }
+.role-chip {
+  flex: 1; background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--rs); padding: 12px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.role-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 2px; }
+.role-name { font-weight: 700; font-size: 15px; color: var(--navy); }
+.criteria-pre { display: flex; flex-direction: column; gap: 8px; margin: 10px 0 18px; }
+.cp-item { display: flex; align-items: flex-start; gap: 10px; font-size: 13px; color: var(--text); }
+.cp-num {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--primary-light); color: var(--primary);
+  font-weight: 700; font-size: 12px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  margin-top: 1px;
+}
+.meta-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.meta-chip {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; color: var(--muted);
+  background: var(--bg); padding: 4px 10px;
+  border-radius: 999px; border: 1px solid var(--border);
+}
+.session-as { text-align: center; font-size: 12px; color: var(--muted); margin-top: 8px; }
+
+/* ---- SESSIONS DRAWER ---- */
+.section-lbl {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted); margin: 16px 0 8px;
+}
+.section-lbl:first-child { margin-top: 0; }
+.session-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 0; border-bottom: 1px solid var(--border);
+  cursor: pointer; transition: all 0.1s;
+}
+.session-item:hover { margin: 0 -24px; padding: 13px 24px; background: var(--bg); }
+.session-item:last-child { border-bottom: none; }
+.si-icon {
+  width: 34px; height: 34px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 14px;
+}
+.si-icon.done { background: var(--green-bg); color: var(--green); }
+.si-info { flex: 1; min-width: 0; }
+.si-name { font-weight: 600; font-size: 14px; color: var(--navy); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.si-meta { font-size: 12px; color: var(--muted); display: flex; gap: 6px; align-items: center; margin-top: 2px; }
+.si-score { font-weight: 700; font-size: 14px; flex-shrink: 0; }
+.si-score.mid { color: var(--amber); }
+.si-score.high { color: var(--green); }
+.si-score.low { color: var(--red); }
+.si-chevron { color: var(--light); flex-shrink: 0; }
+.empty-notice {
+  margin-top: 12px; padding: 20px; text-align: center;
+  background: var(--bg); border-radius: var(--rs);
+  color: var(--muted); font-size: 13px;
+}
+
+/* ---- CRITERIA DRAWER ---- */
+.crit-card {
+  background: var(--bg); border: 1px solid var(--border); border-left: 3px solid var(--primary);
+  border-radius: var(--rs); padding: 14px 16px;
+  margin-bottom: 10px;
+}
+.crit-card-title { font-size: 14px; font-weight: 600; color: var(--navy); margin: 8px 0 6px; }
+
+/* ---- REVIEW SCREEN (side-by-side) ---- */
+.review-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg);
+}
+.review-header {
+  background: white;
+  border-bottom: 1px solid var(--border);
+  height: 60px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-shrink: 0;
+  z-index: 10;
+}
+.review-header-title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--navy);
+  text-align: center;
+}
+.review-header-meta {
+  font-size: 12px;
+  color: var(--muted);
+}
+.review-body {
+  flex: 1;
+  display: flex;
+  overflow: hidden; /* each column scrolls independently */
+}
+
+/* Left — scrollable transcript */
+.review-chat-col {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.review-col-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Right — sticky eval panel */
+.review-eval-col {
+  width: 400px;
+  flex-shrink: 0;
+  overflow: hidden; /* children manage their own scroll */
+  background: white;
+  border-left: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+/* scrollable inner content */
+.review-eval-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.eval-section-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+/* Score summary block inside eval panel */
+.eval-score-block {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.eval-score-info { flex: 1; }
+.eval-score-headline {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+.eval-feedback {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.eval-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--light);
+  margin-top: 8px;
+}
+
+/* Progress bar inside eval */
+.eval-progress-wrap { padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+
+/* Review actions — always pinned at bottom of eval panel */
+.review-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+  padding: 16px 24px;
+  border-top: 1px solid var(--border);
+  background: white;
+}
+
+/* Read-only bubble styles in transcript */
+.review-msg { margin-bottom: 18px; }
+.review-msg-sender {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 5px;
+}
+.review-msg.user-msg { display: flex; flex-direction: column; align-items: flex-end; }
+.review-msg.user-msg .review-msg-sender { text-align: right; }
+.review-bubble {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13.5px;
+  line-height: 1.55;
+}
+.review-bubble.ai { background: white; border: 1px solid var(--border); color: var(--text); border-radius: 2px 12px 12px 12px; }
+.review-bubble.user { background: var(--primary); color: white; border-radius: 12px 2px 12px 12px; }
+
+.score-card {
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--r); padding: 28px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  margin-bottom: 16px;
+}
+.score-top { display: flex; align-items: flex-start; gap: 24px; margin-bottom: 20px; }
+.score-ring-wrap { position: relative; width: 90px; height: 90px; flex-shrink: 0; }
+.score-ring-wrap svg { transform: rotate(-90deg); }
+.score-ring-label {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+}
+.score-pct { font-size: 21px; font-weight: 800; }
+.score-pts { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.score-meta-info { flex: 1; }
+.score-headline { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.score-headline h2 { font-size: 20px; font-weight: 700; color: var(--navy); }
+.score-feedback { font-size: 13px; color: var(--muted); line-height: 1.65; }
+.score-session-meta {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+  font-size: 12px; color: var(--light); margin-top: 10px;
+}
+
+.progress-bar { height: 8px; background: var(--border); border-radius: 999px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 999px; transition: width 0.6s ease; }
+.progress-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--light); margin-top: 5px; }
+
+.crit-section { margin-top: 20px; }
+.crit-section-title {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px;
+}
+.crit-item {
+  background: white; border: 1px solid var(--border);
+  border-radius: var(--rs); padding: 16px;
+  margin-bottom: 10px;
+  display: flex; gap: 14px; align-items: flex-start;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.crit-item.pass { border-left: 3px solid var(--green); }
+.crit-item.partial { border-left: 3px solid var(--amber); }
+.crit-item.fail { border-left: 3px solid var(--red); }
+.crit-icon {
+  width: 30px; height: 30px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+.crit-item.pass .crit-icon { background: var(--green-bg); color: var(--green); }
+.crit-item.partial .crit-icon { background: var(--amber-bg); color: var(--amber); }
+.crit-item.fail .crit-icon { background: var(--red-bg); color: var(--red); }
+.crit-body { flex: 1; }
+.crit-name { font-weight: 600; color: var(--navy); font-size: 14px; margin-bottom: 4px; }
+.crit-feedback { font-size: 13px; color: var(--muted); line-height: 1.5; }
+.crit-score { font-weight: 700; font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+.crit-item.pass .crit-score { color: var(--green); }
+.crit-item.partial .crit-score { color: var(--amber); }
+.crit-item.fail .crit-score { color: var(--red); }
+
+.results-actions {
+  display: flex; align-items: center; gap: 10px;
+  margin-top: 24px; flex-wrap: wrap;
+}
+
+/* ---- END CONFIRM MODAL ---- */
+.confirm-wrap { max-width: 380px; }
+.confirm-body { padding: 32px 28px; text-align: center; }
+.confirm-icon { font-size: 42px; margin-bottom: 14px; }
+.confirm-body h3 { font-size: 18px; font-weight: 700; color: var(--navy); margin-bottom: 8px; }
+.confirm-body p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+.confirm-actions { display: flex; gap: 10px; margin-top: 22px; }
+.confirm-actions .btn { flex: 1; }
+
+/* ---- HISTORY PICKER MODAL ---- */
+.history-modal { max-width: 480px; }
+.history-list { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+.history-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--rs);
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+  background: white;
+  width: 100%;
+}
+.history-item:hover { border-color: var(--primary); background: var(--primary-light); }
+.history-item.best { border-color: var(--amber); }
+.hi-num {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: var(--bg); border: 1.5px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; color: var(--muted);
+  flex-shrink: 0;
+}
+.history-item.best .hi-num { background: var(--amber-bg); border-color: var(--amber); color: var(--amber); }
+.hi-info { flex: 1; min-width: 0; }
+.hi-label { font-weight: 600; font-size: 14px; color: var(--navy); display: flex; align-items: center; gap: 6px; }
+.hi-meta { font-size: 12px; color: var(--muted); margin-top: 2px; display: flex; gap: 8px; }
+.hi-score { font-weight: 700; font-size: 18px; flex-shrink: 0; }
+.hi-score.high { color: var(--green); }
+.hi-score.mid { color: var(--amber); }
+.hi-score.low { color: var(--red); }
+.hi-chevron { color: var(--light); flex-shrink: 0; }
+.trend-up { color: var(--green); font-size: 12px; font-weight: 600; }
+.trend-down { color: var(--red); font-size: 12px; font-weight: 600; }
+.history-summary {
+  background: var(--bg); border-radius: var(--rs);
+  padding: 12px 16px; margin-bottom: 16px;
+  display: flex; gap: 20px;
+}
+.hs-stat { text-align: center; flex: 1; }
+.hs-stat .hs-val { font-size: 18px; font-weight: 700; color: var(--navy); }
+.hs-stat .hs-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ---- EVALUATING STATE ---- */
+.eval-btn {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 13px; border-radius: var(--rs);
+  font-size: 13px; font-weight: 600;
+  background: #fafafa; color: var(--muted);
+  border: 1.5px solid var(--border); cursor: default;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.spin { display: inline-block; animation: spin 1s linear infinite; }
+
+/* ---- SCROLLBAR ---- */
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- Prototype Navigation -->
+<div class="proto-bar">
+  <span class="proto-label">Prototype</span>
+  <button class="proto-btn active" onclick="showScreen('scenarios')">① Scenarios</button>
+  <button class="proto-btn" onclick="showScreen('empty')">① Empty State</button>
+  <button class="proto-btn" onclick="showScreen('chat')">② Chat Session</button>
+  <button class="proto-btn" onclick="showScreen('review')">③ Review</button>
+</div>
+
+<!-- ================================================================
+     SCREEN 0: EMPTY STATE (no scenarios assigned)
+     ================================================================ -->
+<div id="screen-empty" class="screen">
+
+  <nav class="navbar">
+    <a class="logo" href="#">
+      <div class="logo-icon">A</div>
+      <div class="logo-text">
+        <div class="brand">ATLAS</div>
+        <div class="by">by HeyHi</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="#">Courses</a></li>
+      <li><a href="#" class="active">CBL</a></li>
+      <li><a href="#">Performance</a></li>
+      <li><a href="#">PALS</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="icon-btn">🔔</button>
+      <div class="avatar">W</div>
+    </div>
+  </nav>
+
+  <div class="page-content" style="display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 60px);text-align:center;padding:40px 32px">
+
+    <!-- Jen integrated into empty state -->
+    <div style="position:relative;margin-bottom:24px">
+      <div style="width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,#fde68a,#fb923c);display:flex;align-items:center;justify-content:center;font-size:44px;margin:0 auto;box-shadow:0 4px 20px rgba(251,146,60,0.25)">🎭</div>
+      <div style="position:absolute;top:-4px;right:-12px;background:var(--amber-bg);border:1.5px solid var(--amber);border-radius:12px 12px 12px 0;padding:6px 12px;font-size:13px;font-weight:600;color:#92400e;white-space:nowrap">Hi, I'm Jen 👋</div>
+    </div>
+
+    <h1 style="font-size:22px;font-weight:700;color:var(--navy);margin-bottom:10px">No scenarios yet</h1>
+    <p style="font-size:14px;color:var(--muted);max-width:380px;line-height:1.65;margin-bottom:8px">
+      Your admin hasn't assigned any practice scenarios to your role yet. Once they do, they'll appear here personalised to your job role.
+    </p>
+    <p style="font-size:13px;color:var(--light);margin-bottom:28px">Scenarios are personalised based on your assigned job role: <strong style="color:var(--muted)">Front Office Staff</strong></p>
+
+    <div style="display:flex;flex-direction:column;gap:10px;align-items:center">
+      <div style="display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--border);border-radius:var(--r);padding:14px 20px;max-width:360px;text-align:left">
+        <span style="font-size:22px;flex-shrink:0">💬</span>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:2px">What is CBL?</div>
+          <div style="font-size:12px;color:var(--muted)">Conversation-Based Learning lets you practice real work scenarios with an AI partner — and get scored feedback instantly.</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--border);border-radius:var(--r);padding:14px 20px;max-width:360px;text-align:left">
+        <span style="font-size:22px;flex-shrink:0">🔔</span>
+        <div>
+          <div style="font-weight:600;font-size:13px;color:var(--navy);margin-bottom:2px">We'll notify you</div>
+          <div style="font-size:12px;color:var(--muted)">You'll receive a notification when your admin creates and assigns scenarios to your role.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================================================================
+     SCREEN 1: SCENARIOS LIST
+     ================================================================ -->
+<div id="screen-scenarios" class="screen active">
+
+  <nav class="navbar">
+    <a class="logo" href="#">
+      <div class="logo-icon">A</div>
+      <div class="logo-text">
+        <div class="brand">ATLAS</div>
+        <div class="by">by HeyHi</div>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#">Dashboard</a></li>
+      <li><a href="#">Courses</a></li>
+      <li><a href="#" class="active">CBL</a></li>
+      <li><a href="#">Performance</a></li>
+      <li><a href="#">PALS</a></li>
+    </ul>
+    <div class="nav-right">
+      <button class="icon-btn">🔔</button>
+      <div class="avatar">D</div>
+    </div>
+  </nav>
+
+  <div class="page-content">
+
+    <!-- Floating Jen widget — top-right -->
+    <div class="jen-float">
+      <div class="jen-bubble">Hi, I'm Jen 👋</div>
+      <img class="jen-float-img" src="./jen.png" alt="Jen" />
+      <div class="jen-sparkle">◆</div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+      <h1>Practice & Role-Play</h1>
+      <div class="subtitle">
+        Scenarios recommended for your role as <strong>Front Office Staff</strong><br>
+        Scenarios are personalised based on your assigned job role
+      </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <button class="btn btn-outline btn-sm" onclick="openDrawer('sessions-drawer', 'sessions-overlay')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        My Sessions
+      </button>
+      <div class="toolbar-right">2 scenarios available</div>
+    </div>
+
+    <!-- Scenarios Grid -->
+    <div class="scenarios-grid">
+
+      <!-- Card 1: Not started -->
+      <div class="scenario-card">
+        <div class="card-top">
+          <div class="rec-label">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Recommended for you
+          </div>
+        </div>
+        <div>
+          <div class="card-title">Pharmacy Interaction</div>
+          <div class="card-role">Role: <span>Pharmacy Staff</span></div>
+        </div>
+        <div class="card-desc">The pharmacy is busy with customers, and the staff member stands behind the counter, ready to assist patients with their medication needs. A patient...</div>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-full" onclick="openModal('presession-modal')">
+            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Start Practice
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 2: Completed — best = last attempt (show only Best) -->
+      <div class="scenario-card completed">
+        <div class="card-top">
+          <div class="rec-label">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Recommended for you
+          </div>
+          <span class="badge badge-teal">✓ Completed</span>
+        </div>
+        <div>
+          <div class="card-title">Front Office Interaction</div>
+          <div class="card-role">Role: <span>Front Office Staff</span></div>
+        </div>
+        <div class="card-desc">The front office of a busy healthcare clinic is bustling with activity. Patients are arriving for their appointments, and the reception area is filled with...</div>
+        <!-- best = last → only show Best score -->
+        <div class="card-score-row">
+          <span class="attempts-count">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+            3 attempts
+          </span>
+          <div class="score-divider"></div>
+          <span class="score-pill best">
+            <svg width="11" height="11" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Best: 85%
+          </span>
+          <button class="card-history-btn" onclick="openModal('fo-history-modal')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            History
+          </button>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-full" onclick="openModal('presession-modal')">
+            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Practice Again
+          </button>
+        </div>
+      </div>
+
+      <!-- Card 3: Completed — best ≠ last (show both Best and Last) -->
+      <div class="scenario-card completed">
+        <div class="card-top">
+          <div class="rec-label">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Recommended for you
+          </div>
+          <span class="badge badge-teal">✓ Completed</span>
+        </div>
+        <div>
+          <div class="card-title">Emergency Triage</div>
+          <div class="card-role">Role: <span>Front Office Staff</span></div>
+        </div>
+        <div class="card-desc">A patient arrives at the front desk showing signs of distress. The staff member must assess the situation quickly, prioritise the patient's needs...</div>
+        <!-- best ≠ last → show both Best and Last scores -->
+        <div class="card-score-row">
+          <span class="attempts-count">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/></svg>
+            2 attempts
+          </span>
+          <div class="score-divider"></div>
+          <span class="score-pill best-amber">
+            <svg width="11" height="11" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+            Best: 80%
+          </span>
+          <div class="score-divider"></div>
+          <span class="score-pill last">
+            Last: 65%
+          </span>
+          <button class="card-history-btn" onclick="openModal('emg-history-modal')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            History
+          </button>
+        </div>
+        <div class="card-actions">
+          <button class="btn btn-primary btn-full" onclick="openModal('presession-modal')">
+            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Practice Again
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- My Sessions Drawer -->
+  <div class="overlay" id="sessions-overlay" onclick="closeDrawer('sessions-drawer','sessions-overlay')"></div>
+  <div class="drawer" id="sessions-drawer">
+    <div class="drawer-header">
+      <div>
+        <h3 style="font-size:16px;font-weight:700">My Sessions</h3>
+        <p style="font-size:12px;color:var(--muted);margin-top:2px">Your practice history</p>
+      </div>
+      <button class="close-btn" onclick="closeDrawer('sessions-drawer','sessions-overlay')">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="section-lbl">Today — Apr 8, 2026</div>
+      <div class="session-item" onclick="closeDrawer('sessions-drawer','sessions-overlay');openModal('fo-history-modal')">
+        <div class="si-icon done">✓</div>
+        <div class="si-info">
+          <div class="si-name">Front Office Interaction</div>
+          <div class="si-meta">
+            <span>Front Office Staff</span><span>·</span><span>~8 min</span>
+          </div>
+        </div>
+        <div class="si-score mid">67%</div>
+        <svg class="si-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+      </div>
+      <div class="empty-notice">Complete more sessions to grow your history.</div>
+    </div>
+  </div>
+
+  <!-- History Modal: Front Office Interaction -->
+  <div class="modal-overlay" id="fo-history-modal">
+    <div class="modal history-modal">
+      <div class="modal-header">
+        <div>
+          <h2 style="font-size:17px;font-weight:700">Front Office Interaction</h2>
+          <p style="font-size:13px;color:var(--muted);margin-top:3px">Select an attempt to view its results</p>
+        </div>
+        <button class="close-btn" onclick="closeModal('fo-history-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Summary stats -->
+        <div class="history-summary">
+          <div class="hs-stat">
+            <div class="hs-val">3</div>
+            <div class="hs-lbl">Attempts</div>
+          </div>
+          <div class="hs-stat">
+            <div class="hs-val" style="color:var(--green)">85%</div>
+            <div class="hs-lbl">Best Score</div>
+          </div>
+        </div>
+
+        <!-- Attempt list -->
+        <div class="history-list">
+
+          <!-- Attempt 3 — most recent & best -->
+          <button class="history-item" onclick="viewAttempt(3)">
+            <div class="hi-num">3</div>
+            <div class="hi-info">
+              <div class="hi-label">
+                Attempt 3
+                <span class="badge badge-gray" style="font-size:11px">Latest</span>
+                <span class="badge badge-green" style="font-size:11px">Best</span>
+              </div>
+              <div class="hi-meta">
+                <span>Apr 8, 2026 · 10:24 AM</span>
+              </div>
+            </div>
+            <div class="hi-score high">85%</div>
+            <svg class="hi-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <!-- Attempt 2 -->
+          <button class="history-item" onclick="viewAttempt(2)">
+            <div class="hi-num">2</div>
+            <div class="hi-info">
+              <div class="hi-label">Attempt 2</div>
+              <div class="hi-meta">
+                <span>Apr 5, 2026 · 2:05 PM</span>
+              </div>
+            </div>
+            <div class="hi-score mid">72%</div>
+            <svg class="hi-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <!-- Attempt 1 -->
+          <button class="history-item" onclick="viewAttempt(1)">
+            <div class="hi-num">1</div>
+            <div class="hi-info">
+              <div class="hi-label">Attempt 1</div>
+              <div class="hi-meta">
+                <span>Apr 3, 2026 · 9:41 AM</span>
+                <span style="color:var(--muted);font-size:12px">First attempt</span>
+              </div>
+            </div>
+            <div class="hi-score low">67%</div>
+            <svg class="hi-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Modal: Emergency Triage -->
+  <div class="modal-overlay" id="emg-history-modal">
+    <div class="modal history-modal">
+      <div class="modal-header">
+        <div>
+          <h2 style="font-size:17px;font-weight:700">Emergency Triage</h2>
+          <p style="font-size:13px;color:var(--muted);margin-top:3px">Select an attempt to view its results</p>
+        </div>
+        <button class="close-btn" onclick="closeModal('emg-history-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Summary stats -->
+        <div class="history-summary">
+          <div class="hs-stat">
+            <div class="hs-val">2</div>
+            <div class="hs-lbl">Attempts</div>
+          </div>
+          <div class="hs-stat">
+            <div class="hs-val" style="color:var(--amber)">80%</div>
+            <div class="hs-lbl">Best Score</div>
+          </div>
+        </div>
+
+        <!-- Attempt list -->
+        <div class="history-list">
+
+          <!-- Attempt 2 — most recent, lower than best -->
+          <button class="history-item" onclick="viewAttempt(2);closeModal('emg-history-modal')">
+            <div class="hi-num">2</div>
+            <div class="hi-info">
+              <div class="hi-label">
+                Attempt 2
+                <span class="badge badge-gray" style="font-size:11px">Latest</span>
+              </div>
+              <div class="hi-meta">
+                <span>Apr 9, 2026 · 11:03 AM</span>
+              </div>
+            </div>
+            <div class="hi-score low">65%</div>
+            <svg class="hi-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+          <!-- Attempt 1 — best -->
+          <button class="history-item" onclick="viewAttempt(1);closeModal('emg-history-modal')">
+            <div class="hi-num">1</div>
+            <div class="hi-info">
+              <div class="hi-label">
+                Attempt 1
+                <span class="badge badge-green" style="font-size:11px">Best</span>
+              </div>
+              <div class="hi-meta">
+                <span>Apr 7, 2026 · 3:48 PM</span>
+                <span style="color:var(--muted);font-size:12px">First attempt</span>
+              </div>
+            </div>
+            <div class="hi-score mid">80%</div>
+            <svg class="hi-chevron" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pre-session Modal -->
+  <div class="modal-overlay" id="presession-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div>
+          <h2 style="font-size:18px;font-weight:700">Front Office Interaction</h2>
+          <div class="meta-chips">
+            <span class="meta-chip">📋 3 criteria</span>
+            <span class="meta-chip">🔄 1 previous attempt</span>
+          </div>
+        </div>
+        <button class="close-btn" onclick="closeModal('presession-modal')">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="presession-desc" class="desc-box" style="font-size:13px;color:var(--muted);line-height:1.65">
+          The front office of a busy healthcare clinic is bustling with activity. Patients are arriving for their appointments, and the reception area is filled with seating for those waiting. A large digital display board shows the schedule of upcoming appointments. The front office staff member is positioned behind the reception desk, which is equipped with computers, scheduling software, and a telephone. The atmosphere is a mix of urgency and calm, as staff members efficiently manage check-ins and answer phone calls.
+        </div>
+        <button class="read-more" id="read-more-btn" onclick="toggleDesc()">Read more ▾</button>
+
+        <div class="divider"></div>
+
+        <!-- Roles -->
+        <div class="roles-row">
+          <div class="role-chip">
+            <span style="font-size:22px">🧑‍💼</span>
+            <div>
+              <div class="role-lbl">Your Role</div>
+              <div class="role-name">Front Office Staff</div>
+            </div>
+          </div>
+          <div class="role-chip">
+            <span style="font-size:22px">🤖</span>
+            <div>
+              <div class="role-lbl">AI Role</div>
+              <div class="role-name">Patient</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Success Criteria -->
+        <div style="margin-bottom:18px">
+          <p style="font-size:13px;font-weight:600;color:var(--navy);display:flex;align-items:center;gap:6px;margin-bottom:10px">
+            <svg width="14" height="14" fill="none" stroke="var(--primary)" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            Success Criteria
+          </p>
+          <div class="criteria-pre">
+            <div class="cp-item"><div class="cp-num">1</div>Greet the patient promptly and courteously.</div>
+            <div class="cp-item"><div class="cp-num">2</div>Collect and verify the patient's information accurately in the system.</div>
+            <div class="cp-item"><div class="cp-num">3</div>Provide the patient with clear directions and any necessary paperwork.</div>
+          </div>
+        </div>
+
+        <!-- CTA — no manual name entry, pre-filled from session -->
+        <button class="btn btn-primary btn-full btn-lg" onclick="startSession()">
+          <svg width="15" height="15" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Start Session
+        </button>
+        <p class="session-as">Practicing as: <strong>Daffa · Front Office Staff</strong></p>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /screen-scenarios -->
+
+
+<!-- ================================================================
+     SCREEN 2: CHAT SESSION
+     ================================================================ -->
+<div id="screen-chat" class="screen">
+  <div class="chat-layout">
+
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <button class="back-link" onclick="confirmBack()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <div style="width:1px;height:28px;background:var(--border);flex-shrink:0"></div>
+      <div class="chat-title">
+        <h2>Front Office Interaction</h2>
+        <div class="roles-line">
+          <span>🧑‍💼 Daffa (Front Office Staff)</span>
+          <span>·</span>
+          <span>🤖 Patient</span>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="hbtn voice-on" id="voice-btn" onclick="toggleVoice()">
+          <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+          <span id="voice-label">Voice On</span>
+        </button>
+        <button class="hbtn" onclick="openDrawer('criteria-drawer','criteria-overlay')">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          Criteria
+          <span class="hbtn-count">3</span>
+        </button>
+        <button class="hbtn hbtn-icon" onclick="openDrawer('info-drawer','info-overlay')" title="Scenario info">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8" stroke-width="3" stroke-linecap="round"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+        </button>
+        <div id="end-session-wrap">
+          <button class="btn btn-danger-outline btn-sm" onclick="openModal('end-confirm-modal')">End Session</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Context Strip -->
+    <div class="context-strip" id="context-strip">
+      <div class="context-info">
+        <span>📍 <strong>Your role:</strong> Front Office Staff greeting a patient arriving for check-in</span>
+      </div>
+      <button class="context-close" onclick="document.getElementById('context-strip').style.display='none'">Hide ✕</button>
+    </div>
+
+    <!-- Chat Messages -->
+    <div class="chat-area" id="chat-area">
+
+      <!-- AI msg 1 -->
+      <div class="msg-group ai">
+        <div class="msg-sender">🤖 Patient (AI)</div>
+        <div class="bubble ai">Hello! I have an appointment today. Can you help me check in?</div>
+        <div class="audio-player audio-ai">
+          <button class="play-btn">▶</button>
+          <div class="waveform" style="color:var(--primary)">
+            <div class="wv" style="height:8px;background:currentColor"></div>
+            <div class="wv" style="height:14px;background:currentColor"></div>
+            <div class="wv" style="height:10px;background:currentColor"></div>
+            <div class="wv" style="height:18px;background:currentColor"></div>
+            <div class="wv" style="height:11px;background:currentColor"></div>
+            <div class="wv" style="height:16px;background:currentColor"></div>
+            <div class="wv" style="height:9px;background:currentColor"></div>
+            <div class="wv" style="height:14px;background:currentColor"></div>
+            <div class="wv" style="height:19px;background:currentColor"></div>
+            <div class="wv" style="height:12px;background:currentColor"></div>
+            <div class="wv" style="height:16px;background:currentColor"></div>
+            <div class="wv" style="height:8px;background:currentColor"></div>
+            <div class="wv" style="height:18px;background:currentColor"></div>
+            <div class="wv" style="height:11px;background:currentColor"></div>
+            <div class="wv" style="height:14px;background:currentColor"></div>
+          </div>
+          <span class="audio-dur">0:03</span>
+          <span class="audio-lbl">AI voice</span>
+        </div>
+      </div>
+
+      <!-- User msg -->
+      <div class="msg-group user">
+        <div class="bubble user">Sir, I can help you to check in.</div>
+        <div class="audio-player audio-user">
+          <button class="play-btn">▶</button>
+          <div class="waveform" style="color:rgba(255,255,255,0.75)">
+            <div class="wv" style="height:12px;background:currentColor"></div>
+            <div class="wv" style="height:18px;background:currentColor"></div>
+            <div class="wv" style="height:9px;background:currentColor"></div>
+            <div class="wv" style="height:20px;background:currentColor"></div>
+            <div class="wv" style="height:14px;background:currentColor"></div>
+            <div class="wv" style="height:16px;background:currentColor"></div>
+            <div class="wv" style="height:10px;background:currentColor"></div>
+            <div class="wv" style="height:18px;background:currentColor"></div>
+            <div class="wv" style="height:12px;background:currentColor"></div>
+          </div>
+          <span class="audio-dur">0:07</span>
+          <span class="audio-lbl">Your recording</span>
+        </div>
+      </div>
+
+      <!-- AI msg 2 -->
+      <div class="msg-group ai">
+        <div class="msg-sender">🤖 Patient (AI)</div>
+        <div class="bubble ai">I appreciate your help. My name is Fernanda Hutapea, and I have an appointment with Dr. Andreas for skin specialization.</div>
+        <div class="audio-player audio-ai">
+          <button class="play-btn">▶</button>
+          <div class="waveform" style="color:var(--primary)">
+            <div class="wv" style="height:10px;background:currentColor"></div>
+            <div class="wv" style="height:16px;background:currentColor"></div>
+            <div class="wv" style="height:12px;background:currentColor"></div>
+            <div class="wv" style="height:20px;background:currentColor"></div>
+            <div class="wv" style="height:8px;background:currentColor"></div>
+            <div class="wv" style="height:18px;background:currentColor"></div>
+            <div class="wv" style="height:14px;background:currentColor"></div>
+            <div class="wv" style="height:16px;background:currentColor"></div>
+            <div class="wv" style="height:10px;background:currentColor"></div>
+            <div class="wv" style="height:20px;background:currentColor"></div>
+            <div class="wv" style="height:12px;background:currentColor"></div>
+            <div class="wv" style="height:18px;background:currentColor"></div>
+            <div class="wv" style="height:8px;background:currentColor"></div>
+            <div class="wv" style="height:16px;background:currentColor"></div>
+            <div class="wv" style="height:14px;background:currentColor"></div>
+            <div class="wv" style="height:10px;background:currentColor"></div>
+          </div>
+          <span class="audio-dur">0:07</span>
+          <span class="audio-lbl">AI voice</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Input Area -->
+    <div class="chat-input-wrap">
+      <div class="input-row" id="input-row">
+        <button class="mic-btn" id="mic-btn" onclick="toggleRecording()">
+          <svg id="mic-icon" width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2"/></svg>
+        </button>
+        <input class="text-input" id="text-input" type="text" placeholder="Message Patient…" />
+        <button class="send-btn">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+      <p class="input-hint" id="input-hint">Press Enter to send · Shift+Enter for new line</p>
+    </div>
+
+  </div><!-- /chat-layout -->
+
+  <!-- End Session Confirm Modal -->
+  <div class="modal-overlay" id="end-confirm-modal">
+    <div class="modal confirm-wrap">
+      <div class="confirm-body">
+        <div class="confirm-icon">⚠️</div>
+        <h3>End this session?</h3>
+        <p>Your conversation will be saved and evaluated by AI. You can review the feedback and practice again anytime.</p>
+        <div class="confirm-actions">
+          <button class="btn btn-outline" onclick="closeModal('end-confirm-modal')">Keep Practicing</button>
+          <button class="btn btn-danger-outline" onclick="startEvaluating()">End & Evaluate</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /screen-chat -->
+
+
+<!-- ================================================================
+     SCREEN 3: REVIEW — chat transcript + evaluation side by side
+     ================================================================ -->
+<div id="screen-review" class="screen">
+  <div class="review-layout">
+
+    <!-- Header -->
+    <div class="review-header">
+      <button class="back-link" onclick="showScreen('scenarios')">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+        Back
+      </button>
+      <div style="width:1px;height:28px;background:var(--border);flex-shrink:0"></div>
+      <div class="review-header-title">Front Office Interaction</div>
+      <div style="flex:1"></div>
+      <button class="hbtn" onclick="openDrawer('criteria-drawer','criteria-overlay')">
+        <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Criteria
+      </button>
+      <button class="hbtn hbtn-icon" onclick="openDrawer('info-drawer','info-overlay')" title="Scenario details">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12.01" y2="8" stroke-width="3" stroke-linecap="round"/><line x1="12" y1="12" x2="12" y2="16"/></svg>
+      </button>
+    </div>
+
+    <!-- Body: two columns -->
+    <div class="review-body">
+
+      <!-- LEFT: scrollable chat transcript -->
+      <div class="review-chat-col">
+        <div class="review-col-label">Chat Transcript</div>
+
+        <div class="review-msg">
+          <div class="review-msg-sender">🤖 Patient (AI)</div>
+          <div class="review-bubble ai">Hello! I have an appointment today. Can you help me check in?</div>
+        </div>
+
+        <div class="review-msg user-msg">
+          <div class="review-msg-sender">🧑‍💼 You</div>
+          <div class="review-bubble user">Sir, I can help you to check in.</div>
+        </div>
+
+        <div class="review-msg">
+          <div class="review-msg-sender">🤖 Patient (AI)</div>
+          <div class="review-bubble ai">I appreciate your help. My name is Fernanda Hutapea, and I have an appointment with Dr. Andreas for skin specialization.</div>
+        </div>
+
+        <div class="review-msg user-msg">
+          <div class="review-msg-sender">🧑‍💼 You</div>
+          <div class="review-bubble user">Alright, let me pull up your appointment. Could you confirm your date of birth for me?</div>
+        </div>
+
+        <div class="review-msg">
+          <div class="review-msg-sender">🤖 Patient (AI)</div>
+          <div class="review-bubble ai">Of course, it's March 14, 1990.</div>
+        </div>
+
+        <div class="review-msg user-msg">
+          <div class="review-msg-sender">🧑‍💼 You</div>
+          <div class="review-bubble user">Thank you. I've found your record. Please take a seat in the waiting area — Dr. Andreas will be with you shortly. Here's a form to fill out while you wait.</div>
+        </div>
+
+        <div class="review-msg">
+          <div class="review-msg-sender">🤖 Patient (AI)</div>
+          <div class="review-bubble ai">Thank you very much!</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: sticky evaluation report -->
+      <div class="review-eval-col">
+
+        <!-- Scrollable content -->
+        <div class="review-eval-scroll">
+
+        <!-- Score summary -->
+        <div>
+          <div class="eval-section-label">Evaluation Report</div>
+          <div class="eval-score-block">
+            <div class="score-ring-wrap">
+              <svg width="90" height="90" viewBox="0 0 90 90">
+                <circle cx="45" cy="45" r="38" fill="none" stroke="#e5e7eb" stroke-width="8"/>
+                <circle cx="45" cy="45" r="38" fill="none" stroke="#d97706" stroke-width="8"
+                  stroke-dasharray="238.76" stroke-dashoffset="78.79" stroke-linecap="round"/>
+              </svg>
+              <div class="score-ring-label">
+                <div class="score-pct" style="color:var(--amber)">67%</div>
+                <div class="score-pts">4/6 pts</div>
+              </div>
+            </div>
+            <div class="eval-score-info">
+              <div class="eval-score-headline">
+                <span>🏆</span>
+                <span class="score-headline-text">Session Complete!</span>
+              </div>
+              <div class="eval-feedback">
+                Good effort managing the front office interaction. Focus on making your initial greeting warmer and more prompt to score higher.
+              </div>
+              <div class="eval-meta">
+                <span>Apr 8, 2026 · 10:24 AM</span>
+                <span>·</span>
+                <span>Attempt 1</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="eval-progress-wrap">
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:67%;background:var(--amber)"></div>
+          </div>
+          <div class="progress-labels">
+            <span>0%</span>
+            <span style="color:var(--amber)">Your score: 67%</span>
+            <span>Pass: 80%</span>
+          </div>
+        </div>
+
+        <!-- Criteria breakdown -->
+        <div class="crit-section" style="margin-top:0">
+          <div class="eval-section-label">Criteria Breakdown</div>
+
+          <div class="crit-item partial">
+            <div class="crit-icon">½</div>
+            <div class="crit-body">
+              <div class="crit-name">Greet the patient promptly and courteously.</div>
+              <div class="crit-feedback">You acknowledged the patient but the greeting could be warmer and more prompt.</div>
+            </div>
+            <div class="crit-score">1/2</div>
+          </div>
+
+          <div class="crit-item partial">
+            <div class="crit-icon">½</div>
+            <div class="crit-body">
+              <div class="crit-name">Collect and verify patient information accurately.</div>
+              <div class="crit-feedback">You attempted to verify information but missed confirming the appointment time explicitly.</div>
+            </div>
+            <div class="crit-score">1/2</div>
+          </div>
+
+          <div class="crit-item pass">
+            <div class="crit-icon">✓</div>
+            <div class="crit-body">
+              <div class="crit-name">Provide clear directions and necessary paperwork.</div>
+              <div class="crit-feedback">Excellent — clear directions and paperwork handled without hesitation.</div>
+            </div>
+            <div class="crit-score">2/2</div>
+          </div>
+        </div>
+
+        </div><!-- /review-eval-scroll -->
+
+        <!-- Actions — always visible -->
+        <div class="review-actions">
+          <button class="btn btn-primary btn-full" onclick="openModal('presession-modal');showScreen('scenarios')">
+            <svg width="13" height="13" fill="currentColor" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Practice Again
+          </button>
+          <button class="btn btn-outline btn-full" onclick="showScreen('scenarios')">
+            Back to Scenarios
+          </button>
+        </div>
+
+      </div><!-- /review-eval-col -->
+    </div><!-- /review-body -->
+  </div><!-- /review-layout -->
+</div><!-- /screen-review -->
+
+
+<!-- ================================================================
+     SHARED DRAWERS — accessible from chat and review screens
+     ================================================================ -->
+
+<!-- Criteria Drawer -->
+<div class="overlay" id="criteria-overlay" onclick="closeDrawer('criteria-drawer','criteria-overlay')"></div>
+<div class="drawer" id="criteria-drawer">
+  <div class="drawer-header">
+    <div>
+      <h3 style="font-size:16px;font-weight:700">Success Criteria</h3>
+      <p style="font-size:12px;color:var(--muted);margin-top:2px">Your performance will be scored on these</p>
+    </div>
+    <button class="close-btn" onclick="closeDrawer('criteria-drawer','criteria-overlay')">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="crit-card">
+      <div class="cp-num">1</div>
+      <div class="crit-card-title">Greet the patient promptly and courteously.</div>
+      <span class="badge badge-teal">2 points</span>
+    </div>
+    <div class="crit-card">
+      <div class="cp-num">2</div>
+      <div class="crit-card-title">Collect and verify the patient's information accurately in the system.</div>
+      <span class="badge badge-teal">2 points</span>
+    </div>
+    <div class="crit-card">
+      <div class="cp-num">3</div>
+      <div class="crit-card-title">Provide the patient with clear directions and any necessary paperwork.</div>
+      <span class="badge badge-teal">2 points</span>
+    </div>
+    <p style="font-size:12px;color:var(--muted);text-align:center;margin-top:12px">6 points total · Pass threshold: 80%</p>
+  </div>
+</div>
+
+<!-- Scenario Info Drawer -->
+<div class="overlay" id="info-overlay" onclick="closeDrawer('info-drawer','info-overlay')"></div>
+<div class="drawer" id="info-drawer">
+  <div class="drawer-header">
+    <h3 style="font-size:16px;font-weight:700">Front Office Interaction</h3>
+    <button class="close-btn" onclick="closeDrawer('info-drawer','info-overlay')">✕</button>
+  </div>
+  <div class="drawer-body">
+    <p style="font-size:13px;color:var(--muted);line-height:1.65;margin-bottom:16px">The front office of a busy healthcare clinic is bustling with activity. Patients are arriving for their appointments, and the reception area is filled with seating for those waiting. A large digital display board shows the schedule of upcoming appointments.</p>
+    <div class="divider"></div>
+    <div class="roles-row" style="flex-direction:column;gap:8px">
+      <div class="role-chip">
+        <span style="font-size:20px">🧑‍💼</span>
+        <div>
+          <div class="role-lbl">Your Role</div>
+          <div class="role-name" style="font-size:14px">Front Office Staff</div>
+        </div>
+      </div>
+      <div class="role-chip">
+        <span style="font-size:20px">🤖</span>
+        <div>
+          <div class="role-lbl">AI Role</div>
+          <div class="role-name" style="font-size:14px">Patient</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// ---- Screen switching ----
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  const map = { scenarios: 0, empty: 1, chat: 2, review: 3 };
+  document.querySelectorAll('.proto-btn').forEach((b, i) => b.classList.toggle('active', i === map[id]));
+  window.scrollTo(0, 0);
+}
+
+// ---- Drawer ----
+function openDrawer(drawerId, overlayId) {
+  document.getElementById(overlayId).classList.add('open');
+  document.getElementById(drawerId).classList.add('open');
+}
+function closeDrawer(drawerId, overlayId) {
+  document.getElementById(overlayId).classList.remove('open');
+  document.getElementById(drawerId).classList.remove('open');
+}
+
+// ---- Modal ----
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// ---- Pre-session desc toggle ----
+let descOpen = false;
+function toggleDesc() {
+  descOpen = !descOpen;
+  document.getElementById('presession-desc').classList.toggle('open', descOpen);
+  document.getElementById('read-more-btn').textContent = descOpen ? 'Read less ▴' : 'Read more ▾';
+}
+
+// ---- Start session ----
+function startSession() {
+  closeModal('presession-modal');
+  showScreen('chat');
+}
+
+// ---- Voice toggle ----
+let voiceOn = true;
+function toggleVoice() {
+  voiceOn = !voiceOn;
+  const btn = document.getElementById('voice-btn');
+  const lbl = document.getElementById('voice-label');
+  btn.classList.toggle('voice-on', voiceOn);
+  lbl.textContent = voiceOn ? 'Voice On' : 'Voice Off';
+  if (!voiceOn) {
+    btn.querySelector('svg').innerHTML = '<line x1="1" y1="1" x2="23" y2="23" stroke="currentColor" stroke-width="2"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12M15 9.34V4a3 3 0 0 0-5.94-.6"/><path d="M17 16.95A7 7 0 0 1 5 12v-2m14 0v2c0 1.31-.36 2.53-.98 3.58" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2"/>';
+  } else {
+    btn.querySelector('svg').innerHTML = '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2"/>';
+  }
+}
+
+// ---- Recording toggle ----
+let recording = false;
+function toggleRecording() {
+  recording = !recording;
+  const micBtn = document.getElementById('mic-btn');
+  const inputRow = document.getElementById('input-row');
+  const input = document.getElementById('text-input');
+  const hint = document.getElementById('input-hint');
+  const icon = document.getElementById('mic-icon');
+
+  if (recording) {
+    micBtn.classList.add('rec');
+    inputRow.classList.add('is-recording');
+    input.placeholder = 'Recording…';
+    input.disabled = true;
+    hint.innerHTML = '<span style="color:var(--red)">● Recording</span> — tap stop to finish';
+    icon.innerHTML = '<rect x="3" y="3" width="18" height="18" rx="2"/>';
+  } else {
+    micBtn.classList.remove('rec');
+    inputRow.classList.remove('is-recording');
+    input.placeholder = 'Message Patient…';
+    input.disabled = false;
+    hint.innerHTML = 'Press Enter to send · Shift+Enter for new line';
+    icon.innerHTML = '<path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2" fill="none" stroke="currentColor" stroke-width="2"/><line x1="12" y1="19" x2="12" y2="23" stroke="currentColor" stroke-width="2"/><line x1="8" y1="23" x2="16" y2="23" stroke="currentColor" stroke-width="2"/>';
+  }
+}
+
+// ---- Back from chat (with confirm if active) ----
+function confirmBack() { openModal('end-confirm-modal'); }
+
+// ---- History Picker ----
+const attemptData = {
+  3: { pct: '85%', pts: '5/6', color: 'var(--green)', date: 'Apr 8, 2026', duration: '~8 min', attempt: 3,
+       feedback: 'Great improvement! Your greeting was warm and prompt. Work on verifying patient details more precisely.',
+       progressColor: 'var(--green)', progressWidth: '85%',
+       criteria: [
+         { status: 'pass', icon: '✓', name: 'Greet the patient promptly and courteously.', feedback: 'Excellent — warm, prompt, and professional greeting from the start.', score: '2/2' },
+         { status: 'partial', icon: '½', name: 'Collect and verify the patient\'s information accurately in the system.', feedback: 'Mostly correct, but missed confirming the appointment time explicitly.', score: '1/2' },
+         { status: 'pass', icon: '✓', name: 'Provide the patient with clear directions and any necessary paperwork.', feedback: 'Clear directions and paperwork handed out without hesitation.', score: '2/2' },
+       ]},
+  2: { pct: '72%', pts: '4/6', color: 'var(--amber)', date: 'Apr 5, 2026', duration: '~11 min', attempt: 2,
+       feedback: 'Good progress from your first attempt. Your information collection improved, but greeting still needs more warmth.',
+       progressColor: 'var(--amber)', progressWidth: '72%',
+       criteria: [
+         { status: 'partial', icon: '½', name: 'Greet the patient promptly and courteously.', feedback: 'Greeting was friendly but slightly delayed. Lead with a direct welcome.', score: '1/2' },
+         { status: 'pass', icon: '✓', name: 'Collect and verify the patient\'s information accurately in the system.', feedback: 'All patient details collected and confirmed correctly.', score: '2/2' },
+         { status: 'partial', icon: '½', name: 'Provide the patient with clear directions and any necessary paperwork.', feedback: 'Directions were given but paperwork was not clearly offered.', score: '1/2' },
+       ]},
+  1: { pct: '67%', pts: '4/6', color: 'var(--red)', date: 'Apr 3, 2026', duration: '~8 min', attempt: 1,
+       feedback: 'Good first effort. Focus on making your greeting more inviting and verify patient details explicitly.',
+       progressColor: 'var(--amber)', progressWidth: '67%',
+       criteria: [
+         { status: 'partial', icon: '½', name: 'Greet the patient promptly and courteously.', feedback: 'You acknowledged the patient but the greeting could be warmer and more prompt.', score: '1/2' },
+         { status: 'partial', icon: '½', name: 'Collect and verify the patient\'s information accurately in the system.', feedback: 'Some details were missed. Confirm name, appointment, and doctor explicitly.', score: '1/2' },
+         { status: 'pass', icon: '✓', name: 'Provide the patient with clear directions and any necessary paperwork.', feedback: 'Excellent — directions and paperwork handled correctly.', score: '2/2' },
+       ]},
+};
+
+function viewAttempt(n) {
+  const d = attemptData[n];
+  closeModal('fo-history-modal');
+  closeModal('emg-history-modal');
+
+  const panel = document.querySelector('.review-eval-col');
+
+  // Score ring
+  panel.querySelector('.score-pct').textContent = d.pct;
+  panel.querySelector('.score-pct').style.color = d.color;
+  panel.querySelector('.score-pts').textContent = d.pts + ' pts';
+  panel.querySelector('.score-ring-wrap circle:last-child').style.stroke = d.color;
+
+  // Headline + feedback + meta
+  panel.querySelector('.score-headline-text').textContent = 'Attempt ' + d.attempt + ' Results';
+  panel.querySelector('.eval-feedback').textContent = d.feedback;
+  panel.querySelector('.eval-meta').innerHTML =
+    '<span>' + d.date + '</span><span>·</span><span>Attempt ' + d.attempt + '</span>';
+
+  // Progress bar
+  panel.querySelector('.progress-fill').style.width = d.progressWidth;
+  panel.querySelector('.progress-fill').style.background = d.progressColor;
+  panel.querySelector('.progress-labels span:nth-child(2)').textContent = 'Your score: ' + d.pct;
+
+  // Rebuild criteria
+  const section = panel.querySelector('.crit-section');
+  section.innerHTML = '<div class="eval-section-label">Criteria Breakdown</div>' +
+    d.criteria.map(c => `
+      <div class="crit-item ${c.status}">
+        <div class="crit-icon">${c.icon}</div>
+        <div class="crit-body">
+          <div class="crit-name">${c.name}</div>
+          <div class="crit-feedback">${c.feedback}</div>
+        </div>
+        <div class="crit-score">${c.score}</div>
+      </div>`).join('');
+
+  showScreen('review');
+}
+
+// ---- End & Evaluate ----
+function startEvaluating() {
+  closeModal('end-confirm-modal');
+  const wrap = document.getElementById('end-session-wrap');
+  wrap.innerHTML = '<div class="eval-btn"><span class="spin">⟳</span> Evaluating…</div>';
+  setTimeout(() => showScreen('review'), 2000);
+}
+</script>
+
+</body>
+</html>
