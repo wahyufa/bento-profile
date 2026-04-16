@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATLAS — Power Future-Ready Workforce Development with AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,700;1,400&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #223344;
+      --primary: #0d719a;
+      --orange:  #fba333;
+      --body:    #6b6b6b;
+      --border:  #e6e6e6;
+      --warm:    #fffaf4;
+      --sky:     #ebf6ff;
+      --green-bg:#daede8;
+      --hero-bg: #31425d;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      background: #fff;
+      color: var(--navy);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ─── NAVBAR ─── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #fff;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.09);
+      padding: 16px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo img {
+      height: 48px;
+      width: 147px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .btn-demo {
+      border: 1px solid var(--primary);
+      color: var(--primary);
+      background: transparent;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 12px 20px;
+      border-radius: 16px;
+      cursor: pointer;
+      white-space: nowrap;
+      line-height: normal;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      background: var(--hero-bg);
+      min-height: 674px;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 80px 205px;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .hero-left {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .hero-text {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      color: #fff;
+    }
+
+    .hero-h1 {
+      font-weight: 700;
+      font-size: 40px;
+      line-height: normal;
+      letter-spacing: -0.5px;
+      text-transform: capitalize;
+    }
+
+    .hero-body {
+      font-weight: 400;
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .btn-contact {
+      background: var(--primary);
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px 28px;
+      border-radius: 16px;
+      border: none;
+      cursor: pointer;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .hero-tagline {
+      font-style: italic;
+      font-weight: 400;
+      font-size: 16px;
+      color: #fff;
+      white-space: nowrap;
+      line-height: normal;
+    }
+
+    /* Hero visual — right side */
+    .hero-right {
+      flex: 1;
+      min-width: 0;
+      height: 514px;
+      position: relative;
+    }
+
+    /* Everything inside hero-right is absolutely centered */
+    .hero-blob {
+      position: absolute;
+      width: 391px;
+      height: 388px;
+      background: var(--primary);
+      border-radius: 1000px;
+      left: 50%;
+      top: calc(50% + 0.29px);
+      transform: translate(-50%, -50%);
+    }
+
+    .hero-student {
+      position: absolute;
+      width: 289px;
+      height: 339px;
+      left: calc(50% + 0.05px);
+      top: calc(50% + 24.97px);
+      transform: translate(-50%, -50%);
+      overflow: hidden;
+      -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/278ba19c-6949-4f15-b3f2-f0c01f78853f');
+      -webkit-mask-repeat: no-repeat;
+      -webkit-mask-position: -51px -49px;
+      -webkit-mask-size: 391px 388px;
+      mask-image: url('https://www.figma.com/api/mcp/asset/278ba19c-6949-4f15-b3f2-f0c01f78853f');
+      mask-repeat: no-repeat;
+      mask-position: -51px -49px;
+      mask-size: 391px 388px;
+    }
+
+    .hero-student img {
+      position: absolute;
+      width: 181.65%;
+      height: 102.43%;
+      left: -38.3%;
+      top: -2.43%;
+      max-width: none;
+    }
+
+    /* Stat cards */
+    .stat-card {
+      position: absolute;
+      background: #f5f5f4;
+      border: 0.765px solid var(--primary);
+      border-radius: 18px;
+      box-shadow: 0 18px 38px rgba(0,0,0,0.15);
+      transform: translate(-50%, -50%);
+    }
+
+    /* 5K+ — top right */
+    .card-5k {
+      left: calc(50% + 181px);
+      top: calc(50% - 165px);
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-ring {
+      width: 80px;
+      height: 80px;
+      position: relative;
+    }
+
+    .card-ring img {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .stat-num {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 25px;
+      color: #101828;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .stat-lbl {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      font-size: 15px;
+      color: rgba(16,24,40,0.5);
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    /* 2K+ — top left */
+    .card-2k {
+      left: calc(50% - 151px);
+      top: calc(50% - 137px);
+      padding: 12px 16px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    /* 250+ — bottom right */
+    .card-250 {
+      left: calc(50% + 135px);
+      top: calc(50% + 157px);
+      padding: 12px 16px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .icon-stack {
+      width: 49px;
+      height: 49px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .icon-stack-bg {
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+    }
+
+    .icon-stack img {
+      position: absolute;
+      display: block;
+    }
+
+    /* ─── PAGE WRAPPER ─── */
+    .page-wrap {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding-left: 205px;
+      padding-right: 205px;
+    }
+
+    /* ─── SECTION LABELS ─── */
+    .overline {
+      font-weight: 400;
+      font-size: 16px;
+      text-transform: uppercase;
+      color: #000;
+      line-height: normal;
+    }
+
+    .section-title {
+      font-weight: 700;
+      font-size: 32px;
+      color: var(--navy);
+      line-height: normal;
+    }
+
+    /* ─── WHY ATLAS ─── */
+    .why-section {
+      padding: 80px 0;
+    }
+
+    .why-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .cards-row {
+      display: flex;
+      gap: 24px;
+    }
+
+    .feat-card {
+      flex: 1;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .feat-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .feat-icon img {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      display: block;
+    }
+
+    .feat-icon.orange img {
+      top: 14.58px;
+      left: 15.5px;
+      transform: none;
+    }
+
+    .feat-card h3 {
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--navy);
+      text-align: center;
+      line-height: normal;
+    }
+
+    .feat-card p {
+      font-weight: 400;
+      font-size: 16px;
+      color: var(--body);
+      text-align: center;
+      line-height: normal;
+    }
+
+    /* ─── HIGHLIGHT SECTIONS ─── */
+    .highlight-section {
+      padding: 80px 0;
+    }
+
+    .hl-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .hl-layout {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    /* Tab list */
+    .tab-list {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-self: stretch;
+    }
+
+    .tab-row {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      padding: 12px 16px;
+      border-radius: 16px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      text-align: left;
+      width: 100%;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .tab-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      border: 2px solid rgba(255,255,255,0.4);
+      flex-shrink: 0;
+    }
+
+    .tab-dot.active { background: var(--primary); }
+    .tab-dot.idle   { background: var(--sky); }
+
+    .tab-body { flex: 1; min-width: 0; }
+
+    .tab-title {
+      font-weight: 700;
+      font-size: 16px;
+      line-height: normal;
+      white-space: nowrap;
+    }
+
+    .tab-title.active { color: var(--primary); }
+    .tab-title.idle   { color: var(--body); }
+
+    .tab-desc {
+      font-weight: 400;
+      font-size: 16px;
+      color: var(--body);
+      line-height: normal;
+      margin-top: 8px;
+    }
+
+    /* Feature image panel */
+    .hl-panel {
+      width: 503px;
+      height: 284px;
+      border-radius: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .hl-panel.blue  { background: var(--sky); }
+    .hl-panel.green { background: var(--green-bg); }
+
+    /* App screenshot inside blue panel */
+    .app-img {
+      position: absolute;
+      width: 521px;
+      height: 673px;
+      left: calc(50% + 25px);
+      top: 12px;
+      transform: translateX(-50%);
+    }
+
+    .app-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Performance card inside green panel */
+    .perf-label {
+      position: absolute;
+      left: 26px;
+      top: 23px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .perf-title {
+      font-weight: 700;
+      font-size: 20px;
+      color: var(--navy);
+      letter-spacing: -0.4px;
+    }
+
+    .perf-date {
+      font-family: 'Nunito Sans', sans-serif;
+      font-weight: 400;
+      font-size: 14px;
+      color: var(--body);
+      letter-spacing: 0.4px;
+      white-space: nowrap;
+    }
+
+    .perf-card {
+      position: absolute;
+      bottom: 14px;
+      left: 50%;
+      transform: translateX(calc(-50% - 2px));
+      width: 463px;
+      height: 188px;
+      background: #fff;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 16px;
+    }
+
+    /* Donut chart */
+    .donut-wrap {
+      width: 144px;
+      height: 154px;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .donut-ring {
+      position: absolute;
+      width: 138px;
+      height: 138px;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: block;
+    }
+
+    .donut-pct {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-weight: 700;
+      font-size: 35px;
+      color: var(--navy);
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    /* Metrics list */
+    .metrics-list {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .metric-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 18px;
+    }
+
+    .metric-name {
+      font-family: 'Nunito Sans', sans-serif;
+      font-weight: 700;
+      font-size: 11px;
+      color: var(--navy);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      flex: 1;
+      min-width: 0;
+      line-height: 1.3;
+    }
+
+    .metric-val {
+      font-family: 'Nunito Sans', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: #3ec8a2;
+      letter-spacing: 0.25px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ─── LIMITLESS SCENARIOS ─── */
+    .scenarios-wrap {
+      background: var(--warm);
+    }
+
+    .scenarios-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 48px 205px;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+    }
+
+    .scenarios-header {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      text-align: center;
+    }
+
+    .scenarios-header p:last-child {
+      font-weight: 400;
+      font-size: 16px;
+      color: var(--body);
+      line-height: 1.4;
+    }
+
+    .scenarios-header .section-title {
+      margin: 0;
+    }
+
+    .scenario-cards {
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+    }
+
+    .scenario-card {
+      flex: 1;
+      background: #fff;
+      border-radius: 24px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .scenario-icon {
+      background: var(--warm);
+      border-radius: 16px;
+      padding: 12px;
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+    }
+
+    .scenario-icon img {
+      width: 40px;
+      height: 40px;
+      display: block;
+    }
+
+    .scenario-card h3 {
+      font-weight: 700;
+      font-size: 24px;
+      color: var(--navy);
+      line-height: normal;
+    }
+
+    .scenario-card p {
+      font-weight: 400;
+      font-size: 16px;
+      color: var(--body);
+      line-height: 1.4;
+    }
+
+    /* ─── CTA BANNER ─── */
+    .cta-banner {
+      background: var(--orange);
+      height: 319px;
+      overflow: hidden;
+    }
+
+    .cta-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 99px;
+      height: 100%;
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+
+    .cta-img {
+      width: 473px;
+      height: 319px;
+      position: relative;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .cta-img img {
+      position: absolute;
+      width: 99.9%;
+      height: 222.22%;
+      top: -20.28%;
+      left: 0;
+      max-width: none;
+      display: block;
+    }
+
+    .cta-text-block {
+      width: 745px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      justify-content: center;
+    }
+
+    .cta-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      color: #fff;
+    }
+
+    .cta-h2 {
+      font-weight: 700;
+      font-size: 32px;
+      line-height: normal;
+    }
+
+    .cta-p {
+      font-weight: 400;
+      font-size: 16px;
+      line-height: normal;
+    }
+
+    .btn-cta {
+      display: inline-flex;
+      gap: 16px;
+      align-items: center;
+      background: #fff;
+      border: 2px solid var(--primary);
+      border-radius: 16px;
+      padding: 16px 28px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--primary);
+      cursor: pointer;
+      width: fit-content;
+      line-height: normal;
+    }
+
+    .btn-cta img { width: 16px; height: 16px; display: block; }
+
+    /* ─── FOOTER ─── */
+    footer {
+      background: #fff;
+      padding: 24px 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    footer p {
+      font-weight: 400;
+      font-size: 14px;
+      color: var(--navy);
+      line-height: 22px;
+      white-space: nowrap;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══════════════════════════════════
+       NAVBAR
+  ══════════════════════════════════ -->
+  <nav>
+    <div class="nav-logo">
+      <img src="https://www.figma.com/api/mcp/asset/fa23b5bb-b968-44d4-9362-7c16b76c0e61" alt="ATLAS by HeyHi">
+    </div>
+    <button class="btn-demo">Request Demo</button>
+  </nav>
+
+  <!-- ══════════════════════════════════
+       HERO
+  ══════════════════════════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-inner">
+
+      <!-- Left: copy + CTAs -->
+      <div class="hero-left">
+        <div class="hero-text">
+          <h1 class="hero-h1" id="hero-heading">Power Future-Ready Workforce Development with AI</h1>
+          <p class="hero-body">ATLAS Learn empowers every employee with personalised and adaptive AI-powered learning that integrates seamlessly, scales effortlessly, and delivers measurable results.</p>
+        </div>
+        <div class="hero-ctas">
+          <button class="btn-contact">Contact Us</button>
+          <span class="hero-tagline">Let's Get Started!</span>
+        </div>
+      </div>
+
+      <!-- Right: visual with floating stat cards -->
+      <div class="hero-right" aria-hidden="true">
+
+        <!-- Teal oval blob -->
+        <div class="hero-blob"></div>
+
+        <!-- Student photo, clipped by blob mask -->
+        <div class="hero-student">
+          <img
+            src="https://www.figma.com/api/mcp/asset/e3271e1d-ae20-490c-a7ba-a18016990993"
+            alt="Student">
+        </div>
+
+        <!-- Stat card: 5K+ Online Courses -->
+        <div class="stat-card card-5k">
+          <div class="card-ring">
+            <img src="https://www.figma.com/api/mcp/asset/cdd2e134-ac3b-44e7-8779-04757f990369" alt="Progress ring">
+          </div>
+          <p class="stat-num">5K+</p>
+          <p class="stat-lbl">Online Courses</p>
+        </div>
+
+        <!-- Stat card: 2K+ Video Courses -->
+        <div class="stat-card card-2k">
+          <div class="icon-stack">
+            <div class="icon-stack-bg" style="background:#f15d22;"></div>
+            <img src="https://www.figma.com/api/mcp/asset/25aedf4c-d490-4c2a-86af-b390f81a6b5c"
+                 alt="Video Courses"
+                 style="width:36px;height:36px;top:6.64px;left:6.64px;">
+          </div>
+          <div>
+            <p class="stat-num">2K+</p>
+            <p class="stat-lbl">Video Courses</p>
+          </div>
+        </div>
+
+        <!-- Stat card: 250+ Tutors -->
+        <div class="stat-card card-250">
+          <div class="icon-stack">
+            <div class="icon-stack-bg" style="background:#1ca054;"></div>
+            <img src="https://www.figma.com/api/mcp/asset/477c1362-a97f-4b10-a14b-b14c6aa6aaf3"
+                 alt="Tutors"
+                 style="width:30.6px;height:30.6px;top:9.18px;left:9.18px;">
+          </div>
+          <div>
+            <p class="stat-lbl">Tutors</p>
+            <p class="stat-num">250+</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════════════════════════════════
+       WHY ATLAS — 3 Feature Cards
+  ══════════════════════════════════ -->
+  <div class="page-wrap">
+
+    <div class="why-section">
+      <div class="why-header">
+        <p class="overline">WHY ATLAS?</p>
+        <h2 class="section-title">Smarter Learning. Smarter Support. Smarter Decisions.</h2>
+      </div>
+      <div class="cards-row">
+
+        <!-- Card 1: AI Personalised Learning -->
+        <div class="feat-card">
+          <div class="feat-icon" style="background:#0d719a;">
+            <img src="https://www.figma.com/api/mcp/asset/f6db97ab-54a3-4215-8926-fa7b473ffb7e" alt="AI Learning icon">
+          </div>
+          <h3>AI Personalised Learning</h3>
+          <p>ATLAS adapts to each employee's role, pace, and skill needs. We deliver tailored learning content to close knowledge gaps and strengthen skills, ensuring faster upskilling, deeper engagement, and workforce readiness through a truly personalised, adaptive learning.</p>
+        </div>
+
+        <!-- Card 2: AI Co-Instructor -->
+        <div class="feat-card">
+          <div class="feat-icon orange" style="background:#fba333;">
+            <img src="https://www.figma.com/api/mcp/asset/3ba49e55-3641-4dce-921a-bc28a895d923" alt="AI Co-Instructor icon">
+          </div>
+          <h3>AI Co-Instructor</h3>
+          <p>Employees gain a 24/7 AI co-pilot that supports scenario-based training, answers questions in real time, and reinforces knowledge anytime. Acting as a coach and mentor to build confidence, boosts retention, and brings workplace learning to life.</p>
+        </div>
+
+        <!-- Card 3: Admin Level Analytics -->
+        <div class="feat-card">
+          <div class="feat-icon" style="background:#f15d22;">
+            <img src="https://www.figma.com/api/mcp/asset/1d3aedef-5234-4c38-9292-affead8b99fa" alt="Admin Analytics icon">
+          </div>
+          <h3>Admin Level Analytics</h3>
+          <p>Admin can access real-time dashboards that track completions, accuracy, and skill progress. Analytics highlight learning gaps, measure ROI, and guide talent planning, turning data into actionable insights for better workforce performance and organizational growth.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         BUILT FOR WORKFORCE GROWTH
+         Tabs left, screenshot right
+    ══════════════════════════════════ -->
+    <div class="highlight-section">
+      <div class="hl-header">
+        <p class="overline">Built for Workforce Growth</p>
+        <h2 class="section-title">Personalised learning, simplified management, and powerful content tools for smarter learning.</h2>
+      </div>
+
+      <div class="hl-layout">
+        <!-- Tabs -->
+        <div class="tab-list">
+          <!-- Active -->
+          <div class="tab-row" style="align-items:flex-start;cursor:default;">
+            <div class="tab-dot active"></div>
+            <div class="tab-body">
+              <p class="tab-title active">Personalised Adaptive Learning System (PALS)</p>
+              <p class="tab-desc">Delivers tailored learning journeys that adapt to roles, skill levels, and progress, ensuring each employee develops effectively while staying engaged and motivated.</p>
+            </div>
+          </div>
+          <!-- Idle -->
+          <button class="tab-row">
+            <div class="tab-dot idle"></div>
+            <div class="tab-body">
+              <p class="tab-title idle">Learning Management System</p>
+            </div>
+          </button>
+          <button class="tab-row">
+            <div class="tab-dot idle"></div>
+            <div class="tab-body">
+              <p class="tab-title idle">Content Management System</p>
+            </div>
+          </button>
+        </div>
+
+        <!-- App screenshot panel -->
+        <div class="hl-panel blue">
+          <div class="app-img">
+            <img src="https://www.figma.com/api/mcp/asset/8c5fc640-031c-46ae-bcd3-1db874f80d37" alt="ATLAS platform screenshot">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         DRIVING MEASURABLE OUTCOMES
+         Performance card left, tabs right
+    ══════════════════════════════════ -->
+    <div class="highlight-section" style="padding-bottom:80px;">
+      <div class="hl-header">
+        <p class="overline">Driving Measurable Outcomes</p>
+        <h2 class="section-title">Actionable analytics, adaptive coaching, and AI assessments for measurable performance.</h2>
+      </div>
+
+      <div class="hl-layout">
+        <!-- Performance card panel -->
+        <div class="hl-panel green">
+
+          <!-- Header text inside green panel -->
+          <div class="perf-label">
+            <p class="perf-title">Overall Performance</p>
+            <p class="perf-date">Leadership &amp; Management - 01/1/2025 ~ 12/31/2025</p>
+          </div>
+
+          <!-- White inner card with chart -->
+          <div class="perf-card">
+            <!-- Donut chart -->
+            <div class="donut-wrap">
+              <img class="donut-ring" src="https://www.figma.com/api/mcp/asset/26e6fd17-0e2d-4642-93d8-12cf4fcaa3b0" alt="Chart background ring">
+              <img class="donut-ring" src="https://www.figma.com/api/mcp/asset/2a1915c8-b6ae-48ac-bf09-30d26de37704" alt="Chart progress ring">
+              <p class="donut-pct">70%</p>
+            </div>
+            <!-- Metrics -->
+            <div class="metrics-list">
+              <div class="metric-row">
+                <p class="metric-name">Self-Leadership &amp; Personal Effectiveness</p>
+                <p class="metric-val">90%</p>
+              </div>
+              <div class="metric-row">
+                <p class="metric-name">Team Leadership &amp; Communication</p>
+                <p class="metric-val">60%</p>
+              </div>
+              <div class="metric-row">
+                <p class="metric-name">Strategic Thinking &amp; Decision Making</p>
+                <p class="metric-val">70%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tab-list">
+          <!-- Active -->
+          <div class="tab-row" style="align-items:flex-start;cursor:default;">
+            <div class="tab-dot active"></div>
+            <div class="tab-body">
+              <p class="tab-title active">Performance Management System</p>
+              <p class="tab-desc">Track completions, accuracy, and skill growth across teams. Real-time analytics uncover gaps and guide smarter workforce planning and decisions.</p>
+            </div>
+          </div>
+          <!-- Idle -->
+          <button class="tab-row">
+            <div class="tab-dot idle"></div>
+            <div class="tab-body">
+              <p class="tab-title idle">AI Co-pilot Learning</p>
+            </div>
+          </button>
+          <button class="tab-row">
+            <div class="tab-dot idle"></div>
+            <div class="tab-body">
+              <p class="tab-title idle">AI Assessment</p>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /page-wrap -->
+
+  <!-- ══════════════════════════════════
+       LIMITLESS LEARNING SCENARIOS
+  ══════════════════════════════════ -->
+  <div class="scenarios-wrap">
+    <div class="scenarios-inner">
+
+      <div class="scenarios-header">
+        <p class="overline">Limitless Learning Scenarios</p>
+        <h2 class="section-title">Workforce Learning That Adapts to You</h2>
+        <p>From hotel staff to finance and frontline teams, ATLAS Learn supports diverse training needs with scenario-based, data-driven learning that ensures relevance and effectiveness at scale.</p>
+      </div>
+
+      <div class="scenario-cards">
+        <div class="scenario-card">
+          <div class="scenario-icon">
+            <img src="https://www.figma.com/api/mcp/asset/a7eac0be-d7ab-43a0-808b-43bd40c3ecaf" alt="Hospitality icon">
+          </div>
+          <h3>Elevate Hospitality Skills</h3>
+          <p>From guest service to safety, ATLAS enables practical, scenario-driven learning that keeps teams engaged and ensures service excellence every time.</p>
+        </div>
+        <div class="scenario-card">
+          <div class="scenario-icon">
+            <img src="https://www.figma.com/api/mcp/asset/fa901c94-ad08-43b9-aeda-4b8f090f7ed8" alt="Legal icon">
+          </div>
+          <h3>Effective Legal Upskilling</h3>
+          <p>Deliver interactive, case-based training that helps legal teams master regulations, ethics, and best practices while ensuring relevance and retention.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       CTA BANNER — Let's grow together
+  ══════════════════════════════════ -->
+  <div class="cta-banner">
+    <div class="cta-inner">
+
+      <!-- Left: person image -->
+      <div class="cta-img">
+        <img src="https://www.figma.com/api/mcp/asset/64819f6a-9d47-492a-b7ed-1b67dfcc5ef8" alt="ATLAS growth">
+      </div>
+
+      <!-- Right: copy + button -->
+      <div class="cta-text-block">
+        <div class="cta-copy">
+          <h2 class="cta-h2">Let's grow together with ATLAS</h2>
+          <p class="cta-p">Don't just keep up when you can stay ahead. Your workforce deserves more than training, they deserve transformation. Take the leap with ATLAS and unlock tomorrow's growth today.</p>
+        </div>
+        <button class="btn-cta">
+          <img src="https://www.figma.com/api/mcp/asset/530c9959-ad4a-4a6d-a90d-5f82dd45fa46" alt="">
+          Contact Us
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════
+       FOOTER
+  ══════════════════════════════════ -->
+  <footer>
+    <p>©2025 HeyHi. All rights reserved. Managed by HeyHi Pte. Ltd. Privacy Policy</p>
+  </footer>
+
+</body>
+</html>
