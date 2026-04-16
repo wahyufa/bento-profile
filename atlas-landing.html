@@ -758,6 +758,719 @@
       line-height: 22px;
       white-space: nowrap;
     }
+
+    /* ─── CBL PANEL MOCKUP ─── */
+    .hl-panel.cbl {
+      background: #0f172a;
+      display: flex;
+      overflow: hidden;
+      flex-direction: row;
+    }
+
+    /* Left sidebar of CBL mockup */
+    .cbl-sidebar {
+      width: 168px;
+      flex-shrink: 0;
+      background: #0f172a;
+      padding: 16px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      border-right: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .cbl-s-badge {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.35);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .cbl-s-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.35;
+      font-family: 'Montserrat', sans-serif;
+    }
+
+    .cbl-s-divider {
+      height: 1px;
+      background: rgba(255,255,255,0.08);
+      flex-shrink: 0;
+    }
+
+    .cbl-criteria-label {
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.35);
+      font-family: 'Inter', sans-serif;
+    }
+
+    .cbl-criteria-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .cbl-criterion {
+      display: flex;
+      align-items: flex-start;
+      gap: 7px;
+    }
+
+    .cbl-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .cbl-dot.done    { background: #3ec8a2; }
+    .cbl-dot.pending { background: transparent; border: 1.5px solid rgba(255,255,255,0.25); }
+
+    .cbl-criterion-text {
+      font-size: 10px;
+      color: rgba(255,255,255,0.6);
+      line-height: 1.4;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .cbl-jen-label {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .cbl-jen-av {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #fde68a, #f97316);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      flex-shrink: 0;
+    }
+
+    .cbl-jen-name {
+      font-size: 10px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.55);
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Right chat area */
+    .cbl-chat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .cbl-messages {
+      flex: 1;
+      padding: 12px 12px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      overflow: hidden;
+    }
+
+    .cbl-msg {
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+
+    .cbl-msg.user-msg { flex-direction: row-reverse; }
+
+    .cbl-msg-av {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+    }
+
+    .cbl-msg-av.jen-av { background: linear-gradient(135deg, #fde68a, #f97316); }
+
+    .cbl-msg-av.user-av {
+      background: var(--sky);
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 8px;
+    }
+
+    .cbl-bubble {
+      max-width: 210px;
+      padding: 7px 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      line-height: 1.5;
+      color: #1e293b;
+    }
+
+    .cbl-bubble.jen-bubble {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 0 10px 10px 10px;
+    }
+
+    .cbl-bubble.user-bubble {
+      background: var(--primary);
+      color: #fff;
+      border-radius: 10px 0 10px 10px;
+    }
+
+    .cbl-input-bar {
+      padding: 7px 10px;
+      border-top: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #fff;
+      flex-shrink: 0;
+    }
+
+    .cbl-input-field {
+      flex: 1;
+      background: #f1f5f9;
+      border-radius: 20px;
+      height: 26px;
+      padding: 0 10px;
+      font-size: 10px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .cbl-icon-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 12px;
+    }
+
+    .cbl-icon-btn.mic { background: var(--primary); color: #fff; }
+    .cbl-icon-btn.send { background: #f1f5f9; color: #64748b; }
+
+    /* CBL panel state switching */
+    .cbl-panel-state { display: none; width: 100%; height: 100%; }
+    .cbl-panel-state.active { display: flex; }
+
+    /* Panel 2 — Voice & Text Input */
+    .cbl-voice-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      background: #0f172a;
+      padding: 20px 18px;
+    }
+
+    .cbl-mode-toggle {
+      display: flex;
+      background: rgba(255,255,255,0.08);
+      border-radius: 999px;
+      padding: 3px;
+      gap: 2px;
+    }
+
+    .cbl-mode-btn {
+      padding: 5px 16px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .cbl-mode-btn.on {
+      background: var(--primary);
+      color: #fff;
+    }
+    .cbl-mode-btn.off {
+      background: transparent;
+      color: rgba(255,255,255,0.45);
+    }
+
+    .cbl-mic-big {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      position: relative;
+      box-shadow: 0 0 0 0 rgba(13,113,154,0.4);
+      animation: pulse-mic 2s ease-out infinite;
+    }
+    @keyframes pulse-mic {
+      0%   { box-shadow: 0 0 0 0 rgba(13,113,154,0.5); }
+      60%  { box-shadow: 0 0 0 18px rgba(13,113,154,0); }
+      100% { box-shadow: 0 0 0 0 rgba(13,113,154,0); }
+    }
+
+    .cbl-recording-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      color: #3ec8a2;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .cbl-recording-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #3ec8a2;
+      animation: blink-dot 1s step-start infinite;
+    }
+    @keyframes blink-dot { 50% { opacity: 0; } }
+
+    /* Waveform bars */
+    .cbl-waveform {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      height: 32px;
+    }
+    .cbl-wbar {
+      width: 3px;
+      border-radius: 2px;
+      background: rgba(62,200,162,0.7);
+      animation: wbar 1.1s ease-in-out infinite;
+    }
+    .cbl-wbar:nth-child(1)  { height: 8px;  animation-delay: 0s; }
+    .cbl-wbar:nth-child(2)  { height: 20px; animation-delay: 0.1s; }
+    .cbl-wbar:nth-child(3)  { height: 28px; animation-delay: 0.05s; }
+    .cbl-wbar:nth-child(4)  { height: 14px; animation-delay: 0.2s; }
+    .cbl-wbar:nth-child(5)  { height: 30px; animation-delay: 0.15s; }
+    .cbl-wbar:nth-child(6)  { height: 10px; animation-delay: 0.3s; }
+    .cbl-wbar:nth-child(7)  { height: 24px; animation-delay: 0.08s; }
+    .cbl-wbar:nth-child(8)  { height: 18px; animation-delay: 0.25s; }
+    .cbl-wbar:nth-child(9)  { height: 28px; animation-delay: 0.12s; }
+    .cbl-wbar:nth-child(10) { height: 8px;  animation-delay: 0.35s; }
+    @keyframes wbar {
+      0%,100% { transform: scaleY(0.4); opacity: 0.5; }
+      50%     { transform: scaleY(1);   opacity: 1; }
+    }
+
+    .cbl-voice-hint {
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* Panel 3 — Coaching & Assessment */
+    .cbl-results-panel {
+      flex: 1;
+      background: var(--green-bg);
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      gap: 14px;
+      overflow: hidden;
+    }
+
+    .cbl-results-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .cbl-results-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      color: var(--navy);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .cbl-pass-badge {
+      background: #16a34a;
+      color: #fff;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      letter-spacing: 0.03em;
+    }
+
+    .cbl-score-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .cbl-score-ring-wrap {
+      position: relative;
+      width: 68px;
+      height: 68px;
+      flex-shrink: 0;
+    }
+
+    .cbl-score-svg {
+      width: 68px;
+      height: 68px;
+      transform: rotate(-90deg);
+    }
+
+    .cbl-score-track {
+      fill: none;
+      stroke: rgba(0,0,0,0.08);
+      stroke-width: 6;
+    }
+
+    .cbl-score-fill {
+      fill: none;
+      stroke: #16a34a;
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-dasharray: 163.4;
+      stroke-dashoffset: 27.8; /* 83% fill: 163.4 * (1 - 0.83) = 27.8 */
+    }
+
+    .cbl-score-pct {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--navy);
+    }
+
+    .cbl-criteria-results {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .cbl-crit-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 12px;
+    }
+
+    .cbl-crit-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      flex-shrink: 0;
+    }
+    .cbl-crit-icon.pass   { background: #dcfce7; color: #16a34a; }
+    .cbl-crit-icon.partial { background: #fef3c7; color: #d97706; }
+
+    .cbl-crit-name {
+      flex: 1;
+      font-family: 'Inter', sans-serif;
+      font-size: 10px;
+      color: var(--navy);
+      font-weight: 600;
+    }
+
+    .cbl-crit-score {
+      font-family: 'Inter', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .cbl-crit-score.pass    { color: #16a34a; }
+    .cbl-crit-score.partial { color: #d97706; }
+
+    /* ═══════════════════════════════════
+       RESPONSIVE — mobile (≤768px)
+    ═══════════════════════════════════ */
+    @media (max-width: 768px) {
+
+      /* ─── NAVBAR ─── */
+      nav {
+        padding: 14px 16px;
+      }
+      .nav-logo img {
+        height: 38px;
+        width: 115px;
+      }
+      .btn-demo {
+        font-size: 14px;
+        padding: 10px 14px;
+        border-radius: 12px;
+      }
+
+      /* ─── HERO ─── */
+      .hero { min-height: auto; }
+
+      .hero-inner {
+        flex-direction: column;
+        padding: 32px 16px 16px;
+        gap: 24px;
+        align-items: center;
+      }
+
+      .hero-h1 {
+        font-size: 28px;
+        line-height: 36px;
+      }
+
+      .hero-body {
+        font-size: 14px;
+        line-height: 20px;
+      }
+
+      .btn-contact {
+        font-size: 14px;
+        padding: 14px 22px;
+        border-radius: 12px;
+      }
+
+      .hero-tagline { font-size: 14px; }
+
+      /* Hero visual — stacked below text, full width */
+      .hero-right {
+        width: 100%;
+        height: 306px;
+        flex: none;
+      }
+
+      .hero-blob {
+        width: 262px;
+        height: 260px;
+      }
+
+      /* Student image — scaled to 0.67× of desktop */
+      .hero-student {
+        width: 194px;
+        height: 227px;
+        top: calc(50% + 17px);
+        left: 50%;
+        transform: translate(-50%, -50%);
+        -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/069dce68-9e64-4fef-8d4e-f33a575d2169');
+        -webkit-mask-repeat: no-repeat;
+        -webkit-mask-position: -34px -33px;
+        -webkit-mask-size: 262px 260px;
+        mask-image: url('https://www.figma.com/api/mcp/asset/069dce68-9e64-4fef-8d4e-f33a575d2169');
+        mask-repeat: no-repeat;
+        mask-position: -34px -33px;
+        mask-size: 262px 260px;
+      }
+
+      /* Stat cards — scaled ~0.67× */
+      .stat-card { border-radius: 12px; }
+
+      .card-5k {
+        left: calc(50% + 121px);
+        top: calc(50% - 110px);
+        padding: 10px;
+        gap: 8px;
+      }
+      .card-ring { width: 54px; height: 54px; }
+
+      .card-2k {
+        left: calc(50% - 101px);
+        top: calc(50% - 92px);
+        padding: 8px 10px;
+        gap: 10px;
+      }
+
+      .card-250 {
+        left: calc(50% + 90px);
+        top: calc(50% + 105px);
+        padding: 8px 10px;
+        gap: 10px;
+      }
+
+      .stat-num { font-size: 17px; }
+      .stat-lbl { font-size: 10px; }
+
+      .icon-stack {
+        width: 33px;
+        height: 33px;
+      }
+      .icon-stack-bg { border-radius: 8px; }
+      .icon-stack img { width: 22px !important; height: 22px !important; top: 5px !important; left: 5px !important; }
+
+      /* ─── PAGE WRAP ─── */
+      .page-wrap {
+        padding-left: 16px;
+        padding-right: 16px;
+      }
+
+      /* ─── SECTION LABELS ─── */
+      .section-title { font-size: 28px; }
+
+      /* ─── WHY ATLAS ─── */
+      .why-section { padding: 48px 0; }
+
+      .cards-row {
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+      .feat-card { width: 100%; max-width: 327px; }
+
+      /* ─── HIGHLIGHT SECTIONS ─── */
+      .highlight-section { padding: 40px 0; }
+
+      .hl-layout {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .hl-panel {
+        width: 100%;
+        height: 260px;
+      }
+
+      /* Tab titles allowed to wrap on mobile */
+      .tab-title { white-space: normal; }
+
+      /* App screenshot inside blue panel */
+      .app-img {
+        width: 100%;
+        height: 100%;
+        left: 50%;
+        top: 0;
+        transform: translateX(-50%);
+      }
+      .app-img img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+      }
+
+      /* Performance card inside green panel */
+      .perf-card {
+        width: calc(100% - 20px);
+        left: 50%;
+        transform: translateX(-50%);
+        bottom: 10px;
+        height: auto;
+        padding: 10px;
+        gap: 8px;
+      }
+
+      .donut-wrap {
+        width: 96px;
+        height: 104px;
+      }
+      .donut-ring {
+        width: 88px;
+        height: 88px;
+      }
+      .donut-pct { font-size: 24px; }
+
+      .metric-name { font-size: 9px; letter-spacing: 1px; }
+      .metric-val  { font-size: 13px; }
+      .metric-row  { padding: 6px 8px; }
+
+      /* ─── CBL PANEL ─── */
+      .hl-panel.cbl {
+        height: 300px;
+      }
+      .cbl-sidebar {
+        width: 140px;
+        padding: 12px 10px;
+      }
+      .cbl-s-name { font-size: 11px; }
+      .cbl-criterion-text { font-size: 9px; }
+      .cbl-bubble { max-width: 170px; font-size: 9.5px; }
+
+      /* ─── SCENARIOS ─── */
+      .scenarios-inner {
+        padding: 48px 16px;
+        gap: 32px;
+      }
+      .scenario-cards {
+        flex-direction: column;
+        gap: 16px;
+      }
+      .scenario-card { width: 100%; }
+
+      /* ─── CTA BANNER ─── */
+      .cta-banner { height: auto; }
+
+      .cta-inner {
+        flex-direction: column;
+        padding: 0;
+        gap: 0;
+        align-items: stretch;
+      }
+
+      .cta-img {
+        width: 100%;
+        height: 240px;
+        overflow: hidden;
+      }
+      .cta-img img {
+        position: static;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top center;
+      }
+
+      .cta-text-block {
+        width: 100%;
+        padding: 32px 16px;
+        text-align: center;
+        align-items: center;
+      }
+
+      .cta-h2 { font-size: 24px; }
+      .cta-p  { font-size: 14px; }
+
+      .btn-cta {
+        font-size: 14px;
+        padding: 14px 22px;
+        border-radius: 12px;
+      }
+
+      /* ─── FOOTER ─── */
+      footer {
+        padding: 24px 16px;
+        text-align: center;
+      }
+      footer p { white-space: normal; }
+    }
   </style>
 </head>
 <body>
@@ -935,7 +1648,7 @@
          DRIVING MEASURABLE OUTCOMES
          Performance card left, tabs right
     ══════════════════════════════════ -->
-    <div class="highlight-section" style="padding-bottom:80px;">
+    <div class="highlight-section">
       <div class="hl-header">
         <p class="overline">Driving Measurable Outcomes</p>
         <h2 class="section-title">Actionable analytics, adaptive coaching, and AI assessments for measurable performance.</h2>
@@ -1000,6 +1713,192 @@
               <p class="tab-title idle">AI Assessment</p>
             </div>
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         CBL — SCENARIO ROLE PLAY
+         Interactive tabs + panel states
+    ══════════════════════════════════ -->
+    <div class="highlight-section" id="cbl-section">
+      <div class="hl-header">
+        <p class="overline">CBL — Scenario Role Play</p>
+        <h2 class="section-title">Hone Real Workplace Competencies Through AI Role Play</h2>
+      </div>
+
+      <div class="hl-layout">
+        <!-- Tabs left -->
+        <div class="tab-list">
+
+          <!-- Tab 0: Scenario Role Play -->
+          <button class="tab-row" data-cbl-tab="0" style="align-items:flex-start;" onclick="setCblTab(0)">
+            <div class="tab-dot active"></div>
+            <div class="tab-body">
+              <p class="tab-title active">Scenario Role Play</p>
+              <p class="tab-desc">CBL provides the freedom and flexibility to practice and be assessed in real world-like situations, anytime and anywhere. Learners build confidence by interacting with AI personas that simulate real clients, colleagues, and workplace scenarios.</p>
+            </div>
+          </button>
+
+          <!-- Tab 1: Text & Voice Input -->
+          <button class="tab-row" data-cbl-tab="1" style="align-items:flex-start;" onclick="setCblTab(1)">
+            <div class="tab-dot idle"></div>
+            <div class="tab-body">
+              <p class="tab-title idle">Text &amp; Voice Input</p>
+              <p class="tab-desc" style="display:none;">Learners choose how they want to engage — type naturally or speak freely. Switch between text and voice at any point during a session, making practice accessible on any device, in any environment.</p>
+            </div>
+          </button>
+
+          <!-- Tab 2: Real-Time Coaching & Assessment -->
+          <button class="tab-row" data-cbl-tab="2" style="align-items:flex-start;" onclick="setCblTab(2)">
+            <div class="tab-dot idle"></div>
+            <div class="tab-body">
+              <p class="tab-title idle">Real-Time Coaching &amp; Assessment</p>
+              <p class="tab-desc" style="display:none;">ATLAS tracks performance criteria live as learners practice. After each session, receive instant scores and feedback — identifying strengths and areas to improve, driving continuous, measurable growth.</p>
+            </div>
+          </button>
+
+        </div>
+
+        <!-- CBL Panel — 3 states -->
+        <div class="hl-panel cbl" aria-hidden="true">
+
+          <!-- ── State 0: Chat session ── -->
+          <div class="cbl-panel-state active" data-cbl-state="0">
+            <div class="cbl-sidebar">
+              <p class="cbl-s-badge">Scenario</p>
+              <p class="cbl-s-name">Front Office Interaction</p>
+              <div class="cbl-s-divider"></div>
+              <p class="cbl-criteria-label">Criteria</p>
+              <div class="cbl-criteria-list">
+                <div class="cbl-criterion">
+                  <div class="cbl-dot done"></div>
+                  <p class="cbl-criterion-text">Professional Greeting</p>
+                </div>
+                <div class="cbl-criterion">
+                  <div class="cbl-dot done"></div>
+                  <p class="cbl-criterion-text">Empathy &amp; Active Listening</p>
+                </div>
+                <div class="cbl-criterion">
+                  <div class="cbl-dot pending"></div>
+                  <p class="cbl-criterion-text">Problem Resolution</p>
+                </div>
+              </div>
+              <div class="cbl-jen-label">
+                <div class="cbl-jen-av">🤖</div>
+                <p class="cbl-jen-name">Jen — AI Persona</p>
+              </div>
+            </div>
+            <div class="cbl-chat">
+              <div class="cbl-messages">
+                <div class="cbl-msg">
+                  <div class="cbl-msg-av jen-av">🤖</div>
+                  <div class="cbl-bubble jen-bubble">Hi! I just checked in and my room key isn't working. Can you help me?</div>
+                </div>
+                <div class="cbl-msg user-msg">
+                  <div class="cbl-msg-av user-av">You</div>
+                  <div class="cbl-bubble user-bubble">Of course! I'm sorry for the inconvenience. Let me get that sorted right away.</div>
+                </div>
+                <div class="cbl-msg">
+                  <div class="cbl-msg-av jen-av">🤖</div>
+                  <div class="cbl-bubble jen-bubble">Thank you! I really appreciate your quick response.</div>
+                </div>
+              </div>
+              <div class="cbl-input-bar">
+                <div class="cbl-input-field">Type your response…</div>
+                <div class="cbl-icon-btn send">⌨</div>
+                <div class="cbl-icon-btn mic">🎙</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── State 1: Voice & Text input ── -->
+          <div class="cbl-panel-state" data-cbl-state="1">
+            <div class="cbl-sidebar">
+              <p class="cbl-s-badge">Input Mode</p>
+              <p class="cbl-s-name">Pharmacy Interaction</p>
+              <div class="cbl-s-divider"></div>
+              <p class="cbl-criteria-label">Active Mode</p>
+              <div class="cbl-criteria-list" style="margin-top:4px;">
+                <div class="cbl-criterion">
+                  <div class="cbl-dot done"></div>
+                  <p class="cbl-criterion-text" style="color:rgba(255,255,255,0.9);font-weight:600;">Voice</p>
+                </div>
+                <div class="cbl-criterion">
+                  <div class="cbl-dot pending"></div>
+                  <p class="cbl-criterion-text">Text</p>
+                </div>
+              </div>
+              <div class="cbl-s-divider" style="margin-top:auto;"></div>
+              <p style="font-family:'Inter',sans-serif;font-size:10px;color:rgba(255,255,255,0.4);line-height:1.5;">Switch anytime — tap mic to speak, or type freely.</p>
+            </div>
+            <div class="cbl-voice-panel">
+              <div class="cbl-mode-toggle">
+                <button class="cbl-mode-btn on">🎙 Voice</button>
+                <button class="cbl-mode-btn off">⌨ Text</button>
+              </div>
+              <div class="cbl-mic-big">🎙</div>
+              <div class="cbl-recording-label">
+                <div class="cbl-recording-dot"></div>
+                Recording...
+              </div>
+              <div class="cbl-waveform">
+                <div class="cbl-wbar"></div>
+                <div class="cbl-wbar"></div>
+                <div class="cbl-wbar"></div>
+                <div class="cbl-wbar"></div>
+                <div class="cbl-wbar"></div>
+                <div class="cbl-wbar"></div>
+                <div class="cbl-wbar"></div>
+                <div class="cbl-wbar"></div>
+                <div class="cbl-wbar"></div>
+                <div class="cbl-wbar"></div>
+              </div>
+              <p class="cbl-voice-hint">Speak naturally — ATLAS transcribes in real-time</p>
+            </div>
+          </div>
+
+          <!-- ── State 2: Assessment results ── -->
+          <div class="cbl-panel-state" data-cbl-state="2">
+            <div class="cbl-results-panel">
+              <div class="cbl-results-header">
+                <p class="cbl-results-title">✓ Session Complete</p>
+                <span class="cbl-pass-badge">PASS</span>
+              </div>
+              <div class="cbl-score-row">
+                <div class="cbl-score-ring-wrap">
+                  <svg class="cbl-score-svg" viewBox="0 0 68 68">
+                    <circle class="cbl-score-track" cx="34" cy="34" r="26"/>
+                    <circle class="cbl-score-fill"  cx="34" cy="34" r="26"/>
+                  </svg>
+                  <p class="cbl-score-pct">83%</p>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <p style="font-family:'Inter',sans-serif;font-size:11px;color:var(--body);">Overall Score</p>
+                  <p style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#16a34a;line-height:1;">5 <span style="font-size:13px;color:var(--body);font-weight:400;">/ 6 pts</span></p>
+                  <p style="font-family:'Inter',sans-serif;font-size:10px;color:var(--body);">Front Office Interaction</p>
+                </div>
+              </div>
+              <div class="cbl-criteria-results">
+                <div class="cbl-crit-row">
+                  <div class="cbl-crit-icon pass">✓</div>
+                  <p class="cbl-crit-name">Professional Greeting</p>
+                  <p class="cbl-crit-score pass">2/2</p>
+                </div>
+                <div class="cbl-crit-row">
+                  <div class="cbl-crit-icon pass">✓</div>
+                  <p class="cbl-crit-name">Empathy &amp; Active Listening</p>
+                  <p class="cbl-crit-score pass">2/2</p>
+                </div>
+                <div class="cbl-crit-row">
+                  <div class="cbl-crit-icon partial">~</div>
+                  <p class="cbl-crit-name">Problem Resolution</p>
+                  <p class="cbl-crit-score partial">1/2</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -1071,5 +1970,28 @@
     <p>©2025 HeyHi. All rights reserved. Managed by HeyHi Pte. Ltd. Privacy Policy</p>
   </footer>
 
+  <script>
+    function setCblTab(idx) {
+      const tabs   = document.querySelectorAll('[data-cbl-tab]');
+      const panels = document.querySelectorAll('[data-cbl-state]');
+
+      tabs.forEach(tab => {
+        const i    = parseInt(tab.dataset.cblTab);
+        const dot  = tab.querySelector('.tab-dot');
+        const title = tab.querySelector('.tab-title');
+        const desc  = tab.querySelector('.tab-desc');
+        const isActive = i === idx;
+
+        dot.className   = 'tab-dot ' + (isActive ? 'active' : 'idle');
+        title.className = 'tab-title ' + (isActive ? 'active' : 'idle');
+        if (desc) desc.style.display = isActive ? 'block' : 'none';
+      });
+
+      panels.forEach(panel => {
+        const isActive = parseInt(panel.dataset.cblState) === idx;
+        panel.classList.toggle('active', isActive);
+      });
+    }
+  </script>
 </body>
 </html>
