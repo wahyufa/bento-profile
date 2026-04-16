@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HeyHi - Worksheet Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        heyhi: { dark: '#2A2454', blue: '#06A7E3', teal: '#00C9C8', light: '#F7F8FA' }
+                    },
+                    fontFamily: { inter: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .nav-shadow  { box-shadow: 0 4px 12px rgba(0,0,0,.05); }
+            .modal-shadow { box-shadow: 0 16px 56px rgba(0,0,0,.18); }
+            .scrollbar-thin::-webkit-scrollbar       { width: 5px; }
+            .scrollbar-thin::-webkit-scrollbar-track { background: #f1f1f5; }
+            .scrollbar-thin::-webkit-scrollbar-thumb { background: #c5c7d1; border-radius: 3px; }
+        }
+    </style>
+</head>
+<body class="bg-[#F7F8FA] font-inter text-[#2A2454] min-h-screen">
+
+<!-- ─── Header ─────────────────────────────────────────────────────── -->
+<header class="bg-white w-full nav-shadow">
+    <div class="max-w-7xl mx-auto px-6 h-[72px] flex items-center justify-between">
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-[#FF8A00] to-[#FF5E3A] flex items-center justify-center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+                    <rect x="3" y="4" width="18" height="14" rx="2"/><line x1="8" y1="20" x2="8" y2="18"/>
+                    <line x1="16" y1="20" x2="16" y2="18"/><line x1="9" y1="8" x2="15" y2="8"/>
+                </svg>
+            </div>
+            <span class="text-2xl font-bold text-[#2A2454]">HeyHi</span>
+        </div>
+        <nav class="flex items-center gap-8">
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium">Dashboard</a>
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium">Worksheet</a>
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium">Lesson</a>
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium">Question</a>
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium">Evaluation</a>
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium">Classroom</a>
+            <a href="#" class="text-[#00C9C8] font-medium border-b-2 border-[#00C9C8] pb-[26px]">Analytic</a>
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium">Leaderboard</a>
+        </nav>
+        <div class="flex items-center gap-5">
+            <div class="relative">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#70788E" stroke-width="2">
+                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                    <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <span class="absolute -top-1 -right-1 bg-[#06A7E3] text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center">2</span>
+            </div>
+            <div class="w-10 h-10 rounded-full bg-[#FAD7E8] flex items-center justify-center">
+                <span class="text-sm">🐱</span>
+            </div>
+        </div>
+    </div>
+    <div class="border-t border-gray-100">
+        <div class="max-w-7xl mx-auto px-6 h-[68px] flex items-center gap-32">
+            <a href="#" class="text-[#00C9C8] font-medium border-b-2 border-[#00C9C8] pb-[24px] px-4">Worksheet</a>
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium px-4">Topic</a>
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium px-4">Question</a>
+            <a href="#" class="text-[#70788E] hover:text-[#2A2454] font-medium px-4">Lesson</a>
+        </div>
+    </div>
+</header>
+
+<!-- ─── Main Content ────────────────────────────────────────────────── -->
+<main class="max-w-7xl mx-auto px-6 pt-8">
+    <div class="flex items-center justify-between mb-8">
+        <h1 class="text-[40px] font-bold text-[#2A2454]">Worksheet Analytics</h1>
+        <div class="flex items-center gap-2 text-[#2A2454] font-medium">
+            <span>Table legend</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#70788E" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex items-center gap-3 mb-12">
+        <select class="bg-white border border-gray-200 rounded-xl px-4 py-3 w-48 text-[#70788E] focus:outline-none focus:ring-2 focus:ring-[#00C9C8] text-sm">
+            <option>Select Student</option>
+        </select>
+
+        <!-- Worksheet selector trigger -->
+        <button
+            id="openSelectorBtn"
+            onclick="openModal()"
+            class="bg-white border border-gray-200 rounded-xl px-4 py-3 w-56 text-left text-[#70788E] hover:border-[#06A7E3] focus:outline-none focus:ring-2 focus:ring-[#00C9C8] transition-colors flex items-center justify-between gap-2 text-sm"
+        >
+            <span id="selectorLabel" class="truncate">Select Worksheet...</span>
+            <svg class="shrink-0 w-4 h-4 text-[#9CA0B0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M6 9l6 6 6-6"/>
+            </svg>
+        </button>
+
+        <button class="bg-[#93D7F5] text-white font-semibold px-6 py-3 rounded-xl hover:bg-[#7ECEF0] transition-colors text-sm">
+            View Result
+        </button>
+        <button class="bg-[#06A7E3] text-white font-semibold px-6 py-3 rounded-xl flex items-center gap-2 hover:bg-[#0496CC] transition-colors text-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <path d="M3 12h18M12 3v18"/>
+            </svg>
+            Export
+        </button>
+    </div>
+
+    <!-- Empty State -->
+    <div class="relative flex items-center justify-center min-h-[480px]">
+        <div class="absolute w-[700px] h-[380px] bg-[#EFEFF1]/60 rounded-[50%]"></div>
+        <div class="relative z-10 flex items-center gap-36">
+            <!-- Plant -->
+            <svg width="170" height="230" viewBox="0 0 180 240" fill="none">
+                <path d="M60 200 L75 200 L85 230 L50 230 L60 200Z" fill="#3A4E84"/>
+                <path d="M45 198 L90 198 L88 202 L47 202 Z" fill="#2A3A66"/>
+                <path d="M70 198 Q72 120 95 70 Q118 120 120 198 Z" fill="url(#lg1)" opacity="0.85"/>
+                <path d="M50 198 Q65 150 85 130 Q105 150 120 198 Z" fill="url(#lg2)" opacity="0.9"/>
+                <path d="M30 198 Q55 160 85 145 Q115 160 140 198 Z" fill="url(#lg3)"/>
+                <path d="M85 198 Q90 150 95 100" stroke="#2A8A75" stroke-width="2" fill="none" opacity="0.3"/>
+                <path d="M75 198 Q78 165 82 140" stroke="#2A8A75" stroke-width="1.5" fill="none" opacity="0.25"/>
+                <path d="M105 198 Q102 165 98 140" stroke="#2A8A75" stroke-width="1.5" fill="none" opacity="0.25"/>
+                <defs>
+                    <linearGradient id="lg1" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#42C9B8"/><stop offset="100%" stop-color="#24836E"/>
+                    </linearGradient>
+                    <linearGradient id="lg2" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#36B5DA"/><stop offset="100%" stop-color="#24B088"/>
+                    </linearGradient>
+                    <linearGradient id="lg3" x1="0%" y1="100%" x2="100%" y2="0%">
+                        <stop offset="0%" stop-color="#3ACFBF"/><stop offset="100%" stop-color="#26BC8C"/>
+                    </linearGradient>
+                </defs>
+            </svg>
+
+            <span class="text-[26px] font-semibold text-[#5D5783]">no data</span>
+
+            <!-- Books -->
+            <svg width="150" height="170" viewBox="0 0 160 180" fill="none">
+                <path d="M30 120 L130 120 L140 155 L20 155 L30 120Z" fill="#FBC833"/>
+                <path d="M25 120 L135 120 L133 125 L27 125 Z" fill="#F6B720"/>
+                <path d="M130 120 L140 155 L136 155 L126 120 Z" fill="#E9AA16"/>
+                <path d="M50 75 L110 75 L120 110 L40 110 L50 75Z" fill="#3A66D3"/>
+                <path d="M45 75 L115 75 L113 80 L47 80 Z" fill="#2F54B3"/>
+                <path d="M110 75 L120 110 L116 110 L106 75 Z" fill="#254596"/>
+                <path d="M80 25 Q65 35 65 55 Q65 75 80 80 Q95 75 95 55 Q95 35 80 25Z" fill="#F13B3B"/>
+                <path d="M80 25 Q82 30 80 35 Q78 30 80 25Z" fill="#D32C2C"/>
+                <path d="M80 18 L80 28" stroke="#3A2318" stroke-width="2.5" stroke-linecap="round"/>
+                <path d="M83 22 Q90 18 88 12" stroke="#7AB953" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+                <ellipse cx="75" cy="40" rx="6" ry="10" fill="white" opacity="0.18"/>
+            </svg>
+        </div>
+    </div>
+</main>
+
+<!-- ─── Modal Backdrop ──────────────────────────────────────────────── -->
+<div id="modalBackdrop" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-40 hidden" onclick="closeModal()"></div>
+
+<!-- ─── Worksheet Selector Modal ───────────────────────────────────── -->
+<div id="worksheetModal" class="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[960px] max-h-[88vh] bg-white rounded-2xl modal-shadow flex flex-col z-50 hidden overflow-hidden">
+
+    <!-- Modal header: title + close -->
+    <div class="px-6 pt-5 pb-4 flex items-center justify-between border-b border-gray-100">
+        <div>
+            <h2 class="text-lg font-bold text-[#2A2454]">Select Worksheet</h2>
+            <p class="text-xs text-[#9CA0B0] mt-0.5">Choose up to 10 worksheets to compare</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <!-- Selected badge -->
+            <div class="flex items-center gap-1.5 px-3 py-1.5 bg-[#FFF8E6] rounded-lg">
+                <span class="text-xs font-medium text-[#B37A00]">Selected</span>
+                <span id="selectedCount" class="text-sm font-bold text-[#2A2454]">0</span>
+                <span class="text-xs text-[#9CA0B0]">/ 10</span>
+            </div>
+            <button onclick="closeModal()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-gray-100 transition-colors text-[#70788E]">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <!-- Search + filter + actions row -->
+    <div class="px-6 py-3 border-b border-gray-100 flex items-center gap-3">
+        <!-- Search -->
+        <div class="relative flex-1">
+            <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9CA0B0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" stroke-width="2"/><path d="m21 21-4.35-4.35" stroke-width="2"/>
+            </svg>
+            <input id="searchInput" type="text" placeholder="Search worksheet name…"
+                class="w-full pl-10 pr-4 py-2.5 bg-[#F5F5F7] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#06A7E3]/30">
+        </div>
+        <!-- Filter toggle -->
+        <button id="filterBtn" class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors relative shrink-0">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2A2454" stroke-width="2">
+                <path d="M3 4h18M6 9h12M9 14h6M12 19h0"/>
+            </svg>
+            Filter
+            <svg id="filterArrow" class="w-3.5 h-3.5 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="#70788E" stroke-width="2">
+                <path d="M6 9l6 6 6-6"/>
+            </svg>
+        </button>
+        <!-- Divider -->
+        <div class="w-px h-7 bg-gray-200 shrink-0"></div>
+        <!-- Actions -->
+        <button id="toggleSelectAll" class="shrink-0 px-4 py-2.5 border border-[#06A7E3] text-[#06A7E3] rounded-xl text-sm font-semibold hover:bg-[#06A7E3]/5 transition-colors">
+            Check All
+        </button>
+        <button onclick="applySelection()" class="shrink-0 px-6 py-2.5 bg-[#06A7E3] text-white rounded-xl text-sm font-semibold hover:bg-[#0496CC] transition-colors">
+            Apply
+        </button>
+    </div>
+
+    <!-- Filter panel (expandable) -->
+    <div id="filterPanel" class="hidden border-b border-gray-100 bg-[#FAFAFA]">
+        <div class="px-6 py-4 grid grid-cols-3 gap-6">
+            <div>
+                <label class="text-[11px] font-semibold text-[#9CA0B0] uppercase tracking-wider mb-2.5 block">Worksheet Type</label>
+                <div class="space-y-2 text-sm">
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="radio" name="wsType" value="all" checked class="w-4 h-4 accent-[#06A7E3]"> All Worksheets
+                    </label>
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="radio" name="wsType" value="tutor" class="w-4 h-4 accent-[#06A7E3]"> Tutor Worksheets
+                    </label>
+                    <label class="flex items-center gap-2.5 cursor-pointer">
+                        <input type="radio" name="wsType" value="admin" class="w-4 h-4 accent-[#06A7E3]"> Admin Worksheets
+                    </label>
+                </div>
+            </div>
+            <div>
+                <label class="text-[11px] font-semibold text-[#9CA0B0] uppercase tracking-wider mb-2.5 block">Subject</label>
+                <select class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#06A7E3]/30">
+                    <option>All Subjects</option>
+                    <option>Primary English</option><option>Primary Maths</option>
+                    <option>Primary Science</option><option>Primary Chinese</option>
+                    <option>Secondary English</option><option>Secondary Maths</option>
+                </select>
+            </div>
+            <div>
+                <label class="text-[11px] font-semibold text-[#9CA0B0] uppercase tracking-wider mb-2.5 block">Level</label>
+                <select class="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#06A7E3]/30">
+                    <option>All Levels</option>
+                    <option>Primary 1</option><option>Primary 2</option><option>Primary 3</option>
+                    <option>Primary 4</option><option>Primary 5</option><option>Primary 6</option>
+                    <option>Secondary 1</option><option>Secondary 2</option><option>Secondary 3</option>
+                    <option>Secondary 4</option>
+                </select>
+            </div>
+        </div>
+        <div class="px-6 pb-4 flex justify-end gap-2">
+            <button class="px-4 py-1.5 bg-white border border-gray-200 rounded-lg text-sm font-medium hover:bg-gray-50">Reset</button>
+            <button class="px-4 py-1.5 bg-[#06A7E3] text-white rounded-lg text-sm font-medium hover:bg-[#0496CC]">Apply Filter</button>
+        </div>
+    </div>
+
+    <!-- Selected tags (only shown when something is selected) -->
+    <div id="selectedTagsWrap" class="hidden px-6 py-2.5 border-b border-gray-100 bg-[#F8FAFF]">
+        <div id="selectedTags" class="flex flex-wrap gap-2"></div>
+    </div>
+
+    <!-- Table header -->
+    <div class="px-6 py-2.5 bg-[#FBFBFC] border-b border-gray-100 grid grid-cols-12 text-[11px] font-semibold text-[#9CA0B0] uppercase tracking-wider">
+        <div class="col-span-4">Worksheet</div>
+        <div class="col-span-2">Subject</div>
+        <div class="col-span-1">Level</div>
+        <div class="col-span-2">Created On</div>
+        <div class="col-span-2">Assigned</div>
+        <div class="col-span-1">Marked</div>
+    </div>
+
+    <!-- List -->
+    <div class="overflow-y-auto scrollbar-thin flex-1">
+        <div id="worksheetList" class="divide-y divide-gray-100"></div>
+
+        <!-- Load more row -->
+        <div id="loadMoreRow" class="hidden px-6 py-3.5 text-center border-t border-gray-100">
+            <button id="loadMoreBtn" onclick="loadMore()" class="text-sm font-medium text-[#06A7E3] hover:text-[#0496CC] transition-colors">
+                Load more worksheets…
+            </button>
+        </div>
+
+        <!-- All loaded indicator -->
+        <div id="allLoadedRow" class="hidden px-6 py-3.5 text-center border-t border-gray-100">
+            <span class="text-xs text-[#9CA0B0]">All worksheets loaded</span>
+        </div>
+    </div>
+</div>
+
+<!-- ─── Bottom corner badge ─────────────────────────────────────────── -->
+<div class="fixed bottom-1 left-1 w-7 h-7 bg-[#F22850] flex items-center justify-center rounded-sm">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="white">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+    </svg>
+</div>
+
+<!-- ─── Scripts ─────────────────────────────────────────────────────── -->
+<script>
+// ── Data ──────────────────────────────────────────────────────────────
+const SUBJECTS = [
+    { name: 'Primary English',   color: '#FFD79F', icon: '📄' },
+    { name: 'Primary Maths',     color: '#FFB6B6', icon: '📐' },
+    { name: 'Primary Science',   color: '#B5E8E8', icon: '🔬' },
+    { name: 'Primary Chinese',   color: '#FFCEBE', icon: '吉' },
+    { name: 'Secondary English', color: '#FFE8B8', icon: '📄' },
+    { name: 'Secondary Maths',   color: '#FFCCCC', icon: '📐' },
+];
+const LEVELS = ['P1','P2','P3','P4','P5','P6','Sec 1','Sec 2','Sec 3','Sec 4'];
+const LEVEL_FULL = ['Primary 1','Primary 2','Primary 3','Primary 4','Primary 5','Primary 6','Secondary 1','Secondary 2','Secondary 3','Secondary 4'];
+const NAMES = ['testlimit1208adminn','fitb_test2208','fitbbb','P5E MCQnonMCQ','assign check','ws','WS admin','#4 HNA with FITB 1107','aaa','ws grql','vocab_2025','grammar_test','reading_practice','listening_exercise'];
+
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+function makeWorksheet(i) {
+    const sub   = rand(SUBJECTS);
+    const total = Math.floor(Math.random() * 60) + 1;
+    const lvIdx = Math.floor(Math.random() * LEVELS.length);
+    return {
+        id: i + 1,
+        name: NAMES[Math.floor(Math.random() * NAMES.length)] + (i >= 10 ? ` ${i}` : ''),
+        subject: sub.name, subjectColor: sub.color, subjectIcon: sub.icon,
+        level: LEVEL_FULL[lvIdx], levelShort: LEVELS[lvIdx],
+        created: new Date(Date.now() - Math.random() * 365 * 86400000)
+            .toLocaleDateString('en-GB', { day:'2-digit', month:'short', year:'numeric' }),
+        assigned: Math.floor(Math.random() * 60) + 1,
+        marked: Math.floor(Math.random() * (total + 1)),
+        total,
+        selected: false,
+    };
+}
+
+const ALL_WORKSHEETS = Array.from({ length: 50 }, (_, i) => makeWorksheet(i));
+
+// ── State ──────────────────────────────────────────────────────────────
+const PAGE_SIZE = 10;
+let visibleCount = PAGE_SIZE;   // how many rows are rendered
+let selectedCount = 0;
+const MAX_SEL = 10;
+
+// ── Modal ──────────────────────────────────────────────────────────────
+function openModal() {
+    document.getElementById('modalBackdrop').classList.remove('hidden');
+    document.getElementById('worksheetModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+    document.getElementById('modalBackdrop').classList.add('hidden');
+    document.getElementById('worksheetModal').classList.add('hidden');
+    document.body.style.overflow = '';
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+function applySelection() {
+    const sel = ALL_WORKSHEETS.filter(w => w.selected);
+    const lbl = document.getElementById('selectorLabel');
+    lbl.textContent = sel.length === 0 ? 'Select Worksheet...'
+                    : sel.length === 1 ? sel[0].name
+                    : `${sel.length} worksheets selected`;
+    closeModal();
+}
+
+// ── Render helpers ─────────────────────────────────────────────────────
+function rowHTML(ws) {
+    const pct = Math.round((ws.marked / ws.total) * 100);
+    const disabled = selectedCount >= MAX_SEL && !ws.selected ? 'disabled' : '';
+    return `
+    <div class="px-6 py-3 grid grid-cols-12 items-center hover:bg-[#F8FAFF] transition-colors cursor-pointer" data-id="${ws.id}">
+        <div class="col-span-4 flex items-center gap-3 min-w-0">
+            <input type="checkbox" class="w-4 h-4 shrink-0 rounded accent-[#06A7E3] worksheet-checkbox"
+                data-id="${ws.id}" ${ws.selected ? 'checked' : ''} ${disabled}>
+            <span class="text-sm font-medium truncate">${ws.name}</span>
+        </div>
+        <div class="col-span-2 flex items-center gap-2 min-w-0">
+            <span class="w-5 h-5 shrink-0 rounded-full flex items-center justify-center text-[10px]" style="background:${ws.subjectColor}">${ws.subjectIcon}</span>
+            <span class="text-xs text-[#5D5783] truncate">${ws.subject}</span>
+        </div>
+        <div class="col-span-1 text-xs text-[#5D5783]">${ws.levelShort}</div>
+        <div class="col-span-2 text-xs text-[#9CA0B0]">${ws.created}</div>
+        <div class="col-span-2 text-xs text-[#5D5783]">${ws.assigned} students</div>
+        <div class="col-span-1 flex items-center gap-1.5">
+            <div class="w-14 h-1.5 bg-[#EBF1FF] rounded-full overflow-hidden">
+                <div class="h-full bg-[#06A7E3] rounded-full" style="width:${pct}%"></div>
+            </div>
+            <span class="text-xs text-[#9CA0B0]">${ws.marked}/${ws.total}</span>
+        </div>
+    </div>`;
+}
+
+function renderList() {
+    const slice = ALL_WORKSHEETS.slice(0, visibleCount);
+    document.getElementById('worksheetList').innerHTML = slice.map(rowHTML).join('');
+
+    // show / hide load-more
+    document.getElementById('loadMoreRow').classList.toggle('hidden', visibleCount >= ALL_WORKSHEETS.length);
+    document.getElementById('allLoadedRow').classList.toggle('hidden', visibleCount < ALL_WORKSHEETS.length);
+
+    // attach checkbox listeners
+    document.querySelectorAll('.worksheet-checkbox').forEach(cb => {
+        cb.addEventListener('change', onCheckboxChange);
+    });
+}
+
+function renderTags() {
+    const sel = ALL_WORKSHEETS.filter(w => w.selected);
+    const wrap = document.getElementById('selectedTagsWrap');
+    const tags = document.getElementById('selectedTags');
+
+    if (sel.length === 0) { wrap.classList.add('hidden'); return; }
+    wrap.classList.remove('hidden');
+    tags.innerHTML = sel.map(ws => `
+        <span class="inline-flex items-center gap-1.5 pl-2.5 pr-1.5 py-1 bg-white border border-gray-200 rounded-lg text-xs font-medium">
+            ${ws.name}
+            <button class="w-4 h-4 flex items-center justify-center rounded hover:bg-gray-100 text-[#9CA0B0] hover:text-[#2A2454] remove-tag transition-colors" data-id="${ws.id}">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+        </span>`).join('');
+
+    document.querySelectorAll('.remove-tag').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const id = parseInt(e.currentTarget.dataset.id);
+            const ws = ALL_WORKSHEETS.find(w => w.id === id);
+            ws.selected = false;
+            selectedCount--;
+            refreshUI();
+        });
+    });
+}
+
+function updateCountBadge() {
+    document.getElementById('selectedCount').textContent = selectedCount;
+    document.getElementById('toggleSelectAll').textContent = selectedCount > 0 ? 'Uncheck All' : 'Check All';
+}
+
+function refreshUI() {
+    updateCountBadge();
+    renderTags();
+    renderList();
+}
+
+// ── Checkbox change ────────────────────────────────────────────────────
+function onCheckboxChange(e) {
+    const id = parseInt(e.target.dataset.id);
+    const ws = ALL_WORKSHEETS.find(w => w.id === id);
+    if (e.target.checked && selectedCount < MAX_SEL) {
+        ws.selected = true;
+        selectedCount++;
+    } else if (e.target.checked && selectedCount >= MAX_SEL) {
+        // Revert — already at max
+        e.target.checked = false;
+        return;
+    } else {
+        ws.selected = false;
+        selectedCount--;
+    }
+    refreshUI();
+}
+
+// ── Load more ──────────────────────────────────────────────────────────
+function loadMore() {
+    const btn = document.getElementById('loadMoreBtn');
+    btn.textContent = 'Loading…';
+    btn.disabled = true;
+
+    // Snap response — just a tiny delay for the "loading" feel
+    setTimeout(() => {
+        visibleCount = Math.min(visibleCount + PAGE_SIZE, ALL_WORKSHEETS.length);
+        renderList();
+        btn.textContent = 'Load more worksheets…';
+        btn.disabled = false;
+    }, 120);
+}
+
+// ── Select / Unselect all ──────────────────────────────────────────────
+document.getElementById('toggleSelectAll').addEventListener('click', () => {
+    if (selectedCount > 0) {
+        ALL_WORKSHEETS.forEach(w => w.selected = false);
+        selectedCount = 0;
+    } else {
+        ALL_WORKSHEETS.slice(0, MAX_SEL).forEach(w => w.selected = true);
+        selectedCount = MAX_SEL;
+    }
+    refreshUI();
+});
+
+// ── Filter panel toggle ────────────────────────────────────────────────
+document.getElementById('filterBtn').addEventListener('click', () => {
+    const panel = document.getElementById('filterPanel');
+    const arrow = document.getElementById('filterArrow');
+    const open  = panel.classList.toggle('hidden');
+    arrow.classList.toggle('rotate-180', !open);
+});
+
+// ── Search ─────────────────────────────────────────────────────────────
+document.getElementById('searchInput').addEventListener('input', e => {
+    const q = e.target.value.toLowerCase().trim();
+    document.querySelectorAll('#worksheetList > div').forEach(row => {
+        const name = row.querySelector('span.font-medium')?.textContent.toLowerCase() ?? '';
+        row.style.display = name.includes(q) ? '' : 'none';
+    });
+});
+
+// ── Init ───────────────────────────────────────────────────────────────
+renderList();
+</script>
+</body>
+</html>
