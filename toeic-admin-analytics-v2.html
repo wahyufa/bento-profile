@@ -450,10 +450,14 @@
         </select>
         <select class="filter-select" id="compSection" onchange="filterCompletion()">
           <option value="all">All Sections</option>
-          <option value="listening">Listening completed</option>
-          <option value="speaking">Speaking completed</option>
-          <option value="reading">Reading completed</option>
-          <option value="writing">Writing completed</option>
+          <option value="listening">Listening</option>
+          <option value="reading">Reading</option>
+          <option value="speaking">Speaking</option>
+          <option value="writing">Writing</option>
+        </select>
+        <select class="filter-select" id="compPaper" onchange="filterCompletion()">
+          <option value="all">All Papers</option>
+          <!-- populated by JS -->
         </select>
         <div class="search-wrap">
           <svg width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -538,6 +542,7 @@
       <div class="modal-sub" id="modalStudentMeta">—</div>
     </div>
     <div class="modal-body">
+      <div id="modalSummaryCards" style="display:flex;gap:12px;margin-bottom:20px;"></div>
       <div class="section-tabs">
         <div class="section-tab active" id="modalTabLR" onclick="switchModalTab('LR')">Listening &amp; Reading</div>
         <div class="section-tab" id="modalTabSW" onclick="switchModalTab('SW')">Speaking &amp; Writing</div>
@@ -684,21 +689,25 @@ function setView(v) {
   activeView = v;
   document.getElementById('viewLR').classList.toggle('active', v === 'LR');
   document.getElementById('viewSW').classList.toggle('active', v === 'SW');
-  document.getElementById('col1Head').textContent = v === 'LR' ? 'Listening' : 'Speaking';
-  document.getElementById('col2Head').textContent = v === 'LR' ? 'Reading' : 'Writing';
+  // headers updated inside renderCompletionTable based on sectionFilter + view
   renderCompletionTable();
+}
+
+function paperLabel(paper) {
+  return paper
+    ? `<div style="font-size:11px;color:#9ca3af;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;" title="${paper}">${paper}</div>`
+    : '';
 }
 
 function sectionCell(state, score, paper) {
   if (state === 'completed') {
     const pct = score / 495;
     const cls = pct >= 0.65 ? 'score-high' : pct >= 0.4 ? 'score-mid' : 'score-low';
-    const paperHtml = paper
-      ? `<div style="font-size:11px;color:#9ca3af;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;" title="${paper}">${paper}</div>`
-      : '';
-    return `<div><span class="score-pill ${cls}">${score}</span>${paperHtml}</div>`;
+    return `<div><span class="score-pill ${cls}">${score}</span>${paperLabel(paper)}</div>`;
   }
-  if (state === 'progressing') return `<span class="badge badge-yellow">Progressing</span>`;
+  if (state === 'progressing') {
+    return `<div><span class="badge badge-yellow">Progressing</span>${paperLabel(paper)}</div>`;
+  }
   return `<span class="badge badge-gray">Not Started</span>`;
 }
 
@@ -708,8 +717,55 @@ function overallBadge(s) {
   return `<span class="badge badge-red">Not Started</span>`;
 }
 
+// Returns avg of best attempt per section, only if both sections in the view are completed
+function viewAvg(s, view) {
+  if (view === 'LR') {
+    if (s.lState !== 'completed' || s.rState !== 'completed') return null;
+    const bestL = s.lrAttempts.length ? Math.max(...s.lrAttempts.map(a => a.s1)) : s.lScore;
+    const bestR = s.lrAttempts.length ? Math.max(...s.lrAttempts.map(a => a.s2)) : s.rScore;
+    return Math.round((bestL + bestR) / 2);
+  } else {
+    if (s.spState !== 'completed' || s.wState !== 'completed') return null;
+    const bestSp = s.swAttempts.length ? Math.max(...s.swAttempts.map(a => a.s1)) : s.spScore;
+    const bestW  = s.swAttempts.length ? Math.max(...s.swAttempts.map(a => a.s2)) : s.wScore;
+    return Math.round((bestSp + bestW) / 2);
+  }
+}
+
+function scorePill(score) {
+  if (score === null) return `<span style="color:#d1d5db;">—</span>`;
+  const cls = score/495 >= 0.65 ? 'score-high' : score/495 >= 0.4 ? 'score-mid' : 'score-low';
+  return `<span class="score-pill ${cls}">${score}</span>`;
+}
+
+// Returns { state, score, paper } for a named section
+function getSectionData(s, section) {
+  switch (section) {
+    case 'listening': return { state: s.lState,  score: s.lScore,  paper: s.lPaper  };
+    case 'reading':   return { state: s.rState,  score: s.rScore,  paper: s.rPaper  };
+    case 'speaking':  return { state: s.spState, score: s.spScore, paper: s.spPaper };
+    case 'writing':   return { state: s.wState,  score: s.wScore,  paper: s.wPaper  };
+  }
+}
+
 function renderCompletionTable() {
   const tbody = document.getElementById('completionBody');
+  const sectionFilter = document.getElementById('compSection').value;
+  const single = sectionFilter !== 'all' ? sectionFilter : null;
+
+  // Update column headers
+  const col1 = document.getElementById('col1Head');
+  const col2 = document.getElementById('col2Head');
+  if (single) {
+    col1.textContent = single.charAt(0).toUpperCase() + single.slice(1);
+    col2.style.display = 'none';
+  } else {
+    col1.textContent = activeView === 'LR' ? 'Listening' : 'Speaking';
+    col2.textContent = activeView === 'LR' ? 'Reading'   : 'Writing';
+    col2.style.display = '';
+  }
+
+  const colspan = single ? 5 : 6;
   const start = (currentPage - 1) * PAGE_SIZE;
   const slice = filteredStudents.slice(start, start + PAGE_SIZE);
 
@@ -720,10 +776,10 @@ function renderCompletionTable() {
     // School group header row
     if (s.school !== prevSchool) {
       const schoolStudents = filteredStudents.filter(x => x.school === s.school);
-      const completedAvgs = schoolStudents.filter(x => x.avgTOEIC !== null).map(x => x.avgTOEIC);
-      const avgTotal = completedAvgs.length ? Math.round(completedAvgs.reduce((a,b)=>a+b,0)/completedAvgs.length) : null;
+      const schoolAvgs = schoolStudents.map(x => viewAvg(x, activeView)).filter(x => x !== null);
+      const avgTotal = schoolAvgs.length ? Math.round(schoolAvgs.reduce((a,b)=>a+b,0)/schoolAvgs.length) : null;
       html += `<tr class="school-row">
-        <td colspan="6" style="font-size:12px; color:#06A7E3;">
+        <td colspan="${colspan}" style="font-size:12px; color:#06A7E3;">
           <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
           ${s.school}
           <span style="color:#9ca3af; font-weight:400; margin-left:8px;">${schoolStudents.length} students</span>
@@ -737,22 +793,25 @@ function renderCompletionTable() {
     }
 
     const globalIdx = rawStudents.indexOf(s);
+    const avg = viewAvg(s, activeView);
+
+    let sectionCols = '';
+    if (single) {
+      const d = getSectionData(s, single);
+      sectionCols = `<td>${sectionCell(d.state, d.score, d.paper)}</td>`;
+    } else {
+      const d1 = getSectionData(s, activeView === 'LR' ? 'listening' : 'speaking');
+      const d2 = getSectionData(s, activeView === 'LR' ? 'reading'   : 'writing');
+      sectionCols = `<td>${sectionCell(d1.state, d1.score, d1.paper)}</td><td>${sectionCell(d2.state, d2.score, d2.paper)}</td>`;
+    }
+
     html += `<tr class="student-row" onclick="openStudentModal(${globalIdx})">
-      <td style="padding-left:28px;">
-        <span style="color:var(--brand-blue); font-weight:500;">${s.name}</span>
-      </td>
+      <td style="padding-left:28px;"><span style="color:var(--brand-blue); font-weight:500;">${s.name}</span></td>
       <td class="muted" style="font-size:12px;">${s.school}</td>
       <td class="num">${s.attempt || '—'}</td>
       <td class="muted">${s.lastAttempt}</td>
-      <td>${activeView === 'LR' ? sectionCell(s.lState, s.lScore, s.lPaper) : sectionCell(s.spState, s.spScore, s.spPaper)}</td>
-      <td>${activeView === 'LR' ? sectionCell(s.rState, s.rScore, s.rPaper) : sectionCell(s.wState, s.wScore, s.wPaper)}</td>
-      <td class="num">
-        ${s.overall === 'Not Started'
-          ? ``
-          : s.avgTOEIC !== null
-            ? `<span class="score-pill ${s.avgTOEIC/495 >= 0.65 ? 'score-high' : s.avgTOEIC/495 >= 0.4 ? 'score-mid' : 'score-low'}">${s.avgTOEIC}</span>`
-            : `<span style="color:#d1d5db;">—</span>`}
-      </td>
+      ${sectionCols}
+      <td class="num">${scorePill(avg)}</td>
     </tr>`;
   });
 
@@ -791,15 +850,17 @@ function filterCompletion() {
   const school = document.getElementById('compSchool').value;
   const status = document.getElementById('compStatus').value;
   const section = document.getElementById('compSection').value;
+  const paper = document.getElementById('compPaper').value;
   const search = document.getElementById('compSearch').value.toLowerCase();
 
   filteredStudents = rawStudents.filter(s => {
     if (school !== 'all' && s.school !== school) return false;
     if (status !== 'all' && s.overall !== status) return false;
-    if (section === 'listening' && s.lState !== 'completed') return false;
-    if (section === 'speaking' && s.spState !== 'completed') return false;
-    if (section === 'reading' && s.rState !== 'completed') return false;
-    if (section === 'writing' && s.wState !== 'completed') return false;
+    if (section === 'listening' && s.lState === 'not_started') return false;
+    if (section === 'speaking' && s.spState === 'not_started') return false;
+    if (section === 'reading' && s.rState === 'not_started') return false;
+    if (section === 'writing' && s.wState === 'not_started') return false;
+    if (paper !== 'all' && s.lPaper !== paper && s.rPaper !== paper && s.spPaper !== paper && s.wPaper !== paper) return false;
     if (search && !s.name.toLowerCase().includes(search)) return false;
     return true;
   });
@@ -807,23 +868,72 @@ function filterCompletion() {
   renderCompletionTable();
 }
 
+function populatePaperFilter() {
+  const allPapers = [...listeningPapers, ...readingPapers, ...speakingPapers, ...writingPapers];
+  const sel = document.getElementById('compPaper');
+  const groups = [
+    { label: 'Listening', papers: listeningPapers },
+    { label: 'Reading',   papers: readingPapers },
+    { label: 'Speaking',  papers: speakingPapers },
+    { label: 'Writing',   papers: writingPapers },
+  ];
+  groups.forEach(g => {
+    const optgroup = document.createElement('optgroup');
+    optgroup.label = g.label;
+    g.papers.forEach(p => {
+      const opt = document.createElement('option');
+      opt.value = p;
+      opt.textContent = p;
+      optgroup.appendChild(opt);
+    });
+    sel.appendChild(optgroup);
+  });
+}
+
 // ─── Student Modal ────────────────────────────────────────────────────────────
 let modalActiveTab = 'LR';
+
+function calcModalSummary(s) {
+  let lrAvg = null, swAvg = null;
+  if (s.lrAttempts.length > 0) {
+    const scores = s.lrAttempts.map(a => Math.round((a.s1 + a.s2) / 2));
+    lrAvg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  }
+  if (s.swAttempts.length > 0) {
+    const scores = s.swAttempts.map(a => Math.round((a.s1 + a.s2) / 2));
+    swAvg = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+  }
+  return { lrAvg, swAvg };
+}
+
+function summaryCard(label, avg, attemptCount) {
+  const pill = avg !== null
+    ? `<div style="font-size:26px;font-weight:700;color:var(--brand-dark);margin:6px 0 2px;">${avg}</div>`
+    : `<div style="font-size:26px;font-weight:700;color:#d1d5db;margin:6px 0 2px;">—</div>`;
+  const sub = attemptCount > 0
+    ? `<div style="font-size:11.5px;color:#9ca3af;">from ${attemptCount} attempt${attemptCount > 1 ? 's' : ''}</div>`
+    : `<div style="font-size:11.5px;color:#9ca3af;">no attempts yet</div>`;
+  return `<div style="flex:1;background:#f8f9fc;border-radius:10px;padding:14px 18px;border:1px solid #eef0f6;">
+    <div style="font-size:11.5px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">${label}</div>
+    ${pill}${sub}
+  </div>`;
+}
 
 function openStudentModal(idx) {
   const s = rawStudents[idx];
   document.getElementById('modalStudentName').textContent = s.name;
-  document.getElementById('modalStudentMeta').textContent = s.school + ' · ' + overallBadge(s.overall).replace(/<[^>]*>/g, '');
-  document.getElementById('modalStudentMeta').innerHTML = s.school +
-    ' &nbsp;·&nbsp; ' + overallBadge(s.overall);
+  document.getElementById('modalStudentMeta').textContent = s.school;
+
+  const { lrAvg, swAvg } = calcModalSummary(s);
+  document.getElementById('modalSummaryCards').innerHTML =
+    summaryCard('L&R Avg Score', lrAvg, s.lrAttempts.length) +
+    summaryCard('S&W Avg Score', swAvg, s.swAttempts.length);
 
   modalActiveTab = activeView;
-  renderModalAttempts(s);
-
   document.getElementById('modalTabLR').classList.toggle('active', modalActiveTab === 'LR');
   document.getElementById('modalTabSW').classList.toggle('active', modalActiveTab === 'SW');
+  renderModalAttempts(s);
 
-  // store current student for tab switching
   document.getElementById('studentModal').dataset.idx = idx;
   document.getElementById('studentModal').classList.add('open');
 }
@@ -1021,6 +1131,7 @@ function downloadExcel(type) {
 }
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
+populatePaperFilter();
 renderUsageCharts();
 renderCompletionTable();
 </script>
