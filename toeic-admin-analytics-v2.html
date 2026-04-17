@@ -135,6 +135,29 @@
     .page-btn:hover { background: #f4f6fb; }
     .page-btn.active { background: var(--brand-blue); color: #fff; border-color: var(--brand-blue); }
     .page-info { font-size: 12px; color: #9ca3af; margin-left: auto; }
+
+    /* Clickable student rows */
+    tbody tr.student-row { cursor: pointer; }
+    tbody tr.student-row:hover { background: #edf6fd; }
+
+    /* Modal */
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal-card { background: #fff; border-radius: 14px; width: 680px; max-width: calc(100vw - 32px); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.18); }
+    .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #eef0f6; }
+    .modal-title { font-size: 16px; font-weight: 700; color: var(--brand-dark); }
+    .modal-sub { font-size: 12.5px; color: #9ca3af; margin-top: 2px; }
+    .modal-body { overflow-y: auto; padding: 20px 24px; flex: 1; }
+    .modal-footer { padding: 14px 24px; border-top: 1px solid #eef0f6; display: flex; justify-content: flex-end; }
+    .modal-close { position: absolute; top: 0; right: 0; padding: 20px 24px; cursor: pointer; color: #9ca3af; background: none; border: none; font-size: 18px; line-height: 1; }
+    .modal-header { position: relative; }
+    .attempt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .attempt-table th { background: #f8f9fc; padding: 9px 12px; text-align: left; font-size: 11.5px; font-weight: 600; color: #6b7280; border-bottom: 1px solid #eef0f6; white-space: nowrap; }
+    .attempt-table td { padding: 10px 12px; border-bottom: 1px solid #f0f2f8; color: #374151; vertical-align: middle; }
+    .attempt-table tr:last-child td { border-bottom: none; }
+    .section-tabs { display: flex; gap: 0; border-bottom: 1px solid #eef0f6; margin-bottom: 16px; }
+    .section-tab { padding: 8px 18px; font-size: 13px; font-weight: 500; color: #9ca3af; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+    .section-tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); font-weight: 600; }
   </style>
 </head>
 <body>
@@ -506,6 +529,27 @@
 </div><!-- /main -->
 
 
+<!-- ─── Student Detail Modal ──────────────────────────────────────────────── -->
+<div class="modal-overlay" id="studentModal" onclick="closeModal(event)">
+  <div class="modal-card" onclick="event.stopPropagation()">
+    <div class="modal-header">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-title" id="modalStudentName">—</div>
+      <div class="modal-sub" id="modalStudentMeta">—</div>
+    </div>
+    <div class="modal-body">
+      <div class="section-tabs">
+        <div class="section-tab active" id="modalTabLR" onclick="switchModalTab('LR')">Listening &amp; Reading</div>
+        <div class="section-tab" id="modalTabSW" onclick="switchModalTab('SW')">Speaking &amp; Writing</div>
+      </div>
+      <div id="modalAttemptContent"><!-- JS rendered --></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ─── Sample Data ─────────────────────────────────────────────────────────────
 const schools = [
@@ -534,6 +578,35 @@ function randDate() {
 function randScore() {
   // TOEIC-style score 5–495
   return Math.round((Math.random() * 0.7 + 0.2) * 490 + 5);
+}
+
+const listeningPapers = ['Listening Official 1', 'Listening Official 2', 'Listening Official 3', 'Listening Practice A', 'Listening Practice B'];
+const readingPapers   = ['Reading Official 1',   'Reading Official 2',   'Reading Official 3',   'Reading Practice A',   'Reading Practice B'];
+const speakingPapers  = ['Speaking Official 1',  'Speaking Official 2',  'Speaking Practice A'];
+const writingPapers   = ['Writing Official 1',   'Writing Official 2',   'Writing Practice A'];
+
+function randPaper(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function genAttemptHistory(count, type) {
+  if (count === 0) return [];
+  const p1arr = type === 'LR' ? listeningPapers : speakingPapers;
+  const p2arr = type === 'LR' ? readingPapers   : writingPapers;
+  const history = [];
+  for (let i = 0; i < count; i++) {
+    const d = new Date(2025, 9, 1);
+    d.setDate(d.getDate() + Math.floor(Math.random() * 200));
+    history.push({
+      no: i + 1,
+      date: d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'}),
+      paper1: randPaper(p1arr),
+      paper2: randPaper(p2arr),
+      s1: randScore(),
+      s2: randScore(),
+    });
+  }
+  return history.sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
 // Section state: 'not_started' | 'progressing' | 'completed'
@@ -575,7 +648,9 @@ schools.forEach(school => {
     if (allDone) overall = 'Completed';
     else if (anyStarted) overall = 'In Progress';
 
-    const attempt = anyStarted ? Math.floor(Math.random()*5) + 1 : 0;
+    const lrAttemptCount = (lState !== 'not_started' || rState !== 'not_started') ? Math.floor(Math.random()*5) + 1 : 0;
+    const swAttemptCount = (spState !== 'not_started' || wState !== 'not_started') ? Math.floor(Math.random()*5) + 1 : 0;
+    const attempt = Math.max(lrAttemptCount, swAttemptCount);
 
     rawStudents.push({
       name: randName(),
@@ -586,6 +661,12 @@ schools.forEach(school => {
       lScore, spScore, rScore, wScore,
       avgTOEIC,
       overall,
+      lPaper:  randPaper(listeningPapers),
+      rPaper:  randPaper(readingPapers),
+      spPaper: randPaper(speakingPapers),
+      wPaper:  randPaper(writingPapers),
+      lrAttempts: genAttemptHistory(lrAttemptCount, 'LR'),
+      swAttempts: genAttemptHistory(swAttemptCount, 'SW'),
     });
   }
 });
@@ -608,11 +689,14 @@ function setView(v) {
   renderCompletionTable();
 }
 
-function sectionCell(state, score) {
+function sectionCell(state, score, paper) {
   if (state === 'completed') {
     const pct = score / 495;
     const cls = pct >= 0.65 ? 'score-high' : pct >= 0.4 ? 'score-mid' : 'score-low';
-    return `<span class="score-pill ${cls}">${score}</span>`;
+    const paperHtml = paper
+      ? `<div style="font-size:11px;color:#9ca3af;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:150px;" title="${paper}">${paper}</div>`
+      : '';
+    return `<div><span class="score-pill ${cls}">${score}</span>${paperHtml}</div>`;
   }
   if (state === 'progressing') return `<span class="badge badge-yellow">Progressing</span>`;
   return `<span class="badge badge-gray">Not Started</span>`;
@@ -644,8 +728,6 @@ function renderCompletionTable() {
           ${s.school}
           <span style="color:#9ca3af; font-weight:400; margin-left:8px;">${schoolStudents.length} students</span>
         </td>
-        <td style="font-size:12px;"></td>
-        <td style="font-size:12px;"></td>
         <td class="num" style="font-size:12px;">
           <span style="color:#374151;">${avgTotal !== null ? avgTotal : '—'}</span>
           <span style="color:#9ca3af; font-size:11px; display:block;">avg score</span>
@@ -654,13 +736,16 @@ function renderCompletionTable() {
       prevSchool = s.school;
     }
 
-    html += `<tr>
-      <td style="padding-left:28px;">${s.name}</td>
+    const globalIdx = rawStudents.indexOf(s);
+    html += `<tr class="student-row" onclick="openStudentModal(${globalIdx})">
+      <td style="padding-left:28px;">
+        <span style="color:var(--brand-blue); font-weight:500;">${s.name}</span>
+      </td>
       <td class="muted" style="font-size:12px;">${s.school}</td>
       <td class="num">${s.attempt || '—'}</td>
       <td class="muted">${s.lastAttempt}</td>
-      <td>${activeView === 'LR' ? sectionCell(s.lState, s.lScore) : sectionCell(s.spState, s.spScore)}</td>
-      <td>${activeView === 'LR' ? sectionCell(s.rState, s.rScore) : sectionCell(s.wState, s.wScore)}</td>
+      <td>${activeView === 'LR' ? sectionCell(s.lState, s.lScore, s.lPaper) : sectionCell(s.spState, s.spScore, s.spPaper)}</td>
+      <td>${activeView === 'LR' ? sectionCell(s.rState, s.rScore, s.rPaper) : sectionCell(s.wState, s.wScore, s.wPaper)}</td>
       <td class="num">
         ${s.overall === 'Not Started'
           ? ``
@@ -721,6 +806,101 @@ function filterCompletion() {
   currentPage = 1;
   renderCompletionTable();
 }
+
+// ─── Student Modal ────────────────────────────────────────────────────────────
+let modalActiveTab = 'LR';
+
+function openStudentModal(idx) {
+  const s = rawStudents[idx];
+  document.getElementById('modalStudentName').textContent = s.name;
+  document.getElementById('modalStudentMeta').textContent = s.school + ' · ' + overallBadge(s.overall).replace(/<[^>]*>/g, '');
+  document.getElementById('modalStudentMeta').innerHTML = s.school +
+    ' &nbsp;·&nbsp; ' + overallBadge(s.overall);
+
+  modalActiveTab = activeView;
+  renderModalAttempts(s);
+
+  document.getElementById('modalTabLR').classList.toggle('active', modalActiveTab === 'LR');
+  document.getElementById('modalTabSW').classList.toggle('active', modalActiveTab === 'SW');
+
+  // store current student for tab switching
+  document.getElementById('studentModal').dataset.idx = idx;
+  document.getElementById('studentModal').classList.add('open');
+}
+
+function switchModalTab(tab) {
+  modalActiveTab = tab;
+  document.getElementById('modalTabLR').classList.toggle('active', tab === 'LR');
+  document.getElementById('modalTabSW').classList.toggle('active', tab === 'SW');
+  const idx = parseInt(document.getElementById('studentModal').dataset.idx);
+  renderModalAttempts(rawStudents[idx]);
+}
+
+function renderModalAttempts(s) {
+  const isLR = modalActiveTab === 'LR';
+  const attempts = isLR ? s.lrAttempts : s.swAttempts;
+  const col1 = isLR ? 'Listening Score' : 'Speaking Score';
+  const col2 = isLR ? 'Reading Score' : 'Writing Score';
+
+  let html = '';
+  if (attempts.length === 0) {
+    html = `<div style="text-align:center; padding:32px 0; color:#9ca3af; font-size:13px;">No attempts yet for this section.</div>`;
+  } else {
+    html += `<table class="attempt-table">
+      <thead>
+        <tr>
+          <th style="width:36px;">#</th>
+          <th>Date</th>
+          <th class="num">${col1}</th>
+          <th class="num">${col2}</th>
+          <th class="num">Avg Score</th>
+          <th style="width:100px;"></th>
+        </tr>
+      </thead>
+      <tbody>`;
+    attempts.forEach(a => {
+      const avg = Math.round((a.s1 + a.s2) / 2);
+      const avgPct = avg / 495;
+      const avgCls = avgPct >= 0.65 ? 'score-high' : avgPct >= 0.4 ? 'score-mid' : 'score-low';
+      const s1Cls = a.s1/495 >= 0.65 ? 'score-high' : a.s1/495 >= 0.4 ? 'score-mid' : 'score-low';
+      const s2Cls = a.s2/495 >= 0.65 ? 'score-high' : a.s2/495 >= 0.4 ? 'score-mid' : 'score-low';
+      html += `<tr>
+        <td style="color:#9ca3af; font-size:12px;">${a.no}</td>
+        <td style="color:#6b7280; font-size:12.5px;">${a.date}</td>
+        <td class="num">
+          <span class="score-pill ${s1Cls}">${a.s1}</span>
+          <div style="font-size:11px;color:#9ca3af;margin-top:3px;">${a.paper1}</div>
+        </td>
+        <td class="num">
+          <span class="score-pill ${s2Cls}">${a.s2}</span>
+          <div style="font-size:11px;color:#9ca3af;margin-top:3px;">${a.paper2}</div>
+        </td>
+        <td class="num"><span class="score-pill ${avgCls}">${avg}</span></td>
+        <td class="num">
+          <button class="btn btn-primary" style="padding:5px 11px; font-size:12px;" onclick="viewResult(event, '${s.name}', ${a.no})">View Result</button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table>`;
+  }
+  document.getElementById('modalAttemptContent').innerHTML = html;
+}
+
+function viewResult(event, name, attemptNo) {
+  event.stopPropagation();
+  // placeholder — wire to actual result page
+  alert(`Opening result for ${name} — Attempt #${attemptNo}`);
+}
+
+function closeModal(event) {
+  // called with event when clicking overlay; without event when clicking X or Close button
+  if (event && event.target !== document.getElementById('studentModal')) return;
+  document.getElementById('studentModal').classList.remove('open');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('studentModal').classList.remove('open');
+});
 
 // ─── Charts ───────────────────────────────────────────────────────────────────
 let dailyChart, schoolChart;
@@ -818,9 +998,17 @@ function downloadExcel(type) {
     csv += 'SMK TEKNOLOGI BANDUNG,58,41,387,9.4\n';
     csv += 'SMA GLOBAL NUSANTARA,52,39,350,9.0\n';
   } else {
-    csv = 'Student Name,School,Attempt,Last Attempt,Listening Score,Reading Score,Avg TOEIC,L Status,R Status,Overall\n';
+    const isLR = activeView === 'LR';
+    const col1 = isLR ? 'Listening' : 'Speaking';
+    const col2 = isLR ? 'Reading' : 'Writing';
+    csv = `Student Name,School,Attempt,Last Attempt,${col1} Score,${col1} Status,${col2} Score,${col2} Status,Avg Score,Overall\n`;
     filteredStudents.forEach(s => {
-      csv += `"${s.name}","${s.school}",${s.attempt||0},"${s.lastAttempt}",${s.lScore||''},${s.rScore||''},${s.avgTOEIC||''},${s.lDone?'Done':'—'},${s.rDone?'Done':'—'},${s.overall}\n`;
+      const s1State = isLR ? s.lState  : s.spState;
+      const s1Score = isLR ? s.lScore  : s.spScore;
+      const s2State = isLR ? s.rState  : s.wState;
+      const s2Score = isLR ? s.rScore  : s.wScore;
+      const avg = s.overall === 'Not Started' ? '' : (s.avgTOEIC || '');
+      csv += `"${s.name}","${s.school}",${s.attempt||0},"${s.lastAttempt}",${s1Score||''},${s1State},${s2Score||''},${s2State},${avg},${s.overall}\n`;
     });
   }
   const blob = new Blob([csv], { type: 'text/csv' });
