@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOEIC SmartPrep — Admin Analytics</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', sans-serif; }
+    :root {
+      --sidebar-w: 220px;
+      --brand-dark: #1e2a4a;
+      --brand-blue: #06A7E3;
+      --brand-teal: #00C9C8;
+    }
+    body { background: #f4f6fb; }
+
+    /* Sidebar */
+    .sidebar { width: var(--sidebar-w); min-height: 100vh; background: #fff; border-right: 1px solid #eef0f6; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 20; }
+    .sidebar-logo { padding: 20px 20px 8px; display: flex; align-items: center; gap: 10px; }
+    .sidebar-logo img, .logo-icon { width: 36px; height: 36px; }
+    .logo-text { font-size: 15px; font-weight: 700; color: var(--brand-dark); line-height: 1.2; }
+    .logo-text span { display: block; font-size: 10px; font-weight: 500; color: #06A7E3; letter-spacing: .5px; text-transform: uppercase; }
+    .sidebar-menu { flex: 1; padding: 12px 10px; }
+    .menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; color: #6b7280; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: all .15s; margin-bottom: 2px; text-decoration: none; }
+    .menu-item:hover { background: #f4f6fb; color: var(--brand-dark); }
+    .menu-item.active { background: #e8f7fe; color: var(--brand-blue); font-weight: 600; }
+    .menu-item svg { flex-shrink: 0; }
+    .sidebar-bottom { padding: 12px 10px; border-top: 1px solid #eef0f6; }
+    .sidebar-lang { display: flex; align-items: center; gap: 8px; padding: 8px 12px; color: #6b7280; font-size: 13px; cursor: pointer; border-radius: 8px; }
+    .sidebar-lang:hover { background: #f4f6fb; }
+    .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+    .sidebar-user:hover { background: #f4f6fb; }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #06A7E3, #00C9C8); display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+    .user-info { font-size: 12px; line-height: 1.4; }
+    .user-info strong { display: block; color: var(--brand-dark); font-weight: 600; }
+    .user-info span { color: #9ca3af; }
+
+    /* Main */
+    .main { margin-left: var(--sidebar-w); min-height: 100vh; }
+    .topbar { background: #fff; border-bottom: 1px solid #eef0f6; padding: 0 28px; height: 56px; display: flex; align-items: center; gap: 12px; }
+    .topbar-title { font-size: 15px; font-weight: 600; color: var(--brand-dark); }
+    .content { padding: 28px; }
+
+    /* Page heading */
+    .page-title { font-size: 22px; font-weight: 700; color: var(--brand-dark); }
+    .page-sub { font-size: 13px; color: #9ca3af; margin-top: 2px; }
+
+    /* Tabs */
+    .tabs { display: flex; gap: 0; border-bottom: 2px solid #eef0f6; margin: 24px 0 0; }
+    .tab { padding: 10px 22px; font-size: 14px; font-weight: 500; color: #9ca3af; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
+    .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); font-weight: 600; }
+    .tab:hover:not(.active) { color: var(--brand-dark); }
+
+    /* Cards */
+    .stat-card { background: #fff; border-radius: 12px; padding: 20px 24px; border: 1px solid #eef0f6; }
+    .stat-label { font-size: 12.5px; color: #9ca3af; font-weight: 500; }
+    .stat-value { font-size: 28px; font-weight: 700; color: var(--brand-dark); margin-top: 6px; }
+    .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+
+    /* Chart card */
+    .chart-card { background: #fff; border-radius: 12px; padding: 20px 24px; border: 1px solid #eef0f6; }
+    .chart-title { font-size: 14px; font-weight: 600; color: var(--brand-dark); }
+    .chart-sub { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+
+    /* Table */
+    .table-wrap { background: #fff; border-radius: 12px; border: 1px solid #eef0f6; overflow: hidden; }
+    .table-toolbar { padding: 16px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eef0f6; flex-wrap: wrap; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th { background: #f8f9fc; padding: 11px 14px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; white-space: nowrap; border-bottom: 1px solid #eef0f6; }
+    thead th.num { text-align: right; }
+    tbody tr { border-bottom: 1px solid #f0f2f8; transition: background .1s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #f8f9fc; }
+    tbody tr.school-row { background: #f0f8fe; }
+    tbody tr.school-row td { font-weight: 600; color: var(--brand-dark); font-size: 12.5px; }
+    td { padding: 10px 14px; color: #374151; }
+    td.num { text-align: right; color: #374151; }
+    td.muted { color: #9ca3af; font-size: 12px; }
+
+    /* Badge */
+    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+    .badge-green { background: #ecfdf5; color: #059669; }
+    .badge-yellow { background: #f3f0ff; color: #7c3aed; }
+    .badge-red { background: #fef2f2; color: #dc2626; }
+    .badge-blue { background: #eff6ff; color: #2563eb; }
+    .badge-gray { background: #f3f4f6; color: #6b7280; }
+
+    /* Score pill */
+    .score-pill { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+    .score-high { background: #ecfdf5; color: #059669; }
+    .score-mid { background: #fffbeb; color: #d97706; }
+    .score-low { background: #fef2f2; color: #dc2626; }
+
+    /* Filter select */
+    .filter-select { border: 1px solid #e5e7eb; border-radius: 8px; padding: 7px 12px; font-size: 13px; color: #374151; background: #fff; outline: none; cursor: pointer; }
+    .filter-select:focus { border-color: var(--brand-blue); }
+
+    /* Search */
+    .search-wrap { position: relative; }
+    .search-wrap input { border: 1px solid #e5e7eb; border-radius: 8px; padding: 7px 12px 7px 34px; font-size: 13px; color: #374151; background: #fff; outline: none; width: 200px; }
+    .search-wrap input:focus { border-color: var(--brand-blue); }
+    .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .15s; border: none; }
+    .btn-primary { background: var(--brand-blue); color: #fff; }
+    .btn-primary:hover { background: #0496cc; }
+    .btn-outline { background: #fff; color: #374151; border: 1px solid #e5e7eb; }
+    .btn-outline:hover { background: #f4f6fb; }
+    .btn-green { background: #059669; color: #fff; }
+    .btn-green:hover { background: #047857; }
+
+    /* Tab panels */
+    .tab-panel { display: none; padding-top: 24px; }
+    .tab-panel.active { display: block; }
+
+    /* Progress bar */
+    .prog-bar { height: 6px; border-radius: 3px; background: #eef0f6; overflow: hidden; }
+    .prog-fill { height: 100%; border-radius: 3px; }
+
+    /* Scrollable table */
+    .table-scroll { overflow-x: auto; }
+
+    /* View toggle */
+    .view-toggle { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; color: #6b7280; background: transparent; border: none; cursor: pointer; transition: all .15s; }
+    .view-toggle.active { background: #fff; color: #06A7E3; box-shadow: 0 1px 4px rgba(0,0,0,.08); font-weight: 600; }
+    .view-toggle:hover:not(.active) { color: #374151; }
+
+    /* Pagination */
+    .pagination { display: flex; align-items: center; gap: 4px; padding: 12px 20px; border-top: 1px solid #eef0f6; }
+    .page-btn { width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; border: 1px solid #e5e7eb; background: #fff; color: #374151; transition: all .15s; }
+    .page-btn:hover { background: #f4f6fb; }
+    .page-btn.active { background: var(--brand-blue); color: #fff; border-color: var(--brand-blue); }
+    .page-info { font-size: 12px; color: #9ca3af; margin-left: auto; }
+  </style>
+</head>
+<body>
+
+<!-- ─── Sidebar ─────────────────────────────────────────────────────────── -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <!-- TOEIC SmartPrep logo -->
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+      <rect width="36" height="36" rx="8" fill="#06A7E3"/>
+      <text x="18" y="24" text-anchor="middle" fill="white" font-size="18" font-weight="bold">T</text>
+    </svg>
+    <div class="logo-text">
+      SmartPrep
+      <span>TOEIC</span>
+    </div>
+  </div>
+
+  <nav class="sidebar-menu">
+    <a class="menu-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      Dashboard
+    </a>
+    <a class="menu-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Users
+    </a>
+    <a class="menu-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+      Questions
+    </a>
+    <a class="menu-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      Papers
+    </a>
+    <a class="menu-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      Distributors
+    </a>
+    <a class="menu-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+      Schools
+    </a>
+    <a class="menu-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Rubrics
+    </a>
+    <a class="menu-item" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Instructions
+    </a>
+    <a class="menu-item active" href="#">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Analytics
+    </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <div class="sidebar-lang">
+      <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+      English
+      <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="margin-left:auto"><path d="M6 9l6 6 6-6"/></svg>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar">AD</div>
+      <div class="user-info">
+        <strong>admin@heyhi.sg</strong>
+        <span>Admin</span>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ─── Main ─────────────────────────────────────────────────────────────── -->
+<div class="main">
+  <div class="topbar">
+    <svg width="18" height="18" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    <span class="topbar-title">Admin Panel</span>
+  </div>
+
+  <div class="content">
+    <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+      <div>
+        <div class="page-title" style="display:flex;align-items:center;gap:8px;">
+          <svg width="20" height="20" fill="none" stroke="#374151" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          Analytics
+        </div>
+        <div class="page-sub">System statistics and analysis</div>
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('usage')">Usage</div>
+      <div class="tab" onclick="switchTab('completion')">Progress Completion</div>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- TAB: USAGE                                                          -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel active" id="tab-usage">
+
+      <!-- Filters row -->
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+        <select class="filter-select" id="usagePeriod" onchange="renderUsageCharts()">
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 3 months</option>
+          <option value="180">Last 6 months</option>
+        </select>
+        <select class="filter-select" id="usageSchool" onchange="renderUsageCharts()">
+          <option value="all">All Schools</option>
+          <option>MAN INSAN CENDEKIA OKI</option>
+          <option>SMA NEGERI 1 JAKARTA</option>
+          <option>SMK TEKNOLOGI BANDUNG</option>
+          <option>SMA GLOBAL NUSANTARA</option>
+        </select>
+      </div>
+
+      <!-- Stat cards -->
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
+        <div class="stat-card" style="display:flex; align-items:flex-start; justify-content:space-between;">
+          <div>
+            <div class="stat-label">Active Students</div>
+            <div class="stat-value">248</div>
+            <div style="font-size:12px; color:#059669; margin-top:4px;">↑ 12% vs last period</div>
+          </div>
+          <div class="stat-icon" style="background:#e8f7fe;">
+            <svg width="20" height="20" fill="none" stroke="#06A7E3" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+        </div>
+        <div class="stat-card" style="display:flex; align-items:flex-start; justify-content:space-between;">
+          <div>
+            <div class="stat-label">Total Logins</div>
+            <div class="stat-value">1,847</div>
+            <div style="font-size:12px; color:#059669; margin-top:4px;">↑ 8% vs last period</div>
+          </div>
+          <div class="stat-icon" style="background:#ecfdf5;">
+            <svg width="20" height="20" fill="none" stroke="#059669" stroke-width="2" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          </div>
+        </div>
+        <div class="stat-card" style="display:flex; align-items:flex-start; justify-content:space-between;">
+          <div>
+            <div class="stat-label">Avg. Sessions / Student</div>
+            <div class="stat-value">7.4</div>
+            <div style="font-size:12px; color:#d97706; margin-top:4px;">↓ 2% vs last period</div>
+          </div>
+          <div class="stat-icon" style="background:#fffbeb;">
+            <svg width="20" height="20" fill="none" stroke="#d97706" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+        </div>
+        <div class="stat-card" style="display:flex; align-items:flex-start; justify-content:space-between;">
+          <div>
+            <div class="stat-label">Participating Schools</div>
+            <div class="stat-value">4</div>
+            <div style="font-size:12px; color:#9ca3af; margin-top:4px;">No change</div>
+          </div>
+          <div class="stat-icon" style="background:#f0fdf4;">
+            <svg width="20" height="20" fill="none" stroke="#059669" stroke-width="2" viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts row -->
+      <div style="display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:20px;">
+        <div class="chart-card">
+          <div class="chart-title">Daily Active Students</div>
+          <div class="chart-sub">Number of unique students logging in per day</div>
+          <div style="margin-top:16px; height:220px;">
+            <canvas id="dailyActiveChart"></canvas>
+          </div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-title">Usage by School</div>
+          <div class="chart-sub">Active students per school</div>
+          <div style="margin-top:16px; height:220px;">
+            <canvas id="schoolUsageChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Login frequency table -->
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <span style="font-size:14px; font-weight:600; color:#1e2a4a;">Login Activity by School</span>
+          <div style="margin-left:auto; display:flex; gap:8px; align-items:center;">
+            <button class="btn btn-green" onclick="downloadExcel('usage')">
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Download Excel
+            </button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>School</th>
+                <th class="num">Total Students</th>
+                <th class="num">Active Students</th>
+                <th class="num">Total Logins</th>
+                <th class="num">Avg Logins/Student</th>
+                <th class="num">Last Active</th>
+                <th>Engagement</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="font-weight:500;">MAN INSAN CENDEKIA OKI</td>
+                <td class="num">86</td>
+                <td class="num">78</td>
+                <td class="num">612</td>
+                <td class="num">7.9</td>
+                <td class="num muted">Apr 17, 2026</td>
+                <td>
+                  <div style="display:flex; align-items:center; gap:8px; min-width:120px;">
+                    <div class="prog-bar" style="flex:1;"><div class="prog-fill" style="width:91%; background:#06A7E3;"></div></div>
+                    <span style="font-size:12px; color:#374151; font-weight:600;">91%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">SMA NEGERI 1 JAKARTA</td>
+                <td class="num">64</td>
+                <td class="num">52</td>
+                <td class="num">498</td>
+                <td class="num">9.6</td>
+                <td class="num muted">Apr 17, 2026</td>
+                <td>
+                  <div style="display:flex; align-items:center; gap:8px; min-width:120px;">
+                    <div class="prog-bar" style="flex:1;"><div class="prog-fill" style="width:81%; background:#00C9C8;"></div></div>
+                    <span style="font-size:12px; color:#374151; font-weight:600;">81%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">SMK TEKNOLOGI BANDUNG</td>
+                <td class="num">58</td>
+                <td class="num">41</td>
+                <td class="num">387</td>
+                <td class="num">9.4</td>
+                <td class="num muted">Apr 16, 2026</td>
+                <td>
+                  <div style="display:flex; align-items:center; gap:8px; min-width:120px;">
+                    <div class="prog-bar" style="flex:1;"><div class="prog-fill" style="width:71%; background:#06A7E3;"></div></div>
+                    <span style="font-size:12px; color:#374151; font-weight:600;">71%</span>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="font-weight:500;">SMA GLOBAL NUSANTARA</td>
+                <td class="num">52</td>
+                <td class="num">39</td>
+                <td class="num">350</td>
+                <td class="num">9.0</td>
+                <td class="num muted">Apr 15, 2026</td>
+                <td>
+                  <div style="display:flex; align-items:center; gap:8px; min-width:120px;">
+                    <div class="prog-bar" style="flex:1;"><div class="prog-fill" style="width:75%; background:#00C9C8;"></div></div>
+                    <span style="font-size:12px; color:#374151; font-weight:600;">75%</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div><!-- /tab-usage -->
+
+
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- TAB: PROGRESS COMPLETION                                            -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div class="tab-panel" id="tab-completion">
+
+      <!-- Filters row -->
+      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+        <select class="filter-select" id="compSchool" onchange="filterCompletion()">
+          <option value="all">All Schools</option>
+          <option value="MAN INSAN CENDEKIA OKI">MAN INSAN CENDEKIA OKI</option>
+          <option value="SMA NEGERI 1 JAKARTA">SMA NEGERI 1 JAKARTA</option>
+          <option value="SMK TEKNOLOGI BANDUNG">SMK TEKNOLOGI BANDUNG</option>
+          <option value="SMA GLOBAL NUSANTARA">SMA GLOBAL NUSANTARA</option>
+        </select>
+        <select class="filter-select" id="compStatus" onchange="filterCompletion()">
+          <option value="all">All Status</option>
+          <option value="Completed">Completed</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Not Started">Not Started</option>
+        </select>
+        <select class="filter-select" id="compSection" onchange="filterCompletion()">
+          <option value="all">All Sections</option>
+          <option value="listening">Listening completed</option>
+          <option value="speaking">Speaking completed</option>
+          <option value="reading">Reading completed</option>
+          <option value="writing">Writing completed</option>
+        </select>
+        <div class="search-wrap">
+          <svg width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="compSearch" placeholder="Search student…" oninput="filterCompletion()">
+        </div>
+        <div style="margin-left:auto; display:flex; gap:8px;">
+          <button class="btn btn-green" onclick="downloadExcel('completion')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Excel
+          </button>
+        </div>
+      </div>
+
+      <!-- Summary cards -->
+      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
+        <div class="stat-card">
+          <div class="stat-label">Total Students</div>
+          <div class="stat-value">260</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Completed Both Sections</div>
+          <div class="stat-value" style="color:#059669;">142</div>
+          <div style="font-size:12px; color:#9ca3af; margin-top:2px;">54.6%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">In Progress</div>
+          <div class="stat-value" style="color:#d97706;">78</div>
+          <div style="font-size:12px; color:#9ca3af; margin-top:2px;">30.0%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Not Started</div>
+          <div class="stat-value" style="color:#dc2626;">40</div>
+          <div style="font-size:12px; color:#9ca3af; margin-top:2px;">15.4%</div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="table-wrap">
+        <!-- View toggle -->
+        <div style="padding:14px 20px; border-bottom:1px solid #eef0f6; display:flex; align-items:center; gap:8px;">
+          <span style="font-size:12.5px; color:#6b7280; font-weight:500; margin-right:4px;">View sections:</span>
+          <div style="display:flex; background:#f4f6fb; border-radius:8px; padding:3px; gap:2px;">
+            <button id="viewLR" class="view-toggle active" onclick="setView('LR')">Listening &amp; Reading</button>
+            <button id="viewSW" class="view-toggle" onclick="setView('SW')">Speaking &amp; Writing</button>
+          </div>
+        </div>
+        <div class="table-scroll">
+          <table id="completionTable">
+            <thead>
+              <tr>
+                <th>Student Name</th>
+                <th>School</th>
+                <th class="num">Attempt</th>
+                <th>Last Attempt</th>
+                <th id="col1Head">Listening</th>
+                <th id="col2Head">Reading</th>
+                <th class="num">Avg Score</th>
+              </tr>
+            </thead>
+            <tbody id="completionBody">
+              <!-- JS rendered -->
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="compPagination">
+          <!-- JS rendered -->
+        </div>
+      </div>
+
+    </div><!-- /tab-completion -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+
+<script>
+// ─── Sample Data ─────────────────────────────────────────────────────────────
+const schools = [
+  'MAN INSAN CENDEKIA OKI',
+  'SMA NEGERI 1 JAKARTA',
+  'SMK TEKNOLOGI BANDUNG',
+  'SMA GLOBAL NUSANTARA',
+];
+
+const firstNames = ['Ahmad','Siti','Muhammad','Nur','Rizky','Ayu','Dimas','Putri','Fajar','Dewi',
+  'Bagas','Laila','Hendra','Rina','Yoga','Fitri','Budi','Citra','Eko','Diana',
+  'Gilang','Hani','Ivan','Jasmine','Kevin','Lina','Miko','Nadia','Omar','Prita'];
+const lastNames = ['Pratama','Sari','Hidayat','Rahayu','Kusuma','Wulandari','Santoso','Putri',
+  'Wijaya','Permata','Nugroho','Handayani','Saputra','Lestari','Firmansyah','Anggraini',
+  'Ramadhan','Setiawan','Purnama','Sukma'];
+
+function randName() {
+  return firstNames[Math.floor(Math.random()*firstNames.length)] + ' ' +
+         lastNames[Math.floor(Math.random()*lastNames.length)];
+}
+function randDate() {
+  const d = new Date(2025, 9, 1);
+  d.setDate(d.getDate() + Math.floor(Math.random()*200));
+  return d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
+}
+function randScore() {
+  // TOEIC-style score 5–495
+  return Math.round((Math.random() * 0.7 + 0.2) * 490 + 5);
+}
+
+// Section state: 'not_started' | 'progressing' | 'completed'
+function randState() {
+  const r = Math.random();
+  if (r < 0.55) return 'completed';
+  if (r < 0.80) return 'progressing';
+  return 'not_started';
+}
+
+// Generate student records
+const rawStudents = [];
+schools.forEach(school => {
+  const count = school === 'MAN INSAN CENDEKIA OKI' ? 86 :
+                school === 'SMA NEGERI 1 JAKARTA' ? 64 :
+                school === 'SMK TEKNOLOGI BANDUNG' ? 58 : 52;
+  for (let i = 0; i < count; i++) {
+    const lState = randState();
+    const spState = randState();
+    const rState = randState();
+    const wState = randState();
+
+    const lScore  = lState  === 'completed' ? randScore() : null;
+    const spScore = spState === 'completed' ? randScore() : null;
+    const rScore  = rState  === 'completed' ? randScore() : null;
+    const wScore  = wState  === 'completed' ? randScore() : null;
+
+    const completedScores = [lScore, spScore, rScore, wScore].filter(x => x !== null);
+    // avg of whatever is completed (not null)
+    const avgTOEIC = completedScores.length > 0
+      ? Math.round(completedScores.reduce((a,b) => a+b, 0) / completedScores.length)
+      : null;
+
+    const states = [lState, spState, rState, wState];
+    const anyStarted = states.some(s => s !== 'not_started');
+    const allDone = states.every(s => s === 'completed');
+
+    let overall = 'Not Started';
+    if (allDone) overall = 'Completed';
+    else if (anyStarted) overall = 'In Progress';
+
+    const attempt = anyStarted ? Math.floor(Math.random()*5) + 1 : 0;
+
+    rawStudents.push({
+      name: randName(),
+      school,
+      attempt,
+      lastAttempt: anyStarted ? randDate() : '—',
+      lState, spState, rState, wState,
+      lScore, spScore, rScore, wScore,
+      avgTOEIC,
+      overall,
+    });
+  }
+});
+
+// Sort by school then name
+rawStudents.sort((a,b) => a.school.localeCompare(b.school) || a.name.localeCompare(b.name));
+
+// ─── Completion Table ─────────────────────────────────────────────────────────
+let filteredStudents = [...rawStudents];
+let currentPage = 1;
+const PAGE_SIZE = 20;
+let activeView = 'LR'; // 'LR' | 'SW'
+
+function setView(v) {
+  activeView = v;
+  document.getElementById('viewLR').classList.toggle('active', v === 'LR');
+  document.getElementById('viewSW').classList.toggle('active', v === 'SW');
+  document.getElementById('col1Head').textContent = v === 'LR' ? 'Listening' : 'Speaking';
+  document.getElementById('col2Head').textContent = v === 'LR' ? 'Reading' : 'Writing';
+  renderCompletionTable();
+}
+
+function sectionCell(state, score) {
+  if (state === 'completed') {
+    const pct = score / 495;
+    const cls = pct >= 0.65 ? 'score-high' : pct >= 0.4 ? 'score-mid' : 'score-low';
+    return `<span class="score-pill ${cls}">${score}</span>`;
+  }
+  if (state === 'progressing') return `<span class="badge badge-yellow">Progressing</span>`;
+  return `<span class="badge badge-gray">Not Started</span>`;
+}
+
+function overallBadge(s) {
+  if (s === 'Completed') return `<span class="badge badge-green">Completed</span>`;
+  if (s === 'In Progress') return `<span class="badge badge-yellow">In Progress</span>`;
+  return `<span class="badge badge-red">Not Started</span>`;
+}
+
+function renderCompletionTable() {
+  const tbody = document.getElementById('completionBody');
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filteredStudents.slice(start, start + PAGE_SIZE);
+
+  let html = '';
+  let prevSchool = null;
+
+  slice.forEach(s => {
+    // School group header row
+    if (s.school !== prevSchool) {
+      const schoolStudents = filteredStudents.filter(x => x.school === s.school);
+      const completedAvgs = schoolStudents.filter(x => x.avgTOEIC !== null).map(x => x.avgTOEIC);
+      const avgTotal = completedAvgs.length ? Math.round(completedAvgs.reduce((a,b)=>a+b,0)/completedAvgs.length) : null;
+      html += `<tr class="school-row">
+        <td colspan="6" style="font-size:12px; color:#06A7E3;">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:4px;"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          ${s.school}
+          <span style="color:#9ca3af; font-weight:400; margin-left:8px;">${schoolStudents.length} students</span>
+        </td>
+        <td style="font-size:12px;"></td>
+        <td style="font-size:12px;"></td>
+        <td class="num" style="font-size:12px;">
+          <span style="color:#374151;">${avgTotal !== null ? avgTotal : '—'}</span>
+          <span style="color:#9ca3af; font-size:11px; display:block;">avg score</span>
+        </td>
+      </tr>`;
+      prevSchool = s.school;
+    }
+
+    html += `<tr>
+      <td style="padding-left:28px;">${s.name}</td>
+      <td class="muted" style="font-size:12px;">${s.school}</td>
+      <td class="num">${s.attempt || '—'}</td>
+      <td class="muted">${s.lastAttempt}</td>
+      <td>${activeView === 'LR' ? sectionCell(s.lState, s.lScore) : sectionCell(s.spState, s.spScore)}</td>
+      <td>${activeView === 'LR' ? sectionCell(s.rState, s.rScore) : sectionCell(s.wState, s.wScore)}</td>
+      <td class="num">
+        ${s.overall === 'Not Started'
+          ? ``
+          : s.avgTOEIC !== null
+            ? `<span class="score-pill ${s.avgTOEIC/495 >= 0.65 ? 'score-high' : s.avgTOEIC/495 >= 0.4 ? 'score-mid' : 'score-low'}">${s.avgTOEIC}</span>`
+            : `<span style="color:#d1d5db;">—</span>`}
+      </td>
+    </tr>`;
+  });
+
+  tbody.innerHTML = html;
+  renderPagination();
+}
+
+function renderPagination() {
+  const total = filteredStudents.length;
+  const pages = Math.ceil(total / PAGE_SIZE);
+  const pg = document.getElementById('compPagination');
+
+  let html = '';
+  const prev = currentPage > 1;
+  const next = currentPage < pages;
+  html += `<button class="page-btn" ${!prev?'disabled style="opacity:.4"':''} onclick="goPage(${currentPage-1})">‹</button>`;
+
+  for (let i = 1; i <= pages; i++) {
+    if (i === 1 || i === pages || Math.abs(i - currentPage) <= 1) {
+      html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+    } else if (Math.abs(i - currentPage) === 2) {
+      html += `<span style="color:#9ca3af;padding:0 4px;">…</span>`;
+    }
+  }
+  html += `<button class="page-btn" ${!next?'disabled style="opacity:.4"':''} onclick="goPage(${currentPage+1})">›</button>`;
+  html += `<span class="page-info">Showing ${Math.min((currentPage-1)*PAGE_SIZE+1, total)}–${Math.min(currentPage*PAGE_SIZE, total)} of ${total} students</span>`;
+  pg.innerHTML = html;
+}
+
+function goPage(p) {
+  currentPage = p;
+  renderCompletionTable();
+}
+
+function filterCompletion() {
+  const school = document.getElementById('compSchool').value;
+  const status = document.getElementById('compStatus').value;
+  const section = document.getElementById('compSection').value;
+  const search = document.getElementById('compSearch').value.toLowerCase();
+
+  filteredStudents = rawStudents.filter(s => {
+    if (school !== 'all' && s.school !== school) return false;
+    if (status !== 'all' && s.overall !== status) return false;
+    if (section === 'listening' && s.lState !== 'completed') return false;
+    if (section === 'speaking' && s.spState !== 'completed') return false;
+    if (section === 'reading' && s.rState !== 'completed') return false;
+    if (section === 'writing' && s.wState !== 'completed') return false;
+    if (search && !s.name.toLowerCase().includes(search)) return false;
+    return true;
+  });
+  currentPage = 1;
+  renderCompletionTable();
+}
+
+// ─── Charts ───────────────────────────────────────────────────────────────────
+let dailyChart, schoolChart;
+
+function renderUsageCharts() {
+  // Daily active chart
+  const labels = [];
+  const data = [];
+  const days = parseInt(document.getElementById('usagePeriod').value);
+  for (let i = days - 1; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    labels.push(d.toLocaleDateString('en-GB', {day:'2-digit', month:'short'}));
+    data.push(Math.floor(20 + Math.random() * 80));
+  }
+
+  if (dailyChart) dailyChart.destroy();
+  dailyChart = new Chart(document.getElementById('dailyActiveChart'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        borderColor: '#06A7E3',
+        backgroundColor: 'rgba(6,167,227,0.08)',
+        borderWidth: 2,
+        pointRadius: days <= 30 ? 3 : 0,
+        pointHoverRadius: 5,
+        fill: true,
+        tension: 0.4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { color: '#9ca3af', font: { size: 11 }, maxTicksLimit: 8 }
+        },
+        y: {
+          grid: { color: '#f0f2f8' },
+          ticks: { color: '#9ca3af', font: { size: 11 } },
+          beginAtZero: true,
+        }
+      }
+    }
+  });
+
+  // School donut
+  if (schoolChart) schoolChart.destroy();
+  schoolChart = new Chart(document.getElementById('schoolUsageChart'), {
+    type: 'doughnut',
+    data: {
+      labels: schools.map(s => s.split(' ').slice(0,3).join(' ')),
+      datasets: [{
+        data: [78, 52, 41, 39],
+        backgroundColor: ['#06A7E3','#00C9C8','#6366f1','#f59e0b'],
+        borderWidth: 0,
+        hoverOffset: 4,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { font: { size: 11 }, color: '#374151', padding: 12, boxWidth: 10 }
+        }
+      }
+    }
+  });
+}
+
+// ─── Tab switching ────────────────────────────────────────────────────────────
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', (i === 0 && name === 'usage') || (i === 1 && name === 'completion'));
+  });
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+}
+
+// ─── Download Excel (mock) ────────────────────────────────────────────────────
+function downloadExcel(type) {
+  // Build CSV content
+  let csv = '';
+  if (type === 'usage') {
+    csv = 'School,Total Students,Active Students,Total Logins,Avg Logins/Student\n';
+    csv += 'MAN INSAN CENDEKIA OKI,86,78,612,7.9\n';
+    csv += 'SMA NEGERI 1 JAKARTA,64,52,498,9.6\n';
+    csv += 'SMK TEKNOLOGI BANDUNG,58,41,387,9.4\n';
+    csv += 'SMA GLOBAL NUSANTARA,52,39,350,9.0\n';
+  } else {
+    csv = 'Student Name,School,Attempt,Last Attempt,Listening Score,Reading Score,Avg TOEIC,L Status,R Status,Overall\n';
+    filteredStudents.forEach(s => {
+      csv += `"${s.name}","${s.school}",${s.attempt||0},"${s.lastAttempt}",${s.lScore||''},${s.rScore||''},${s.avgTOEIC||''},${s.lDone?'Done':'—'},${s.rDone?'Done':'—'},${s.overall}\n`;
+    });
+  }
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `toeic_${type}_analytics.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ─── Init ─────────────────────────────────────────────────────────────────────
+renderUsageCharts();
+renderCompletionTable();
+</script>
+</body>
+</html>
