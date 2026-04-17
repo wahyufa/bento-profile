@@ -961,10 +961,9 @@ function renderModalAttempts(s) {
         <tr>
           <th style="width:36px;">#</th>
           <th>Date</th>
-          <th class="num">${col1}</th>
-          <th class="num">${col2}</th>
+          <th>${col1}</th>
+          <th>${col2}</th>
           <th class="num">Avg Score</th>
-          <th style="width:100px;"></th>
         </tr>
       </thead>
       <tbody>`;
@@ -977,18 +976,17 @@ function renderModalAttempts(s) {
       html += `<tr>
         <td style="color:#9ca3af; font-size:12px;">${a.no}</td>
         <td style="color:#6b7280; font-size:12.5px;">${a.date}</td>
-        <td class="num">
+        <td>
           <span class="score-pill ${s1Cls}">${a.s1}</span>
           <div style="font-size:11px;color:#9ca3af;margin-top:3px;">${a.paper1}</div>
+          <button class="btn btn-primary" style="padding:4px 10px;font-size:11.5px;margin-top:6px;" onclick="viewResult(event, '${s.name}', ${a.no}, '${isLR ? 'Listening' : 'Speaking'}', '${a.paper1}')">View Result</button>
         </td>
-        <td class="num">
+        <td>
           <span class="score-pill ${s2Cls}">${a.s2}</span>
           <div style="font-size:11px;color:#9ca3af;margin-top:3px;">${a.paper2}</div>
+          <button class="btn btn-primary" style="padding:4px 10px;font-size:11.5px;margin-top:6px;" onclick="viewResult(event, '${s.name}', ${a.no}, '${isLR ? 'Reading' : 'Writing'}', '${a.paper2}')">View Result</button>
         </td>
         <td class="num"><span class="score-pill ${avgCls}">${avg}</span></td>
-        <td class="num">
-          <button class="btn btn-primary" style="padding:5px 11px; font-size:12px;" onclick="viewResult(event, '${s.name}', ${a.no})">View Result</button>
-        </td>
       </tr>`;
     });
     html += `</tbody></table>`;
@@ -996,10 +994,10 @@ function renderModalAttempts(s) {
   document.getElementById('modalAttemptContent').innerHTML = html;
 }
 
-function viewResult(event, name, attemptNo) {
+function viewResult(event, name, attemptNo, section, paper) {
   event.stopPropagation();
   // placeholder — wire to actual result page
-  alert(`Opening result for ${name} — Attempt #${attemptNo}`);
+  alert(`Opening result for ${name}\nAttempt #${attemptNo} · ${section}\nPaper: ${paper}`);
 }
 
 function closeModal(event) {
