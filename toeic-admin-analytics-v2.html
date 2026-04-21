@@ -4,171 +4,590 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TOEIC SmartPrep — Admin Analytics</title>
+  <script src="https://mcp.figma.com/mcp/html-to-design/capture.js" async></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Inter', sans-serif; }
+    * { font-family: 'Montserrat', sans-serif; }
     :root {
-      --sidebar-w: 220px;
+      --sidebar-w: 210px;
       --brand-dark: #1e2a4a;
       --brand-blue: #06A7E3;
       --brand-teal: #00C9C8;
     }
-    body { background: #f4f6fb; }
+    body { background: #f5f6fa; margin: 0; }
 
-    /* Sidebar */
-    .sidebar { width: var(--sidebar-w); min-height: 100vh; background: #fff; border-right: 1px solid #eef0f6; display: flex; flex-direction: column; position: fixed; top: 0; left: 0; z-index: 20; }
-    .sidebar-logo { padding: 20px 20px 8px; display: flex; align-items: center; gap: 10px; }
-    .sidebar-logo img, .logo-icon { width: 36px; height: 36px; }
+    /* ── Sidebar overlay (mobile) ── */
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.4);
+      z-index: 19;
+    }
+    .sidebar-overlay.open { display: block; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: var(--sidebar-w);
+      min-height: 100vh;
+      background: #fff;
+      border-right: 1px solid #e8eaf0;
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 20;
+      transition: transform .25s ease;
+    }
+    .sidebar-logo {
+      padding: 18px 16px 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo-icon { width: 36px; height: 36px; flex-shrink: 0; }
     .logo-text { font-size: 15px; font-weight: 700; color: var(--brand-dark); line-height: 1.2; }
-    .logo-text span { display: block; font-size: 10px; font-weight: 500; color: #06A7E3; letter-spacing: .5px; text-transform: uppercase; }
-    .sidebar-menu { flex: 1; padding: 12px 10px; }
-    .menu-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; color: #6b7280; font-size: 13.5px; font-weight: 500; cursor: pointer; transition: all .15s; margin-bottom: 2px; text-decoration: none; }
-    .menu-item:hover { background: #f4f6fb; color: var(--brand-dark); }
+    .logo-text span {
+      display: block;
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--brand-blue);
+      letter-spacing: .6px;
+      text-transform: uppercase;
+    }
+
+    .sidebar-section-label {
+      padding: 4px 16px 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #b0b7c3;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+    }
+    .sidebar-menu { flex: 1; padding: 0 8px 12px; }
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      color: #6b7280;
+      font-size: 13.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      margin-bottom: 2px;
+      text-decoration: none;
+    }
+    .menu-item:hover { background: #f5f6fa; color: var(--brand-dark); }
     .menu-item.active { background: #e8f7fe; color: var(--brand-blue); font-weight: 600; }
     .menu-item svg { flex-shrink: 0; }
-    .sidebar-bottom { padding: 12px 10px; border-top: 1px solid #eef0f6; }
-    .sidebar-lang { display: flex; align-items: center; gap: 8px; padding: 8px 12px; color: #6b7280; font-size: 13px; cursor: pointer; border-radius: 8px; }
-    .sidebar-lang:hover { background: #f4f6fb; }
-    .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
-    .sidebar-user:hover { background: #f4f6fb; }
-    .user-avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #06A7E3, #00C9C8); display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+
+    .sidebar-bottom { padding: 10px 8px 14px; border-top: 1px solid #e8eaf0; }
+    .sidebar-lang {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      color: #6b7280;
+      font-size: 13px;
+      cursor: pointer;
+      border-radius: 8px;
+    }
+    .sidebar-lang:hover { background: #f5f6fa; }
+    .sidebar-user {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-top: 2px;
+    }
+    .sidebar-user:hover { background: #f5f6fa; }
+    .user-avatar {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #06A7E3, #00C9C8);
+      display: flex; align-items: center; justify-content: center;
+      color: white; font-size: 11px; font-weight: 700;
+      flex-shrink: 0;
+    }
     .user-info { font-size: 12px; line-height: 1.4; }
     .user-info strong { display: block; color: var(--brand-dark); font-weight: 600; }
     .user-info span { color: #9ca3af; }
 
-    /* Main */
+    /* ── Main ── */
     .main { margin-left: var(--sidebar-w); min-height: 100vh; }
-    .topbar { background: #fff; border-bottom: 1px solid #eef0f6; padding: 0 28px; height: 56px; display: flex; align-items: center; gap: 12px; }
-    .topbar-title { font-size: 15px; font-weight: 600; color: var(--brand-dark); }
+    .topbar {
+      background: #fff;
+      border-bottom: 1px solid #e8eaf0;
+      padding: 0 28px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .topbar-title { font-size: 14px; font-weight: 600; color: var(--brand-dark); }
+    .hamburger-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      color: #6b7280;
+      flex-shrink: 0;
+    }
+    .hamburger-btn:hover { background: #f5f6fa; }
     .content { padding: 28px; }
 
-    /* Page heading */
-    .page-title { font-size: 22px; font-weight: 700; color: var(--brand-dark); }
-    .page-sub { font-size: 13px; color: #9ca3af; margin-top: 2px; }
+    /* ── Page heading ── */
+    .page-heading { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0; }
+    .page-title { font-size: 22px; font-weight: 700; color: var(--brand-dark); display: flex; align-items: center; gap: 8px; }
+    .page-sub { font-size: 13px; color: #9ca3af; margin-top: 3px; }
 
-    /* Tabs */
-    .tabs { display: flex; gap: 0; border-bottom: 2px solid #eef0f6; margin: 24px 0 0; }
-    .tab { padding: 10px 22px; font-size: 14px; font-weight: 500; color: #9ca3af; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
-    .tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); font-weight: 600; }
+    /* ── Tabs ── */
+    .tabs { display: flex; gap: 0; margin: 20px 0 0; }
+    .tabs-inner {
+      display: flex;
+      background: #f5f6fa;
+      border: 1px solid #e8eaf0;
+      border-radius: 8px;
+      padding: 3px;
+      gap: 2px;
+    }
+    .tab {
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 500;
+      color: #6b7280;
+      cursor: pointer;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      transition: all .15s;
+      white-space: nowrap;
+    }
+    .tab.active {
+      background: #fff;
+      color: var(--brand-blue);
+      font-weight: 600;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+    }
     .tab:hover:not(.active) { color: var(--brand-dark); }
 
-    /* Cards */
-    .stat-card { background: #fff; border-radius: 12px; padding: 20px 24px; border: 1px solid #eef0f6; }
+    /* ── Stat cards ── */
+    .stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 22px;
+      border: 1px solid #e8eaf0;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
     .stat-label { font-size: 12.5px; color: #9ca3af; font-weight: 500; }
     .stat-value { font-size: 28px; font-weight: 700; color: var(--brand-dark); margin-top: 6px; }
-    .stat-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .stat-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+    }
 
-    /* Chart card */
-    .chart-card { background: #fff; border-radius: 12px; padding: 20px 24px; border: 1px solid #eef0f6; }
+    /* ── Chart card ── */
+    .chart-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px 22px;
+      border: 1px solid #e8eaf0;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
     .chart-title { font-size: 14px; font-weight: 600; color: var(--brand-dark); }
     .chart-sub { font-size: 12px; color: #9ca3af; margin-top: 2px; }
 
-    /* Table */
-    .table-wrap { background: #fff; border-radius: 12px; border: 1px solid #eef0f6; overflow: hidden; }
-    .table-toolbar { padding: 16px 20px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid #eef0f6; flex-wrap: wrap; }
+    /* ── Table ── */
+    .table-wrap {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #e8eaf0;
+      box-shadow: 0 1px 4px rgba(0,0,0,.04);
+      overflow: hidden;
+    }
+    .table-toolbar {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #e8eaf0;
+      flex-wrap: wrap;
+    }
     table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    thead th { background: #f8f9fc; padding: 11px 14px; text-align: left; font-size: 12px; font-weight: 600; color: #6b7280; white-space: nowrap; border-bottom: 1px solid #eef0f6; }
+    thead th {
+      background: #f8f9fc;
+      padding: 11px 16px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 600;
+      color: #6b7280;
+      white-space: nowrap;
+      border-bottom: 1px solid #e8eaf0;
+    }
     thead th.num { text-align: right; }
     tbody tr { border-bottom: 1px solid #f0f2f8; transition: background .1s; }
     tbody tr:last-child { border-bottom: none; }
     tbody tr:hover { background: #f8f9fc; }
     tbody tr.school-row { background: #f0f8fe; }
     tbody tr.school-row td { font-weight: 600; color: var(--brand-dark); font-size: 12.5px; }
-    td { padding: 10px 14px; color: #374151; }
+    td { padding: 11px 16px; color: #374151; }
     td.num { text-align: right; color: #374151; }
     td.muted { color: #9ca3af; font-size: 12px; }
 
-    /* Badge */
-    .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
-    .badge-green { background: #ecfdf5; color: #059669; }
+    /* ── Badge ── */
+    .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 9px;
+      border-radius: 20px;
+      font-size: 11.5px; font-weight: 500;
+    }
+    .badge-green  { background: #ecfdf5; color: #059669; }
     .badge-yellow { background: #f3f0ff; color: #7c3aed; }
-    .badge-red { background: #fef2f2; color: #dc2626; }
-    .badge-blue { background: #eff6ff; color: #2563eb; }
-    .badge-gray { background: #f3f4f6; color: #6b7280; }
+    .badge-red    { background: #fef2f2; color: #dc2626; }
+    .badge-blue   { background: #eff6ff; color: #2563eb; }
+    .badge-gray   { background: #f3f4f6; color: #6b7280; }
 
-    /* Score pill */
-    .score-pill { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 600; }
+    /* ── Score pill ── */
+    .score-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 12px; font-weight: 600;
+    }
     .score-high { background: #ecfdf5; color: #059669; }
-    .score-mid { background: #fffbeb; color: #d97706; }
-    .score-low { background: #fef2f2; color: #dc2626; }
+    .score-mid  { background: #fffbeb; color: #d97706; }
+    .score-low  { background: #fef2f2; color: #dc2626; }
 
-    /* Filter select */
-    .filter-select { border: 1px solid #e5e7eb; border-radius: 8px; padding: 7px 12px; font-size: 13px; color: #374151; background: #fff; outline: none; cursor: pointer; }
+    /* ── Filters ── */
+    .filter-select {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 13px;
+      color: #374151;
+      background: #fff;
+      outline: none;
+      cursor: pointer;
+    }
     .filter-select:focus { border-color: var(--brand-blue); }
 
-    /* Search */
     .search-wrap { position: relative; }
-    .search-wrap input { border: 1px solid #e5e7eb; border-radius: 8px; padding: 7px 12px 7px 34px; font-size: 13px; color: #374151; background: #fff; outline: none; width: 200px; }
+    .search-wrap input {
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 7px 12px 7px 34px;
+      font-size: 13px;
+      color: #374151;
+      background: #fff;
+      outline: none;
+      width: 210px;
+    }
     .search-wrap input:focus { border-color: var(--brand-blue); }
     .search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); }
 
-    /* Buttons */
-    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; transition: all .15s; border: none; }
+    /* ── Buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px;
+      border-radius: 8px;
+      font-size: 13px; font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+      border: none;
+    }
     .btn-primary { background: var(--brand-blue); color: #fff; }
     .btn-primary:hover { background: #0496cc; }
     .btn-outline { background: #fff; color: #374151; border: 1px solid #e5e7eb; }
-    .btn-outline:hover { background: #f4f6fb; }
+    .btn-outline:hover { background: #f5f6fa; }
     .btn-green { background: #059669; color: #fff; }
     .btn-green:hover { background: #047857; }
 
-    /* Tab panels */
+    /* ── Tab panels ── */
     .tab-panel { display: none; padding-top: 24px; }
     .tab-panel.active { display: block; }
 
-    /* Progress bar */
-    .prog-bar { height: 6px; border-radius: 3px; background: #eef0f6; overflow: hidden; }
+    /* ── Progress bar ── */
+    .prog-bar { height: 6px; border-radius: 3px; background: #e8eaf0; overflow: hidden; }
     .prog-fill { height: 100%; border-radius: 3px; }
 
-    /* Scrollable table */
+    /* ── Scrollable table ── */
     .table-scroll { overflow-x: auto; }
 
-    /* View toggle */
-    .view-toggle { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 500; color: #6b7280; background: transparent; border: none; cursor: pointer; transition: all .15s; }
-    .view-toggle.active { background: #fff; color: #06A7E3; box-shadow: 0 1px 4px rgba(0,0,0,.08); font-weight: 600; }
+    /* ── View toggle ── */
+    .view-toggle {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 13px; font-weight: 500;
+      color: #6b7280;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .view-toggle.active {
+      background: #fff;
+      color: #06A7E3;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      font-weight: 600;
+    }
     .view-toggle:hover:not(.active) { color: #374151; }
 
-    /* Pagination */
-    .pagination { display: flex; align-items: center; gap: 4px; padding: 12px 20px; border-top: 1px solid #eef0f6; }
-    .page-btn { width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; cursor: pointer; border: 1px solid #e5e7eb; background: #fff; color: #374151; transition: all .15s; }
-    .page-btn:hover { background: #f4f6fb; }
+    /* ── Pagination ── */
+    .pagination {
+      display: flex; align-items: center; gap: 4px;
+      padding: 12px 20px;
+      border-top: 1px solid #e8eaf0;
+    }
+    .page-btn {
+      width: 30px; height: 30px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+      cursor: pointer;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      color: #374151;
+      transition: all .15s;
+    }
+    .page-btn:hover { background: #f5f6fa; }
     .page-btn.active { background: var(--brand-blue); color: #fff; border-color: var(--brand-blue); }
     .page-info { font-size: 12px; color: #9ca3af; margin-left: auto; }
 
-    /* Clickable student rows */
+    /* ── Clickable student rows ── */
     tbody tr.student-row { cursor: pointer; }
     tbody tr.student-row:hover { background: #edf6fd; }
 
-    /* Modal */
-    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.45); z-index: 100; align-items: center; justify-content: center; }
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.45);
+      z-index: 100;
+      align-items: center; justify-content: center;
+    }
     .modal-overlay.open { display: flex; }
-    .modal-card { background: #fff; border-radius: 14px; width: 680px; max-width: calc(100vw - 32px); max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.18); }
-    .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #eef0f6; }
+    .modal-card {
+      background: #fff;
+      border-radius: 14px;
+      width: 680px;
+      max-width: calc(100vw - 32px);
+      max-height: 90vh;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,.18);
+    }
+    .modal-header { padding: 20px 24px 16px; border-bottom: 1px solid #e8eaf0; position: relative; }
     .modal-title { font-size: 16px; font-weight: 700; color: var(--brand-dark); }
     .modal-sub { font-size: 12.5px; color: #9ca3af; margin-top: 2px; }
     .modal-body { overflow-y: auto; padding: 20px 24px; flex: 1; }
-    .modal-footer { padding: 14px 24px; border-top: 1px solid #eef0f6; display: flex; justify-content: flex-end; }
-    .modal-close { position: absolute; top: 0; right: 0; padding: 20px 24px; cursor: pointer; color: #9ca3af; background: none; border: none; font-size: 18px; line-height: 1; }
-    .modal-header { position: relative; }
+    .modal-footer { padding: 14px 24px; border-top: 1px solid #e8eaf0; display: flex; justify-content: flex-end; }
+    .modal-close {
+      position: absolute; top: 0; right: 0;
+      padding: 20px 24px;
+      cursor: pointer;
+      color: #9ca3af;
+      background: none; border: none;
+      font-size: 18px; line-height: 1;
+    }
     .attempt-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    .attempt-table th { background: #f8f9fc; padding: 9px 12px; text-align: left; font-size: 11.5px; font-weight: 600; color: #6b7280; border-bottom: 1px solid #eef0f6; white-space: nowrap; }
-    .attempt-table td { padding: 10px 12px; border-bottom: 1px solid #f0f2f8; color: #374151; vertical-align: middle; }
+    .attempt-table th {
+      background: #f8f9fc;
+      padding: 9px 12px;
+      text-align: left;
+      font-size: 11.5px; font-weight: 600;
+      color: #6b7280;
+      border-bottom: 1px solid #e8eaf0;
+      white-space: nowrap;
+    }
+    .attempt-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #f0f2f8;
+      color: #374151;
+      vertical-align: middle;
+    }
     .attempt-table tr:last-child td { border-bottom: none; }
-    .section-tabs { display: flex; gap: 0; border-bottom: 1px solid #eef0f6; margin-bottom: 16px; }
-    .section-tab { padding: 8px 18px; font-size: 13px; font-weight: 500; color: #9ca3af; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .15s; }
+    .section-tabs { display: flex; gap: 0; border-bottom: 1px solid #e8eaf0; margin-bottom: 16px; }
+    .section-tab {
+      padding: 8px 18px;
+      font-size: 13px; font-weight: 500;
+      color: #9ca3af;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: all .15s;
+    }
     .section-tab.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); font-weight: 600; }
+
+    /* ── Paper searchable dropdown ── */
+    .paper-dropdown { position: relative; }
+    .paper-trigger {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 7px 12px;
+      font-size: 13px;
+      font-family: 'Montserrat', sans-serif;
+      color: #374151;
+      background: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+      min-width: 130px;
+      transition: border-color .15s;
+    }
+    .paper-trigger:focus,
+    .paper-dropdown.open .paper-trigger { border-color: var(--brand-blue); outline: none; }
+    .paper-trigger svg { flex-shrink: 0; color: #9ca3af; transition: transform .15s; }
+    .paper-dropdown.open .paper-trigger svg { transform: rotate(180deg); }
+
+    .paper-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.10);
+      z-index: 50;
+      min-width: 220px;
+      overflow: hidden;
+    }
+    .paper-dropdown.open .paper-menu { display: block; }
+
+    .paper-search-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-bottom: 1px solid #e8eaf0;
+    }
+    .paper-search-wrap input {
+      border: none;
+      outline: none;
+      font-size: 13px;
+      font-family: 'Montserrat', sans-serif;
+      color: #374151;
+      width: 100%;
+      background: transparent;
+    }
+    .paper-search-wrap input::placeholder { color: #b0b7c3; }
+
+    .paper-options { max-height: 240px; overflow-y: auto; padding: 4px; }
+    .paper-group-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #9ca3af;
+      padding: 8px 10px 3px;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+    }
+    .paper-option {
+      padding: 7px 10px;
+      font-size: 13px;
+      color: #374151;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background .1s;
+    }
+    .paper-option:hover { background: #f5f6fa; }
+    .paper-option.selected { background: #e8f7fe; color: var(--brand-blue); font-weight: 600; }
+    .paper-no-results { padding: 16px 10px; font-size: 13px; color: #9ca3af; text-align: center; }
+
+    /* ── Responsive ── */
+    @media (max-width: 900px) {
+      .stat-cards-grid { grid-template-columns: repeat(2, 1fr) !important; }
+      .charts-grid     { grid-template-columns: 1fr !important; }
+    }
+
+    @media (max-width: 768px) {
+      /* Sidebar: off-screen drawer */
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); box-shadow: 4px 0 24px rgba(0,0,0,.12); }
+
+      /* Main: full width */
+      .main { margin-left: 0; }
+
+      /* Topbar */
+      .topbar { padding: 0 16px; }
+      .hamburger-btn { display: flex; }
+
+      /* Content */
+      .content { padding: 16px; }
+
+      /* Page title */
+      .page-title { font-size: 18px; }
+
+      /* Stat cards: 2 columns on mobile */
+      .stat-cards-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 12px !important; }
+
+      /* Charts: stack */
+      .charts-grid { grid-template-columns: 1fr !important; }
+
+      /* Filters row: full width selects */
+      .filters-row { gap: 8px !important; }
+      .filters-row .filter-select { flex: 1; min-width: 130px; }
+      .filters-row .search-wrap input { width: 100%; }
+      .filters-row .search-wrap { flex: 1; min-width: 130px; }
+
+      /* Tabs: shrink padding */
+      .tab { padding: 6px 12px; font-size: 12px; }
+
+      /* Table toolbar: wrap */
+      .table-toolbar { gap: 8px; }
+
+      /* Modal: full width */
+      .modal-card { width: calc(100vw - 24px); }
+      #modalSummaryCards { flex-direction: column !important; }
+
+      /* Summary cards: 2 col */
+      .summary-cards-grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+    }
+
+    @media (max-width: 480px) {
+      /* Stat cards: 1 column on very small screens */
+      .stat-cards-grid { grid-template-columns: 1fr !important; }
+      .summary-cards-grid { grid-template-columns: 1fr !important; }
+      .page-title { font-size: 17px; }
+      .stat-value { font-size: 24px; }
+    }
   </style>
 </head>
 <body>
 
+<!-- ─── Sidebar Overlay ──────────────────────────────────────────────────── -->
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebar()"></div>
+
 <!-- ─── Sidebar ─────────────────────────────────────────────────────────── -->
-<aside class="sidebar">
+<aside class="sidebar" id="sidebar">
   <div class="sidebar-logo">
     <!-- TOEIC SmartPrep logo -->
-    <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-      <rect width="36" height="36" rx="8" fill="#06A7E3"/>
-      <text x="18" y="24" text-anchor="middle" fill="white" font-size="18" font-weight="bold">T</text>
+    <svg class="logo-icon" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="36" height="36" rx="9" fill="#06A7E3"/>
+      <!-- chat bubble base -->
+      <rect x="6" y="7" width="24" height="17" rx="4" fill="white"/>
+      <polygon points="10,24 14,24 10,29" fill="white"/>
+      <!-- robot eyes -->
+      <rect x="11" y="12" width="4" height="4" rx="1.5" fill="#06A7E3"/>
+      <rect x="21" y="12" width="4" height="4" rx="1.5" fill="#06A7E3"/>
+      <!-- robot smile -->
+      <rect x="12" y="18" width="12" height="2" rx="1" fill="#06A7E3"/>
     </svg>
     <div class="logo-text">
       SmartPrep
@@ -177,6 +596,7 @@
   </div>
 
   <nav class="sidebar-menu">
+    <div class="sidebar-section-label">Menu</div>
     <a class="menu-item" href="#">
       <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
       Dashboard
@@ -227,6 +647,7 @@
         <strong>admin@heyhi.sg</strong>
         <span>Admin</span>
       </div>
+      <svg width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24" style="margin-left:auto"><path d="M18 15l-6-6-6 6"/></svg>
     </div>
   </div>
 </aside>
@@ -234,14 +655,16 @@
 <!-- ─── Main ─────────────────────────────────────────────────────────────── -->
 <div class="main">
   <div class="topbar">
-    <svg width="18" height="18" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    <span class="topbar-title">Admin Panel</span>
+    <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Toggle menu">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+<span class="topbar-title">Admin Panel</span>
   </div>
 
   <div class="content">
-    <div style="display:flex; align-items:flex-start; justify-content:space-between;">
+    <div class="page-heading">
       <div>
-        <div class="page-title" style="display:flex;align-items:center;gap:8px;">
+        <div class="page-title">
           <svg width="20" height="20" fill="none" stroke="#374151" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
           Analytics
         </div>
@@ -251,8 +674,10 @@
 
     <!-- Tabs -->
     <div class="tabs">
-      <div class="tab active" onclick="switchTab('usage')">Usage</div>
-      <div class="tab" onclick="switchTab('completion')">Progress Completion</div>
+      <div class="tabs-inner">
+        <button class="tab active" onclick="switchTab('usage')">Usage</button>
+        <button class="tab" onclick="switchTab('completion')">Progress Completion</button>
+      </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
@@ -261,7 +686,7 @@
     <div class="tab-panel active" id="tab-usage">
 
       <!-- Filters row -->
-      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+      <div class="filters-row" style="display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
         <select class="filter-select" id="usagePeriod" onchange="renderUsageCharts()">
           <option value="7">Last 7 days</option>
           <option value="30" selected>Last 30 days</option>
@@ -278,7 +703,7 @@
       </div>
 
       <!-- Stat cards -->
-      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
+      <div class="stat-cards-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
         <div class="stat-card" style="display:flex; align-items:flex-start; justify-content:space-between;">
           <div>
             <div class="stat-label">Active Students</div>
@@ -322,7 +747,7 @@
       </div>
 
       <!-- Charts row -->
-      <div style="display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:20px;">
+      <div class="charts-grid" style="display:grid; grid-template-columns:2fr 1fr; gap:16px; margin-bottom:20px;">
         <div class="chart-card">
           <div class="chart-title">Daily Active Students</div>
           <div class="chart-sub">Number of unique students logging in per day</div>
@@ -434,7 +859,7 @@
     <div class="tab-panel" id="tab-completion">
 
       <!-- Filters row -->
-      <div style="display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+      <div class="filters-row" style="display:flex; align-items:center; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
         <select class="filter-select" id="compSchool" onchange="filterCompletion()">
           <option value="all">All Schools</option>
           <option value="MAN INSAN CENDEKIA OKI">MAN INSAN CENDEKIA OKI</option>
@@ -455,10 +880,19 @@
           <option value="speaking">Speaking</option>
           <option value="writing">Writing</option>
         </select>
-        <select class="filter-select" id="compPaper" onchange="filterCompletion()">
-          <option value="all">All Papers</option>
-          <!-- populated by JS -->
-        </select>
+        <div class="paper-dropdown" id="paperDropdown">
+          <button class="paper-trigger" id="paperTrigger" onclick="togglePaperDropdown(event)" type="button">
+            <span id="paperLabel">All Papers</span>
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="paper-menu" id="paperMenu">
+            <div class="paper-search-wrap">
+              <svg width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input type="text" id="paperSearch" placeholder="Search paper…" oninput="filterPaperList()" autocomplete="off">
+            </div>
+            <div class="paper-options" id="paperOptions"></div>
+          </div>
+        </div>
         <div class="search-wrap">
           <svg width="14" height="14" fill="none" stroke="#9ca3af" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input type="text" id="compSearch" placeholder="Search student…" oninput="filterCompletion()">
@@ -472,7 +906,7 @@
       </div>
 
       <!-- Summary cards -->
-      <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
+      <div class="stat-cards-grid summary-cards-grid" style="display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px;">
         <div class="stat-card">
           <div class="stat-label">Total Students</div>
           <div class="stat-value">260</div>
@@ -496,10 +930,9 @@
 
       <!-- Table -->
       <div class="table-wrap">
-        <!-- View toggle -->
-        <div style="padding:14px 20px; border-bottom:1px solid #eef0f6; display:flex; align-items:center; gap:8px;">
+        <div style="padding:14px 20px; border-bottom:1px solid #e8eaf0; display:flex; align-items:center; gap:8px;">
           <span style="font-size:12.5px; color:#6b7280; font-weight:500; margin-right:4px;">View sections:</span>
-          <div style="display:flex; background:#f4f6fb; border-radius:8px; padding:3px; gap:2px;">
+          <div style="display:flex; background:#f5f6fa; border-radius:8px; padding:3px; gap:2px;">
             <button id="viewLR" class="view-toggle active" onclick="setView('LR')">Listening &amp; Reading</button>
             <button id="viewSW" class="view-toggle" onclick="setView('SW')">Speaking &amp; Writing</button>
           </div>
@@ -517,14 +950,10 @@
                 <th class="num">Avg Score</th>
               </tr>
             </thead>
-            <tbody id="completionBody">
-              <!-- JS rendered -->
-            </tbody>
+            <tbody id="completionBody"></tbody>
           </table>
         </div>
-        <div class="pagination" id="compPagination">
-          <!-- JS rendered -->
-        </div>
+        <div class="pagination" id="compPagination"></div>
       </div>
 
     </div><!-- /tab-completion -->
@@ -547,7 +976,7 @@
         <div class="section-tab active" id="modalTabLR" onclick="switchModalTab('LR')">Listening &amp; Reading</div>
         <div class="section-tab" id="modalTabSW" onclick="switchModalTab('SW')">Speaking &amp; Writing</div>
       </div>
-      <div id="modalAttemptContent"><!-- JS rendered --></div>
+      <div id="modalAttemptContent"></div>
     </div>
     <div class="modal-footer">
       <button class="btn btn-outline" onclick="closeModal()">Close</button>
@@ -581,7 +1010,6 @@ function randDate() {
   return d.toLocaleDateString('en-GB', {day:'2-digit', month:'short', year:'numeric'});
 }
 function randScore() {
-  // TOEIC-style score 5–495
   return Math.round((Math.random() * 0.7 + 0.2) * 490 + 5);
 }
 
@@ -590,9 +1018,7 @@ const readingPapers   = ['Reading Official 1',   'Reading Official 2',   'Readin
 const speakingPapers  = ['Speaking Official 1',  'Speaking Official 2',  'Speaking Practice A'];
 const writingPapers   = ['Writing Official 1',   'Writing Official 2',   'Writing Practice A'];
 
-function randPaper(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+function randPaper(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 
 function genAttemptHistory(count, type) {
   if (count === 0) return [];
@@ -614,7 +1040,6 @@ function genAttemptHistory(count, type) {
   return history.sort((a, b) => new Date(b.date) - new Date(a.date));
 }
 
-// Section state: 'not_started' | 'progressing' | 'completed'
 function randState() {
   const r = Math.random();
   if (r < 0.55) return 'completed';
@@ -622,7 +1047,6 @@ function randState() {
   return 'not_started';
 }
 
-// Generate student records
 const rawStudents = [];
 schools.forEach(school => {
   const count = school === 'MAN INSAN CENDEKIA OKI' ? 86 :
@@ -640,7 +1064,6 @@ schools.forEach(school => {
     const wScore  = wState  === 'completed' ? randScore() : null;
 
     const completedScores = [lScore, spScore, rScore, wScore].filter(x => x !== null);
-    // avg of whatever is completed (not null)
     const avgTOEIC = completedScores.length > 0
       ? Math.round(completedScores.reduce((a,b) => a+b, 0) / completedScores.length)
       : null;
@@ -658,38 +1081,32 @@ schools.forEach(school => {
     const attempt = Math.max(lrAttemptCount, swAttemptCount);
 
     rawStudents.push({
-      name: randName(),
-      school,
-      attempt,
+      name: randName(), school, attempt,
       lastAttempt: anyStarted ? randDate() : '—',
       lState, spState, rState, wState,
       lScore, spScore, rScore, wScore,
-      avgTOEIC,
-      overall,
-      lPaper:  randPaper(listeningPapers),
-      rPaper:  randPaper(readingPapers),
+      avgTOEIC, overall,
+      lPaper: randPaper(listeningPapers),
+      rPaper: randPaper(readingPapers),
       spPaper: randPaper(speakingPapers),
-      wPaper:  randPaper(writingPapers),
+      wPaper: randPaper(writingPapers),
       lrAttempts: genAttemptHistory(lrAttemptCount, 'LR'),
       swAttempts: genAttemptHistory(swAttemptCount, 'SW'),
     });
   }
 });
-
-// Sort by school then name
 rawStudents.sort((a,b) => a.school.localeCompare(b.school) || a.name.localeCompare(b.name));
 
 // ─── Completion Table ─────────────────────────────────────────────────────────
 let filteredStudents = [...rawStudents];
 let currentPage = 1;
 const PAGE_SIZE = 20;
-let activeView = 'LR'; // 'LR' | 'SW'
+let activeView = 'LR';
 
 function setView(v) {
   activeView = v;
   document.getElementById('viewLR').classList.toggle('active', v === 'LR');
   document.getElementById('viewSW').classList.toggle('active', v === 'SW');
-  // headers updated inside renderCompletionTable based on sectionFilter + view
   renderCompletionTable();
 }
 
@@ -717,7 +1134,6 @@ function overallBadge(s) {
   return `<span class="badge badge-red">Not Started</span>`;
 }
 
-// Returns avg of best attempt per section, only if both sections in the view are completed
 function viewAvg(s, view) {
   if (view === 'LR') {
     if (s.lState !== 'completed' || s.rState !== 'completed') return null;
@@ -738,7 +1154,6 @@ function scorePill(score) {
   return `<span class="score-pill ${cls}">${score}</span>`;
 }
 
-// Returns { state, score, paper } for a named section
 function getSectionData(s, section) {
   switch (section) {
     case 'listening': return { state: s.lState,  score: s.lScore,  paper: s.lPaper  };
@@ -753,7 +1168,6 @@ function renderCompletionTable() {
   const sectionFilter = document.getElementById('compSection').value;
   const single = sectionFilter !== 'all' ? sectionFilter : null;
 
-  // Update column headers
   const col1 = document.getElementById('col1Head');
   const col2 = document.getElementById('col2Head');
   if (single) {
@@ -773,7 +1187,6 @@ function renderCompletionTable() {
   let prevSchool = null;
 
   slice.forEach(s => {
-    // School group header row
     if (s.school !== prevSchool) {
       const schoolStudents = filteredStudents.filter(x => x.school === s.school);
       const schoolAvgs = schoolStudents.map(x => viewAvg(x, activeView)).filter(x => x !== null);
@@ -825,10 +1238,7 @@ function renderPagination() {
   const pg = document.getElementById('compPagination');
 
   let html = '';
-  const prev = currentPage > 1;
-  const next = currentPage < pages;
-  html += `<button class="page-btn" ${!prev?'disabled style="opacity:.4"':''} onclick="goPage(${currentPage-1})">‹</button>`;
-
+  html += `<button class="page-btn" ${currentPage<=1?'disabled style="opacity:.4"':''} onclick="goPage(${currentPage-1})">‹</button>`;
   for (let i = 1; i <= pages; i++) {
     if (i === 1 || i === pages || Math.abs(i - currentPage) <= 1) {
       html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
@@ -836,22 +1246,19 @@ function renderPagination() {
       html += `<span style="color:#9ca3af;padding:0 4px;">…</span>`;
     }
   }
-  html += `<button class="page-btn" ${!next?'disabled style="opacity:.4"':''} onclick="goPage(${currentPage+1})">›</button>`;
+  html += `<button class="page-btn" ${currentPage>=pages?'disabled style="opacity:.4"':''} onclick="goPage(${currentPage+1})">›</button>`;
   html += `<span class="page-info">Showing ${Math.min((currentPage-1)*PAGE_SIZE+1, total)}–${Math.min(currentPage*PAGE_SIZE, total)} of ${total} students</span>`;
   pg.innerHTML = html;
 }
 
-function goPage(p) {
-  currentPage = p;
-  renderCompletionTable();
-}
+function goPage(p) { currentPage = p; renderCompletionTable(); }
 
 function filterCompletion() {
-  const school = document.getElementById('compSchool').value;
-  const status = document.getElementById('compStatus').value;
+  const school  = document.getElementById('compSchool').value;
+  const status  = document.getElementById('compStatus').value;
   const section = document.getElementById('compSection').value;
-  const paper = document.getElementById('compPaper').value;
-  const search = document.getElementById('compSearch').value.toLowerCase();
+  const paper   = selectedPaper;
+  const search  = document.getElementById('compSearch').value.toLowerCase();
 
   filteredStudents = rawStudents.filter(s => {
     if (school !== 'all' && s.school !== school) return false;
@@ -868,27 +1275,87 @@ function filterCompletion() {
   renderCompletionTable();
 }
 
+// ─── Paper Searchable Dropdown ────────────────────────────────────────────────
+let selectedPaper = 'all';
+
+const paperGroups = [
+  { label: 'Listening', papers: listeningPapers },
+  { label: 'Reading',   papers: readingPapers },
+  { label: 'Speaking',  papers: speakingPapers },
+  { label: 'Writing',   papers: writingPapers },
+];
+
 function populatePaperFilter() {
-  const allPapers = [...listeningPapers, ...readingPapers, ...speakingPapers, ...writingPapers];
-  const sel = document.getElementById('compPaper');
-  const groups = [
-    { label: 'Listening', papers: listeningPapers },
-    { label: 'Reading',   papers: readingPapers },
-    { label: 'Speaking',  papers: speakingPapers },
-    { label: 'Writing',   papers: writingPapers },
-  ];
-  groups.forEach(g => {
-    const optgroup = document.createElement('optgroup');
-    optgroup.label = g.label;
-    g.papers.forEach(p => {
-      const opt = document.createElement('option');
-      opt.value = p;
-      opt.textContent = p;
-      optgroup.appendChild(opt);
-    });
-    sel.appendChild(optgroup);
-  });
+  buildPaperOptions('');
 }
+
+function buildPaperOptions(query) {
+  const container = document.getElementById('paperOptions');
+  const q = query.toLowerCase().trim();
+  let html = '';
+  let hasResults = false;
+
+  // "All Papers" option
+  if (!q || 'all papers'.includes(q)) {
+    html += `<div class="paper-option${selectedPaper === 'all' ? ' selected' : ''}" onclick="selectPaper('all', 'All Papers')">All Papers</div>`;
+    hasResults = true;
+  }
+
+  paperGroups.forEach(g => {
+    const matched = g.papers.filter(p => !q || p.toLowerCase().includes(q));
+    if (matched.length === 0) return;
+    hasResults = true;
+    html += `<div class="paper-group-label">${g.label}</div>`;
+    matched.forEach(p => {
+      html += `<div class="paper-option${selectedPaper === p ? ' selected' : ''}" onclick="selectPaper('${p}', '${p}')">${p}</div>`;
+    });
+  });
+
+  if (!hasResults) {
+    html = `<div class="paper-no-results">No papers found</div>`;
+  }
+
+  container.innerHTML = html;
+}
+
+function filterPaperList() {
+  buildPaperOptions(document.getElementById('paperSearch').value);
+}
+
+function selectPaper(value, label) {
+  selectedPaper = value;
+  document.getElementById('paperLabel').textContent = label;
+  closePaperDropdown();
+  filterCompletion();
+}
+
+function togglePaperDropdown(event) {
+  event.stopPropagation();
+  const dd = document.getElementById('paperDropdown');
+  const isOpen = dd.classList.contains('open');
+  closePaperDropdown();
+  if (!isOpen) {
+    dd.classList.add('open');
+    const input = document.getElementById('paperSearch');
+    input.value = '';
+    buildPaperOptions('');
+    input.focus();
+  }
+}
+
+function closePaperDropdown() {
+  document.getElementById('paperDropdown').classList.remove('open');
+}
+
+document.addEventListener('click', (e) => {
+  if (!document.getElementById('paperDropdown').contains(e.target)) {
+    closePaperDropdown();
+  }
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closePaperDropdown();
+});
 
 // ─── Student Modal ────────────────────────────────────────────────────────────
 let modalActiveTab = 'LR';
@@ -913,7 +1380,7 @@ function summaryCard(label, avg, attemptCount) {
   const sub = attemptCount > 0
     ? `<div style="font-size:11.5px;color:#9ca3af;">from ${attemptCount} attempt${attemptCount > 1 ? 's' : ''}</div>`
     : `<div style="font-size:11.5px;color:#9ca3af;">no attempts yet</div>`;
-  return `<div style="flex:1;background:#f8f9fc;border-radius:10px;padding:14px 18px;border:1px solid #eef0f6;">
+  return `<div style="flex:1;background:#f8f9fc;border-radius:10px;padding:14px 18px;border:1px solid #e8eaf0;">
     <div style="font-size:11.5px;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.4px;">${label}</div>
     ${pill}${sub}
   </div>`;
@@ -969,8 +1436,7 @@ function renderModalAttempts(s) {
       <tbody>`;
     attempts.forEach(a => {
       const avg = Math.round((a.s1 + a.s2) / 2);
-      const avgPct = avg / 495;
-      const avgCls = avgPct >= 0.65 ? 'score-high' : avgPct >= 0.4 ? 'score-mid' : 'score-low';
+      const avgCls = avg/495 >= 0.65 ? 'score-high' : avg/495 >= 0.4 ? 'score-mid' : 'score-low';
       const s1Cls = a.s1/495 >= 0.65 ? 'score-high' : a.s1/495 >= 0.4 ? 'score-mid' : 'score-low';
       const s2Cls = a.s2/495 >= 0.65 ? 'score-high' : a.s2/495 >= 0.4 ? 'score-mid' : 'score-low';
       html += `<tr>
@@ -996,12 +1462,10 @@ function renderModalAttempts(s) {
 
 function viewResult(event, name, attemptNo, section, paper) {
   event.stopPropagation();
-  // placeholder — wire to actual result page
   alert(`Opening result for ${name}\nAttempt #${attemptNo} · ${section}\nPaper: ${paper}`);
 }
 
 function closeModal(event) {
-  // called with event when clicking overlay; without event when clicking X or Close button
   if (event && event.target !== document.getElementById('studentModal')) return;
   document.getElementById('studentModal').classList.remove('open');
 }
@@ -1014,9 +1478,7 @@ document.addEventListener('keydown', e => {
 let dailyChart, schoolChart;
 
 function renderUsageCharts() {
-  // Daily active chart
-  const labels = [];
-  const data = [];
+  const labels = [], data = [];
   const days = parseInt(document.getElementById('usagePeriod').value);
   for (let i = days - 1; i >= 0; i--) {
     const d = new Date();
@@ -1046,20 +1508,12 @@ function renderUsageCharts() {
       maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: {
-          grid: { display: false },
-          ticks: { color: '#9ca3af', font: { size: 11 }, maxTicksLimit: 8 }
-        },
-        y: {
-          grid: { color: '#f0f2f8' },
-          ticks: { color: '#9ca3af', font: { size: 11 } },
-          beginAtZero: true,
-        }
+        x: { grid: { display: false }, ticks: { color: '#9ca3af', font: { size: 11 }, maxTicksLimit: 8 } },
+        y: { grid: { color: '#f0f2f8' }, ticks: { color: '#9ca3af', font: { size: 11 } }, beginAtZero: true }
       }
     }
   });
 
-  // School donut
   if (schoolChart) schoolChart.destroy();
   schoolChart = new Chart(document.getElementById('schoolUsageChart'), {
     type: 'doughnut',
@@ -1077,10 +1531,7 @@ function renderUsageCharts() {
       maintainAspectRatio: false,
       cutout: '65%',
       plugins: {
-        legend: {
-          position: 'bottom',
-          labels: { font: { size: 11 }, color: '#374151', padding: 12, boxWidth: 10 }
-        }
+        legend: { position: 'bottom', labels: { font: { size: 11 }, color: '#374151', padding: 12, boxWidth: 10 } }
       }
     }
   });
@@ -1097,7 +1548,6 @@ function switchTab(name) {
 
 // ─── Download Excel (mock) ────────────────────────────────────────────────────
 function downloadExcel(type) {
-  // Build CSV content
   let csv = '';
   if (type === 'usage') {
     csv = 'School,Total Students,Active Students,Total Logins,Avg Logins/Student\n';
@@ -1127,6 +1577,28 @@ function downloadExcel(type) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+// ─── Sidebar toggle (mobile) ──────────────────────────────────────────────────
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('open');
+}
+
+// Close sidebar when a nav item is clicked on mobile
+document.querySelectorAll('.menu-item').forEach(item => {
+  item.addEventListener('click', () => {
+    if (window.innerWidth <= 768) closeSidebar();
+  });
+});
+
+// Close sidebar on resize to desktop
+window.addEventListener('resize', () => {
+  if (window.innerWidth > 768) closeSidebar();
+});
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 populatePaperFilter();
