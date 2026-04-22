@@ -7,7 +7,6 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,500;0,700;1,400&family=Nunito+Sans:opsz,wght@6..12,400;6..12,700&family=Inter:wght@400;700&display=swap" rel="stylesheet">
-
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -33,6 +32,18 @@
       overflow-x: hidden;
     }
 
+    /* ─── SCROLL ANIMATIONS ─── */
+    .animate {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s cubic-bezier(0.4,0,0.2,1),
+                  transform 0.65s cubic-bezier(0.4,0,0.2,1);
+    }
+    .animate.visible { opacity: 1; transform: translateY(0); }
+    .animate[data-delay="1"] { transition-delay: 0.12s; }
+    .animate[data-delay="2"] { transition-delay: 0.22s; }
+    .animate[data-delay="3"] { transition-delay: 0.32s; }
+
     /* ─── NAVBAR ─── */
     nav {
       position: sticky;
@@ -46,278 +57,276 @@
       justify-content: space-between;
     }
 
-    .nav-logo img {
-      height: 48px;
-      width: 147px;
-      object-fit: cover;
-      display: block;
-    }
+    .nav-logo img { height: 48px; width: 147px; object-fit: cover; display: block; }
 
     .btn-demo {
-      border: 1px solid var(--primary);
+      border: 1.5px solid var(--primary);
       color: var(--primary);
       background: transparent;
       font-family: 'Montserrat', sans-serif;
       font-weight: 700;
-      font-size: 16px;
-      padding: 12px 20px;
-      border-radius: 16px;
+      font-size: 15px;
+      padding: 10px 22px;
+      border-radius: 12px;
       cursor: pointer;
       white-space: nowrap;
-      line-height: normal;
+      transition: background 0.2s, color 0.2s;
     }
+    .btn-demo:hover { background: var(--primary); color: #fff; }
 
     /* ─── HERO ─── */
     .hero {
       background: var(--hero-bg);
-      min-height: 674px;
       overflow: hidden;
+      padding-bottom: 0;
     }
 
     .hero-inner {
-      max-width: 1440px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 80px 205px;
+      padding: 60px 0 0;
       display: flex;
-      gap: 24px;
+      flex-direction: column;
       align-items: center;
     }
 
-    .hero-left {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 32px;
-    }
-
-    .hero-text {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-      color: #fff;
+    .hero-badge {
+      display: inline-flex;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.88);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 18px;
+      border-radius: 20px;
+      margin-bottom: 22px;
+      letter-spacing: 0.3px;
+      animation: heroUp 0.7s ease both;
     }
 
     .hero-h1 {
       font-weight: 700;
-      font-size: 40px;
-      line-height: normal;
+      font-size: 46px;
+      line-height: 1.18;
       letter-spacing: -0.5px;
-      text-transform: capitalize;
+      color: #fff;
+      text-align: center;
+      max-width: 660px;
+      margin-bottom: 18px;
+      animation: heroUp 0.7s 0.1s ease both;
     }
 
     .hero-body {
       font-weight: 400;
       font-size: 16px;
-      line-height: 24px;
+      color: rgba(255,255,255,0.72);
+      text-align: center;
+      line-height: 1.65;
+      max-width: 520px;
+      margin-bottom: 30px;
+      animation: heroUp 0.7s 0.18s ease both;
     }
 
-    .hero-ctas {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .btn-contact {
+    .btn-hero {
       background: var(--primary);
       color: #fff;
+      border: none;
       font-family: 'Montserrat', sans-serif;
       font-weight: 700;
       font-size: 16px;
-      padding: 16px 28px;
-      border-radius: 16px;
-      border: none;
+      padding: 14px 34px;
+      border-radius: 12px;
       cursor: pointer;
-      line-height: normal;
-      white-space: nowrap;
+      margin-bottom: 48px;
+      transition: background 0.2s;
+      animation: heroUp 0.7s 0.26s ease both;
+    }
+    .btn-hero:hover { background: #0a5a7a; }
+
+    @keyframes heroUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
-    .hero-tagline {
-      font-style: italic;
-      font-weight: 400;
-      font-size: 16px;
-      color: #fff;
-      white-space: nowrap;
-      line-height: normal;
-    }
-
-    /* Hero visual — right side */
-    .hero-right {
-      flex: 1;
-      min-width: 0;
-      height: 514px;
-      position: relative;
-    }
-
-    /* Everything inside hero-right is absolutely centered */
-    .hero-blob {
-      position: absolute;
-      width: 391px;
-      height: 388px;
-      background: var(--primary);
-      border-radius: 1000px;
-      left: 50%;
-      top: calc(50% + 0.29px);
-      transform: translate(-50%, -50%);
-    }
-
-    .hero-student {
-      position: absolute;
-      width: 289px;
-      height: 339px;
-      left: calc(50% + 0.05px);
-      top: calc(50% + 24.97px);
-      transform: translate(-50%, -50%);
-      overflow: hidden;
-      -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/278ba19c-6949-4f15-b3f2-f0c01f78853f');
-      -webkit-mask-repeat: no-repeat;
-      -webkit-mask-position: -51px -49px;
-      -webkit-mask-size: 391px 388px;
-      mask-image: url('https://www.figma.com/api/mcp/asset/278ba19c-6949-4f15-b3f2-f0c01f78853f');
-      mask-repeat: no-repeat;
-      mask-position: -51px -49px;
-      mask-size: 391px 388px;
-    }
-
-    .hero-student img {
-      position: absolute;
-      width: 181.65%;
-      height: 102.43%;
-      left: -38.3%;
-      top: -2.43%;
-      max-width: none;
-    }
-
-    /* Stat cards */
-    .stat-card {
-      position: absolute;
-      background: #f5f5f4;
-      border: 0.765px solid var(--primary);
-      border-radius: 18px;
-      box-shadow: 0 18px 38px rgba(0,0,0,0.15);
-      transform: translate(-50%, -50%);
-    }
-
-    /* 5K+ — top right */
-    .card-5k {
-      left: calc(50% + 181px);
-      top: calc(50% - 165px);
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .card-ring {
-      width: 80px;
-      height: 80px;
-      position: relative;
-    }
-
-    .card-ring img {
+    /* App mockup scene */
+    .hero-app-scene {
       width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .stat-num {
-      font-family: 'Inter', sans-serif;
-      font-weight: 700;
-      font-size: 25px;
-      color: #101828;
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    .stat-lbl {
-      font-family: 'Inter', sans-serif;
-      font-weight: 400;
-      font-size: 15px;
-      color: rgba(16,24,40,0.5);
-      text-align: center;
-      white-space: nowrap;
-    }
-
-    /* 2K+ — top left */
-    .card-2k {
-      left: calc(50% - 151px);
-      top: calc(50% - 137px);
-      padding: 12px 16px;
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    /* 250+ — bottom right */
-    .card-250 {
-      left: calc(50% + 135px);
-      top: calc(50% + 157px);
-      padding: 12px 16px;
       display: flex;
       gap: 16px;
       align-items: flex-start;
+      animation: heroUp 0.9s 0.36s ease both;
     }
 
-    .icon-stack {
-      width: 49px;
-      height: 49px;
-      position: relative;
+    .hero-float-col {
+      width: 182px;
       flex-shrink: 0;
-    }
-
-    .icon-stack-bg {
-      position: absolute;
-      inset: 0;
-      border-radius: 12px;
-    }
-
-    .icon-stack img {
-      position: absolute;
-      display: block;
-    }
-
-    /* ─── PAGE WRAPPER ─── */
-    .page-wrap {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding-left: 205px;
-      padding-right: 205px;
-    }
-
-    /* ─── SECTION LABELS ─── */
-    .overline {
-      font-weight: 400;
-      font-size: 16px;
-      text-transform: uppercase;
-      color: #000;
-      line-height: normal;
-    }
-
-    .section-title {
-      font-weight: 700;
-      font-size: 32px;
-      color: var(--navy);
-      line-height: normal;
-    }
-
-    /* ─── WHY ATLAS ─── */
-    .why-section {
-      padding: 80px 0;
-    }
-
-    .why-header {
       display: flex;
       flex-direction: column;
       gap: 12px;
-      text-align: center;
-      margin-bottom: 24px;
+      padding-top: 24px;
     }
 
-    .cards-row {
+    .hero-float-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 11px 13px;
       display: flex;
-      gap: 24px;
+      gap: 10px;
+      align-items: flex-start;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.18);
     }
+
+    .hfc-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .hfc-title { font-size: 11px; font-weight: 700; color: var(--navy); margin-bottom: 2px; }
+    .hfc-sub   { font-size: 9px; color: var(--body); line-height: 1.4; }
+
+    /* Main app card */
+    .hero-app-main {
+      flex: 1;
+      background: #fff;
+      border-radius: 16px 16px 0 0;
+      overflow: hidden;
+      box-shadow: 0 -8px 50px rgba(0,0,0,0.22);
+      min-width: 0;
+    }
+
+    .app-nav {
+      background: #fff;
+      border-bottom: 1px solid #e8eef5;
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .app-nav-logo {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -0.3px;
+      flex-shrink: 0;
+    }
+
+    .app-nav-tabs {
+      flex: 1;
+      display: flex;
+      gap: 18px;
+    }
+
+    .app-nav-tab {
+      font-size: 10px;
+      color: var(--body);
+      padding-bottom: 2px;
+    }
+
+    .app-nav-tab.active {
+      color: var(--primary);
+      font-weight: 700;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    .app-nav-icons { display: flex; gap: 8px; align-items: center; flex-shrink: 0; }
+    .app-nav-dot   { width: 26px; height: 26px; border-radius: 50%; background: #e8eef5; display: flex; align-items: center; justify-content: center; }
+
+    .app-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; }
+
+    .app-welcome { display: flex; align-items: flex-start; justify-content: space-between; }
+
+    .app-greeting {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 4px;
+    }
+
+    .app-subtitle { font-size: 10px; color: var(--body); }
+
+    .app-avatar {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #f0a070, #e07848);
+      flex-shrink: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .app-chat-wrap {
+      background: #f7f9fc;
+      border-radius: 12px;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-chat-ai {
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .app-chat-input {
+      flex: 1;
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    .app-chat-send {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .app-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .app-chip {
+      background: #fff;
+      border: 1px solid #e5e9ee;
+      border-radius: 20px;
+      font-size: 9px;
+      color: var(--body);
+      padding: 5px 11px;
+      white-space: nowrap;
+    }
+
+    /* ─── PAGE WRAPPER ─── */
+    .page-wrap { max-width: 1440px; margin: 0 auto; padding-left: 205px; padding-right: 205px; }
+
+    /* ─── SECTION LABELS ─── */
+    .overline { font-weight: 400; font-size: 16px; text-transform: uppercase; color: #000; line-height: normal; }
+    .section-title { font-weight: 700; font-size: 32px; color: var(--navy); line-height: normal; }
+
+    /* ─── WHY ATLAS ─── */
+    .why-section { padding: 80px 0; }
+
+    .why-header { display: flex; flex-direction: column; gap: 12px; text-align: center; margin-bottom: 24px; }
+
+    .cards-row { display: flex; gap: 24px; }
 
     .feat-card {
       flex: 1;
@@ -329,76 +338,34 @@
       flex-direction: column;
       align-items: center;
       gap: 16px;
+      cursor: default;
+      transition: transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+                  box-shadow 0.28s ease,
+                  border-color 0.28s ease;
     }
-
+    .feat-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 16px 40px rgba(13,113,154,0.12);
+      border-color: rgba(13,113,154,0.25);
+    }
     .feat-icon {
-      width: 80px;
-      height: 80px;
-      border-radius: 16px;
-      overflow: hidden;
-      position: relative;
-      flex-shrink: 0;
+      width: 80px; height: 80px; border-radius: 16px; overflow: hidden;
+      position: relative; flex-shrink: 0;
+      transition: transform 0.32s cubic-bezier(0.34,1.56,0.64,1);
     }
-
-    .feat-icon img {
-      position: absolute;
-      width: 50px;
-      height: 50px;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      display: block;
-    }
-
-    .feat-icon.orange img {
-      top: 14.58px;
-      left: 15.5px;
-      transform: none;
-    }
-
-    .feat-card h3 {
-      font-weight: 700;
-      font-size: 20px;
-      color: var(--navy);
-      text-align: center;
-      line-height: normal;
-    }
-
-    .feat-card p {
-      font-weight: 400;
-      font-size: 16px;
-      color: var(--body);
-      text-align: center;
-      line-height: normal;
-    }
+    .feat-card:hover .feat-icon { transform: scale(1.12) rotate(-4deg); }
+    .feat-icon img { position: absolute; width: 50px; height: 50px; top: 50%; left: 50%; transform: translate(-50%,-50%); display: block; }
+    .feat-icon.orange img { top: 14.58px; left: 15.5px; transform: none; }
+    .feat-card h3 { font-weight: 700; font-size: 20px; color: var(--navy); text-align: center; line-height: normal; }
+    .feat-card p  { font-weight: 400; font-size: 16px; color: var(--body); text-align: center; line-height: 1.5; }
 
     /* ─── HIGHLIGHT SECTIONS ─── */
-    .highlight-section {
-      padding: 80px 0;
-    }
+    .highlight-section { padding: 80px 0; }
+    .hl-header { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+    .hl-layout { display: flex; gap: 24px; align-items: flex-start; }
 
-    .hl-header {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      margin-bottom: 24px;
-    }
-
-    .hl-layout {
-      display: flex;
-      gap: 24px;
-      align-items: flex-start;
-    }
-
-    /* Tab list */
-    .tab-list {
-      flex: 1;
-      min-width: 0;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      align-self: stretch;
-    }
+    /* ─── TABS ─── */
+    .tab-list { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; align-self: stretch; }
 
     .tab-row {
       display: flex;
@@ -412,7 +379,10 @@
       text-align: left;
       width: 100%;
       font-family: 'Montserrat', sans-serif;
+      transition: background 0.2s ease;
     }
+    .tab-row:hover:not(.is-active) { background: rgba(13,113,154,0.05); }
+    .tab-row.is-active { background: rgba(13,113,154,0.07); cursor: default; }
 
     .tab-dot {
       width: 32px;
@@ -420,87 +390,60 @@
       border-radius: 8px;
       border: 2px solid rgba(255,255,255,0.4);
       flex-shrink: 0;
+      transition: background 0.25s ease;
     }
-
     .tab-dot.active { background: var(--primary); }
     .tab-dot.idle   { background: var(--sky); }
 
     .tab-body { flex: 1; min-width: 0; }
-
-    .tab-title {
-      font-weight: 700;
-      font-size: 16px;
-      line-height: normal;
-      white-space: nowrap;
-    }
-
+    .tab-title { font-weight: 700; font-size: 16px; line-height: normal; }
     .tab-title.active { color: var(--primary); }
     .tab-title.idle   { color: var(--body); }
 
-    .tab-desc {
-      font-weight: 400;
-      font-size: 16px;
-      color: var(--body);
-      line-height: normal;
-      margin-top: 8px;
-    }
+    .tab-desc { display: none; font-weight: 400; font-size: 16px; color: var(--body); line-height: 1.5; margin-top: 8px; }
+    .tab-row.is-active .tab-desc { display: block; }
 
-    /* Feature image panel */
-    .hl-panel {
+    /* ─── PANEL GROUP ─── */
+    .hl-panel-group {
       width: 503px;
       height: 284px;
-      border-radius: 16px;
-      overflow: hidden;
       flex-shrink: 0;
       position: relative;
+      border-radius: 16px;
+      overflow: hidden;
     }
 
+    .rl-panel-group {
+      width: 503px;
+      height: 320px;
+      flex-shrink: 0;
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    [data-panel] {
+      position: absolute;
+      inset: 0;
+      border-radius: 16px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    [data-panel].is-active { opacity: 1; pointer-events: auto; }
+
+    .hl-panel { overflow: hidden; }
     .hl-panel.blue  { background: var(--sky); }
     .hl-panel.green { background: var(--green-bg); }
 
-    /* App screenshot inside blue panel */
-    .app-img {
-      position: absolute;
-      width: 521px;
-      height: 673px;
-      left: calc(50% + 25px);
-      top: 12px;
-      transform: translateX(-50%);
-    }
+    /* PALS: app screenshot */
+    .app-img { position: absolute; width: 521px; height: 673px; left: calc(50% + 25px); top: 12px; transform: translateX(-50%); }
+    .app-img img { width: 100%; height: 100%; object-fit: cover; pointer-events: none; display: block; }
 
-    .app-img img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      pointer-events: none;
-      display: block;
-    }
-
-    /* Performance card inside green panel */
-    .perf-label {
-      position: absolute;
-      left: 26px;
-      top: 23px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .perf-title {
-      font-weight: 700;
-      font-size: 20px;
-      color: var(--navy);
-      letter-spacing: -0.4px;
-    }
-
-    .perf-date {
-      font-family: 'Nunito Sans', sans-serif;
-      font-weight: 400;
-      font-size: 14px;
-      color: var(--body);
-      letter-spacing: 0.4px;
-      white-space: nowrap;
-    }
+    /* Performance: donut chart */
+    .perf-label { position: absolute; left: 26px; top: 23px; display: flex; flex-direction: column; gap: 8px; }
+    .perf-title { font-weight: 700; font-size: 20px; color: var(--navy); letter-spacing: -0.4px; }
+    .perf-date  { font-family: 'Nunito Sans', sans-serif; font-weight: 400; font-size: 14px; color: var(--body); letter-spacing: 0.4px; white-space: nowrap; }
 
     .perf-card {
       position: absolute;
@@ -517,215 +460,148 @@
       padding: 16px;
     }
 
-    /* Donut chart */
-    .donut-wrap {
-      width: 144px;
-      height: 154px;
-      position: relative;
-      flex-shrink: 0;
-    }
+    .donut-wrap { width: 144px; height: 154px; position: relative; flex-shrink: 0; }
+    .donut-ring { position: absolute; width: 138px; height: 138px; top: 8px; left: 50%; transform: translateX(-50%); display: block; }
+    .donut-pct  { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-weight: 700; font-size: 35px; color: var(--navy); letter-spacing: 1px; white-space: nowrap; }
 
-    .donut-ring {
-      position: absolute;
-      width: 138px;
-      height: 138px;
-      top: 8px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: block;
-    }
+    .metrics-list { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+    .metric-row  { display: flex; align-items: center; justify-content: space-between; padding: 8px 18px; }
+    .metric-name { font-family: 'Nunito Sans', sans-serif; font-weight: 700; font-size: 11px; color: var(--navy); letter-spacing: 1.5px; text-transform: uppercase; flex: 1; min-width: 0; line-height: 1.3; }
+    .metric-val  { font-family: 'Nunito Sans', sans-serif; font-weight: 700; font-size: 15px; color: #3ec8a2; letter-spacing: 0.25px; white-space: nowrap; flex-shrink: 0; }
 
-    .donut-pct {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-weight: 700;
-      font-size: 35px;
-      color: var(--navy);
-      letter-spacing: 1px;
-      white-space: nowrap;
-    }
+    /* ─── PANEL: LMS Course Card ─── */
+    .panel-lms { position: absolute; inset: 0; background: var(--sky); display: flex; align-items: center; justify-content: center; padding: 18px; }
 
-    /* Metrics list */
-    .metrics-list {
-      flex: 1;
-      min-width: 0;
+    .course-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px 22px 18px;
+      width: 100%;
+      height: 100%;
+      box-shadow: 0 6px 28px rgba(0,0,0,0.09);
       display: flex;
       flex-direction: column;
+      gap: 14px;
     }
 
-    .metric-row {
+    .course-card-top  { display: flex; gap: 14px; align-items: flex-start; }
+    .course-icon      { width: 52px; height: 52px; border-radius: 12px; background: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .course-cat       { font-size: 10px; font-weight: 600; color: var(--body); letter-spacing: 1.2px; text-transform: uppercase; margin-bottom: 5px; }
+    .course-title     { font-size: 16px; font-weight: 700; color: var(--navy); line-height: 1.35; }
+    .course-badges    { display: flex; align-items: center; gap: 8px; }
+    .course-badge     { padding: 5px 13px; border-radius: 20px; background: #f1f4f8; font-size: 11px; font-weight: 500; color: var(--navy); white-space: nowrap; display: flex; align-items: center; gap: 4px; }
+    .course-progress-wrap { display: flex; align-items: center; gap: 8px; flex: 1; }
+    .course-progress-bar  { flex: 1; height: 7px; background: #e5e9ee; border-radius: 4px; overflow: hidden; }
+    .course-progress-fill { width: 70%; height: 100%; background: var(--orange); border-radius: 4px; }
+    .course-pct           { font-size: 12px; font-weight: 700; color: var(--navy); white-space: nowrap; }
+    .course-desc          { font-size: 12px; color: var(--body); line-height: 1.6; }
+
+    /* ─── PANEL: K2L Flashcard ─── */
+    .panel-k2l { position: absolute; inset: 0; background: var(--sky); display: flex; align-items: center; justify-content: center; padding: 14px; }
+
+    .flashcard {
+      width: 100%; height: 100%;
+      background: #6A72CC;
+      border-radius: 14px;
+      overflow: hidden;
+      position: relative;
       display: flex;
+      flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 8px 18px;
+      justify-content: center;
+      padding: 28px 32px 48px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.14);
     }
 
-    .metric-name {
-      font-family: 'Nunito Sans', sans-serif;
-      font-weight: 700;
-      font-size: 11px;
-      color: var(--navy);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      flex: 1;
-      min-width: 0;
-      line-height: 1.3;
+    .flashcard-title { font-size: 24px; font-weight: 700; color: #fff; text-align: center; margin-bottom: 14px; line-height: 1.3; }
+    .flashcard-body  { font-size: 13px; color: rgba(255,255,255,0.82); text-align: center; line-height: 1.6; }
+    .flashcard-waves { position: absolute; bottom: 36px; left: 0; width: 100%; opacity: 0.25; }
+    .flashcard-dots  { position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%); display: flex; align-items: center; gap: 8px; }
+    .flashcard-dot   { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.28); }
+    .flashcard-dot.active { width: 20px; height: 20px; background: #fff; }
+
+    /* ─── PANEL: Co-pilot Reviewed by AI ─── */
+    .panel-copilot {
+      position: absolute; inset: 0;
+      background: #FEE8CA;
+      border-radius: 16px;
+      padding: 24px 26px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      overflow: hidden;
     }
 
-    .metric-val {
-      font-family: 'Nunito Sans', sans-serif;
-      font-weight: 700;
-      font-size: 15px;
-      color: #3ec8a2;
-      letter-spacing: 0.25px;
-      white-space: nowrap;
-      flex-shrink: 0;
-    }
+    .reviewed-header  { display: flex; align-items: flex-start; justify-content: space-between; }
+    .reviewed-title   { font-size: 22px; font-weight: 700; color: #1a2a3a; line-height: 1.2; }
+    .sparkle-cluster  { position: relative; width: 68px; height: 62px; flex-shrink: 0; }
+    .sp               { position: absolute; line-height: 1; font-style: normal; }
+    .sp-plus  { top: 6px;  left: 4px;  font-size: 14px; color: #7B4F2E; font-weight: 700; }
+    .sp-large { top: -4px; left: 18px; font-size: 36px; color: #fff; filter: drop-shadow(0 1px 3px rgba(0,0,0,0.12)); }
+    .sp-med   { top: 24px; left: 42px; font-size: 20px; color: #D4961A; }
+    .sp-tiny  { top: 4px;  left: 56px; font-size: 11px; color: #E8B040; }
+    .reviewed-bars  { display: flex; flex-direction: column; gap: 11px; }
+    .reviewed-bar   { height: 40px; background: #fff; border-radius: 24px; }
+
+    /* ─── PANEL: AI Assessment Quiz ─── */
+    .panel-assessment { position: absolute; inset: 0; background: #B8C9D8; border-radius: 16px; display: flex; align-items: center; justify-content: center; padding: 16px; }
+
+    .quiz-card { background: #fff; border-radius: 14px; overflow: hidden; width: 100%; box-shadow: 0 4px 20px rgba(0,0,0,0.10); display: flex; flex-direction: column; }
+    .quiz-header { padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e8eef5; }
+    .quiz-q-label { font-size: 15px; font-weight: 700; color: var(--navy); }
+    .quiz-toolbar { display: flex; align-items: center; gap: 2px; }
+    .quiz-tool-btn { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #e8eef5; background: #fff; display: flex; align-items: center; justify-content: center; cursor: default; }
+    .quiz-divider { width: 1px; height: 20px; background: #e5e9ee; margin: 0 4px; }
+    .quiz-body { padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+    .quiz-question { font-size: 11.5px; color: #444; line-height: 1.55; }
+    .quiz-options { display: flex; flex-direction: column; gap: 7px; }
+    .quiz-option { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 8px; border: 1.5px solid #e5e9ee; background: #fff; }
+    .quiz-option.selected { border-color: var(--primary); background: #EBF6FF; }
+    .quiz-radio { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #ccc; flex-shrink: 0; }
+    .quiz-option.selected .quiz-radio { border-color: var(--primary); background: var(--primary); }
+    .quiz-option-text { font-size: 11px; color: #444; line-height: 1.4; }
+    .quiz-option.selected .quiz-option-text { color: var(--primary); font-weight: 600; }
+
+    /* ─── PANELS: Role Play Section ─── */
+    /* Scenario: chat UI - uses var(--sky) bg via inline style */
+    /* Voice: mint bg via inline style */
+    /* Coaching: cream bg via inline style */
+    .waveform { display: flex; align-items: center; gap: 4px; }
+    .waveform-bar { width: 4px; border-radius: 2px; background: rgba(30,80,70,0.3); }
 
     /* ─── LIMITLESS SCENARIOS ─── */
-    .scenarios-wrap {
-      background: var(--warm);
-    }
+    .scenarios-wrap { background: var(--warm); }
 
-    .scenarios-inner {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 48px 205px;
-      display: flex;
-      flex-direction: column;
-      gap: 48px;
-    }
+    .scenarios-inner { max-width: 1440px; margin: 0 auto; padding: 80px 205px; display: flex; flex-direction: column; gap: 48px; }
 
-    .scenarios-header {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      text-align: center;
-    }
+    .scenarios-header { display: flex; flex-direction: column; gap: 16px; text-align: center; }
+    .scenarios-header p:last-child { font-weight: 400; font-size: 16px; color: var(--body); line-height: 1.4; }
+    .scenarios-header .section-title { margin: 0; }
 
-    .scenarios-header p:last-child {
-      font-weight: 400;
-      font-size: 16px;
-      color: var(--body);
-      line-height: 1.4;
-    }
+    .scenario-cards { display: flex; gap: 24px; justify-content: center; }
 
-    .scenarios-header .section-title {
-      margin: 0;
-    }
-
-    .scenario-cards {
-      display: flex;
-      gap: 24px;
-      justify-content: center;
-    }
-
-    .scenario-card {
-      flex: 1;
-      background: #fff;
-      border-radius: 24px;
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .scenario-icon {
-      background: var(--warm);
-      border-radius: 16px;
-      padding: 12px;
-      display: inline-flex;
-      align-items: center;
-      width: fit-content;
-    }
-
-    .scenario-icon img {
-      width: 40px;
-      height: 40px;
-      display: block;
-    }
-
-    .scenario-card h3 {
-      font-weight: 700;
-      font-size: 24px;
-      color: var(--navy);
-      line-height: normal;
-    }
-
-    .scenario-card p {
-      font-weight: 400;
-      font-size: 16px;
-      color: var(--body);
-      line-height: 1.4;
-    }
+    .scenario-card { flex: 1; background: #fff; border-radius: 24px; padding: 24px; display: flex; flex-direction: column; gap: 24px; }
+    .scenario-icon { background: var(--warm); border-radius: 16px; padding: 12px; display: inline-flex; align-items: center; width: fit-content; }
+    .scenario-icon img { width: 40px; height: 40px; display: block; }
+    .scenario-card h3 { font-weight: 700; font-size: 24px; color: var(--navy); line-height: normal; }
+    .scenario-card p  { font-weight: 400; font-size: 16px; color: var(--body); line-height: 1.4; }
 
     /* ─── CTA BANNER ─── */
-    .cta-banner {
-      background: var(--orange);
-      height: 319px;
-      overflow: hidden;
-    }
+    .cta-banner { background: var(--orange); height: 319px; overflow: hidden; }
 
-    .cta-inner {
-      max-width: 1440px;
-      margin: 0 auto;
-      padding: 0 99px;
-      height: 100%;
-      display: flex;
-      gap: 24px;
-      align-items: center;
-    }
+    .cta-inner { max-width: 1440px; margin: 0 auto; padding: 0 99px; height: 100%; display: flex; gap: 24px; align-items: center; }
 
-    .cta-img {
-      width: 473px;
-      height: 319px;
-      position: relative;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
+    .cta-img { width: 473px; height: 319px; position: relative; flex-shrink: 0; overflow: hidden; }
+    .cta-img img { position: absolute; width: 99.9%; height: 222.22%; top: -20.28%; left: 0; max-width: none; display: block; }
 
-    .cta-img img {
-      position: absolute;
-      width: 99.9%;
-      height: 222.22%;
-      top: -20.28%;
-      left: 0;
-      max-width: none;
-      display: block;
-    }
-
-    .cta-text-block {
-      width: 745px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      justify-content: center;
-    }
-
-    .cta-copy {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      color: #fff;
-    }
-
-    .cta-h2 {
-      font-weight: 700;
-      font-size: 32px;
-      line-height: normal;
-    }
-
-    .cta-p {
-      font-weight: 400;
-      font-size: 16px;
-      line-height: normal;
-    }
+    .cta-text-block { width: 745px; display: flex; flex-direction: column; gap: 16px; justify-content: center; }
+    .cta-copy { display: flex; flex-direction: column; gap: 8px; color: #fff; }
+    .cta-h2 { font-weight: 700; font-size: 32px; line-height: normal; }
+    .cta-p  { font-weight: 400; font-size: 16px; line-height: normal; }
 
     .btn-cta {
       display: inline-flex;
-      gap: 16px;
+      gap: 12px;
       align-items: center;
       background: #fff;
       border: 2px solid var(--primary);
@@ -737,819 +613,129 @@
       color: var(--primary);
       cursor: pointer;
       width: fit-content;
-      line-height: normal;
+      transition: background 0.2s, color 0.2s;
     }
-
+    .btn-cta:hover { background: var(--primary); color: #fff; }
     .btn-cta img { width: 16px; height: 16px; display: block; }
 
     /* ─── FOOTER ─── */
-    footer {
-      background: #fff;
-      padding: 24px 100px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    footer p {
-      font-weight: 400;
-      font-size: 14px;
-      color: var(--navy);
-      line-height: 22px;
-      white-space: nowrap;
-    }
-
-    /* ─── CBL PANEL MOCKUP ─── */
-    .hl-panel.cbl {
-      background: #0f172a;
-      display: flex;
-      overflow: hidden;
-      flex-direction: row;
-    }
-
-    /* Left sidebar of CBL mockup */
-    .cbl-sidebar {
-      width: 168px;
-      flex-shrink: 0;
-      background: #0f172a;
-      padding: 16px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      border-right: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .cbl-s-badge {
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.35);
-      font-family: 'Inter', sans-serif;
-    }
-
-    .cbl-s-name {
-      font-size: 13px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.35;
-      font-family: 'Montserrat', sans-serif;
-    }
-
-    .cbl-s-divider {
-      height: 1px;
-      background: rgba(255,255,255,0.08);
-      flex-shrink: 0;
-    }
-
-    .cbl-criteria-label {
-      font-size: 9px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: rgba(255,255,255,0.35);
-      font-family: 'Inter', sans-serif;
-    }
-
-    .cbl-criteria-list {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .cbl-criterion {
-      display: flex;
-      align-items: flex-start;
-      gap: 7px;
-    }
-
-    .cbl-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .cbl-dot.done    { background: #3ec8a2; }
-    .cbl-dot.pending { background: transparent; border: 1.5px solid rgba(255,255,255,0.25); }
-
-    .cbl-criterion-text {
-      font-size: 10px;
-      color: rgba(255,255,255,0.6);
-      line-height: 1.4;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .cbl-jen-label {
-      margin-top: auto;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding-top: 8px;
-      border-top: 1px solid rgba(255,255,255,0.07);
-    }
-
-    .cbl-jen-av {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #fde68a, #f97316);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      flex-shrink: 0;
-    }
-
-    .cbl-jen-name {
-      font-size: 10px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.55);
-      font-family: 'Inter', sans-serif;
-    }
-
-    /* Right chat area */
-    .cbl-chat {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-      overflow: hidden;
-    }
-
-    .cbl-messages {
-      flex: 1;
-      padding: 12px 12px 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 9px;
-      overflow: hidden;
-    }
-
-    .cbl-msg {
-      display: flex;
-      gap: 6px;
-      align-items: flex-start;
-    }
-
-    .cbl-msg.user-msg { flex-direction: row-reverse; }
-
-    .cbl-msg-av {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-    }
-
-    .cbl-msg-av.jen-av { background: linear-gradient(135deg, #fde68a, #f97316); }
-
-    .cbl-msg-av.user-av {
-      background: var(--sky);
-      color: var(--primary);
-      font-weight: 700;
-      font-size: 8px;
-    }
-
-    .cbl-bubble {
-      max-width: 210px;
-      padding: 7px 10px;
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      line-height: 1.5;
-      color: #1e293b;
-    }
-
-    .cbl-bubble.jen-bubble {
-      background: #f8fafc;
-      border: 1px solid #e2e8f0;
-      border-radius: 0 10px 10px 10px;
-    }
-
-    .cbl-bubble.user-bubble {
-      background: var(--primary);
-      color: #fff;
-      border-radius: 10px 0 10px 10px;
-    }
-
-    .cbl-input-bar {
-      padding: 7px 10px;
-      border-top: 1px solid #e2e8f0;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      background: #fff;
-      flex-shrink: 0;
-    }
-
-    .cbl-input-field {
-      flex: 1;
-      background: #f1f5f9;
-      border-radius: 20px;
-      height: 26px;
-      padding: 0 10px;
-      font-size: 10px;
-      color: #94a3b8;
-      display: flex;
-      align-items: center;
-      font-family: 'Inter', sans-serif;
-    }
-
-    .cbl-icon-btn {
-      width: 26px;
-      height: 26px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      font-size: 12px;
-    }
-
-    .cbl-icon-btn.mic { background: var(--primary); color: #fff; }
-    .cbl-icon-btn.send { background: #f1f5f9; color: #64748b; }
-
-    /* CBL panel state switching */
-    .cbl-panel-state { display: none; width: 100%; height: 100%; }
-    .cbl-panel-state.active { display: flex; }
-
-    /* Panel 2 — Voice & Text Input */
-    .cbl-voice-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      background: #0f172a;
-      padding: 20px 18px;
-    }
-
-    .cbl-mode-toggle {
-      display: flex;
-      background: rgba(255,255,255,0.08);
-      border-radius: 999px;
-      padding: 3px;
-      gap: 2px;
-    }
-
-    .cbl-mode-btn {
-      padding: 5px 16px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      border: none;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .cbl-mode-btn.on {
-      background: var(--primary);
-      color: #fff;
-    }
-    .cbl-mode-btn.off {
-      background: transparent;
-      color: rgba(255,255,255,0.45);
-    }
-
-    .cbl-mic-big {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      background: var(--primary);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      position: relative;
-      box-shadow: 0 0 0 0 rgba(13,113,154,0.4);
-      animation: pulse-mic 2s ease-out infinite;
-    }
-    @keyframes pulse-mic {
-      0%   { box-shadow: 0 0 0 0 rgba(13,113,154,0.5); }
-      60%  { box-shadow: 0 0 0 18px rgba(13,113,154,0); }
-      100% { box-shadow: 0 0 0 0 rgba(13,113,154,0); }
-    }
-
-    .cbl-recording-label {
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 600;
-      color: #3ec8a2;
-      letter-spacing: 0.04em;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    .cbl-recording-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #3ec8a2;
-      animation: blink-dot 1s step-start infinite;
-    }
-    @keyframes blink-dot { 50% { opacity: 0; } }
-
-    /* Waveform bars */
-    .cbl-waveform {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      height: 32px;
-    }
-    .cbl-wbar {
-      width: 3px;
-      border-radius: 2px;
-      background: rgba(62,200,162,0.7);
-      animation: wbar 1.1s ease-in-out infinite;
-    }
-    .cbl-wbar:nth-child(1)  { height: 8px;  animation-delay: 0s; }
-    .cbl-wbar:nth-child(2)  { height: 20px; animation-delay: 0.1s; }
-    .cbl-wbar:nth-child(3)  { height: 28px; animation-delay: 0.05s; }
-    .cbl-wbar:nth-child(4)  { height: 14px; animation-delay: 0.2s; }
-    .cbl-wbar:nth-child(5)  { height: 30px; animation-delay: 0.15s; }
-    .cbl-wbar:nth-child(6)  { height: 10px; animation-delay: 0.3s; }
-    .cbl-wbar:nth-child(7)  { height: 24px; animation-delay: 0.08s; }
-    .cbl-wbar:nth-child(8)  { height: 18px; animation-delay: 0.25s; }
-    .cbl-wbar:nth-child(9)  { height: 28px; animation-delay: 0.12s; }
-    .cbl-wbar:nth-child(10) { height: 8px;  animation-delay: 0.35s; }
-    @keyframes wbar {
-      0%,100% { transform: scaleY(0.4); opacity: 0.5; }
-      50%     { transform: scaleY(1);   opacity: 1; }
-    }
-
-    .cbl-voice-hint {
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      color: rgba(255,255,255,0.35);
-    }
-
-    /* Panel 3 — Coaching & Assessment */
-    .cbl-results-panel {
-      flex: 1;
-      background: var(--green-bg);
-      display: flex;
-      flex-direction: column;
-      padding: 20px;
-      gap: 14px;
-      overflow: hidden;
-    }
-
-    .cbl-results-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .cbl-results-title {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      color: var(--navy);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .cbl-pass-badge {
-      background: #16a34a;
-      color: #fff;
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      font-weight: 700;
-      padding: 3px 10px;
-      border-radius: 999px;
-      letter-spacing: 0.03em;
-    }
-
-    .cbl-score-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .cbl-score-ring-wrap {
-      position: relative;
-      width: 68px;
-      height: 68px;
-      flex-shrink: 0;
-    }
-
-    .cbl-score-svg {
-      width: 68px;
-      height: 68px;
-      transform: rotate(-90deg);
-    }
-
-    .cbl-score-track {
-      fill: none;
-      stroke: rgba(0,0,0,0.08);
-      stroke-width: 6;
-    }
-
-    .cbl-score-fill {
-      fill: none;
-      stroke: #16a34a;
-      stroke-width: 6;
-      stroke-linecap: round;
-      stroke-dasharray: 163.4;
-      stroke-dashoffset: 27.8; /* 83% fill: 163.4 * (1 - 0.83) = 27.8 */
-    }
-
-    .cbl-score-pct {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: 'Inter', sans-serif;
-      font-weight: 700;
-      font-size: 16px;
-      color: var(--navy);
-    }
-
-    .cbl-criteria-results {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .cbl-crit-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: #fff;
-      border-radius: 10px;
-      padding: 8px 12px;
-    }
-
-    .cbl-crit-icon {
-      width: 20px;
-      height: 20px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 10px;
-      flex-shrink: 0;
-    }
-    .cbl-crit-icon.pass   { background: #dcfce7; color: #16a34a; }
-    .cbl-crit-icon.partial { background: #fef3c7; color: #d97706; }
-
-    .cbl-crit-name {
-      flex: 1;
-      font-family: 'Inter', sans-serif;
-      font-size: 10px;
-      color: var(--navy);
-      font-weight: 600;
-    }
-
-    .cbl-crit-score {
-      font-family: 'Inter', sans-serif;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .cbl-crit-score.pass    { color: #16a34a; }
-    .cbl-crit-score.partial { color: #d97706; }
-
-    /* ═══════════════════════════════════
-       RESPONSIVE — mobile (≤768px)
-    ═══════════════════════════════════ */
-    @media (max-width: 768px) {
-
-      /* ─── NAVBAR ─── */
-      nav {
-        padding: 14px 16px;
-      }
-      .nav-logo img {
-        height: 38px;
-        width: 115px;
-      }
-      .btn-demo {
-        font-size: 14px;
-        padding: 10px 14px;
-        border-radius: 12px;
-      }
-
-      /* ─── HERO ─── */
-      .hero { min-height: auto; }
-
-      .hero-inner {
-        flex-direction: column;
-        padding: 32px 16px 16px;
-        gap: 24px;
-        align-items: center;
-      }
-
-      .hero-h1 {
-        font-size: 28px;
-        line-height: 36px;
-      }
-
-      .hero-body {
-        font-size: 14px;
-        line-height: 20px;
-      }
-
-      .btn-contact {
-        font-size: 14px;
-        padding: 14px 22px;
-        border-radius: 12px;
-      }
-
-      .hero-tagline { font-size: 14px; }
-
-      /* Hero visual — stacked below text, full width */
-      .hero-right {
-        width: 100%;
-        height: 306px;
-        flex: none;
-      }
-
-      .hero-blob {
-        width: 262px;
-        height: 260px;
-      }
-
-      /* Student image — scaled to 0.67× of desktop */
-      .hero-student {
-        width: 194px;
-        height: 227px;
-        top: calc(50% + 17px);
-        left: 50%;
-        transform: translate(-50%, -50%);
-        -webkit-mask-image: url('https://www.figma.com/api/mcp/asset/069dce68-9e64-4fef-8d4e-f33a575d2169');
-        -webkit-mask-repeat: no-repeat;
-        -webkit-mask-position: -34px -33px;
-        -webkit-mask-size: 262px 260px;
-        mask-image: url('https://www.figma.com/api/mcp/asset/069dce68-9e64-4fef-8d4e-f33a575d2169');
-        mask-repeat: no-repeat;
-        mask-position: -34px -33px;
-        mask-size: 262px 260px;
-      }
-
-      /* Stat cards — scaled ~0.67× */
-      .stat-card { border-radius: 12px; }
-
-      .card-5k {
-        left: calc(50% + 121px);
-        top: calc(50% - 110px);
-        padding: 10px;
-        gap: 8px;
-      }
-      .card-ring { width: 54px; height: 54px; }
-
-      .card-2k {
-        left: calc(50% - 101px);
-        top: calc(50% - 92px);
-        padding: 8px 10px;
-        gap: 10px;
-      }
-
-      .card-250 {
-        left: calc(50% + 90px);
-        top: calc(50% + 105px);
-        padding: 8px 10px;
-        gap: 10px;
-      }
-
-      .stat-num { font-size: 17px; }
-      .stat-lbl { font-size: 10px; }
-
-      .icon-stack {
-        width: 33px;
-        height: 33px;
-      }
-      .icon-stack-bg { border-radius: 8px; }
-      .icon-stack img { width: 22px !important; height: 22px !important; top: 5px !important; left: 5px !important; }
-
-      /* ─── PAGE WRAP ─── */
-      .page-wrap {
-        padding-left: 16px;
-        padding-right: 16px;
-      }
-
-      /* ─── SECTION LABELS ─── */
-      .section-title { font-size: 28px; }
-
-      /* ─── WHY ATLAS ─── */
-      .why-section { padding: 48px 0; }
-
-      .cards-row {
-        flex-direction: column;
-        align-items: center;
-        gap: 16px;
-      }
-      .feat-card { width: 100%; max-width: 327px; }
-
-      /* ─── HIGHLIGHT SECTIONS ─── */
-      .highlight-section { padding: 40px 0; }
-
-      .hl-layout {
-        flex-direction: column;
-        gap: 16px;
-      }
-
-      .hl-panel {
-        width: 100%;
-        height: 260px;
-      }
-
-      /* Tab titles allowed to wrap on mobile */
-      .tab-title { white-space: normal; }
-
-      /* App screenshot inside blue panel */
-      .app-img {
-        width: 100%;
-        height: 100%;
-        left: 50%;
-        top: 0;
-        transform: translateX(-50%);
-      }
-      .app-img img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: top center;
-      }
-
-      /* Performance card inside green panel */
-      .perf-card {
-        width: calc(100% - 20px);
-        left: 50%;
-        transform: translateX(-50%);
-        bottom: 10px;
-        height: auto;
-        padding: 10px;
-        gap: 8px;
-      }
-
-      .donut-wrap {
-        width: 96px;
-        height: 104px;
-      }
-      .donut-ring {
-        width: 88px;
-        height: 88px;
-      }
-      .donut-pct { font-size: 24px; }
-
-      .metric-name { font-size: 9px; letter-spacing: 1px; }
-      .metric-val  { font-size: 13px; }
-      .metric-row  { padding: 6px 8px; }
-
-      /* ─── CBL PANEL ─── */
-      .hl-panel.cbl {
-        height: 300px;
-      }
-      .cbl-sidebar {
-        width: 140px;
-        padding: 12px 10px;
-      }
-      .cbl-s-name { font-size: 11px; }
-      .cbl-criterion-text { font-size: 9px; }
-      .cbl-bubble { max-width: 170px; font-size: 9.5px; }
-
-      /* ─── SCENARIOS ─── */
-      .scenarios-inner {
-        padding: 48px 16px;
-        gap: 32px;
-      }
-      .scenario-cards {
-        flex-direction: column;
-        gap: 16px;
-      }
-      .scenario-card { width: 100%; }
-
-      /* ─── CTA BANNER ─── */
-      .cta-banner { height: auto; }
-
-      .cta-inner {
-        flex-direction: column;
-        padding: 0;
-        gap: 0;
-        align-items: stretch;
-      }
-
-      .cta-img {
-        width: 100%;
-        height: 240px;
-        overflow: hidden;
-      }
-      .cta-img img {
-        position: static;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: top center;
-      }
-
-      .cta-text-block {
-        width: 100%;
-        padding: 32px 16px;
-        text-align: center;
-        align-items: center;
-      }
-
-      .cta-h2 { font-size: 24px; }
-      .cta-p  { font-size: 14px; }
-
-      .btn-cta {
-        font-size: 14px;
-        padding: 14px 22px;
-        border-radius: 12px;
-      }
-
-      /* ─── FOOTER ─── */
-      footer {
-        padding: 24px 16px;
-        text-align: center;
-      }
-      footer p { white-space: normal; }
-    }
+    footer { background: #fff; padding: 24px 100px; display: flex; flex-direction: column; align-items: center; }
+    footer p { font-weight: 400; font-size: 14px; color: var(--navy); line-height: 22px; white-space: nowrap; }
   </style>
 </head>
 <body>
 
-  <!-- ══════════════════════════════════
-       NAVBAR
-  ══════════════════════════════════ -->
+  <!-- ══════════════ NAVBAR ══════════════ -->
   <nav>
     <div class="nav-logo">
       <img src="https://www.figma.com/api/mcp/asset/fa23b5bb-b968-44d4-9362-7c16b76c0e61" alt="ATLAS by HeyHi">
     </div>
-    <button class="btn-demo">Request Demo</button>
+    <button class="btn-demo">Book a Demo</button>
   </nav>
 
-  <!-- ══════════════════════════════════
-       HERO
-  ══════════════════════════════════ -->
+  <!-- ══════════════ HERO ══════════════ -->
   <section class="hero" aria-labelledby="hero-heading">
     <div class="hero-inner">
 
-      <!-- Left: copy + CTAs -->
-      <div class="hero-left">
-        <div class="hero-text">
-          <h1 class="hero-h1" id="hero-heading">Power Future-Ready Workforce Development with AI</h1>
-          <p class="hero-body">ATLAS Learn empowers every employee with personalised and adaptive AI-powered learning that integrates seamlessly, scales effortlessly, and delivers measurable results.</p>
-        </div>
-        <div class="hero-ctas">
-          <button class="btn-contact">Contact Us</button>
-          <span class="hero-tagline">Let's Get Started!</span>
-        </div>
-      </div>
+      <span class="hero-badge">ATLAS by HeyHi</span>
 
-      <!-- Right: visual with floating stat cards -->
-      <div class="hero-right" aria-hidden="true">
+      <h1 class="hero-h1" id="hero-heading">Power Future-Ready Workforce Development With AI</h1>
 
-        <!-- Teal oval blob -->
-        <div class="hero-blob"></div>
+      <p class="hero-body">ATLAS Learn delivers personalised, adaptive learning that transforms knowledge into bite-sized experiences and measures how effectively learners apply it in real work contexts.</p>
 
-        <!-- Student photo, clipped by blob mask -->
-        <div class="hero-student">
-          <img
-            src="https://www.figma.com/api/mcp/asset/e3271e1d-ae20-490c-a7ba-a18016990993"
-            alt="Student">
-        </div>
+      <button class="btn-hero">Book a Demo</button>
 
-        <!-- Stat card: 5K+ Online Courses -->
-        <div class="stat-card card-5k">
-          <div class="card-ring">
-            <img src="https://www.figma.com/api/mcp/asset/cdd2e134-ac3b-44e7-8779-04757f990369" alt="Progress ring">
+      <!-- App mockup -->
+      <div class="hero-app-scene" aria-hidden="true">
+
+        <!-- Left float cards -->
+        <div class="hero-float-col">
+          <div class="hero-float-card">
+            <div class="hfc-icon" style="background:#ebf6ff;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M4 19V6a2 2 0 012-2h13a1 1 0 011 1v14" stroke="#0d719a" stroke-width="2" stroke-linecap="round"/><path d="M6 17h14M6 21h14" stroke="#0d719a" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="21" r="2" fill="#0d719a"/></svg>
+            </div>
+            <div>
+              <p class="hfc-title">PALS</p>
+              <p class="hfc-sub">Follow your personalised learning journey</p>
+            </div>
           </div>
-          <p class="stat-num">5K+</p>
-          <p class="stat-lbl">Online Courses</p>
-        </div>
-
-        <!-- Stat card: 2K+ Video Courses -->
-        <div class="stat-card card-2k">
-          <div class="icon-stack">
-            <div class="icon-stack-bg" style="background:#f15d22;"></div>
-            <img src="https://www.figma.com/api/mcp/asset/25aedf4c-d490-4c2a-86af-b390f81a6b5c"
-                 alt="Video Courses"
-                 style="width:36px;height:36px;top:6.64px;left:6.64px;">
-          </div>
-          <div>
-            <p class="stat-num">2K+</p>
-            <p class="stat-lbl">Video Courses</p>
+          <div class="hero-float-card">
+            <div class="hfc-icon" style="background:#fff3e8;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="7" height="7" rx="1.5" fill="#fba333"/><rect x="14" y="3" width="7" height="7" rx="1.5" fill="#fba333"/><rect x="3" y="14" width="7" height="7" rx="1.5" fill="#fba333"/><rect x="14" y="14" width="7" height="7" rx="1.5" fill="#fba333"/></svg>
+            </div>
+            <div>
+              <p class="hfc-title">Courses</p>
+              <p class="hfc-sub">Browse and continue your enrolled courses</p>
+            </div>
           </div>
         </div>
 
-        <!-- Stat card: 250+ Tutors -->
-        <div class="stat-card card-250">
-          <div class="icon-stack">
-            <div class="icon-stack-bg" style="background:#1ca054;"></div>
-            <img src="https://www.figma.com/api/mcp/asset/477c1362-a97f-4b10-a14b-b14c6aa6aaf3"
-                 alt="Tutors"
-                 style="width:30.6px;height:30.6px;top:9.18px;left:9.18px;">
+        <!-- Main app card -->
+        <div class="hero-app-main">
+          <!-- Nav bar -->
+          <div class="app-nav">
+            <span class="app-nav-logo">ATLAS</span>
+            <div class="app-nav-tabs">
+              <span class="app-nav-tab active">Dashboard</span>
+              <span class="app-nav-tab">Courses</span>
+              <span class="app-nav-tab">CBL</span>
+              <span class="app-nav-tab">Performance</span>
+              <span class="app-nav-tab">PALS</span>
+            </div>
+            <div class="app-nav-icons">
+              <div class="app-nav-dot">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9M13.73 21a2 2 0 01-3.46 0" stroke="#888" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <div class="app-nav-dot" style="background:#0d719a;">
+                <span style="font-size:10px;font-weight:700;color:#fff;">S</span>
+              </div>
+            </div>
           </div>
-          <div>
-            <p class="stat-lbl">Tutors</p>
-            <p class="stat-num">250+</p>
+          <!-- Content -->
+          <div class="app-body">
+            <div class="app-welcome">
+              <div>
+                <p class="app-greeting">Welcome Back, Samantha</p>
+                <p class="app-subtitle">Start exploring courses to begin your learning journey</p>
+              </div>
+              <div class="app-avatar">S</div>
+            </div>
+            <div class="app-chat-wrap">
+              <div class="app-chat-ai">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="13" rx="3" stroke="#fff" stroke-width="2"/><path d="M8 7V5a4 4 0 018 0v2" stroke="#fff" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="13" r="1.5" fill="#fff"/><circle cx="15" cy="13" r="1.5" fill="#fff"/></svg>
+              </div>
+              <span class="app-chat-input">Ask me anything about courses, skills or learning</span>
+              <div class="app-chat-send">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <div class="app-chips">
+              <span class="app-chip">What courses I can take next?</span>
+              <span class="app-chip">Summarise my learning progress</span>
+              <span class="app-chip">💡 Options for struggling with...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right float cards -->
+        <div class="hero-float-col">
+          <div class="hero-float-card">
+            <div class="hfc-icon" style="background:#f0fdf9;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M2 20h20M4 20V10l8-8 8 8v10" stroke="#3ec8a2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><rect x="9" y="13" width="6" height="7" rx="1" stroke="#3ec8a2" stroke-width="2"/></svg>
+            </div>
+            <div>
+              <p class="hfc-title">CBL</p>
+              <p class="hfc-sub">Follow your personalised learning journey</p>
+            </div>
+          </div>
+          <div class="hero-float-card">
+            <div class="hfc-icon" style="background:#fff8eb;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke="#fba333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <div>
+              <p class="hfc-title">Evaluate My Skills</p>
+              <p class="hfc-sub">Test your knowledge and track mastery</p>
+            </div>
           </div>
         </div>
 
@@ -1557,375 +743,422 @@
     </div>
   </section>
 
-  <!-- ══════════════════════════════════
-       WHY ATLAS — 3 Feature Cards
-  ══════════════════════════════════ -->
+  <!-- ══════════════ WHY ATLAS ══════════════ -->
   <div class="page-wrap">
 
     <div class="why-section">
-      <div class="why-header">
+      <div class="why-header animate">
         <p class="overline">WHY ATLAS?</p>
-        <h2 class="section-title">Smarter Learning. Smarter Support. Smarter Decisions.</h2>
+        <h2 class="section-title">Smarter Learning. Real Skill Impact.</h2>
       </div>
       <div class="cards-row">
 
-        <!-- Card 1: AI Personalised Learning -->
-        <div class="feat-card">
+        <div class="feat-card animate" data-delay="1">
           <div class="feat-icon" style="background:#0d719a;">
             <img src="https://www.figma.com/api/mcp/asset/f6db97ab-54a3-4215-8926-fa7b473ffb7e" alt="AI Learning icon">
           </div>
           <h3>AI Personalised Learning</h3>
-          <p>ATLAS adapts to each employee's role, pace, and skill needs. We deliver tailored learning content to close knowledge gaps and strengthen skills, ensuring faster upskilling, deeper engagement, and workforce readiness through a truly personalised, adaptive learning.</p>
+          <p>Delivers role-based, adaptive learning that targets real skill gaps, helping learners build skills faster and apply knowledge effectively at work.</p>
         </div>
 
-        <!-- Card 2: AI Co-Instructor -->
-        <div class="feat-card">
+        <div class="feat-card animate" data-delay="2">
           <div class="feat-icon orange" style="background:#fba333;">
             <img src="https://www.figma.com/api/mcp/asset/3ba49e55-3641-4dce-921a-bc28a895d923" alt="AI Co-Instructor icon">
           </div>
           <h3>AI Co-Instructor</h3>
-          <p>Employees gain a 24/7 AI co-pilot that supports scenario-based training, answers questions in real time, and reinforces knowledge anytime. Acting as a coach and mentor to build confidence, boosts retention, and brings workplace learning to life.</p>
+          <p>A 24/7 AI learning assistant that supports scenario-based training, answers questions instantly, and reinforces learning in context.</p>
         </div>
 
-        <!-- Card 3: Admin Level Analytics -->
-        <div class="feat-card">
+        <div class="feat-card animate" data-delay="3">
           <div class="feat-icon" style="background:#f15d22;">
             <img src="https://www.figma.com/api/mcp/asset/1d3aedef-5234-4c38-9292-affead8b99fa" alt="Admin Analytics icon">
           </div>
           <h3>Admin Level Analytics</h3>
-          <p>Admin can access real-time dashboards that track completions, accuracy, and skill progress. Analytics highlight learning gaps, measure ROI, and guide talent planning, turning data into actionable insights for better workforce performance and organizational growth.</p>
+          <p>Track progress, skill development, and learning impact in real time. Identify gaps, measure effectiveness, and guide workforce decisions with data.</p>
         </div>
 
       </div>
     </div>
 
-    <!-- ══════════════════════════════════
-         BUILT FOR WORKFORCE GROWTH
-         Tabs left, screenshot right
-    ══════════════════════════════════ -->
-    <div class="highlight-section">
-      <div class="hl-header">
+    <!-- ══════════════ SECTION 1: WORKFORCE ══════════════ -->
+    <div class="highlight-section" data-tab-group="workforce">
+      <div class="hl-header animate">
         <p class="overline">Built for Workforce Growth</p>
-        <h2 class="section-title">Personalised learning, simplified management, and powerful content tools for smarter learning.</h2>
+        <h2 class="section-title">Personalised Learning and Knowledge Management in One Platform</h2>
       </div>
 
       <div class="hl-layout">
-        <!-- Tabs -->
-        <div class="tab-list">
-          <!-- Active -->
-          <div class="tab-row" style="align-items:flex-start;cursor:default;">
+        <div class="tab-list animate">
+
+          <div class="tab-row is-active" data-tab="pals">
             <div class="tab-dot active"></div>
             <div class="tab-body">
               <p class="tab-title active">Personalised Adaptive Learning System (PALS)</p>
-              <p class="tab-desc">Delivers tailored learning journeys that adapt to roles, skill levels, and progress, ensuring each employee develops effectively while staying engaged and motivated.</p>
+              <p class="tab-desc">Personalised learning paths that adjust to each learner's role, skill level, and progress, keeping learning relevant and effective.</p>
             </div>
           </div>
-          <!-- Idle -->
-          <button class="tab-row">
+
+          <div class="tab-row" data-tab="lms">
             <div class="tab-dot idle"></div>
             <div class="tab-body">
               <p class="tab-title idle">Learning Management System</p>
+              <p class="tab-desc">Manage training programs, track progress, and deliver structured learning with integrated assessments and reporting.</p>
             </div>
-          </button>
-          <button class="tab-row">
+          </div>
+
+          <div class="tab-row" data-tab="k2l">
             <div class="tab-dot idle"></div>
             <div class="tab-body">
-              <p class="tab-title idle">Content Management System</p>
+              <p class="tab-title idle">Knowledge to Learning Conversion</p>
+              <p class="tab-desc">Transform internal documents, SOPs, and expertise into bite-sized, interactive learning modules, ready to deploy at scale.</p>
             </div>
-          </button>
+          </div>
+
         </div>
 
-        <!-- App screenshot panel -->
-        <div class="hl-panel blue">
-          <div class="app-img">
-            <img src="https://www.figma.com/api/mcp/asset/8c5fc640-031c-46ae-bcd3-1db874f80d37" alt="ATLAS platform screenshot">
+        <div class="hl-panel-group animate" data-delay="2">
+
+          <!-- PALS -->
+          <div class="hl-panel blue is-active" data-panel="pals">
+            <div class="app-img">
+              <img src="https://www.figma.com/api/mcp/asset/8c5fc640-031c-46ae-bcd3-1db874f80d37" alt="ATLAS PALS screenshot">
+            </div>
           </div>
+
+          <!-- LMS -->
+          <div class="hl-panel blue" data-panel="lms">
+            <div class="panel-lms">
+              <div class="course-card">
+                <div class="course-card-top">
+                  <div class="course-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none"><path d="M4 5h11M4 9h8M4 13h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M14 12l2.5 2.5L21 9" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  <div>
+                    <p class="course-cat">Education</p>
+                    <p class="course-title">Teaching Character and Creating Positive Classroom</p>
+                  </div>
+                </div>
+                <div class="course-badges">
+                  <span class="course-badge">Beginner</span>
+                  <span class="course-badge">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="#555" stroke-width="2"/><path d="M12 7v5l3 3" stroke="#555" stroke-width="2" stroke-linecap="round"/></svg>
+                    45 Minutes
+                  </span>
+                  <div class="course-progress-wrap">
+                    <div class="course-progress-bar"><div class="course-progress-fill"></div></div>
+                    <span class="course-pct">70%</span>
+                  </div>
+                </div>
+                <p class="course-desc">This course explores key ideas of positive psychology and shows how great teachers apply those lessons to maximize student engagement</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- K2L -->
+          <div class="hl-panel blue" data-panel="k2l">
+            <div class="panel-k2l">
+              <div class="flashcard">
+                <p class="flashcard-title">Identifying Time Drains</p>
+                <p class="flashcard-body">is an extremely important step in time management and personal productivity.</p>
+                <svg class="flashcard-waves" viewBox="0 0 475 32" preserveAspectRatio="none">
+                  <path d="M0 16 Q118 2 237 16 Q356 30 475 16" stroke="#fff" stroke-width="2.5" fill="none"/>
+                  <path d="M0 24 Q118 10 237 24 Q356 38 475 24" stroke="#fff" stroke-width="1.8" fill="none"/>
+                </svg>
+                <div class="flashcard-dots">
+                  <span class="flashcard-dot active"></span>
+                  <span class="flashcard-dot"></span>
+                  <span class="flashcard-dot"></span>
+                  <span class="flashcard-dot"></span>
+                  <span class="flashcard-dot"></span>
+                  <span class="flashcard-dot"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
 
-    <!-- ══════════════════════════════════
-         DRIVING MEASURABLE OUTCOMES
-         Performance card left, tabs right
-    ══════════════════════════════════ -->
-    <div class="highlight-section">
-      <div class="hl-header">
+    <!-- ══════════════ SECTION 2: OUTCOMES ══════════════ -->
+    <div class="highlight-section" style="padding-bottom:80px;" data-tab-group="outcomes">
+      <div class="hl-header animate">
         <p class="overline">Driving Measurable Outcomes</p>
-        <h2 class="section-title">Actionable analytics, adaptive coaching, and AI assessments for measurable performance.</h2>
+        <h2 class="section-title">Measure Learning That Translates to Real Work Performance</h2>
       </div>
 
       <div class="hl-layout">
-        <!-- Performance card panel -->
-        <div class="hl-panel green">
 
-          <!-- Header text inside green panel -->
-          <div class="perf-label">
-            <p class="perf-title">Overall Performance</p>
-            <p class="perf-date">Leadership &amp; Management - 01/1/2025 ~ 12/31/2025</p>
-          </div>
+        <div class="hl-panel-group animate">
 
-          <!-- White inner card with chart -->
-          <div class="perf-card">
-            <!-- Donut chart -->
-            <div class="donut-wrap">
-              <img class="donut-ring" src="https://www.figma.com/api/mcp/asset/26e6fd17-0e2d-4642-93d8-12cf4fcaa3b0" alt="Chart background ring">
-              <img class="donut-ring" src="https://www.figma.com/api/mcp/asset/2a1915c8-b6ae-48ac-bf09-30d26de37704" alt="Chart progress ring">
-              <p class="donut-pct">70%</p>
+          <!-- Performance -->
+          <div class="hl-panel green is-active" data-panel="performance">
+            <div class="perf-label">
+              <p class="perf-title">Overall Performance</p>
+              <p class="perf-date">Leadership &amp; Management - 01/1/2025 ~ 12/31/2025</p>
             </div>
-            <!-- Metrics -->
-            <div class="metrics-list">
-              <div class="metric-row">
-                <p class="metric-name">Self-Leadership &amp; Personal Effectiveness</p>
-                <p class="metric-val">90%</p>
+            <div class="perf-card">
+              <div class="donut-wrap">
+                <img class="donut-ring" src="https://www.figma.com/api/mcp/asset/26e6fd17-0e2d-4642-93d8-12cf4fcaa3b0" alt="">
+                <img class="donut-ring" src="https://www.figma.com/api/mcp/asset/2a1915c8-b6ae-48ac-bf09-30d26de37704" alt="">
+                <p class="donut-pct">70%</p>
               </div>
-              <div class="metric-row">
-                <p class="metric-name">Team Leadership &amp; Communication</p>
-                <p class="metric-val">60%</p>
-              </div>
-              <div class="metric-row">
-                <p class="metric-name">Strategic Thinking &amp; Decision Making</p>
-                <p class="metric-val">70%</p>
+              <div class="metrics-list">
+                <div class="metric-row">
+                  <p class="metric-name">Self-Leadership &amp; Personal Effectiveness</p>
+                  <p class="metric-val">90%</p>
+                </div>
+                <div class="metric-row">
+                  <p class="metric-name">Team Leadership &amp; Communication</p>
+                  <p class="metric-val">60%</p>
+                </div>
+                <div class="metric-row">
+                  <p class="metric-name">Strategic Thinking &amp; Decision Making</p>
+                  <p class="metric-val">70%</p>
+                </div>
               </div>
             </div>
           </div>
+
+          <!-- Co-pilot -->
+          <div class="hl-panel" data-panel="copilot">
+            <div class="panel-copilot">
+              <div class="reviewed-header">
+                <p class="reviewed-title">Reviewed by AI!</p>
+                <div class="sparkle-cluster" aria-hidden="true">
+                  <span class="sp sp-plus">✚</span>
+                  <span class="sp sp-large">✦</span>
+                  <span class="sp sp-med">✦</span>
+                  <span class="sp sp-tiny">✦</span>
+                </div>
+              </div>
+              <div class="reviewed-bars">
+                <div class="reviewed-bar" style="width:55%;"></div>
+                <div class="reviewed-bar" style="width:100%;"></div>
+                <div class="reviewed-bar" style="width:100%;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Assessment -->
+          <div class="hl-panel blue" data-panel="assessment">
+            <div class="panel-assessment">
+              <div class="quiz-card">
+                <div class="quiz-header">
+                  <span class="quiz-q-label">Question 2</span>
+                  <div class="quiz-toolbar">
+                    <button class="quiz-tool-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="#555" stroke-width="2" stroke-linecap="round"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="#555" stroke-width="2" stroke-linecap="round"/></svg></button>
+                    <button class="quiz-tool-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><rect x="3" y="3" width="18" height="18" rx="2" stroke="#555" stroke-width="2"/><circle cx="8.5" cy="8.5" r="1.5" stroke="#555" stroke-width="1.5"/><path d="M21 15l-5-5L5 21" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    <button class="quiz-tool-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2v16z" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    <button class="quiz-tool-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M18 11.5V17a4 4 0 01-4 4H9a4 4 0 01-4-4V8.5a1.5 1.5 0 013 0V13" stroke="#555" stroke-width="2" stroke-linecap="round"/><path d="M12 4.5v8M15 5.5v7" stroke="#555" stroke-width="2" stroke-linecap="round"/></svg></button>
+                    <div class="quiz-divider"></div>
+                    <button class="quiz-tool-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                    <button class="quiz-tool-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="#555" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+                  </div>
+                </div>
+                <div class="quiz-body">
+                  <p class="quiz-question">Which of the following best describes the difference between leadership and management?</p>
+                  <div class="quiz-options">
+                    <div class="quiz-option">
+                      <div class="quiz-radio"></div>
+                      <span class="quiz-option-text">Managers innovate, leaders control</span>
+                    </div>
+                    <div class="quiz-option selected">
+                      <div class="quiz-radio"></div>
+                      <span class="quiz-option-text">Leaders focus on processes, managers focus on people</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
 
-        <!-- Tabs -->
-        <div class="tab-list">
-          <!-- Active -->
-          <div class="tab-row" style="align-items:flex-start;cursor:default;">
+        <div class="tab-list animate" data-delay="2">
+
+          <div class="tab-row is-active" data-tab="performance">
             <div class="tab-dot active"></div>
             <div class="tab-body">
               <p class="tab-title active">Performance Management System</p>
               <p class="tab-desc">Track completions, accuracy, and skill growth across teams. Real-time analytics uncover gaps and guide smarter workforce planning and decisions.</p>
             </div>
           </div>
-          <!-- Idle -->
-          <button class="tab-row">
+
+          <div class="tab-row" data-tab="copilot">
             <div class="tab-dot idle"></div>
             <div class="tab-body">
               <p class="tab-title idle">AI Co-pilot Learning</p>
+              <p class="tab-desc">AI-guided simulations help learners apply knowledge in realistic scenarios, reinforcing learning through practice.</p>
             </div>
-          </button>
-          <button class="tab-row">
+          </div>
+
+          <div class="tab-row" data-tab="assessment">
             <div class="tab-dot idle"></div>
             <div class="tab-body">
               <p class="tab-title idle">AI Assessment</p>
+              <p class="tab-desc">Evaluate not just knowledge, but the ability to apply it in job-relevant scenarios, ensuring training translates into performance.</p>
             </div>
-          </button>
+          </div>
+
         </div>
       </div>
     </div>
 
-    <!-- ══════════════════════════════════
-         CBL — SCENARIO ROLE PLAY
-         Interactive tabs + panel states
-    ══════════════════════════════════ -->
-    <div class="highlight-section" id="cbl-section">
-      <div class="hl-header">
-        <p class="overline">CBL — Scenario Role Play</p>
+    <!-- ══════════════ SECTION 3: ROLE PLAY ══════════════ -->
+    <div class="highlight-section" data-tab-group="roleplay">
+      <div class="hl-header animate">
+        <p class="overline">Scenario-Based Learning</p>
         <h2 class="section-title">Hone Real Workplace Competencies Through AI Role Play</h2>
       </div>
 
       <div class="hl-layout">
-        <!-- Tabs left -->
-        <div class="tab-list">
 
-          <!-- Tab 0: Scenario Role Play -->
-          <button class="tab-row" data-cbl-tab="0" style="align-items:flex-start;" onclick="setCblTab(0)">
+        <div class="tab-list animate">
+
+          <div class="tab-row is-active" data-tab="scenario">
             <div class="tab-dot active"></div>
             <div class="tab-body">
               <p class="tab-title active">Scenario Role Play</p>
-              <p class="tab-desc">CBL provides the freedom and flexibility to practice and be assessed in real world-like situations, anytime and anywhere. Learners build confidence by interacting with AI personas that simulate real clients, colleagues, and workplace scenarios.</p>
+              <p class="tab-desc">Practice real-world situations through AI-powered role play. Interact with realistic personas to build confidence and decision-making skills.</p>
             </div>
-          </button>
+          </div>
 
-          <!-- Tab 1: Text & Voice Input -->
-          <button class="tab-row" data-cbl-tab="1" style="align-items:flex-start;" onclick="setCblTab(1)">
+          <div class="tab-row" data-tab="voice">
             <div class="tab-dot idle"></div>
             <div class="tab-body">
               <p class="tab-title idle">Text &amp; Voice Input</p>
-              <p class="tab-desc" style="display:none;">Learners choose how they want to engage — type naturally or speak freely. Switch between text and voice at any point during a session, making practice accessible on any device, in any environment.</p>
+              <p class="tab-desc">Engage via text or voice and switch seamlessly based on your environment and preference.</p>
             </div>
-          </button>
+          </div>
 
-          <!-- Tab 2: Real-Time Coaching & Assessment -->
-          <button class="tab-row" data-cbl-tab="2" style="align-items:flex-start;" onclick="setCblTab(2)">
+          <div class="tab-row" data-tab="coaching">
             <div class="tab-dot idle"></div>
             <div class="tab-body">
               <p class="tab-title idle">Real-Time Coaching &amp; Assessment</p>
-              <p class="tab-desc" style="display:none;">ATLAS tracks performance criteria live as learners practice. After each session, receive instant scores and feedback — identifying strengths and areas to improve, driving continuous, measurable growth.</p>
+              <p class="tab-desc">Get real-time feedback and scoring based on performance criteria, with clear insights on strengths and areas to improve.</p>
             </div>
-          </button>
+          </div>
 
         </div>
 
-        <!-- CBL Panel — 3 states -->
-        <div class="hl-panel cbl" aria-hidden="true">
+        <div class="rl-panel-group animate" data-delay="2">
 
-          <!-- ── State 0: Chat session ── -->
-          <div class="cbl-panel-state active" data-cbl-state="0">
-            <div class="cbl-sidebar">
-              <p class="cbl-s-badge">Scenario</p>
-              <p class="cbl-s-name">Front Office Interaction</p>
-              <div class="cbl-s-divider"></div>
-              <p class="cbl-criteria-label">Criteria</p>
-              <div class="cbl-criteria-list">
-                <div class="cbl-criterion">
-                  <div class="cbl-dot done"></div>
-                  <p class="cbl-criterion-text">Professional Greeting</p>
+          <!-- Scenario: chat UI -->
+          <div class="hl-panel blue is-active" data-panel="scenario">
+            <div style="position:absolute;inset:10px;background:#fff;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 4px 20px rgba(0,0,0,0.08);">
+              <div style="padding:10px 14px;border-bottom:1px solid #e8eef5;display:flex;align-items:center;gap:8px;flex-shrink:0;">
+                <span style="font-size:10px;color:var(--primary);font-weight:600;white-space:nowrap;cursor:default;">← Back to Scenarios</span>
+                <div style="flex:1;min-width:0;">
+                  <p style="font-size:10px;font-weight:700;color:var(--navy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Handling a Client Confidentiality Complain</p>
+                  <div style="display:flex;gap:8px;margin-top:2px;">
+                    <span style="font-size:8px;color:var(--body);white-space:nowrap;">👤 Learner (Legal Associate Coporate)</span>
+                    <span style="font-size:8px;color:var(--body);white-space:nowrap;">🏢 Disgruntled Client</span>
+                  </div>
                 </div>
-                <div class="cbl-criterion">
-                  <div class="cbl-dot done"></div>
-                  <p class="cbl-criterion-text">Empathy &amp; Active Listening</p>
-                </div>
-                <div class="cbl-criterion">
-                  <div class="cbl-dot pending"></div>
-                  <p class="cbl-criterion-text">Problem Resolution</p>
-                </div>
+                <div style="background:var(--primary);color:#fff;font-size:8px;font-weight:700;padding:4px 10px;border-radius:20px;display:flex;align-items:center;gap:3px;white-space:nowrap;flex-shrink:0;">🔊 Voice On</div>
+                <div style="border:1.5px solid #e5e9ee;color:var(--navy);font-size:8px;font-weight:600;padding:4px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;">✓ Criteria 3</div>
               </div>
-              <div class="cbl-jen-label">
-                <div class="cbl-jen-av">🤖</div>
-                <p class="cbl-jen-name">Jen — AI Persona</p>
-              </div>
-            </div>
-            <div class="cbl-chat">
-              <div class="cbl-messages">
-                <div class="cbl-msg">
-                  <div class="cbl-msg-av jen-av">🤖</div>
-                  <div class="cbl-bubble jen-bubble">Hi! I just checked in and my room key isn't working. Can you help me?</div>
+              <div style="flex:1;padding:10px 14px;overflow:hidden;display:flex;flex-direction:column;gap:7px;">
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                  <div style="width:22px;height:22px;border-radius:6px;background:#eef2f8;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;">🤖</div>
+                  <div style="background:#f5f7fa;border-radius:0 8px 8px 8px;padding:7px 10px;font-size:9px;color:#333;line-height:1.5;max-width:84%;">I can't believe I have to fight to get information that directly affects my business. Since we have overlapping interests, I deserve to know what's going on with your other client's case. How is it fair that I'm kept in the dark?</div>
                 </div>
-                <div class="cbl-msg user-msg">
-                  <div class="cbl-msg-av user-av">You</div>
-                  <div class="cbl-bubble user-bubble">Of course! I'm sorry for the inconvenience. Let me get that sorted right away.</div>
+                <div style="display:flex;align-items:center;gap:6px;padding-left:30px;">
+                  <span style="font-size:10px;color:#bbb;">▷</span>
+                  <div style="flex:1;height:2px;background:#e0e7ef;border-radius:2px;"></div>
+                  <span style="font-size:7.5px;color:#aaa;white-space:nowrap;">0:05 AI voice</span>
                 </div>
-                <div class="cbl-msg">
-                  <div class="cbl-msg-av jen-av">🤖</div>
-                  <div class="cbl-bubble jen-bubble">Thank you! I really appreciate your quick response.</div>
+                <div style="display:flex;gap:8px;align-items:flex-start;justify-content:flex-end;">
+                  <div style="background:var(--primary);border-radius:8px 0 8px 8px;padding:7px 10px;font-size:9px;color:#fff;line-height:1.5;max-width:80%;">I hear your frustration, and I know how much is at stake for you. However, I have a strict legal and ethical duty to protect the privacy of every client. If I were to share their details with you, could you ever truly trust me not to share your trade secrets with them?</div>
+                  <div style="width:22px;height:22px;border-radius:50%;background:#eef2f8;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;">👤</div>
                 </div>
-              </div>
-              <div class="cbl-input-bar">
-                <div class="cbl-input-field">Type your response…</div>
-                <div class="cbl-icon-btn send">⌨</div>
-                <div class="cbl-icon-btn mic">🎙</div>
-              </div>
-            </div>
-          </div>
-
-          <!-- ── State 1: Voice & Text input ── -->
-          <div class="cbl-panel-state" data-cbl-state="1">
-            <div class="cbl-sidebar">
-              <p class="cbl-s-badge">Input Mode</p>
-              <p class="cbl-s-name">Pharmacy Interaction</p>
-              <div class="cbl-s-divider"></div>
-              <p class="cbl-criteria-label">Active Mode</p>
-              <div class="cbl-criteria-list" style="margin-top:4px;">
-                <div class="cbl-criterion">
-                  <div class="cbl-dot done"></div>
-                  <p class="cbl-criterion-text" style="color:rgba(255,255,255,0.9);font-weight:600;">Voice</p>
+                <div style="display:flex;align-items:center;gap:6px;justify-content:flex-end;padding-right:30px;">
+                  <span style="font-size:10px;color:#bbb;">▷</span>
+                  <div style="width:44px;height:2px;background:#e0e7ef;border-radius:2px;"></div>
+                  <span style="font-size:7.5px;color:#aaa;white-space:nowrap;">0:05 Your recording</span>
                 </div>
-                <div class="cbl-criterion">
-                  <div class="cbl-dot pending"></div>
-                  <p class="cbl-criterion-text">Text</p>
-                </div>
-              </div>
-              <div class="cbl-s-divider" style="margin-top:auto;"></div>
-              <p style="font-family:'Inter',sans-serif;font-size:10px;color:rgba(255,255,255,0.4);line-height:1.5;">Switch anytime — tap mic to speak, or type freely.</p>
-            </div>
-            <div class="cbl-voice-panel">
-              <div class="cbl-mode-toggle">
-                <button class="cbl-mode-btn on">🎙 Voice</button>
-                <button class="cbl-mode-btn off">⌨ Text</button>
-              </div>
-              <div class="cbl-mic-big">🎙</div>
-              <div class="cbl-recording-label">
-                <div class="cbl-recording-dot"></div>
-                Recording...
-              </div>
-              <div class="cbl-waveform">
-                <div class="cbl-wbar"></div>
-                <div class="cbl-wbar"></div>
-                <div class="cbl-wbar"></div>
-                <div class="cbl-wbar"></div>
-                <div class="cbl-wbar"></div>
-                <div class="cbl-wbar"></div>
-                <div class="cbl-wbar"></div>
-                <div class="cbl-wbar"></div>
-                <div class="cbl-wbar"></div>
-                <div class="cbl-wbar"></div>
-              </div>
-              <p class="cbl-voice-hint">Speak naturally — ATLAS transcribes in real-time</p>
-            </div>
-          </div>
-
-          <!-- ── State 2: Assessment results ── -->
-          <div class="cbl-panel-state" data-cbl-state="2">
-            <div class="cbl-results-panel">
-              <div class="cbl-results-header">
-                <p class="cbl-results-title">✓ Session Complete</p>
-                <span class="cbl-pass-badge">PASS</span>
-              </div>
-              <div class="cbl-score-row">
-                <div class="cbl-score-ring-wrap">
-                  <svg class="cbl-score-svg" viewBox="0 0 68 68">
-                    <circle class="cbl-score-track" cx="34" cy="34" r="26"/>
-                    <circle class="cbl-score-fill"  cx="34" cy="34" r="26"/>
-                  </svg>
-                  <p class="cbl-score-pct">83%</p>
-                </div>
-                <div style="display:flex;flex-direction:column;gap:4px;">
-                  <p style="font-family:'Inter',sans-serif;font-size:11px;color:var(--body);">Overall Score</p>
-                  <p style="font-family:'Inter',sans-serif;font-size:22px;font-weight:800;color:#16a34a;line-height:1;">5 <span style="font-size:13px;color:var(--body);font-weight:400;">/ 6 pts</span></p>
-                  <p style="font-family:'Inter',sans-serif;font-size:10px;color:var(--body);">Front Office Interaction</p>
-                </div>
-              </div>
-              <div class="cbl-criteria-results">
-                <div class="cbl-crit-row">
-                  <div class="cbl-crit-icon pass">✓</div>
-                  <p class="cbl-crit-name">Professional Greeting</p>
-                  <p class="cbl-crit-score pass">2/2</p>
-                </div>
-                <div class="cbl-crit-row">
-                  <div class="cbl-crit-icon pass">✓</div>
-                  <p class="cbl-crit-name">Empathy &amp; Active Listening</p>
-                  <p class="cbl-crit-score pass">2/2</p>
-                </div>
-                <div class="cbl-crit-row">
-                  <div class="cbl-crit-icon partial">~</div>
-                  <p class="cbl-crit-name">Problem Resolution</p>
-                  <p class="cbl-crit-score partial">1/2</p>
+                <div style="display:flex;gap:8px;align-items:flex-start;">
+                  <div style="width:22px;height:22px;border-radius:6px;background:#eef2f8;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;">🤖</div>
+                  <div style="background:#f5f7fa;border-radius:0 8px 8px 8px;padding:7px 10px;font-size:9px;color:#333;line-height:1.5;max-width:84%;">That's different! We're on the same side here. If their case fails, it hits me too. I'm not asking for their bank records, I just need to know if I should be pulling my investments right now.</div>
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Text & Voice Input -->
+          <div class="hl-panel" data-panel="voice" style="background:#C8E4DC;">
+            <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;">
+              <div style="background:#B4D0C8;border-radius:30px;padding:4px;display:flex;">
+                <span style="background:#fff;padding:7px 26px;border-radius:26px;font-size:13px;font-weight:700;color:var(--navy);">Voice</span>
+                <span style="padding:7px 26px;font-size:13px;color:#7a9990;">Text</span>
+              </div>
+              <div style="width:86px;height:86px;background:var(--primary);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(13,113,154,0.35);">
+                <svg width="38" height="38" viewBox="0 0 24 24" fill="none"><rect x="9" y="2" width="6" height="11" rx="3" fill="#fff"/><path d="M5 11a7 7 0 0014 0" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="18" x2="12" y2="21" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="9" y1="21" x2="15" y2="21" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+              </div>
+              <p style="font-size:15px;font-weight:700;color:var(--navy);">Recording</p>
+              <div class="waveform">
+                <div class="waveform-bar" style="height:8px;"></div>
+                <div class="waveform-bar" style="height:14px;"></div>
+                <div class="waveform-bar" style="height:22px;"></div>
+                <div class="waveform-bar" style="height:26px;"></div>
+                <div class="waveform-bar" style="height:30px;"></div>
+                <div class="waveform-bar" style="height:22px;"></div>
+                <div class="waveform-bar" style="height:30px;"></div>
+                <div class="waveform-bar" style="height:16px;"></div>
+                <div class="waveform-bar" style="height:24px;"></div>
+                <div class="waveform-bar" style="height:18px;"></div>
+                <div class="waveform-bar" style="height:10px;"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real-Time Coaching -->
+          <div class="hl-panel" data-panel="coaching" style="background:#FFF8E8;">
+            <div style="position:absolute;inset:0;padding:22px 26px;display:flex;flex-direction:column;gap:14px;">
+              <div><span style="background:#dbeafe;color:var(--primary);font-size:10px;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:0.8px;text-transform:uppercase;">Evaluation Report</span></div>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 21h8M12 17v4M7 3h10l-1 7a5 5 0 01-8 0L7 3z" stroke="#D4961A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 3H4M19 3h1" stroke="#D4961A" stroke-width="2" stroke-linecap="round"/></svg>
+                <span style="font-size:18px;font-weight:700;color:var(--navy);">Session complete!</span>
+              </div>
+              <div style="display:flex;gap:14px;align-items:center;background:#fff;border-radius:12px;padding:14px;border:2px solid var(--orange);">
+                <div style="min-width:68px;height:68px;display:flex;align-items:center;justify-content:center;border-radius:10px;border:2px solid var(--orange);">
+                  <span style="font-size:24px;font-weight:700;color:var(--orange);">67%</span>
+                </div>
+                <div>
+                  <p style="font-size:12px;font-weight:700;color:var(--navy);margin-bottom:5px;">Score: 4/6 points</p>
+                  <p style="font-size:10.5px;color:var(--body);line-height:1.55;">Good effort managing the front office interaction. Focus on making your initial greeting warmer and more prompt to score higher.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
         </div>
       </div>
     </div>
 
   </div><!-- /page-wrap -->
 
-  <!-- ══════════════════════════════════
-       LIMITLESS LEARNING SCENARIOS
-  ══════════════════════════════════ -->
+  <!-- ══════════════ LIMITLESS SCENARIOS ══════════════ -->
   <div class="scenarios-wrap">
     <div class="scenarios-inner">
 
-      <div class="scenarios-header">
+      <div class="scenarios-header animate">
         <p class="overline">Limitless Learning Scenarios</p>
-        <h2 class="section-title">Workforce Learning That Adapts to You</h2>
+        <h2 class="section-title">Workforce Learning That Adapts to Every Role</h2>
         <p>From hotel staff to finance and frontline teams, ATLAS Learn supports diverse training needs with scenario-based, data-driven learning that ensures relevance and effectiveness at scale.</p>
       </div>
 
       <div class="scenario-cards">
-        <div class="scenario-card">
+        <div class="scenario-card animate" data-delay="1">
           <div class="scenario-icon">
             <img src="https://www.figma.com/api/mcp/asset/a7eac0be-d7ab-43a0-808b-43bd40c3ecaf" alt="Hospitality icon">
           </div>
           <h3>Elevate Hospitality Skills</h3>
           <p>From guest service to safety, ATLAS enables practical, scenario-driven learning that keeps teams engaged and ensures service excellence every time.</p>
         </div>
-        <div class="scenario-card">
+        <div class="scenario-card animate" data-delay="2">
           <div class="scenario-icon">
             <img src="https://www.figma.com/api/mcp/asset/fa901c94-ad08-43b9-aeda-4b8f090f7ed8" alt="Legal icon">
           </div>
@@ -1937,19 +1170,15 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       CTA BANNER — Let's grow together
-  ══════════════════════════════════ -->
+  <!-- ══════════════ CTA BANNER ══════════════ -->
   <div class="cta-banner">
     <div class="cta-inner">
 
-      <!-- Left: person image -->
-      <div class="cta-img">
+      <div class="cta-img animate">
         <img src="https://www.figma.com/api/mcp/asset/64819f6a-9d47-492a-b7ed-1b67dfcc5ef8" alt="ATLAS growth">
       </div>
 
-      <!-- Right: copy + button -->
-      <div class="cta-text-block">
+      <div class="cta-text-block animate" data-delay="1">
         <div class="cta-copy">
           <h2 class="cta-h2">Let's grow together with ATLAS</h2>
           <p class="cta-p">Don't just keep up when you can stay ahead. Your workforce deserves more than training, they deserve transformation. Take the leap with ATLAS and unlock tomorrow's growth today.</p>
@@ -1963,35 +1192,50 @@
     </div>
   </div>
 
-  <!-- ══════════════════════════════════
-       FOOTER
-  ══════════════════════════════════ -->
+  <!-- ══════════════ FOOTER ══════════════ -->
   <footer>
-    <p>©2025 HeyHi. All rights reserved. Managed by HeyHi Pte. Ltd. Privacy Policy</p>
+    <p>©2026 HeyHi. All rights reserved. Managed by HeyHi Pte. Ltd. Privacy Policy</p>
   </footer>
 
   <script>
-    function setCblTab(idx) {
-      const tabs   = document.querySelectorAll('[data-cbl-tab]');
-      const panels = document.querySelectorAll('[data-cbl-state]');
+    /* ── Tab system ── */
+    document.querySelectorAll('[data-tab-group]').forEach(function(group) {
+      var tabs   = group.querySelectorAll('[data-tab]');
+      var panels = group.querySelectorAll('[data-panel]');
 
-      tabs.forEach(tab => {
-        const i    = parseInt(tab.dataset.cblTab);
-        const dot  = tab.querySelector('.tab-dot');
-        const title = tab.querySelector('.tab-title');
-        const desc  = tab.querySelector('.tab-desc');
-        const isActive = i === idx;
+      tabs.forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          if (tab.classList.contains('is-active')) return;
+          var target = tab.dataset.tab;
 
-        dot.className   = 'tab-dot ' + (isActive ? 'active' : 'idle');
-        title.className = 'tab-title ' + (isActive ? 'active' : 'idle');
-        if (desc) desc.style.display = isActive ? 'block' : 'none';
+          tabs.forEach(function(t) {
+            var on = t.dataset.tab === target;
+            t.classList.toggle('is-active', on);
+            t.querySelector('.tab-dot').className   = 'tab-dot '   + (on ? 'active' : 'idle');
+            t.querySelector('.tab-title').className = 'tab-title ' + (on ? 'active' : 'idle');
+          });
+
+          panels.forEach(function(p) {
+            p.classList.toggle('is-active', p.dataset.panel === target);
+          });
+        });
       });
+    });
 
-      panels.forEach(panel => {
-        const isActive = parseInt(panel.dataset.cblState) === idx;
-        panel.classList.toggle('active', isActive);
+    /* ── Scroll animations ── */
+    var animObserver = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          animObserver.unobserve(entry.target);
+        }
       });
-    }
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.animate').forEach(function(el) {
+      animObserver.observe(el);
+    });
   </script>
+
 </body>
 </html>
