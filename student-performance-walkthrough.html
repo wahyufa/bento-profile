@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATLAS Student — Performance Walkthrough</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f1f5f9; min-height: 100vh; }
+
+    /* NAV */
+    .nav { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 40px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; color: #0f172a; text-decoration: none; }
+    .nav-logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, #f97316, #0e7490); border-radius: 8px; }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { font-size: 14px; color: #64748b; text-decoration: none; font-weight: 500; padding-bottom: 4px; }
+    .nav-links a.active { color: #0e7490; border-bottom: 2px solid #f97316; padding-bottom: 2px; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-bell { width: 34px; height: 34px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; position: relative; }
+    .nav-bell-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: #f97316; border-radius: 50%; border: 2px solid #fff; }
+    .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #0e7490, #0891b2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; }
+
+    /* HERO */
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e4976 60%, #243b6e 100%);
+      padding: 36px 40px 28px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 36px 36px;
+    }
+
+    .hero-title { font-size: 28px; font-weight: 800; color: #fff; margin-bottom: 6px; position: relative; }
+    .hero-sub { font-size: 14px; color: rgba(255,255,255,.65); margin-bottom: 24px; position: relative; }
+
+    .hero-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      position: relative;
+    }
+
+    .hero-tab {
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all .15s;
+      background: rgba(255,255,255,.12);
+      color: rgba(255,255,255,.75);
+    }
+
+    .hero-tab.active {
+      background: #fff;
+      color: #0f172a;
+    }
+
+    /* FILTERS */
+    .filters-bar {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 14px 40px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .filter-date {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: #475569;
+    }
+
+    .toggle {
+      width: 36px;
+      height: 20px;
+      background: #e2e8f0;
+      border-radius: 10px;
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      background: #fff;
+      border-radius: 50%;
+      top: 3px;
+      left: 3px;
+      box-shadow: 0 1px 3px rgba(0,0,0,.2);
+    }
+
+    .filter-dropdown {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 14px;
+      font-size: 13px;
+      color: #475569;
+      cursor: pointer;
+    }
+
+    /* CONTENT */
+    .content { max-width: 1060px; margin: 0 auto; padding: 28px 40px 60px; }
+
+    /* Quick Insights view */
+    .insights-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 16px;
+    }
+
+    .chart-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 24px;
+    }
+
+    .chart-title { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 24px; }
+
+    /* Donut chart (SVG) */
+    .donut-wrap { display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
+
+    .bar-chart-wrap { padding-top: 8px; }
+
+    .bar-chart-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .bar-chart-label { font-size: 12px; color: #64748b; width: 100px; text-align: right; flex-shrink: 0; }
+    .bar-chart-track { flex: 1; height: 20px; background: #f1f5f9; border-left: 1px solid #e2e8f0; position: relative; }
+    .bar-chart-fill { height: 100%; background: #0e7490; border-radius: 0 3px 3px 0; }
+
+    .bar-axis { display: flex; justify-content: space-between; font-size: 11px; color: #94a3b8; padding-left: 110px; margin-top: 4px; }
+
+    /* My Skills view (hidden by default) */
+    .skills-view { display: none; }
+
+    .skills-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+
+    .skill-stat-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .skill-stat-icon { width: 40px; height: 40px; border-radius: 10px; background: #f1f5f9; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .skill-stat-num { font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1; }
+    .skill-stat-label { font-size: 12px; color: #64748b; }
+
+    .skills-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 9px;
+      padding: 10px 16px;
+      margin-bottom: 12px;
+    }
+
+    .skills-search input { flex: 1; border: none; background: transparent; font-size: 13px; color: #94a3b8; outline: none; font-family: inherit; }
+
+    .skills-empty {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 60px 20px;
+      text-align: center;
+    }
+
+    .skills-empty-icon { margin-bottom: 16px; color: #94a3b8; }
+    .skills-empty-text { font-size: 14px; color: #64748b; line-height: 1.6; }
+
+    /* TOUR */
+    .tour-overlay { position: fixed; inset: 0; z-index: 900; pointer-events: none; display: none; }
+    .tour-overlay svg { width: 100%; height: 100%; }
+    .tour-highlight { position: relative; z-index: 950 !important; border-radius: 12px; outline: 3px solid rgba(255,255,255,.7); outline-offset: 4px; box-shadow: 0 0 0 4px rgba(255,255,255,.15), 0 8px 32px rgba(0,0,0,.2); }
+    .tour-highlight-light { position: relative; z-index: 950 !important; border-radius: 12px; outline: 3px solid rgba(14,116,144,.7); outline-offset: 4px; box-shadow: 0 0 0 4px rgba(14,116,144,.15), 0 8px 32px rgba(0,0,0,.2); }
+    .tour-tooltip { position: fixed; z-index: 1000; width: 310px; background: #fff; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.18); padding: 20px 20px 16px; pointer-events: all; transition: opacity .2s, transform .2s; }
+    .tour-tooltip.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
+    .tour-tooltip::before { content: ''; position: absolute; width: 12px; height: 12px; background: #fff; transform: rotate(45deg); }
+    .tour-tooltip.arrow-top::before { top: -6px; left: 28px; box-shadow: -2px -2px 4px rgba(0,0,0,.06); }
+    .tour-tooltip.arrow-bottom::before { bottom: -6px; left: 28px; box-shadow: 2px 2px 4px rgba(0,0,0,.06); }
+    .tour-step-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0e7490; margin-bottom: 6px; }
+    .tour-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+    .tour-desc { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 16px; }
+    .tour-footer { display: flex; align-items: center; justify-content: space-between; }
+    .tour-dots { display: flex; gap: 5px; align-items: center; }
+    .tour-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; border: none; cursor: pointer; padding: 0; transition: all .2s; }
+    .tour-dot.active { width: 16px; border-radius: 3px; background: #0e7490; }
+    .tour-btns { display: flex; align-items: center; gap: 6px; }
+    .tour-skip { background: none; border: none; font-size: 12px; color: #94a3b8; cursor: pointer; font-family: inherit; padding: 6px 2px; }
+    .tour-skip:hover { color: #64748b; }
+    .tour-prev { background: #f1f5f9; border: none; font-size: 12px; font-weight: 600; color: #475569; padding: 7px 14px; border-radius: 7px; cursor: pointer; font-family: inherit; }
+    .tour-next { background: #0e7490; border: none; font-size: 12px; font-weight: 600; color: #fff; padding: 7px 16px; border-radius: 7px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 5px; }
+    .tour-next:hover { background: #0c6578; }
+    .tour-start-btn { position: fixed; bottom: 24px; right: 24px; background: #0e7490; color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 12px rgba(14,116,144,.35); z-index: 1100; display: flex; align-items: center; justify-content: center; transition: background .15s, transform .1s; }
+    .tour-start-btn:hover { background: #0c6578; transform: scale(1.08); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="student-walkthrough.html">
+    <div class="nav-logo-icon"></div>
+    ATLAS
+  </a>
+  <ul class="nav-links">
+    <li><a href="student-walkthrough.html">Dashboard</a></li>
+    <li><a href="student-courses-walkthrough.html">Courses</a></li>
+    <li><a href="student-assessments-walkthrough.html">Assessments</a></li>
+    <li><a href="student-cbl-walkthrough.html">CBL</a></li>
+    <li><a href="student-performance-walkthrough.html" class="active">Performance</a></li>
+    <li><a href="student-pals-walkthrough.html">PALS</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-bell">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="nav-bell-dot"></div>
+    </div>
+    <div class="nav-avatar">L</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="section-hero">
+  <div class="hero-title">Performance Analytics</div>
+  <div class="hero-sub">Track your learning progress and performance across different topics</div>
+  <div class="hero-tabs" id="section-tabs">
+    <button class="hero-tab active" onclick="switchTab('insights', this)">Quick Insights</button>
+    <button class="hero-tab" onclick="switchTab('insights', this)">Full Analytics</button>
+    <button class="hero-tab" onclick="switchTab('insights', this)">Statistics</button>
+    <button class="hero-tab" onclick="switchTab('skills', this)">My Skills</button>
+  </div>
+</div>
+
+<!-- FILTERS -->
+<div class="filters-bar" id="section-filters">
+  <div class="filter-date">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+    All Time
+  </div>
+  <div class="toggle-wrap">
+    Courses
+    <div class="toggle"></div>
+    PALS
+  </div>
+  <div class="filter-dropdown">
+    All Courses
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="content">
+
+  <!-- Quick Insights view -->
+  <div id="view-insights">
+    <div class="insights-grid" id="section-content">
+      <div class="chart-card">
+        <div class="chart-title">Overall Performance</div>
+        <div class="donut-wrap">
+          <svg width="160" height="160" viewBox="0 0 160 160">
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#e2e8f0" stroke-width="18"/>
+            <circle cx="80" cy="80" r="60" fill="none" stroke="#cbd5e1" stroke-width="18"
+              stroke-dasharray="377" stroke-dashoffset="377" stroke-linecap="round" transform="rotate(-90 80 80)"/>
+            <text x="80" y="76" text-anchor="middle" font-size="22" font-weight="800" fill="#0f172a">0%</text>
+            <text x="80" y="95" text-anchor="middle" font-size="12" fill="#94a3b8">Proficiency</text>
+          </svg>
+        </div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-title">Performance by Strand</div>
+        <div class="bar-chart-wrap">
+          <div class="bar-chart-row">
+            <div class="bar-chart-label">Audit &amp;<br>Assurance</div>
+            <div class="bar-chart-track">
+              <div class="bar-chart-fill" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+        <div class="bar-axis">
+          <span>0</span><span>25</span><span>50</span><span>75</span><span>100</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- My Skills view -->
+  <div id="view-skills" class="skills-view">
+    <div class="skills-stats" id="section-skills-stats">
+      <div class="skill-stat-card">
+        <div class="skill-stat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div>
+          <div class="skill-stat-num">0</div>
+          <div class="skill-stat-label">Skills Tracked</div>
+        </div>
+      </div>
+      <div class="skill-stat-card">
+        <div class="skill-stat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        </div>
+        <div>
+          <div class="skill-stat-num">0%</div>
+          <div class="skill-stat-label">Average Mastery</div>
+        </div>
+      </div>
+      <div class="skill-stat-card">
+        <div class="skill-stat-icon">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg>
+        </div>
+        <div>
+          <div class="skill-stat-num">0</div>
+          <div class="skill-stat-label">Skills Mastered (≥70%)</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="skills-search">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input type="text" placeholder="Search skills..." />
+    </div>
+
+    <div class="skills-empty">
+      <div class="skills-empty-icon">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#cbd5e1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+      </div>
+      <div class="skills-empty-text">No skills tracked yet. Complete lessons and assessments to start building your skill profile.</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="tour-overlay" id="tourOverlay">
+  <svg xmlns="http://www.w3.org/2000/svg">
+    <defs><mask id="spotlightMask"><rect width="100%" height="100%" fill="white"/><rect id="spotlightCutout" rx="14" fill="black"/></mask></defs>
+    <rect width="100%" height="100%" fill="rgba(15,23,42,0.62)" mask="url(#spotlightMask)"/>
+  </svg>
+</div>
+
+<div class="tour-tooltip hidden" id="tourTooltip">
+  <div class="tour-step-label" id="tourStepLabel"></div>
+  <div class="tour-title" id="tourTitle"></div>
+  <div class="tour-desc" id="tourDesc"></div>
+  <div class="tour-footer">
+    <div class="tour-dots" id="tourDots"></div>
+    <div class="tour-btns">
+      <button class="tour-skip" id="tourSkip">Skip tour</button>
+      <button class="tour-prev" id="tourPrev" style="display:none">Back</button>
+      <button class="tour-next" id="tourNext"><span id="tourNextLabel">Next</span><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<button class="tour-start-btn" id="tourStartBtn" title="Start guide tour" onclick="startTour()">?</button>
+
+<script>
+  function switchTab(view, btn) {
+    document.querySelectorAll('.hero-tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('view-insights').style.display = view === 'insights' ? 'block' : 'none';
+    document.getElementById('view-skills').style.display = view === 'skills' ? 'block' : 'none';
+  }
+
+  // Wire My Skills tab properly
+  document.querySelectorAll('.hero-tab')[3].onclick = function() { switchTab('skills', this); };
+
+  const steps = [
+    {
+      targetId: 'section-tabs',
+      position: 'below',
+      arrowDir: 'arrow-top',
+      title: '4 ways to view your performance',
+      desc: 'Quick Insights gives a summary overview. Full Analytics goes deeper. Statistics shows raw data. My Skills breaks down your mastery per skill. Switch between them anytime.',
+    },
+    {
+      targetId: 'section-filters',
+      position: 'below',
+      arrowDir: 'arrow-top',
+      title: 'Filter your data',
+      desc: 'Choose a time range to see performance over a specific period. Toggle between Courses and PALS data, and filter down to a specific course using the dropdown.',
+    },
+    {
+      targetId: 'section-content',
+      position: 'above',
+      arrowDir: 'arrow-bottom',
+      title: 'Your performance charts',
+      desc: 'Overall Performance shows your proficiency as a percentage. Performance by Strand breaks it down by topic area. These will fill up as you complete more lessons and assessments.',
+    },
+  ];
+
+  let current = 0, tourActive = false;
+
+  function startTour() {
+    tourActive = true;
+    current = 0;
+    // Ensure Quick Insights is shown for tour
+    switchTab('insights', document.querySelectorAll('.hero-tab')[0]);
+    document.getElementById('tourStartBtn').style.display = 'none';
+    renderStep();
+  }
+
+  function endTour() {
+    tourActive = false;
+    steps.forEach(s => {
+      const el = document.getElementById(s.targetId);
+      if (el) { el.classList.remove('tour-highlight'); el.classList.remove('tour-highlight-light'); }
+    });
+    document.getElementById('tourTooltip').classList.add('hidden');
+    document.getElementById('tourOverlay').style.display = 'none';
+    document.getElementById('tourStartBtn').style.display = 'flex';
+  }
+
+  function renderStep() {
+    const step = steps[current];
+    steps.forEach(s => {
+      const el = document.getElementById(s.targetId);
+      if (el) { el.classList.remove('tour-highlight'); el.classList.remove('tour-highlight-light'); }
+    });
+    const target = document.getElementById(step.targetId);
+    // Use white outline for elements on dark hero, teal for light bg
+    const onHero = step.targetId === 'section-tabs' || step.targetId === 'section-hero';
+    target.classList.add(onHero ? 'tour-highlight' : 'tour-highlight-light');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('tourOverlay').style.display = 'block';
+    setTimeout(() => { updateSpotlight(target); positionTooltip(target.getBoundingClientRect(), step); }, 320);
+    document.getElementById('tourStepLabel').textContent = `Step ${current + 1} of ${steps.length}`;
+    document.getElementById('tourTitle').textContent = step.title;
+    document.getElementById('tourDesc').textContent = step.desc;
+    document.getElementById('tourDots').innerHTML = steps.map((_, i) =>
+      `<button class="tour-dot ${i === current ? 'active' : ''}" onclick="goTo(${i})"></button>`
+    ).join('');
+    document.getElementById('tourPrev').style.display = current > 0 ? 'inline-flex' : 'none';
+    document.getElementById('tourNextLabel').textContent = current === steps.length - 1 ? 'Done' : 'Next';
+    const tt = document.getElementById('tourTooltip');
+    tt.classList.remove('hidden', 'arrow-top', 'arrow-bottom');
+    tt.classList.add(step.arrowDir);
+  }
+
+  function updateSpotlight(target) {
+    const r = target.getBoundingClientRect(), p = 8;
+    const c = document.getElementById('spotlightCutout');
+    c.setAttribute('x', r.left - p); c.setAttribute('y', r.top - p);
+    c.setAttribute('width', r.width + p * 2); c.setAttribute('height', r.height + p * 2);
+  }
+
+  function positionTooltip(rect, step) {
+    const tt = document.getElementById('tourTooltip'), ttW = 310, ttH = tt.offsetHeight || 160, gap = 16, p = 8;
+    let top = step.position === 'below' ? rect.bottom + p + gap : rect.top - p - ttH - gap;
+    let left = rect.left + p;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    if (left + ttW > vw - 16) left = vw - ttW - 16;
+    if (left < 16) left = 16;
+    if (top + ttH > vh - 16) top = vh - ttH - 16;
+    if (top < 16) top = 16;
+    tt.style.top = top + 'px'; tt.style.left = left + 'px';
+    tt.classList.remove('hidden');
+  }
+
+  function goTo(i) { current = i; renderStep(); }
+  document.getElementById('tourNext').addEventListener('click', () => { if (current < steps.length - 1) { current++; renderStep(); } else endTour(); });
+  document.getElementById('tourPrev').addEventListener('click', () => { if (current > 0) { current--; renderStep(); } });
+  document.getElementById('tourSkip').addEventListener('click', endTour);
+  window.addEventListener('scroll', () => {
+    if (!tourActive) return;
+    const t = document.getElementById(steps[current].targetId);
+    updateSpotlight(t); positionTooltip(t.getBoundingClientRect(), steps[current]);
+  });
+  window.addEventListener('DOMContentLoaded', () => startTour());
+</script>
+</body>
+</html>

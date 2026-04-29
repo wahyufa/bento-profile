@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATLAS Student — PALS Walkthrough</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f1f5f9; min-height: 100vh; }
+
+    /* PALS-specific top bar */
+    .pals-topbar {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 40px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .pals-back { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #0e7490; font-weight: 500; text-decoration: none; }
+    .pals-center { font-size: 14px; font-weight: 600; color: #0f172a; }
+    .pals-topic { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #475569; }
+    .pals-topic-dot { width: 12px; height: 12px; background: #f59e0b; border-radius: 3px; }
+    .pals-change { font-size: 13px; font-weight: 600; color: #0e7490; cursor: pointer; }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e4976 60%, #243b6e 100%);
+      padding: 36px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 140px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle at 20% 50%, rgba(255,255,255,.04) 1px, transparent 1px),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+    .hero-title { font-size: 26px; font-weight: 800; color: #fff; margin-bottom: 6px; }
+    .hero-sub { font-size: 14px; color: rgba(255,255,255,.7); max-width: 460px; line-height: 1.5; }
+    .hero-figure { width: 120px; height: 120px; background: rgba(255,255,255,.08); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 48px; position: relative; z-index: 1; }
+
+    /* Main layout */
+    .pals-layout {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 24px;
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 32px 40px 60px;
+    }
+
+    /* Left panel */
+    .left-panel { display: flex; flex-direction: column; gap: 16px; }
+
+    .topic-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .topic-icon { width: 52px; height: 52px; border-radius: 50%; background: linear-gradient(135deg, #e0f2fe, #dbeafe); margin: 0 auto 10px; display: flex; align-items: center; justify-content: center; }
+    .topic-name { font-size: 14px; font-weight: 700; color: #0f172a; margin-bottom: 10px; }
+    .btn-diagnostic { font-size: 12px; font-weight: 600; color: #0e7490; background: #fff; border: 1.5px solid #0e7490; border-radius: 20px; padding: 5px 14px; cursor: pointer; font-family: inherit; }
+
+    .stat-card-left {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 18px;
+    }
+
+    .stat-label-left { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
+    .stat-bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .stat-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .stat-bar-label { font-size: 12px; color: #64748b; flex: 1; }
+    .stat-bar-val { font-size: 12px; font-weight: 600; color: #0f172a; }
+
+    .skill-ring-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .ring-label { font-size: 13px; font-weight: 700; color: #0f172a; }
+    .ring-sub { font-size: 11px; color: #94a3b8; }
+
+    /* Right panel */
+    .right-panel { display: flex; flex-direction: column; gap: 20px; }
+
+    .upnext-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .upnext-content { flex: 1; }
+    .upnext-label { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: #0e7490; margin-bottom: 4px; }
+    .upnext-sub { font-size: 11px; color: #94a3b8; margin-bottom: 8px; }
+    .upnext-title { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .upnext-topic { font-size: 12px; color: #64748b; margin-bottom: 12px; }
+    .btn-continue { display: inline-flex; align-items: center; gap: 6px; background: #fff; border: 1.5px solid #e2e8f0; border-radius: 20px; padding: 6px 14px; font-size: 12px; font-weight: 600; color: #0f172a; cursor: pointer; font-family: inherit; }
+    .btn-continue-dot { width: 8px; height: 8px; background: #0e7490; border-radius: 50%; }
+    .upnext-thumb { width: 80px; height: 70px; background: linear-gradient(135deg, #e0f2fe, #f0fdf4); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 28px; flex-shrink: 0; }
+
+    /* Learning path */
+    .path-title { font-size: 16px; font-weight: 700; color: #0f172a; margin-bottom: 4px; }
+    .path-sub { font-size: 13px; color: #64748b; margin-bottom: 20px; }
+
+    .path-container { position: relative; }
+
+    .path-node {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 18px;
+      width: 220px;
+      margin-bottom: 0;
+      position: relative;
+    }
+
+    .path-node.mastered { background: #f0fdf4; border-color: #bbf7d0; }
+    .path-node.current { border-color: #0e7490; }
+
+    .node-title { font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 3px; }
+    .node-sub { font-size: 11px; color: #64748b; margin-bottom: 10px; }
+    .node-status { font-size: 11px; font-weight: 600; color: #15803d; display: flex; align-items: center; gap: 4px; margin-bottom: 10px; }
+    .node-continue { display: inline-block; background: #0e7490; color: #fff; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+
+    .node-icons { display: flex; gap: 6px; align-items: center; }
+    .node-icon { width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid #e2e8f0; display: flex; align-items: center; justify-content: center; background: #fff; }
+    .node-icon.filled { background: #0e7490; border-color: #0e7490; }
+    .node-icon svg { color: #94a3b8; }
+    .node-icon.filled svg { color: #fff; }
+    .node-dash { flex: 1; height: 1px; background: #e2e8f0; max-width: 20px; }
+
+    /* Zigzag path layout */
+    .path-row { display: flex; align-items: flex-start; margin-bottom: 8px; }
+    .path-row.right { justify-content: flex-end; }
+    .path-connector {
+      position: absolute;
+      border: 2px solid #e2e8f0;
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    .path-wrapper { position: relative; padding: 0 0 24px; }
+
+    .path-zigzag {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .zigzag-row {
+      display: flex;
+      margin-bottom: 32px;
+      position: relative;
+    }
+
+    .zigzag-row.left { justify-content: flex-start; }
+    .zigzag-row.right { justify-content: flex-end; }
+
+    /* Curved connector */
+    .connector-svg {
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .see-full-btn {
+      display: block;
+      width: 200px;
+      margin: 8px auto 0;
+      padding: 12px;
+      background: #0e7490;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    /* TOUR */
+    .tour-overlay { position: fixed; inset: 0; z-index: 900; pointer-events: none; display: none; }
+    .tour-overlay svg.bg { width: 100%; height: 100%; }
+    .tour-highlight { position: relative; z-index: 950 !important; border-radius: 12px; outline: 3px solid rgba(14,116,144,.7); outline-offset: 4px; box-shadow: 0 0 0 4px rgba(14,116,144,.15), 0 8px 32px rgba(0,0,0,.2); }
+    .tour-tooltip { position: fixed; z-index: 1000; width: 310px; background: #fff; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.18); padding: 20px 20px 16px; pointer-events: all; transition: opacity .2s, transform .2s; }
+    .tour-tooltip.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
+    .tour-tooltip::before { content: ''; position: absolute; width: 12px; height: 12px; background: #fff; transform: rotate(45deg); }
+    .tour-tooltip.arrow-top::before { top: -6px; left: 28px; box-shadow: -2px -2px 4px rgba(0,0,0,.06); }
+    .tour-tooltip.arrow-bottom::before { bottom: -6px; left: 28px; box-shadow: 2px 2px 4px rgba(0,0,0,.06); }
+    .tour-step-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0e7490; margin-bottom: 6px; }
+    .tour-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+    .tour-desc { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 16px; }
+    .tour-footer { display: flex; align-items: center; justify-content: space-between; }
+    .tour-dots { display: flex; gap: 5px; align-items: center; }
+    .tour-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; border: none; cursor: pointer; padding: 0; transition: all .2s; }
+    .tour-dot.active { width: 16px; border-radius: 3px; background: #0e7490; }
+    .tour-btns { display: flex; align-items: center; gap: 6px; }
+    .tour-skip { background: none; border: none; font-size: 12px; color: #94a3b8; cursor: pointer; font-family: inherit; padding: 6px 2px; }
+    .tour-prev { background: #f1f5f9; border: none; font-size: 12px; font-weight: 600; color: #475569; padding: 7px 14px; border-radius: 7px; cursor: pointer; font-family: inherit; }
+    .tour-next { background: #0e7490; border: none; font-size: 12px; font-weight: 600; color: #fff; padding: 7px 16px; border-radius: 7px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 5px; }
+    .tour-next:hover { background: #0c6578; }
+    .tour-start-btn { position: fixed; bottom: 24px; right: 24px; background: #0e7490; color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 12px rgba(14,116,144,.35); z-index: 1100; display: flex; align-items: center; justify-content: center; transition: background .15s, transform .1s; }
+    .tour-start-btn:hover { background: #0c6578; transform: scale(1.08); }
+  </style>
+</head>
+<body>
+
+<!-- PALS Top Bar -->
+<div class="pals-topbar" id="section-topbar">
+  <a class="pals-back" href="student-walkthrough.html">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Dashboard
+  </a>
+  <span class="pals-center">Personalised Adaptive Learning System</span>
+  <div class="pals-topic">
+    <div class="pals-topic-dot"></div>
+    Exam Anxiety
+    <span class="pals-change">Change</span>
+  </div>
+</div>
+
+<!-- Hero -->
+<div class="hero" id="section-hero">
+  <div class="hero-content">
+    <div class="hero-title">Start Learning, Learner</div>
+    <div class="hero-sub">Pick up right where you left off and continue building your knowledge with our adaptive system.</div>
+  </div>
+  <div class="hero-figure">👩‍💼</div>
+</div>
+
+<!-- Main layout -->
+<div class="pals-layout">
+
+  <!-- Left panel -->
+  <div class="left-panel">
+
+    <div class="topic-card" id="section-topic">
+      <div class="topic-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0e7490" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      </div>
+      <div class="topic-name">Exam Anxiety</div>
+      <button class="btn-diagnostic">See your diagnostic result</button>
+    </div>
+
+    <div class="stat-card-left" id="section-stats">
+      <div class="stat-label-left">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0e7490" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Statistic
+      </div>
+      <div class="stat-bar-row">
+        <div class="stat-dot" style="background:#16a34a"></div>
+        <span class="stat-bar-label">Mastered: 1</span>
+      </div>
+      <div class="stat-bar-row">
+        <div class="stat-dot" style="background:#0e7490"></div>
+        <span class="stat-bar-label">Learned: 2</span>
+      </div>
+      <div class="stat-bar-row">
+        <div class="stat-dot" style="background:#e2e8f0"></div>
+        <span class="stat-bar-label">Remaining: 8</span>
+      </div>
+    </div>
+
+    <div class="skill-ring-card" id="section-ring">
+      <svg width="44" height="44" viewBox="0 0 44 44">
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#e2e8f0" stroke-width="5"/>
+        <circle cx="22" cy="22" r="18" fill="none" stroke="#0e7490" stroke-width="5"
+          stroke-dasharray="113" stroke-dashoffset="90" stroke-linecap="round" transform="rotate(-90 22 22)"/>
+      </svg>
+      <div>
+        <div class="ring-label">Exam Anxiety</div>
+        <div class="ring-sub">9 skills</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right panel -->
+  <div class="right-panel">
+
+    <div class="upnext-card" id="section-upnext">
+      <div class="upnext-content">
+        <div class="upnext-label">Up next for you!</div>
+        <div class="upnext-sub">Continue your learning journey and achieve your goals!</div>
+        <div class="upnext-title">Breaking the Panic Cycle</div>
+        <div class="upnext-topic">Understanding and Recognising Exam Anxiety</div>
+        <button class="btn-continue"><span class="btn-continue-dot"></span> Continue</button>
+      </div>
+      <div class="upnext-thumb">📖</div>
+    </div>
+
+    <div id="section-path">
+      <div class="path-title">Your learning path</div>
+      <div class="path-sub">We've designed a learning experience tailored to your skills!</div>
+
+      <div class="path-zigzag">
+
+        <!-- Node 1 — left, mastered -->
+        <div class="zigzag-row left">
+          <div class="path-node mastered">
+            <div class="node-title">Recognising the Signs of Exam Anxiety</div>
+            <div class="node-sub">Understanding and Recognising Exam Anxiety</div>
+            <div class="node-status">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+              Mastered
+            </div>
+            <div class="node-icons">
+              <div class="node-icon filled"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+              <div class="node-dash"></div>
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
+              <div class="node-dash"></div>
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Node 2 — right, current -->
+        <div class="zigzag-row right">
+          <div class="path-node current">
+            <div class="node-title">Breaking the Panic Cycle</div>
+            <div class="node-sub">Understanding and Recognising Exam Anxiety</div>
+            <div style="margin-bottom:10px"><span class="node-continue">Continue</span></div>
+            <div class="node-icons">
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+              <div class="node-dash"></div>
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
+              <div class="node-dash"></div>
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Node 3 — left -->
+        <div class="zigzag-row left">
+          <div class="path-node">
+            <div class="node-title">Building Self-Worth Beyond Grades</div>
+            <div class="node-sub">Managing External and Internal Pressures</div>
+            <div class="node-icons">
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+              <div class="node-dash"></div>
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
+              <div class="node-dash"></div>
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Node 4 — right -->
+        <div class="zigzag-row right">
+          <div class="path-node">
+            <div class="node-title">Preparing for Exams Without Burnout</div>
+            <div class="node-sub">Practical Strategies for Exam Preparation</div>
+            <div class="node-icons">
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+              <div class="node-dash"></div>
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></div>
+              <div class="node-dash"></div>
+              <div class="node-icon"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <button class="see-full-btn">See full learning path</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="tour-overlay" id="tourOverlay">
+  <svg class="bg" xmlns="http://www.w3.org/2000/svg">
+    <defs><mask id="spotlightMask"><rect width="100%" height="100%" fill="white"/><rect id="spotlightCutout" rx="14" fill="black"/></mask></defs>
+    <rect width="100%" height="100%" fill="rgba(15,23,42,0.62)" mask="url(#spotlightMask)"/>
+  </svg>
+</div>
+
+<div class="tour-tooltip hidden" id="tourTooltip">
+  <div class="tour-step-label" id="tourStepLabel"></div>
+  <div class="tour-title" id="tourTitle"></div>
+  <div class="tour-desc" id="tourDesc"></div>
+  <div class="tour-footer">
+    <div class="tour-dots" id="tourDots"></div>
+    <div class="tour-btns">
+      <button class="tour-skip" id="tourSkip">Skip tour</button>
+      <button class="tour-prev" id="tourPrev" style="display:none">Back</button>
+      <button class="tour-next" id="tourNext"><span id="tourNextLabel">Next</span><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<button class="tour-start-btn" id="tourStartBtn" title="Start guide tour" onclick="startTour()">?</button>
+
+<script>
+  const steps = [
+    { targetId: 'section-topbar', position: 'below', arrowDir: 'arrow-top', title: 'Your active learning topic', desc: 'PALS adapts to a specific topic you\'re working on — here it\'s "Exam Anxiety". Hit "Change" anytime to switch to a different topic your organization has set up for you.' },
+    { targetId: 'section-topic', position: 'below', arrowDir: 'arrow-top', title: 'Your topic card', desc: 'Shows which topic you\'re currently learning. "See your diagnostic result" shows how you performed in the initial skill assessment that was used to build your path.' },
+    { targetId: 'section-stats', position: 'below', arrowDir: 'arrow-top', title: 'Your progress at a glance', desc: 'Mastered means you\'ve fully demonstrated the skill. Learned means you\'ve studied it. Remaining shows how many are still ahead. Watch these numbers change as you progress.' },
+    { targetId: 'section-upnext', position: 'below', arrowDir: 'arrow-top', title: 'Jump back in immediately', desc: '"Up next for you" always shows your most relevant next lesson. ATLAS figures this out based on where you left off and what your current skill gaps are.' },
+    { targetId: 'section-path', position: 'above', arrowDir: 'arrow-bottom', title: 'Your personalised learning path', desc: 'This is the full sequence of topics, ordered by difficulty and relevance to your role. Completed nodes show mastery icons. Your current step is highlighted — follow the path to build up knowledge progressively.' },
+  ];
+
+  let current = 0, tourActive = false;
+
+  function startTour() { tourActive = true; current = 0; document.getElementById('tourStartBtn').style.display = 'none'; renderStep(); }
+
+  function endTour() {
+    tourActive = false;
+    steps.forEach(s => document.getElementById(s.targetId)?.classList.remove('tour-highlight'));
+    document.getElementById('tourTooltip').classList.add('hidden');
+    document.getElementById('tourOverlay').style.display = 'none';
+    document.getElementById('tourStartBtn').style.display = 'flex';
+  }
+
+  function renderStep() {
+    const step = steps[current];
+    steps.forEach(s => document.getElementById(s.targetId)?.classList.remove('tour-highlight'));
+    const target = document.getElementById(step.targetId);
+    target.classList.add('tour-highlight');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('tourOverlay').style.display = 'block';
+    setTimeout(() => { updateSpotlight(target); positionTooltip(target.getBoundingClientRect(), step); }, 320);
+    document.getElementById('tourStepLabel').textContent = `Step ${current + 1} of ${steps.length}`;
+    document.getElementById('tourTitle').textContent = step.title;
+    document.getElementById('tourDesc').textContent = step.desc;
+    document.getElementById('tourDots').innerHTML = steps.map((_, i) => `<button class="tour-dot ${i === current ? 'active' : ''}" onclick="goTo(${i})"></button>`).join('');
+    document.getElementById('tourPrev').style.display = current > 0 ? 'inline-flex' : 'none';
+    document.getElementById('tourNextLabel').textContent = current === steps.length - 1 ? 'Done' : 'Next';
+    const tt = document.getElementById('tourTooltip');
+    tt.classList.remove('hidden', 'arrow-top', 'arrow-bottom');
+    tt.classList.add(step.arrowDir);
+  }
+
+  function updateSpotlight(target) {
+    const r = target.getBoundingClientRect(), p = 8;
+    const c = document.getElementById('spotlightCutout');
+    c.setAttribute('x', r.left - p); c.setAttribute('y', r.top - p);
+    c.setAttribute('width', r.width + p * 2); c.setAttribute('height', r.height + p * 2);
+  }
+
+  function positionTooltip(rect, step) {
+    const tt = document.getElementById('tourTooltip'), ttW = 310, ttH = tt.offsetHeight || 160, gap = 16, p = 8;
+    let top = step.position === 'below' ? rect.bottom + p + gap : rect.top - p - ttH - gap;
+    let left = rect.left + p;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    if (left + ttW > vw - 16) left = vw - ttW - 16;
+    if (left < 16) left = 16;
+    if (top + ttH > vh - 16) top = vh - ttH - 16;
+    if (top < 16) top = 16;
+    tt.style.top = top + 'px'; tt.style.left = left + 'px';
+    tt.classList.remove('hidden');
+  }
+
+  function goTo(i) { current = i; renderStep(); }
+  document.getElementById('tourNext').addEventListener('click', () => { if (current < steps.length - 1) { current++; renderStep(); } else endTour(); });
+  document.getElementById('tourPrev').addEventListener('click', () => { if (current > 0) { current--; renderStep(); } });
+  document.getElementById('tourSkip').addEventListener('click', endTour);
+  window.addEventListener('scroll', () => { if (!tourActive) return; const t = document.getElementById(steps[current].targetId); updateSpotlight(t); positionTooltip(t.getBoundingClientRect(), steps[current]); });
+  window.addEventListener('DOMContentLoaded', () => startTour());
+</script>
+</body>
+</html>

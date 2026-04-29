@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATLAS Student — Courses Walkthrough</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f1f5f9;
+      min-height: 100vh;
+    }
+
+    /* ─── NAV ─── */
+    .nav {
+      background: #fff;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0 40px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 800;
+      font-size: 16px;
+      color: #0f172a;
+      text-decoration: none;
+    }
+
+    .nav-logo-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, #f97316, #0e7490);
+      border-radius: 8px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 14px;
+      color: #64748b;
+      text-decoration: none;
+      font-weight: 500;
+      padding-bottom: 4px;
+    }
+
+    .nav-links a.active {
+      color: #0e7490;
+      border-bottom: 2px solid #f97316;
+      padding-bottom: 2px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-bell {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .nav-bell-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: #f97316;
+      border-radius: 50%;
+      border: 2px solid #fff;
+    }
+
+    .nav-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0e7490, #0891b2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    /* ─── HERO ─── */
+    .hero {
+      background: linear-gradient(135deg, #1e3a5f 0%, #1e4976 60%, #243b6e 100%);
+      padding: 36px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 140px;
+    }
+
+    .hero-content { position: relative; z-index: 1; }
+
+    .hero-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .hero-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,.7);
+    }
+
+    .hero-figure {
+      width: 160px;
+      height: 110px;
+      background: rgba(255,255,255,.08);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(255,255,255,.3);
+      font-size: 12px;
+    }
+
+    /* ─── TABS ─── */
+    .page-tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 24px;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .page-tab {
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 600;
+      color: #94a3b8;
+      padding: 12px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all .15s;
+    }
+
+    .page-tab.active {
+      color: #0e7490;
+      border-bottom-color: #0e7490;
+    }
+
+    /* ─── MAIN ─── */
+    .main {
+      max-width: 1060px;
+      margin: 0 auto;
+      padding: 36px 40px 60px;
+    }
+
+    /* ─── PAGE HEADER ─── */
+    .page-header {
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #0f172a;
+      margin-bottom: 4px;
+    }
+
+    .page-sub {
+      font-size: 14px;
+      color: #64748b;
+    }
+
+    /* ─── FILTERS ─── */
+    .filters-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .search-wrap {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 9px;
+      padding: 0 14px;
+    }
+
+    .search-wrap input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 13px;
+      color: #94a3b8;
+      padding: 10px 0;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .filter-select {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 9px;
+      font-family: inherit;
+      font-size: 13px;
+      color: #475569;
+      padding: 8px 32px 8px 12px;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      white-space: nowrap;
+    }
+
+    /* ─── PROGRESS SUMMARY ─── */
+    .progress-summary {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin-bottom: 32px;
+    }
+
+    .summary-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .summary-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .summary-num {
+      font-size: 22px;
+      font-weight: 800;
+      color: #0f172a;
+      line-height: 1;
+      margin-bottom: 2px;
+    }
+
+    .summary-label {
+      font-size: 12px;
+      color: #64748b;
+    }
+
+    /* ─── SECTION TITLE ─── */
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 16px;
+    }
+
+    /* ─── COURSE CARDS ─── */
+    .courses-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+      margin-bottom: 36px;
+    }
+
+    .course-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .course-thumb {
+      height: 100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      position: relative;
+    }
+
+    .course-status-badge {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+
+    .badge-inprogress { background: #fef3c7; color: #b45309; }
+    .badge-completed  { background: #dcfce7; color: #15803d; }
+    .badge-new        { background: #e0f2fe; color: #0369a1; }
+
+    .course-body { padding: 16px; flex: 1; display: flex; flex-direction: column; }
+
+    .course-tag {
+      font-size: 10px;
+      font-weight: 600;
+      color: #0e7490;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .course-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+
+    .course-meta {
+      font-size: 12px;
+      color: #94a3b8;
+      margin-bottom: 12px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .course-meta span {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .progress-wrap {
+      margin-bottom: 12px;
+    }
+
+    .progress-top {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #64748b;
+      margin-bottom: 5px;
+    }
+
+    .progress-bar {
+      height: 5px;
+      background: #e2e8f0;
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #0e7490, #0891b2);
+    }
+
+    .progress-fill.complete { background: linear-gradient(90deg, #16a34a, #22c55e); }
+
+    .course-cta {
+      margin-top: auto;
+      display: block;
+      text-align: center;
+      padding: 9px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .cta-primary { background: #0e7490; color: #fff; }
+    .cta-outline { background: transparent; color: #0e7490; border: 1.5px solid #0e7490; }
+    .cta-gray { background: #f1f5f9; color: #475569; }
+
+    /* ─── WALKTHROUGH ─── */
+    .tour-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      pointer-events: none;
+      display: none;
+    }
+
+    .tour-overlay svg { width: 100%; height: 100%; }
+
+    .tour-highlight {
+      position: relative;
+      z-index: 950 !important;
+      border-radius: 12px;
+      outline: 3px solid rgba(14,116,144,.7);
+      outline-offset: 4px;
+      box-shadow: 0 0 0 4px rgba(14,116,144,.15), 0 8px 32px rgba(0,0,0,.2);
+    }
+
+    .tour-tooltip {
+      position: fixed;
+      z-index: 1000;
+      width: 320px;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.18), 0 2px 8px rgba(0,0,0,.08);
+      padding: 20px 20px 16px;
+      pointer-events: all;
+      transition: opacity .2s ease, transform .2s ease;
+    }
+
+    .tour-tooltip.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
+
+    .tour-tooltip::before {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      background: #fff;
+      transform: rotate(45deg);
+    }
+
+    .tour-tooltip.arrow-top::before    { top: -6px; left: 28px; box-shadow: -2px -2px 4px rgba(0,0,0,.06); }
+    .tour-tooltip.arrow-bottom::before { bottom: -6px; left: 28px; box-shadow: 2px 2px 4px rgba(0,0,0,.06); }
+
+    .tour-step-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0e7490; margin-bottom: 6px; }
+    .tour-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+    .tour-desc { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 16px; }
+
+    .tour-footer { display: flex; align-items: center; justify-content: space-between; }
+
+    .tour-dots { display: flex; gap: 5px; align-items: center; }
+    .tour-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; border: none; cursor: pointer; padding: 0; transition: all .2s; }
+    .tour-dot.active { width: 16px; border-radius: 3px; background: #0e7490; }
+
+    .tour-btns { display: flex; align-items: center; gap: 6px; }
+    .tour-skip { background: none; border: none; font-size: 12px; color: #94a3b8; cursor: pointer; font-family: inherit; padding: 6px 2px; transition: color .15s; }
+    .tour-skip:hover { color: #64748b; }
+    .tour-prev { background: #f1f5f9; border: none; font-size: 12px; font-weight: 600; color: #475569; padding: 7px 14px; border-radius: 7px; cursor: pointer; font-family: inherit; transition: background .15s; }
+    .tour-prev:hover { background: #e2e8f0; }
+    .tour-next { background: #0e7490; border: none; font-size: 12px; font-weight: 600; color: #fff; padding: 7px 16px; border-radius: 7px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 5px; transition: background .15s; }
+    .tour-next:hover { background: #0c6578; }
+
+    .tour-start-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #0e7490;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow: 0 4px 12px rgba(14,116,144,.35);
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .15s, transform .1s;
+    }
+
+    .tour-start-btn:hover { background: #0c6578; transform: scale(1.08); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-logo" href="student-walkthrough.html">
+    <div class="nav-logo-icon"></div>
+    ATLAS
+  </a>
+  <ul class="nav-links">
+    <li><a href="student-walkthrough.html">Dashboard</a></li>
+    <li><a href="student-courses-walkthrough.html" class="active">Courses</a></li>
+    <li><a href="student-assessments-walkthrough.html">Assessments</a></li>
+    <li><a href="student-cbl-walkthrough.html">CBL</a></li>
+    <li><a href="student-performance-walkthrough.html">Performance</a></li>
+    <li><a href="student-pals-walkthrough.html">PALS</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-bell">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+      </svg>
+      <div class="nav-bell-dot"></div>
+    </div>
+    <div class="nav-avatar">L</div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="section-hero">
+  <div class="hero-content">
+    <div class="hero-title">Courses 📚</div>
+    <div class="hero-sub">Browse, enroll, and continue your learning journey.</div>
+  </div>
+  <div class="hero-figure">[ Illustration ]</div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- Tabs -->
+  <div class="page-tabs" id="section-tabs">
+    <button class="page-tab active">My Courses</button>
+    <button class="page-tab">Available Courses</button>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-row" id="section-filters">
+    <div class="search-wrap">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" placeholder="Search courses..." />
+    </div>
+    <select class="filter-select">
+      <option>All Industries</option>
+      <option>Healthcare</option>
+      <option>Pharmacy</option>
+      <option>Operations</option>
+    </select>
+    <select class="filter-select">
+      <option>All Levels</option>
+      <option>Beginner</option>
+      <option>Intermediate</option>
+      <option>Advanced</option>
+    </select>
+  </div>
+
+  <!-- Progress summary -->
+  <div class="progress-summary" id="section-summary">
+    <div class="summary-card">
+      <div class="summary-icon" style="background:#e0f2fe">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0e7490" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+      </div>
+      <div>
+        <div class="summary-num">6</div>
+        <div class="summary-label">Enrolled Courses</div>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon" style="background:#fef3c7">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b45309" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="summary-num">3</div>
+        <div class="summary-label">In Progress</div>
+      </div>
+    </div>
+    <div class="summary-card">
+      <div class="summary-icon" style="background:#dcfce7">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div>
+        <div class="summary-num">3</div>
+        <div class="summary-label">Completed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Course cards -->
+  <div class="section-title">Continue Learning</div>
+  <div class="courses-grid" id="section-cards">
+
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#0c4a6e,#0e7490)">
+        🏥
+        <span class="course-status-badge badge-inprogress">In Progress</span>
+      </div>
+      <div class="course-body">
+        <div class="course-tag">Front Office</div>
+        <div class="course-title">Effective Communication in Healthcare</div>
+        <div class="course-meta">
+          <span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            4h 20m
+          </span>
+          <span>12 lessons</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-top"><span>Progress</span><span>65%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:65%"></div></div>
+        </div>
+        <button class="course-cta cta-primary">Continue →</button>
+      </div>
+    </div>
+
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#134e4a,#0f766e)">
+        💊
+        <span class="course-status-badge badge-inprogress">In Progress</span>
+      </div>
+      <div class="course-body">
+        <div class="course-tag">Pharmacy</div>
+        <div class="course-title">Patient Medication Counselling</div>
+        <div class="course-meta">
+          <span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            3h 10m
+          </span>
+          <span>9 lessons</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-top"><span>Progress</span><span>30%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:30%"></div></div>
+        </div>
+        <button class="course-cta cta-primary">Continue →</button>
+      </div>
+    </div>
+
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#1e3a5f,#1d4ed8)">
+        🧠
+        <span class="course-status-badge badge-inprogress">In Progress</span>
+      </div>
+      <div class="course-body">
+        <div class="course-tag">Soft Skills</div>
+        <div class="course-title">Empathy and Active Listening</div>
+        <div class="course-meta">
+          <span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            2h 45m
+          </span>
+          <span>8 lessons</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-top"><span>Progress</span><span>80%</span></div>
+          <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
+        </div>
+        <button class="course-cta cta-primary">Continue →</button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="section-title">Completed</div>
+  <div class="courses-grid" id="section-completed">
+
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#14532d,#16a34a)">
+        ✅
+        <span class="course-status-badge badge-completed">Completed</span>
+      </div>
+      <div class="course-body">
+        <div class="course-tag">Safety</div>
+        <div class="course-title">The Safe Surgery Saves Lives</div>
+        <div class="course-meta">
+          <span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            5h 00m
+          </span>
+          <span>15 lessons</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-top"><span>Progress</span><span style="color:#15803d;font-weight:600">100%</span></div>
+          <div class="progress-bar"><div class="progress-fill complete" style="width:100%"></div></div>
+        </div>
+        <button class="course-cta cta-outline">Review Course</button>
+      </div>
+    </div>
+
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#3b1764,#7c3aed)">
+        🎯
+        <span class="course-status-badge badge-completed">Completed</span>
+      </div>
+      <div class="course-body">
+        <div class="course-tag">Mindset</div>
+        <div class="course-title">Nature-Based Relaxation Practices</div>
+        <div class="course-meta">
+          <span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            1h 30m
+          </span>
+          <span>6 lessons</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-top"><span>Progress</span><span style="color:#15803d;font-weight:600">100%</span></div>
+          <div class="progress-bar"><div class="progress-fill complete" style="width:100%"></div></div>
+        </div>
+        <button class="course-cta cta-outline">Review Course</button>
+      </div>
+    </div>
+
+    <div class="course-card">
+      <div class="course-thumb" style="background:linear-gradient(135deg,#7c2d12,#c2410c)">
+        📋
+        <span class="course-status-badge badge-completed">Completed</span>
+      </div>
+      <div class="course-body">
+        <div class="course-tag">Operations</div>
+        <div class="course-title">Organization and Principles of Work</div>
+        <div class="course-meta">
+          <span>
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            2h 00m
+          </span>
+          <span>7 lessons</span>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-top"><span>Progress</span><span style="color:#15803d;font-weight:600">100%</span></div>
+          <div class="progress-bar"><div class="progress-fill complete" style="width:100%"></div></div>
+        </div>
+        <button class="course-cta cta-outline">Review Course</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TOUR OVERLAY -->
+<div class="tour-overlay" id="tourOverlay">
+  <svg id="spotlightSvg" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <mask id="spotlightMask">
+        <rect width="100%" height="100%" fill="white"/>
+        <rect id="spotlightCutout" rx="14" fill="black"/>
+      </mask>
+    </defs>
+    <rect width="100%" height="100%" fill="rgba(15,23,42,0.62)" mask="url(#spotlightMask)"/>
+  </svg>
+</div>
+
+<!-- TOOLTIP -->
+<div class="tour-tooltip hidden" id="tourTooltip">
+  <div class="tour-step-label" id="tourStepLabel">Step 1 of 4</div>
+  <div class="tour-title" id="tourTitle"></div>
+  <div class="tour-desc" id="tourDesc"></div>
+  <div class="tour-footer">
+    <div class="tour-dots" id="tourDots"></div>
+    <div class="tour-btns">
+      <button class="tour-skip" id="tourSkip">Skip tour</button>
+      <button class="tour-prev" id="tourPrev" style="display:none">Back</button>
+      <button class="tour-next" id="tourNext">
+        <span id="tourNextLabel">Next</span>
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none">
+          <path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TRIGGER -->
+<button class="tour-start-btn" id="tourStartBtn" title="Start guide tour" onclick="startTour()">?</button>
+
+<script>
+  const steps = [
+    {
+      targetId: 'section-tabs',
+      position: 'below',
+      arrowDir: 'arrow-top',
+      title: 'My Courses vs Available Courses',
+      desc: '"My Courses" shows everything you\'re enrolled in. Switch to "Available Courses" to discover and enroll in new content your organization has published.',
+    },
+    {
+      targetId: 'section-filters',
+      position: 'below',
+      arrowDir: 'arrow-top',
+      title: 'Find courses quickly',
+      desc: 'Search by name, filter by industry, or narrow down by level. Use these to find exactly what you need without scrolling through everything.',
+    },
+    {
+      targetId: 'section-summary',
+      position: 'below',
+      arrowDir: 'arrow-top',
+      title: 'Your learning at a glance',
+      desc: 'See how many courses you\'re enrolled in, how many are still in progress, and how many you\'ve completed — all in one quick view.',
+    },
+    {
+      targetId: 'section-cards',
+      position: 'below',
+      arrowDir: 'arrow-top',
+      title: 'Pick up where you left off',
+      desc: 'Your in-progress courses are shown here with a progress bar. Hit "Continue" to jump straight back into the lesson you left off on.',
+    },
+    {
+      targetId: 'section-completed',
+      position: 'above',
+      arrowDir: 'arrow-bottom',
+      title: 'Review completed courses',
+      desc: 'Already finished a course? You can always go back and review the material. Completed courses stay accessible — knowledge doesn\'t expire.',
+    },
+  ];
+
+  let current = 0;
+  let tourActive = false;
+
+  function startTour() {
+    tourActive = true;
+    current = 0;
+    document.getElementById('tourStartBtn').style.display = 'none';
+    renderStep();
+  }
+
+  function endTour() {
+    tourActive = false;
+    steps.forEach(s => {
+      const el = document.getElementById(s.targetId);
+      if (el) el.classList.remove('tour-highlight');
+    });
+    document.getElementById('tourTooltip').classList.add('hidden');
+    document.getElementById('tourOverlay').style.display = 'none';
+    document.getElementById('tourStartBtn').style.display = 'flex';
+  }
+
+  function renderStep() {
+    const step = steps[current];
+    const total = steps.length;
+
+    steps.forEach(s => {
+      const el = document.getElementById(s.targetId);
+      if (el) el.classList.remove('tour-highlight');
+    });
+
+    const target = document.getElementById(step.targetId);
+    target.classList.add('tour-highlight');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    document.getElementById('tourOverlay').style.display = 'block';
+
+    setTimeout(() => {
+      updateSpotlight(target);
+      positionTooltip(target.getBoundingClientRect(), step);
+    }, 320);
+
+    document.getElementById('tourStepLabel').textContent = `Step ${current + 1} of ${total}`;
+    document.getElementById('tourTitle').textContent = step.title;
+    document.getElementById('tourDesc').textContent = step.desc;
+
+    document.getElementById('tourDots').innerHTML = steps.map((_, i) => `
+      <button class="tour-dot ${i === current ? 'active' : ''}" onclick="goTo(${i})"></button>
+    `).join('');
+
+    document.getElementById('tourPrev').style.display = current > 0 ? 'inline-flex' : 'none';
+    document.getElementById('tourNextLabel').textContent = current === total - 1 ? 'Done' : 'Next';
+
+    const tooltip = document.getElementById('tourTooltip');
+    tooltip.classList.remove('hidden', 'arrow-top', 'arrow-bottom');
+    tooltip.classList.add(step.arrowDir);
+  }
+
+  function updateSpotlight(target) {
+    const rect = target.getBoundingClientRect();
+    const pad = 8;
+    const cutout = document.getElementById('spotlightCutout');
+    cutout.setAttribute('x', rect.left - pad);
+    cutout.setAttribute('y', rect.top - pad);
+    cutout.setAttribute('width', rect.width + pad * 2);
+    cutout.setAttribute('height', rect.height + pad * 2);
+  }
+
+  function positionTooltip(rect, step) {
+    const tooltip = document.getElementById('tourTooltip');
+    const ttW = 320;
+    const ttH = tooltip.offsetHeight || 180;
+    const gap = 16;
+    const pad = 8;
+    let top, left;
+
+    if (step.position === 'below') {
+      top = rect.bottom + pad + gap;
+      left = rect.left + pad;
+    } else {
+      top = rect.top - pad - ttH - gap;
+      left = rect.left + pad;
+    }
+
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    if (left + ttW > vw - 16) left = vw - ttW - 16;
+    if (left < 16) left = 16;
+    if (top + ttH > vh - 16) top = vh - ttH - 16;
+    if (top < 16) top = 16;
+
+    tooltip.style.top = top + 'px';
+    tooltip.style.left = left + 'px';
+    tooltip.classList.remove('hidden');
+  }
+
+  function goTo(index) { current = index; renderStep(); }
+
+  document.getElementById('tourNext').addEventListener('click', () => {
+    if (current < steps.length - 1) { current++; renderStep(); }
+    else endTour();
+  });
+
+  document.getElementById('tourPrev').addEventListener('click', () => {
+    if (current > 0) { current--; renderStep(); }
+  });
+
+  document.getElementById('tourSkip').addEventListener('click', endTour);
+
+  window.addEventListener('scroll', () => {
+    if (!tourActive) return;
+    const target = document.getElementById(steps[current].targetId);
+    updateSpotlight(target);
+    positionTooltip(target.getBoundingClientRect(), steps[current]);
+  });
+
+  window.addEventListener('DOMContentLoaded', () => startTour());
+</script>
+</body>
+</html>

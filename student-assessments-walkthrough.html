@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATLAS Student — Assessments Walkthrough</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f1f5f9; min-height: 100vh; }
+
+    .nav { background: #fff; border-bottom: 1px solid #e2e8f0; padding: 0 40px; height: 56px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 1; }
+    .nav-logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 16px; color: #0f172a; text-decoration: none; }
+    .nav-logo-icon { width: 34px; height: 34px; background: linear-gradient(135deg, #f97316, #0e7490); border-radius: 8px; }
+    .nav-links { display: flex; gap: 32px; list-style: none; }
+    .nav-links a { font-size: 14px; color: #64748b; text-decoration: none; font-weight: 500; padding-bottom: 4px; }
+    .nav-links a.active { color: #0e7490; border-bottom: 2px solid #f97316; padding-bottom: 2px; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-bell { width: 34px; height: 34px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; position: relative; }
+    .nav-bell-dot { position: absolute; top: 6px; right: 6px; width: 8px; height: 8px; background: #f97316; border-radius: 50%; border: 2px solid #fff; }
+    .nav-avatar { width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, #0e7490, #0891b2); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #fff; }
+
+    .main { max-width: 900px; margin: 0 auto; padding: 36px 40px 60px; }
+
+    .page-title { font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 24px; }
+
+    .assessment-card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 22px 24px;
+      max-width: 380px;
+    }
+
+    .card-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .card-name { font-size: 15px; font-weight: 700; color: #0f172a; }
+
+    .status-badge {
+      font-size: 12px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+      border: 1px solid #e2e8f0;
+      color: #64748b;
+      background: #fff;
+      white-space: nowrap;
+    }
+
+    .card-desc { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 18px; }
+
+    .btn-take {
+      display: block;
+      width: 100%;
+      padding: 11px;
+      background: #0e7490;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      text-align: center;
+      transition: background .15s;
+    }
+    .btn-take:hover { background: #0c6578; }
+
+    /* TOUR */
+    .tour-overlay { position: fixed; inset: 0; z-index: 900; pointer-events: none; display: none; }
+    .tour-overlay svg { width: 100%; height: 100%; }
+    .tour-highlight { position: relative; z-index: 950 !important; border-radius: 12px; outline: 3px solid rgba(14,116,144,.7); outline-offset: 4px; box-shadow: 0 0 0 4px rgba(14,116,144,.15), 0 8px 32px rgba(0,0,0,.2); }
+    .tour-tooltip { position: fixed; z-index: 1000; width: 300px; background: #fff; border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,.18); padding: 20px 20px 16px; pointer-events: all; transition: opacity .2s, transform .2s; }
+    .tour-tooltip.hidden { opacity: 0; pointer-events: none; transform: translateY(8px); }
+    .tour-tooltip::before { content: ''; position: absolute; width: 12px; height: 12px; background: #fff; transform: rotate(45deg); }
+    .tour-tooltip.arrow-top::before { top: -6px; left: 28px; box-shadow: -2px -2px 4px rgba(0,0,0,.06); }
+    .tour-tooltip.arrow-bottom::before { bottom: -6px; left: 28px; box-shadow: 2px 2px 4px rgba(0,0,0,.06); }
+    .tour-step-label { font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #0e7490; margin-bottom: 6px; }
+    .tour-title { font-size: 15px; font-weight: 700; color: #0f172a; margin-bottom: 6px; }
+    .tour-desc { font-size: 13px; color: #64748b; line-height: 1.6; margin-bottom: 16px; }
+    .tour-footer { display: flex; align-items: center; justify-content: space-between; }
+    .tour-dots { display: flex; gap: 5px; align-items: center; }
+    .tour-dot { width: 6px; height: 6px; border-radius: 50%; background: #cbd5e1; border: none; cursor: pointer; padding: 0; transition: all .2s; }
+    .tour-dot.active { width: 16px; border-radius: 3px; background: #0e7490; }
+    .tour-btns { display: flex; align-items: center; gap: 6px; }
+    .tour-skip { background: none; border: none; font-size: 12px; color: #94a3b8; cursor: pointer; font-family: inherit; padding: 6px 2px; }
+    .tour-skip:hover { color: #64748b; }
+    .tour-prev { background: #f1f5f9; border: none; font-size: 12px; font-weight: 600; color: #475569; padding: 7px 14px; border-radius: 7px; cursor: pointer; font-family: inherit; }
+    .tour-next { background: #0e7490; border: none; font-size: 12px; font-weight: 600; color: #fff; padding: 7px 16px; border-radius: 7px; cursor: pointer; font-family: inherit; display: flex; align-items: center; gap: 5px; }
+    .tour-next:hover { background: #0c6578; }
+    .tour-start-btn { position: fixed; bottom: 24px; right: 24px; background: #0e7490; color: #fff; border: none; border-radius: 50%; width: 40px; height: 40px; font-size: 18px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 12px rgba(14,116,144,.35); z-index: 1100; display: flex; align-items: center; justify-content: center; transition: background .15s, transform .1s; }
+    .tour-start-btn:hover { background: #0c6578; transform: scale(1.08); }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-logo" href="student-walkthrough.html">
+    <div class="nav-logo-icon"></div>
+    ATLAS
+  </a>
+  <ul class="nav-links">
+    <li><a href="student-walkthrough.html">Dashboard</a></li>
+    <li><a href="student-courses-walkthrough.html">Courses</a></li>
+    <li><a href="student-assessments-walkthrough.html" class="active">Assessments</a></li>
+    <li><a href="student-cbl-walkthrough.html">CBL</a></li>
+    <li><a href="student-performance-walkthrough.html">Performance</a></li>
+    <li><a href="student-pals-walkthrough.html">PALS</a></li>
+  </ul>
+  <div class="nav-right">
+    <div class="nav-bell">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <div class="nav-bell-dot"></div>
+    </div>
+    <div class="nav-avatar">L</div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="page-title" id="section-title">Assessments</div>
+
+  <div id="section-card">
+    <div class="assessment-card">
+      <div class="card-top">
+        <div class="card-name">Data management</div>
+        <span class="status-badge">Pending</span>
+      </div>
+      <div class="card-desc">This test is to evaluate your decision making and understanding of Corporate data management</div>
+      <button class="btn-take">Take Assessment</button>
+    </div>
+  </div>
+</div>
+
+<div class="tour-overlay" id="tourOverlay">
+  <svg xmlns="http://www.w3.org/2000/svg">
+    <defs><mask id="spotlightMask"><rect width="100%" height="100%" fill="white"/><rect id="spotlightCutout" rx="14" fill="black"/></mask></defs>
+    <rect width="100%" height="100%" fill="rgba(15,23,42,0.62)" mask="url(#spotlightMask)"/>
+  </svg>
+</div>
+
+<div class="tour-tooltip hidden" id="tourTooltip">
+  <div class="tour-step-label" id="tourStepLabel"></div>
+  <div class="tour-title" id="tourTitle"></div>
+  <div class="tour-desc" id="tourDesc"></div>
+  <div class="tour-footer">
+    <div class="tour-dots" id="tourDots"></div>
+    <div class="tour-btns">
+      <button class="tour-skip" id="tourSkip">Skip tour</button>
+      <button class="tour-prev" id="tourPrev" style="display:none">Back</button>
+      <button class="tour-next" id="tourNext"><span id="tourNextLabel">Next</span><svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M3 7h8M7 3l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+  </div>
+</div>
+
+<button class="tour-start-btn" id="tourStartBtn" title="Start guide tour" onclick="startTour()">?</button>
+
+<script>
+  const steps = [
+    { targetId: 'section-title', position: 'below', arrowDir: 'arrow-top', title: 'Your assigned assessments', desc: 'Assessments are assigned to you by your organization. They\'re designed to evaluate specific skills and knowledge relevant to your role.' },
+    { targetId: 'section-card', position: 'below', arrowDir: 'arrow-top', title: 'See what\'s pending', desc: 'Each card shows the assessment name, a short description, and its current status. "Pending" means it\'s waiting for you to start. Hit "Take Assessment" when you\'re ready.' },
+  ];
+
+  let current = 0, tourActive = false;
+
+  function startTour() { tourActive = true; current = 0; document.getElementById('tourStartBtn').style.display = 'none'; renderStep(); }
+
+  function endTour() {
+    tourActive = false;
+    steps.forEach(s => document.getElementById(s.targetId)?.classList.remove('tour-highlight'));
+    document.getElementById('tourTooltip').classList.add('hidden');
+    document.getElementById('tourOverlay').style.display = 'none';
+    document.getElementById('tourStartBtn').style.display = 'flex';
+  }
+
+  function renderStep() {
+    const step = steps[current];
+    steps.forEach(s => document.getElementById(s.targetId)?.classList.remove('tour-highlight'));
+    const target = document.getElementById(step.targetId);
+    target.classList.add('tour-highlight');
+    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    document.getElementById('tourOverlay').style.display = 'block';
+    setTimeout(() => { updateSpotlight(target); positionTooltip(target.getBoundingClientRect(), step); }, 320);
+    document.getElementById('tourStepLabel').textContent = `Step ${current + 1} of ${steps.length}`;
+    document.getElementById('tourTitle').textContent = step.title;
+    document.getElementById('tourDesc').textContent = step.desc;
+    document.getElementById('tourDots').innerHTML = steps.map((_, i) => `<button class="tour-dot ${i === current ? 'active' : ''}" onclick="goTo(${i})"></button>`).join('');
+    document.getElementById('tourPrev').style.display = current > 0 ? 'inline-flex' : 'none';
+    document.getElementById('tourNextLabel').textContent = current === steps.length - 1 ? 'Done' : 'Next';
+    const tt = document.getElementById('tourTooltip');
+    tt.classList.remove('hidden', 'arrow-top', 'arrow-bottom');
+    tt.classList.add(step.arrowDir);
+  }
+
+  function updateSpotlight(target) {
+    const r = target.getBoundingClientRect(), p = 8;
+    const c = document.getElementById('spotlightCutout');
+    c.setAttribute('x', r.left - p); c.setAttribute('y', r.top - p);
+    c.setAttribute('width', r.width + p * 2); c.setAttribute('height', r.height + p * 2);
+  }
+
+  function positionTooltip(rect, step) {
+    const tt = document.getElementById('tourTooltip'), ttW = 300, ttH = tt.offsetHeight || 160, gap = 16, p = 8;
+    let top = step.position === 'below' ? rect.bottom + p + gap : rect.top - p - ttH - gap;
+    let left = rect.left + p;
+    const vw = window.innerWidth, vh = window.innerHeight;
+    if (left + ttW > vw - 16) left = vw - ttW - 16;
+    if (left < 16) left = 16;
+    if (top + ttH > vh - 16) top = vh - ttH - 16;
+    if (top < 16) top = 16;
+    tt.style.top = top + 'px'; tt.style.left = left + 'px';
+    tt.classList.remove('hidden');
+  }
+
+  function goTo(i) { current = i; renderStep(); }
+  document.getElementById('tourNext').addEventListener('click', () => { if (current < steps.length - 1) { current++; renderStep(); } else endTour(); });
+  document.getElementById('tourPrev').addEventListener('click', () => { if (current > 0) { current--; renderStep(); } });
+  document.getElementById('tourSkip').addEventListener('click', endTour);
+  window.addEventListener('scroll', () => { if (!tourActive) return; const t = document.getElementById(steps[current].targetId); updateSpotlight(t); positionTooltip(t.getBoundingClientRect(), steps[current]); });
+  window.addEventListener('DOMContentLoaded', () => startTour());
+</script>
+</body>
+</html>
