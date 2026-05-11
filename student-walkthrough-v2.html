@@ -930,7 +930,7 @@
 <!-- ─── DEMO BAR ─── -->
 <div class="demo-bar">
   <strong>Demo mode:</strong>
-  Simulates first-time login and first-page-visit states.
+  Simulates the first-time landing page experience.
   <button class="demo-reset-btn" onclick="resetDemo()">Reset to first visit</button>
 </div>
 
@@ -1296,10 +1296,6 @@
   function closeFeatureOverview() {
     document.getElementById('foBackdrop').style.display = 'none';
     localStorage.setItem(KEY_NEW_USER, '1');
-    /* After closing the feature overview, show page hint if not seen yet */
-    if (!localStorage.getItem(KEY_VISITED_PAGE)) {
-      setTimeout(showPageHint, 400);
-    }
   }
 
   /* ═══════════════════════════════════════
@@ -1474,14 +1470,9 @@
 
   window.addEventListener('DOMContentLoaded', () => {
     const isNewUser    = !localStorage.getItem(KEY_NEW_USER);
-    const isFirstVisit = !localStorage.getItem(KEY_VISITED_PAGE);
-
     if (isNewUser) {
       /* First ever login → show feature overview modal */
       showFeatureOverview();
-    } else if (isFirstVisit) {
-      /* Returning user, first visit to this page → hint the Take Tour button */
-      setTimeout(showPageHint, 600);
     }
     /* Otherwise → nothing, page loads normally */
   });

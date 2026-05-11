@@ -76,8 +76,8 @@
 <body>
 
 <div class="demo-bar">
-  <strong>Demo mode:</strong> Simulates first-page-visit state.
-  <button class="demo-reset-btn" onclick="resetDemo()">Reset to first visit</button>
+  <strong>Demo mode:</strong> Guided walkthrough is available from Take Tour.
+  <button class="demo-reset-btn" onclick="startTour()">Start guided tour</button>
 </div>
 
 <nav class="nav">
@@ -238,11 +238,7 @@
   document.getElementById('tourSkip').addEventListener('click', endTour);
   window.addEventListener('scroll', () => { if (!tourActive) return; const t = document.getElementById(steps[current].targetId); updateSpotlight(t); positionTooltip(t.getBoundingClientRect(), steps[current]); });
 
-  function resetDemo() { localStorage.removeItem(KEY); window.location.reload(); }
-
-  window.addEventListener('DOMContentLoaded', () => {
-    if (!localStorage.getItem(KEY)) setTimeout(showPageHint, 600);
-  });
+  function resetDemo() { startTour(); }
 </script>
 </body>
 </html>
