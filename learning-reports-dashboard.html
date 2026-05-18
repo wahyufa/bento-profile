@@ -820,7 +820,7 @@
     </div>
     <div class="user-chip">
       <span class="user-avatar" aria-hidden="true"></span>
-      smartjen_admin
+      Admin
       <span aria-hidden="true">v</span>
     </div>
   </header>
@@ -1462,10 +1462,10 @@
     function updateHeader() {
       const admin = state.view === "admin";
       document.getElementById("eyebrow").textContent = admin ? "Admin Reports" : "Learner Dashboard";
-      document.getElementById("pageTitle").textContent = admin ? "Programme analytics at a glance" : "School leaderboards";
+      document.getElementById("pageTitle").textContent = admin ? "Programme analytics" : "School leaderboards";
       document.getElementById("pageSubtitle").textContent = admin
-        ? "Track sign ups, activation, completion, school performance, and challenge participation across Primary and Secondary learners."
-        : "Compare school-level outcomes without showing individual learner names.";
+        ? ""
+        : "";
     }
 
     function updateVisibleSections() {
