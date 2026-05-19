@@ -641,40 +641,6 @@
       line-height: 1.45;
     }
 
-    .dropoff-detail {
-      position: relative;
-      display: inline-block;
-      margin-left: 8px;
-      color: var(--brand-dark);
-      font-size: 12px;
-      font-weight: 700;
-    }
-
-    .dropoff-detail summary {
-      cursor: pointer;
-      list-style: none;
-    }
-
-    .dropoff-detail summary::-webkit-details-marker {
-      display: none;
-    }
-
-    .dropoff-popover {
-      position: absolute;
-      z-index: 5;
-      right: 0;
-      top: 24px;
-      width: 220px;
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #ffffff;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 500;
-      line-height: 1.4;
-    }
-
     .info-tip {
       position: relative;
       display: inline-grid;
@@ -710,6 +676,276 @@
     .info-tip:hover span,
     .info-tip:focus span {
       display: block;
+    }
+
+    .text-button {
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid rgba(15, 176, 248, 0.35);
+      border-radius: 999px;
+      background: #ffffff;
+      color: var(--brand-dark);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .text-button.primary {
+      border-color: var(--brand);
+      background: var(--brand);
+      color: #ffffff;
+    }
+
+    .detail-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .detail-title {
+      margin: 0;
+      color: var(--text);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .detail-caption {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .detail-stack {
+      display: grid;
+      gap: 18px;
+    }
+
+    .detail-view-tabs {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 12px;
+    }
+
+    .detail-view-tabs span {
+      color: var(--text);
+      font-size: 13px;
+    }
+
+    .detail-view-tab {
+      position: relative;
+      min-height: 34px;
+      padding: 0 0 10px;
+      border: 0;
+      background: transparent;
+      color: #7d8aa3;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .detail-view-tab.active {
+      color: var(--text);
+    }
+
+    .detail-view-tab.active::after {
+      position: absolute;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      height: 1px;
+      background: var(--brand);
+      content: "";
+    }
+
+    .content-type {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #eef6fb;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .content-type.quiz {
+      background: #e2f6ff;
+      color: var(--brand-dark);
+    }
+
+    .content-type.video {
+      background: #fff4d8;
+      color: #9a6700;
+    }
+
+    .content-type.document {
+      background: #edf2ff;
+      color: #4053a4;
+    }
+
+    .content-type.personalized {
+      background: #eaf8ef;
+      color: #0f7a55;
+    }
+
+    .content-type.mission {
+      background: #ffeaf2;
+      color: #c01855;
+    }
+
+    .student-cell {
+      display: grid;
+      gap: 4px;
+    }
+
+    .student-cell strong {
+      color: var(--text);
+    }
+
+    .student-cell span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 12px 24px 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pagination-controls {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .page-btn {
+      min-width: 34px;
+      height: 34px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #ffffff;
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .page-btn.active {
+      border-color: var(--brand);
+      color: var(--brand-dark);
+    }
+
+    .matrix-table {
+      min-width: 980px;
+    }
+
+    .matrix-table th:first-child,
+    .matrix-table td:first-child {
+      position: sticky;
+      left: 0;
+      z-index: 2;
+    }
+
+    .matrix-table th:first-child {
+      z-index: 3;
+    }
+
+    .lesson-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .lesson-toggle span {
+      display: inline-grid;
+      width: 22px;
+      height: 22px;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--brand-dark);
+    }
+
+    .content-label {
+      display: grid;
+      gap: 6px;
+      padding-left: 30px;
+    }
+
+    .content-label strong {
+      font-weight: 700;
+    }
+
+    .status-pill {
+      display: inline-flex;
+      justify-content: center;
+      min-width: 96px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status-pill.completed {
+      background: #eaf8ef;
+      color: #0f7a55;
+    }
+
+    .status-pill.in-progress {
+      background: #fff4d8;
+      color: #9a6700;
+    }
+
+    .status-pill.not-started {
+      background: #eef2f6;
+      color: #667085;
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      z-index: 40;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      background: rgba(18, 38, 63, 0.36);
+    }
+
+    .modal {
+      width: min(920px, 100%);
+      max-height: min(720px, 86vh);
+      overflow: hidden;
+      border-radius: var(--radius);
+      background: #ffffff;
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .modal-body {
+      max-height: 560px;
+      overflow: auto;
+      padding: 0 0 16px;
     }
 
     .empty {
@@ -820,7 +1056,7 @@
     </div>
     <div class="user-chip">
       <span class="user-avatar" aria-hidden="true"></span>
-      Admin
+      smartjen_admin
       <span aria-hidden="true">v</span>
     </div>
   </header>
@@ -928,10 +1164,55 @@
         </div>
       </section>
 
+      <section id="moduleDetailView" class="hidden">
+        <div class="detail-toolbar">
+          <button class="text-button" id="backToReports" type="button">Back to Reports</button>
+        </div>
+
+        <div class="detail-stack">
+          <div class="metrics" id="moduleDetailMetrics"></div>
+
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <h2 class="panel-title" id="moduleDetailTitle">Module Detail</h2>
+                <p class="panel-caption" id="moduleDrilldownCaption">Primary drill-down by school for the selected module.</p>
+                <div class="detail-view-tabs" role="tablist" aria-label="Module detail views">
+                  <span>View by:</span>
+                  <button class="detail-view-tab active" data-detail-view="school" type="button">School</button>
+                  <button class="detail-view-tab" data-detail-view="content" type="button">Learning Content</button>
+                  <button class="detail-view-tab" data-detail-view="students" type="button">Students</button>
+                </div>
+              </div>
+            </div>
+            <div class="table-wrap" id="moduleSchoolTable"></div>
+          </section>
+        </div>
+      </section>
+
       <section id="learnerView" class="hidden">
+        <div class="tabs" role="tablist" aria-label="Learner dashboard view">
+          <button class="tab active" data-learner-view="school" type="button">View by School</button>
+          <button class="tab" data-learner-view="student" type="button">View by Individual Student</button>
+        </div>
         <div class="leaderboards" id="leaderboards"></div>
       </section>
     </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="dropoffModal" role="dialog" aria-modal="true" aria-labelledby="dropoffModalTitle">
+    <section class="modal">
+      <div class="modal-header">
+        <div>
+          <h2 class="panel-title" id="dropoffModalTitle">Drop-off Learners</h2>
+          <p class="panel-caption" id="dropoffModalCaption">Learner names are shown for admin review in this prototype.</p>
+        </div>
+        <button class="text-button" id="closeDropoffModal" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <div class="table-wrap" id="dropoffModalTable"></div>
+      </div>
+    </section>
   </div>
 
   <script>
@@ -1050,13 +1331,47 @@
       "Module 5: Reflection"
     ];
 
+    const moduleLessons = [
+      [
+        { name: "Lesson 1: Orientation", contents: [{ title: "Welcome Video", type: "video" }, { title: "Readiness Quiz", type: "quiz" }, { title: "Starter Document", type: "document" }] },
+        { name: "Lesson 2: Digital Habits", contents: [{ title: "Learning Path", type: "personalized learning" }, { title: "Reflection Mission", type: "mission" }] }
+      ],
+      [
+        { name: "Lesson 1: Tool Basics", contents: [{ title: "Interface Walkthrough", type: "video" }, { title: "Skills Check", type: "quiz" }] },
+        { name: "Lesson 2: Collaboration", contents: [{ title: "Team Brief", type: "document" }, { title: "Adaptive Practice", type: "personalized learning" }, { title: "Collaboration Mission", type: "mission" }] }
+      ],
+      [
+        { name: "Lesson 1: Research", contents: [{ title: "Problem Framing", type: "video" }, { title: "Research Notes", type: "document" }] },
+        { name: "Lesson 2: Insights", contents: [{ title: "Insight Quiz", type: "quiz" }, { title: "User Need Mission", type: "mission" }] }
+      ],
+      [
+        { name: "Lesson 1: Ideation", contents: [{ title: "Prototype Examples", type: "video" }, { title: "Design Guide", type: "document" }] },
+        { name: "Lesson 2: Build Sprint", contents: [{ title: "Adaptive Build Plan", type: "personalized learning" }, { title: "Prototype Mission", type: "mission" }, { title: "Sprint Quiz", type: "quiz" }] }
+      ],
+      [
+        { name: "Lesson 1: Portfolio", contents: [{ title: "Portfolio Template", type: "document" }, { title: "Reflection Video", type: "video" }] },
+        { name: "Lesson 2: Final Review", contents: [{ title: "Final Quiz", type: "quiz" }, { title: "Showcase Mission", type: "mission" }] }
+      ]
+    ];
+
+    const learnerFirstNames = ["Alya", "Ben", "Chloe", "Danial", "Eva", "Farhan", "Grace", "Hana", "Isaac", "Jia Min", "Kai", "Leah", "Mika", "Nora", "Owen", "Priya", "Rayyan", "Sara", "Theo", "Uma"];
+    const learnerLastNames = ["Tan", "Lim", "Ng", "Lee", "Koh", "Wong", "Rahman", "Goh", "Chan", "Patel", "Ong", "Yeo", "Singh", "Teo", "Chua", "Ho"];
+
     const state = {
       view: "admin",
       tab: "individuals",
       level: "All",
       school: "All",
       dateFrom: "2026-01-01",
-      dateTo: "2026-05-18"
+      dateTo: "2026-05-18",
+      detailModuleIndex: null,
+      learnerSchoolName: null,
+      selectedContentIndex: null,
+      detailView: "school",
+      learnerViewBy: "school",
+      expandedLessons: {},
+      detailPage: 1,
+      modalPage: 1
     };
 
     const adminMetrics = document.getElementById("adminMetrics");
@@ -1068,6 +1383,13 @@
     const schoolFilter = document.getElementById("schoolFilter");
     const dateFrom = document.getElementById("dateFrom");
     const dateTo = document.getElementById("dateTo");
+    const moduleDetailMetrics = document.getElementById("moduleDetailMetrics");
+    const moduleSchoolTable = document.getElementById("moduleSchoolTable");
+    const moduleDrilldownCaption = document.getElementById("moduleDrilldownCaption");
+    const dropoffModal = document.getElementById("dropoffModal");
+    const dropoffModalTitle = document.getElementById("dropoffModalTitle");
+    const dropoffModalCaption = document.getElementById("dropoffModalCaption");
+    const dropoffModalTable = document.getElementById("dropoffModalTable");
 
     function formatNumber(value) {
       return new Intl.NumberFormat("en").format(Math.round(value || 0));
@@ -1086,8 +1408,64 @@
       return `${formatNumber(value)}h`;
     }
 
+    function learnerName(seed) {
+      return `${learnerFirstNames[seed % learnerFirstNames.length]} ${learnerLastNames[(seed * 3) % learnerLastNames.length]}`;
+    }
+
+    function flattenContents(moduleIndex) {
+      return moduleLessons[moduleIndex].flatMap((lesson) => lesson.contents.map((content) => ({ lesson: lesson.name, ...content })));
+    }
+
+    function contentTypeBadge(type) {
+      const key = type.replace(/\s+/g, "-");
+      const cssKey = type === "personalized learning" ? "personalized" : key;
+      return `<span class="content-type ${cssKey}">${type}</span>`;
+    }
+
+    function statusPill(status) {
+      const css = status.toLowerCase().replace(/\s+/g, "-");
+      return `<span class="status-pill ${css}">${status}</span>`;
+    }
+
+    function paginate(rows, page, perPage = 5) {
+      const totalPages = Math.max(1, Math.ceil(rows.length / perPage));
+      const currentPage = Math.min(Math.max(1, page), totalPages);
+      const start = (currentPage - 1) * perPage;
+      return {
+        currentPage,
+        totalPages,
+        rows: rows.slice(start, start + perPage),
+        start,
+        total: rows.length
+      };
+    }
+
+    function paginationHtml(pager, scope) {
+      const from = pager.total ? pager.start + 1 : 0;
+      const to = Math.min(pager.start + pager.rows.length, pager.total);
+      return `
+        <div class="pagination">
+          <span>Showing ${from} to ${to} out of ${pager.total} records</span>
+          <div class="pagination-controls">
+            <button class="page-btn" data-page-scope="${scope}" data-page-action="prev" type="button">&lt;</button>
+            <button class="page-btn active" type="button">${pager.currentPage}</button>
+            <button class="page-btn" data-page-scope="${scope}" data-page-action="next" type="button">&gt;</button>
+          </div>
+        </div>
+      `;
+    }
+
     function averageCompletedTime(school) {
       return school.completedLearners ? school.completedTimeHours / school.completedLearners : 0;
+    }
+
+    function totalTimeSpent(school) {
+      const incompleteActive = Math.max(0, school.activeLearners - school.completedLearners);
+      return school.completedTimeHours + Math.round(incompleteActive * averageCompletedTime(school) * 0.55);
+    }
+
+    function averageAllLearnerTime(school) {
+      return school.totalLearners ? totalTimeSpent(school) / school.totalLearners : 0;
     }
 
     function getFilteredSchools() {
@@ -1106,6 +1484,7 @@
         acc.activeLearners += school.activeLearners;
         acc.completedLearners += school.completedLearners;
         acc.completedTimeHours += school.completedTimeHours;
+        acc.timeSpentHours += totalTimeSpent(school);
         acc.challengeParticipants += school.challengeParticipants;
         acc.teamsRegistered += school.teamsRegistered;
         acc.teamsSubmitted += school.teamsSubmitted;
@@ -1115,6 +1494,7 @@
         activeLearners: 0,
         completedLearners: 0,
         completedTimeHours: 0,
+        timeSpentHours: 0,
         challengeParticipants: 0,
         teamsRegistered: 0,
         teamsSubmitted: 0
@@ -1154,7 +1534,7 @@
         const rate = percent(completed, total);
         const droppedLearners = Math.max(0, priorCompleted - completed);
         const dropoff = Math.max(0, percent(droppedLearners, priorCompleted));
-        return { name, completed, rate, dropoff, droppedLearners, priorCompleted };
+        return { name, index, completed, rate, dropoff, droppedLearners, priorCompleted };
       });
     }
 
@@ -1222,7 +1602,7 @@
       const selected = data.length;
       const completion = percent(sum.completedLearners, sum.totalLearners);
       const activeRate = percent(sum.activeLearners, sum.totalLearners);
-      const avgTime = sum.completedLearners ? sum.completedTimeHours / sum.completedLearners : 0;
+      const avgTime = sum.totalLearners ? sum.timeSpentHours / sum.totalLearners : 0;
 
       if (state.tab === "individuals") {
         adminMetrics.innerHTML = [
@@ -1230,8 +1610,8 @@
           metric("Active Learners", formatNumber(sum.activeLearners), `${formatPercent(activeRate)} logged in at least once`, icons.users),
           metric("Total Completed", formatNumber(sum.completedLearners), "Completed all learning modules", icons.check),
           metric("Completion Rate", formatPercent(completion), "Completed divided by total sign ups", icons.trophy),
-          metric("Time Spent", formatHours(sum.completedTimeHours), "Total time among completed learners", icons.clock),
-          metric("Average Time Spent", `${avgTime.toFixed(1)}h`, "Average per completed learner", icons.clock)
+          metric("Time Spent", formatHours(sum.timeSpentHours), "Total time among all learners", icons.clock),
+          metric("Average Time Spent", `${avgTime.toFixed(1)}h`, "Average per signed-up learner", icons.clock)
         ].join("");
       }
 
@@ -1272,6 +1652,7 @@
               <th>Completed Learners</th>
               <th>Completion %</th>
               <th>Drop-off Indicator</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody>
@@ -1281,6 +1662,7 @@
                 <td>${formatNumber(row.completed)}</td>
                 <td class="progress-cell">${progress(row.rate, "green")}</td>
                 <td>${dropoffBadge(row)}</td>
+                <td><button class="text-button primary" data-module-detail="${row.index}" type="button">View details</button></td>
               </tr>
             `).join("")}
           </tbody>
@@ -1298,13 +1680,7 @@
           : 'class="badge" style="background:var(--red-soft);color:var(--red);"';
       return `
         <span ${style}>${label} ${formatPercent(row.dropoff)}</span>
-        <details class="dropoff-detail">
-          <summary>View details</summary>
-          <div class="dropoff-popover">
-            ${formatNumber(row.droppedLearners)} learner${row.droppedLearners === 1 ? "" : "s"} did not continue from the previous step.
-            Previous step completion base: ${formatNumber(row.priorCompleted)}.
-          </div>
-        </details>
+        <button class="text-button" data-dropoff-detail="${row.index}" type="button">View details</button>
       `;
     }
 
@@ -1343,7 +1719,7 @@
                 <td>${formatNumber(school.activeLearners)}</td>
                 <td>${formatNumber(school.completedLearners)}</td>
                 <td class="progress-cell">${progress(completionRate(school), "green")}</td>
-                <td>${averageCompletedTime(school).toFixed(1)}h</td>
+                <td>${averageAllLearnerTime(school).toFixed(1)}h</td>
               </tr>
             `).join("")}
           </tbody>
@@ -1391,6 +1767,477 @@
       `;
     }
 
+    function moduleSchoolStats(school, moduleIndex) {
+      const started = moduleIndex === 0
+        ? school.totalLearners
+        : Math.round(school.totalLearners * school.moduleRates[moduleIndex - 1]);
+      const completed = Math.round(school.totalLearners * school.moduleRates[moduleIndex]);
+      const dropped = Math.max(0, started - completed);
+      const moduleHours = [1.2, 1.6, 2.1, 2.4, 1.1][moduleIndex];
+      const timeSpent = completed * moduleHours + dropped * moduleHours * 0.45;
+      return {
+        school,
+        started,
+        completed,
+        dropped,
+        completion: percent(completed, school.totalLearners),
+        dropoff: percent(dropped, started),
+        timeSpent,
+        avgTime: started ? timeSpent / started : 0
+      };
+    }
+
+    function learnerRowsForSchool(school, moduleIndex) {
+      const stats = moduleSchoolStats(school, moduleIndex);
+      const contents = flattenContents(moduleIndex);
+      const sampleSize = Math.min(10, Math.max(5, Math.ceil(school.totalLearners / 28)));
+      const rows = [];
+      for (let i = 0; i < sampleSize; i += 1) {
+        const completedCutoff = Math.round(sampleSize * (stats.completed / Math.max(1, stats.started)));
+        const seed = (schools.indexOf(school) + 1) * 100 + moduleIndex * 20 + i;
+        const notStartedCount = Math.min(2, Math.max(1, sampleSize - completedCutoff - 1));
+        const inProgressCount = Math.min(2, Math.max(1, sampleSize - completedCutoff - notStartedCount));
+        const learnerStatus = i < completedCutoff
+          ? "Completed"
+          : i < completedCutoff + inProgressCount
+            ? "In progress"
+            : i < completedCutoff + inProgressCount + notStartedCount
+              ? "Not started"
+              : "Dropped off";
+        const completedContents = learnerStatus === "Completed"
+          ? contents.length
+          : learnerStatus === "In progress"
+            ? Math.max(1, ((i + moduleIndex) % Math.max(2, contents.length - 1)))
+            : learnerStatus === "Not started"
+              ? 0
+              : Math.max(1, Math.min(contents.length - 1, (i + moduleIndex) % contents.length));
+
+        contents.forEach((content, contentIndex) => {
+          if (state.selectedContentIndex !== null && contentIndex !== state.selectedContentIndex) return;
+          const contentStatus = contentIndex < completedContents
+            ? "Completed"
+            : contentIndex === completedContents && learnerStatus === "In progress"
+              ? "In progress"
+              : "Not started";
+          rows.push({
+            name: learnerName(seed),
+            school: school.name,
+            status: contentStatus,
+            lesson: content.lesson,
+            contentTitle: content.title,
+            contentType: content.type,
+            contentIndex,
+            timeSpent: contentStatus === "Completed"
+              ? Math.max(0.2, stats.avgTime / contents.length + contentIndex * 0.04)
+              : contentStatus === "In progress"
+                ? Math.max(0.1, stats.avgTime / contents.length * 0.45)
+                : 0,
+            lastActive: contentStatus === "Not started" ? "-" : `2026-05-${String(18 - ((i + contentIndex) % 9)).padStart(2, "0")}`
+          });
+        });
+      }
+      return rows;
+    }
+
+    function learnerSummaryRowsForSchool(school, moduleIndex) {
+      const allRows = learnerRowsForSchool(school, moduleIndex);
+      const totalContents = Math.max(1, flattenContents(moduleIndex).length);
+      const grouped = new Map();
+
+      allRows.forEach((row) => {
+        const key = `${row.school}::${row.name}`;
+        if (!grouped.has(key)) {
+          grouped.set(key, {
+            name: row.name,
+            school: row.school,
+            completedCount: 0,
+            totalContents,
+            timeSpent: 0,
+            lastActive: "-",
+            lastActivity: null,
+            furthestIndex: -1
+          });
+        }
+
+        const learner = grouped.get(key);
+        learner.timeSpent += row.timeSpent;
+
+        if (row.status === "Completed") {
+          learner.completedCount += 1;
+          if (row.contentIndex >= learner.furthestIndex) {
+            learner.furthestIndex = row.contentIndex;
+            learner.lastActivity = {
+              lesson: row.lesson,
+              contentTitle: row.contentTitle,
+              contentType: row.contentType
+            };
+            learner.lastActive = row.lastActive;
+          }
+        } else if (row.status === "In progress" && learner.furthestIndex < row.contentIndex) {
+          learner.furthestIndex = row.contentIndex;
+          learner.lastActivity = {
+            lesson: row.lesson,
+            contentTitle: row.contentTitle,
+            contentType: row.contentType
+          };
+          learner.lastActive = row.lastActive;
+        }
+      });
+
+      return Array.from(grouped.values()).map((learner) => ({
+        ...learner,
+        completionRate: percent(learner.completedCount, learner.totalContents)
+      }));
+    }
+
+    function dropoffRowsForModule(moduleIndex) {
+      const rows = [];
+      getFilteredSchools().forEach((school) => {
+        const stats = moduleSchoolStats(school, moduleIndex);
+        const sampleSize = Math.min(18, Math.max(6, Math.ceil(stats.dropped / 4)));
+        for (let i = 0; i < sampleSize; i += 1) {
+          const seed = (schools.indexOf(school) + 1) * 130 + moduleIndex * 23 + i;
+          rows.push({
+            name: learnerName(seed),
+            school: school.name,
+            lastCompleted: moduleIndex === 0 ? "Not started" : modules[moduleIndex - 1],
+            droppedAt: modules[moduleIndex],
+            timeSpent: Math.max(0.3, stats.avgTime * 0.42 + i * 0.05),
+            lastActive: `2026-05-${String(17 - (i % 8)).padStart(2, "0")}`
+          });
+        }
+      });
+      return rows.slice(0, 36);
+    }
+
+    function individualLeaderboardRows() {
+      const rows = [];
+      schools.forEach((school, schoolIndex) => {
+        const sampleSize = Math.min(18, Math.max(10, Math.ceil(school.totalLearners / 14)));
+        for (let i = 0; i < sampleSize; i += 1) {
+          const seed = (schoolIndex + 1) * 211 + i;
+          const completion = Math.min(100, Math.max(28, Math.round(completionRate(school) + ((i % 7) - 3) * 5)));
+          const completed = completion >= 100 || i < Math.round(sampleSize * completionRate(school) / 100);
+          const timeSpent = completed
+            ? Math.max(4.2, averageCompletedTime(school) * (0.72 + (i % 6) * 0.07))
+            : Math.max(1.5, averageAllLearnerTime(school) * (0.42 + (i % 5) * 0.05));
+          const challengeParticipant = i < Math.round(sampleSize * participationRate(school) / 100);
+          rows.push({
+            name: learnerName(seed),
+            school: school.name,
+            completion,
+            completed,
+            timeSpent,
+            challengeParticipant,
+            challengeStatus: challengeParticipant ? (i % 4 === 0 ? "Submitted" : "Registered") : "Not participating"
+          });
+        }
+      });
+      return rows;
+    }
+
+    function contentRowsForModule(moduleIndex) {
+      const contents = flattenContents(moduleIndex);
+      const learnerRows = getFilteredSchools().flatMap((school) => {
+        const previousSelection = state.selectedContentIndex;
+        state.selectedContentIndex = null;
+        const rows = learnerRowsForSchool(school, moduleIndex);
+        state.selectedContentIndex = previousSelection;
+        return rows;
+      });
+
+      return contents.map((content, index) => {
+        const rows = learnerRows.filter((row) => row.contentIndex === index);
+        const completed = rows.filter((row) => row.status === "Completed").length;
+        const inProgress = rows.filter((row) => row.status === "In progress").length;
+        const notStarted = rows.filter((row) => row.status === "Not started").length;
+        return {
+          ...content,
+          index,
+          total: rows.length,
+          completed,
+          inProgress,
+          notStarted,
+          completion: percent(completed, rows.length)
+        };
+      });
+    }
+
+    function renderModuleDetail() {
+      if (state.detailModuleIndex === null) return;
+      const data = getFilteredSchools();
+      const moduleName = modules[state.detailModuleIndex];
+      const rows = data.map((school) => moduleSchoolStats(school, state.detailModuleIndex));
+      const pager = paginate(rows, state.detailPage, 5);
+      state.detailPage = pager.currentPage;
+      const totalsRow = rows.reduce((acc, row) => {
+        acc.totalLearners += row.school.totalLearners;
+        acc.started += row.started;
+        acc.completed += row.completed;
+        acc.dropped += row.dropped;
+        acc.timeSpent += row.timeSpent;
+        return acc;
+      }, { totalLearners: 0, started: 0, completed: 0, dropped: 0, timeSpent: 0 });
+
+      document.getElementById("moduleDetailTitle").textContent = `${moduleName} Detail`;
+
+      moduleDetailMetrics.innerHTML = [
+        metric("Total Learners", formatNumber(totalsRow.totalLearners), "Learners in the current filter", icons.users),
+        metric("Started Module", formatNumber(totalsRow.started), "Learners who reached this module", icons.users),
+        metric("Completed Module", formatNumber(totalsRow.completed), "Learners who completed this module", icons.check),
+        metric("Drop-off Learners", formatNumber(totalsRow.dropped), `${formatPercent(percent(totalsRow.dropped, totalsRow.started))} did not continue`, icons.trophy),
+        metric("Average Time Spent", `${(totalsRow.started ? totalsRow.timeSpent / totalsRow.started : 0).toFixed(1)}h`, "Average for learners who reached this module", icons.clock)
+      ].join("");
+
+      if (!rows.length) {
+        moduleSchoolTable.innerHTML = emptyState("Try changing the date range, school level, or school filter.");
+        return;
+      }
+
+      if (state.detailView === "content") {
+        renderLearningContentDetail();
+        return;
+      }
+
+      if (state.detailView === "students") {
+        renderLearnerDrilldown();
+        return;
+      }
+
+      moduleDrilldownCaption.textContent = "Primary drill-down by school for the selected module.";
+      updateDetailViewTabs();
+
+      moduleSchoolTable.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>School</th>
+              <th>Total Learners</th>
+              <th>Started Module</th>
+              <th>Completed Module</th>
+              <th>Completion %</th>
+              <th>Drop-off Count</th>
+              <th>Avg Time Spent</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pager.rows.map((row) => `
+              <tr>
+                <td><strong>${row.school.name}</strong></td>
+                <td>${formatNumber(row.school.totalLearners)}</td>
+                <td>${formatNumber(row.started)}</td>
+                <td>${formatNumber(row.completed)}</td>
+                <td class="progress-cell">${progress(row.completion, "green")}</td>
+                <td>${formatNumber(row.dropped)} (${formatPercent(row.dropoff)})</td>
+                <td>${row.avgTime.toFixed(1)}h</td>
+                <td><button class="text-button" data-learner-school="${row.school.name}" type="button">View learners</button></td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+        ${paginationHtml(pager, "detail")}
+      `;
+    }
+
+    function renderLearnerDrilldown() {
+      if (state.detailModuleIndex === null) return;
+      const data = getFilteredSchools();
+      const selectedSchools = state.learnerSchoolName ? data.filter((school) => school.name === state.learnerSchoolName) : data;
+      const rows = selectedSchools.flatMap((school) => learnerSummaryRowsForSchool(school, state.detailModuleIndex));
+      const pager = paginate(rows, state.detailPage, 5);
+      state.detailPage = pager.currentPage;
+      const selectedContent = state.selectedContentIndex !== null ? flattenContents(state.detailModuleIndex)[state.selectedContentIndex] : null;
+      moduleDrilldownCaption.textContent = state.learnerSchoolName
+        ? `Students view for ${state.learnerSchoolName}.`
+        : selectedContent
+          ? `Student statuses for ${selectedContent.lesson} - ${selectedContent.title}.`
+        : "Students view across schools matching the current filters, including lesson and learning content progress.";
+      updateDetailViewTabs();
+      moduleSchoolTable.innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Last Activity</th>
+              <th>Completion Rate</th>
+              <th>Time Spent</th>
+              <th>Last Active</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pager.rows.map((row) => `
+              <tr>
+                <td><span class="student-cell"><strong>${row.name}</strong><span>${row.school}</span></span></td>
+                <td>${row.lastActivity
+                  ? `<span class="student-cell"><strong>${row.lastActivity.lesson}</strong><span>${row.lastActivity.contentTitle} ${contentTypeBadge(row.lastActivity.contentType)}</span></span>`
+                  : `<span class="student-cell"><strong>No activity yet</strong><span>No learning content started</span></span>`}</td>
+                <td class="progress-cell">${progress(row.completionRate, "blue")}</td>
+                <td>${row.timeSpent.toFixed(1)}h</td>
+                <td>${row.lastActive}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+        ${paginationHtml(pager, "detail")}
+      `;
+    }
+
+    function renderLearningContentDetail() {
+      if (state.detailModuleIndex === null) return;
+      const selectedSchools = getFilteredSchools();
+      const studentRows = selectedSchools.flatMap((school) => {
+        const previousSelection = state.selectedContentIndex;
+        state.selectedContentIndex = null;
+        const rows = learnerRowsForSchool(school, state.detailModuleIndex);
+        state.selectedContentIndex = previousSelection;
+        return rows;
+      });
+      const studentKeys = [];
+      studentRows.forEach((row) => {
+        const key = `${row.name}|${row.school}`;
+        if (!studentKeys.some((student) => student.key === key)) {
+          studentKeys.push({ key, name: row.name, school: row.school });
+        }
+      });
+      const pager = paginate(studentKeys, state.detailPage, 5);
+      state.detailPage = pager.currentPage;
+      const lessons = moduleLessons[state.detailModuleIndex];
+      moduleDrilldownCaption.textContent = "Module content matrix by lesson, learning content, and student status.";
+      updateDetailViewTabs();
+
+      const statusFor = (student, contentTitle) => {
+        const row = studentRows.find((item) => `${item.name}|${item.school}` === student.key && item.contentTitle === contentTitle);
+        return row ? row.status : "Not started";
+      };
+
+      const bodyRows = lessons.map((lesson, lessonIndex) => {
+        const lessonKey = `${state.detailModuleIndex}-${lessonIndex}`;
+        const expanded = state.expandedLessons[lessonKey] !== false;
+        const lessonSummary = pager.rows.map((student) => {
+          const statuses = lesson.contents.map((content) => statusFor(student, content.title));
+          if (statuses.every((status) => status === "Completed")) return `<td>${statusPill("Completed")}</td>`;
+          if (statuses.some((status) => status === "Completed" || status === "In progress")) return `<td>${statusPill("In progress")}</td>`;
+          return `<td>${statusPill("Not started")}</td>`;
+        }).join("");
+
+        const contentRows = expanded ? lesson.contents.map((content) => `
+          <tr>
+            <td>
+              <span class="content-label">
+                <strong>${content.title}</strong>
+                ${contentTypeBadge(content.type)}
+              </span>
+            </td>
+            ${pager.rows.map((student) => `<td>${statusPill(statusFor(student, content.title))}</td>`).join("")}
+          </tr>
+        `).join("") : "";
+
+        return `
+          <tr class="top-row">
+            <td>
+              <button class="lesson-toggle" data-lesson-toggle="${lessonKey}" type="button">
+                <span>${expanded ? "-" : "+"}</span>
+                ${lesson.name}
+              </button>
+            </td>
+            ${lessonSummary}
+          </tr>
+          ${contentRows}
+        `;
+      }).join("");
+
+      moduleSchoolTable.innerHTML = `
+        <table class="matrix-table">
+          <thead>
+            <tr>
+              <th>Lesson / Learning Content</th>
+              ${pager.rows.map((student) => `<th><span class="student-cell"><strong>${student.name}</strong><span>${student.school}</span></span></th>`).join("")}
+            </tr>
+          </thead>
+          <tbody>${bodyRows}</tbody>
+        </table>
+        ${paginationHtml(pager, "detail")}
+      `;
+    }
+
+    function updateDetailViewTabs() {
+      document.querySelectorAll(".detail-view-tab").forEach((button) => {
+        button.classList.toggle("active", button.dataset.detailView === state.detailView);
+      });
+    }
+
+    function openDropoffModal(moduleIndex) {
+      const rows = dropoffRowsForModule(moduleIndex);
+      const pager = paginate(rows, state.modalPage, 5);
+      state.modalPage = pager.currentPage;
+      dropoffModalTitle.textContent = `${modules[moduleIndex]} Drop-off Learners`;
+      dropoffModalCaption.textContent = "Sample learners who did not continue from the previous step.";
+      dropoffModalTable.innerHTML = rows.length ? `
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Last Completed</th>
+              <th>Dropped At</th>
+              <th>Time Spent</th>
+              <th>Last Active</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${pager.rows.map((row) => `
+              <tr>
+                <td><span class="student-cell"><strong>${row.name}</strong><span>${row.school}</span></span></td>
+                <td>${row.lastCompleted}</td>
+                <td>${row.droppedAt}</td>
+                <td>${row.timeSpent.toFixed(1)}h</td>
+                <td>${row.lastActive}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+        ${paginationHtml(pager, "modal")}
+      ` : emptyState("No drop-off learners match the current filter.");
+      dropoffModal.classList.remove("hidden");
+    }
+
+    function closeDropoffModal() {
+      dropoffModal.classList.add("hidden");
+    }
+
+    function currentDetailRowCount() {
+      if (state.detailModuleIndex === null) return 0;
+      if (state.detailView === "students") {
+        const data = getFilteredSchools();
+        const selectedSchools = state.learnerSchoolName ? data.filter((school) => school.name === state.learnerSchoolName) : data;
+        return selectedSchools.flatMap((school) => learnerSummaryRowsForSchool(school, state.detailModuleIndex)).length;
+      }
+      if (state.detailView === "content") {
+        const keys = new Set();
+        getFilteredSchools().forEach((school) => {
+          learnerRowsForSchool(school, state.detailModuleIndex).forEach((row) => {
+            keys.add(`${row.name}|${row.school}`);
+          });
+        });
+        return keys.size;
+      }
+      return getFilteredSchools().length;
+    }
+
+    function handlePagination(scope, action) {
+      if (scope === "detail") {
+        const totalPages = Math.max(1, Math.ceil(currentDetailRowCount() / 5));
+        state.detailPage = action === "next" ? Math.min(totalPages, state.detailPage + 1) : Math.max(1, state.detailPage - 1);
+        renderModuleDetail();
+      }
+
+      if (scope === "modal") {
+        const totalPages = Math.max(1, Math.ceil(dropoffRowsForModule(state.detailModuleIndex ?? 0).length / 5));
+        state.modalPage = action === "next" ? Math.min(totalPages, state.modalPage + 1) : Math.max(1, state.modalPage - 1);
+        openDropoffModal(state.detailModuleIndex ?? 0);
+      }
+    }
+
     function leaderboardTable(title, caption, data, valueRenderer, infoText = "") {
       const rows = data.slice(0, 6);
       return `
@@ -1429,7 +2276,79 @@
       `;
     }
 
+    function studentLeaderboardTable(title, caption, data, valueRenderer, infoText = "") {
+      const rows = data.slice(0, 6);
+      return `
+        <section class="leaderboard-card">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">${title}${infoText ? `<span class="info-tip" tabindex="0">i<span>${infoText}</span></span>` : ""}</h2>
+              <p class="panel-caption">${caption}</p>
+            </div>
+          </div>
+          ${rows.length ? `
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Student</th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${rows.map((row, index) => `
+                    <tr class="${index === 0 ? "top-row" : ""}">
+                      <td><span class="rank ${index === 0 ? "gold" : ""}">${index + 1}</span></td>
+                      <td><span class="student-cell"><strong>${row.name}</strong><span>${row.school}</span></span></td>
+                      <td>${valueRenderer(row)}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          ` : emptyState("No students are available for this view.")}
+        </section>
+      `;
+    }
+
     function renderLearnerDashboard() {
+      document.querySelectorAll("[data-learner-view]").forEach((button) => {
+        button.classList.toggle("active", button.dataset.learnerView === state.learnerViewBy);
+      });
+
+      if (state.learnerViewBy === "student") {
+        const students = individualLeaderboardRows();
+        const byCompletion = [...students].sort((a, b) => b.completion - a.completion || a.timeSpent - b.timeSpent);
+        const fastest = students.filter((student) => student.completed).sort((a, b) => a.timeSpent - b.timeSpent);
+        const challenge = students
+          .filter((student) => student.challengeParticipant)
+          .sort((a, b) => (a.challengeStatus === "Submitted" ? -1 : 1) - (b.challengeStatus === "Submitted" ? -1 : 1));
+
+        leaderboards.innerHTML = [
+          studentLeaderboardTable(
+            "Highest Completion Rate by Student",
+            "Individual learner completion across programme modules.",
+            byCompletion,
+            (student) => `<div class="progress-cell">${progress(student.completion, "green")}</div>`
+          ),
+          studentLeaderboardTable(
+            "Fastest Completion by Student",
+            "Completed learners ranked by total time spent.",
+            fastest,
+            (student) => `<strong>${student.timeSpent.toFixed(1)}h</strong>`,
+            "Fastest completion only includes students who completed all modules."
+          ),
+          studentLeaderboardTable(
+            "Innovation Challenge Students",
+            "Individual challenge participation is shown as status, not a rate.",
+            challenge,
+            (student) => `<span class="badge ${student.challengeStatus === "Submitted" ? "primary" : "secondary"}">${student.challengeStatus}</span>`
+          )
+        ].join("");
+        return;
+      }
+
       const completion = [...schools].sort((a, b) => completionRate(b) - completionRate(a));
       const fastest = schools
         .filter((school) => school.completedLearners > 0)
@@ -1461,16 +2380,21 @@
 
     function updateHeader() {
       const admin = state.view === "admin";
-      document.getElementById("eyebrow").textContent = admin ? "Admin Reports" : "Learner Dashboard";
-      document.getElementById("pageTitle").textContent = admin ? "Programme analytics" : "School leaderboards";
-      document.getElementById("pageSubtitle").textContent = admin
-        ? ""
-        : "";
+      const detail = state.view === "moduleDetail";
+      document.getElementById("eyebrow").textContent = detail ? "Module Detail" : admin ? "Admin Reports" : "Learner Dashboard";
+      document.getElementById("pageTitle").textContent = detail ? "Learner progress drill-down" : admin ? "Programme analytics at a glance" : "School leaderboards";
+      document.getElementById("pageSubtitle").textContent = detail
+        ? "Review school-level module outcomes and drill down into learner progress."
+        : admin
+        ? "Track sign ups, activation, completion, school performance, and challenge participation across Primary and Secondary learners."
+        : "Compare school-level outcomes without showing individual learner names.";
     }
 
     function updateVisibleSections() {
       document.getElementById("adminView").classList.toggle("hidden", state.view !== "admin");
       document.getElementById("learnerView").classList.toggle("hidden", state.view !== "learner");
+      document.getElementById("moduleDetailView").classList.toggle("hidden", state.view !== "moduleDetail");
+      document.querySelector(".page-heading").classList.toggle("hidden", state.view === "moduleDetail");
       document.getElementById("filters").classList.toggle("hidden", state.view !== "admin");
 
       document.getElementById("individualsContent").classList.toggle("hidden", state.tab !== "individuals");
@@ -1478,9 +2402,9 @@
       document.getElementById("challengeContent").classList.toggle("hidden", state.tab !== "challenge");
 
       document.querySelectorAll(".nav-btn").forEach((button) => {
-        button.classList.toggle("active", button.dataset.view === state.view);
+        button.classList.toggle("active", button.dataset.view === state.view || (state.view === "moduleDetail" && button.dataset.view === "admin"));
       });
-      document.querySelectorAll(".tab").forEach((button) => {
+      document.querySelectorAll("[data-tab]").forEach((button) => {
         button.classList.toggle("active", button.dataset.tab === state.tab);
       });
     }
@@ -1493,6 +2417,7 @@
       renderSchools(data);
       renderChallenge(data);
       renderLearnerDashboard();
+      renderModuleDetail();
       updateHeader();
       updateVisibleSections();
     }
@@ -1500,6 +2425,8 @@
     document.querySelectorAll(".nav-btn").forEach((button) => {
       button.addEventListener("click", () => {
         state.view = button.dataset.view;
+        state.detailModuleIndex = null;
+        state.learnerSchoolName = null;
         render();
       });
     });
@@ -1519,6 +2446,94 @@
     schoolFilter.addEventListener("change", () => {
       state.school = schoolFilter.value;
       render();
+    });
+
+    document.getElementById("backToReports").addEventListener("click", () => {
+      state.view = "admin";
+      state.detailModuleIndex = null;
+      state.learnerSchoolName = null;
+      state.selectedContentIndex = null;
+      state.detailView = "school";
+      render();
+    });
+
+    document.getElementById("closeDropoffModal").addEventListener("click", closeDropoffModal);
+
+    dropoffModal.addEventListener("click", (event) => {
+      if (event.target === dropoffModal) closeDropoffModal();
+    });
+
+    document.addEventListener("click", (event) => {
+      const dropoffButton = event.target.closest("[data-dropoff-detail]");
+      if (dropoffButton) {
+        state.modalPage = 1;
+        openDropoffModal(Number(dropoffButton.dataset.dropoffDetail));
+        return;
+      }
+
+      const moduleButton = event.target.closest("[data-module-detail]");
+      if (moduleButton) {
+        state.view = "moduleDetail";
+        state.detailModuleIndex = Number(moduleButton.dataset.moduleDetail);
+        state.learnerSchoolName = null;
+        state.selectedContentIndex = null;
+        state.detailView = "school";
+        state.detailPage = 1;
+        render();
+        return;
+      }
+
+      const learnerButton = event.target.closest("[data-learner-school]");
+      if (learnerButton) {
+        state.learnerSchoolName = learnerButton.dataset.learnerSchool;
+        state.selectedContentIndex = null;
+        state.detailView = "students";
+        state.detailPage = 1;
+        renderModuleDetail();
+        return;
+      }
+
+      const contentButton = event.target.closest("[data-content-status]");
+      if (contentButton) {
+        state.selectedContentIndex = Number(contentButton.dataset.contentStatus);
+        state.learnerSchoolName = null;
+        state.detailView = "students";
+        state.detailPage = 1;
+        renderModuleDetail();
+        return;
+      }
+
+      const pageButton = event.target.closest("[data-page-scope]");
+      if (pageButton) {
+        handlePagination(pageButton.dataset.pageScope, pageButton.dataset.pageAction);
+        return;
+      }
+
+      const lessonButton = event.target.closest("[data-lesson-toggle]");
+      if (lessonButton) {
+        const key = lessonButton.dataset.lessonToggle;
+        state.expandedLessons[key] = state.expandedLessons[key] === false;
+        renderLearningContentDetail();
+      }
+    });
+
+    document.querySelectorAll(".detail-view-tab").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.detailView = button.dataset.detailView;
+        if (state.detailView !== "students") {
+          state.learnerSchoolName = null;
+          state.selectedContentIndex = null;
+        }
+        state.detailPage = 1;
+        renderModuleDetail();
+      });
+    });
+
+    document.querySelectorAll("[data-learner-view]").forEach((button) => {
+      button.addEventListener("click", () => {
+        state.learnerViewBy = button.dataset.learnerView;
+        renderLearnerDashboard();
+      });
     });
 
     dateFrom.addEventListener("change", () => {
