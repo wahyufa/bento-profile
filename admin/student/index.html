@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atlas Learner Performance</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="topnav">
+      <div class="nav-inner">
+        <img class="brand" src="../atlas-logo.png" alt="ATLAS by HeyHi" />
+        <nav aria-label="Learner navigation">
+          <a href="#">Dashboard</a>
+          <a href="#">Courses</a>
+          <a href="#">Assessments</a>
+          <a href="#">CBL</a>
+          <a class="active" href="#">Performance</a>
+          <a href="#">PALS</a>
+        </nav>
+        <div class="nav-actions">
+          <button aria-label="Notifications"><i data-icon="bell"></i></button>
+          <div class="avatar">L</div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-inner">
+          <h1>Performance Analytics</h1>
+          <p>Track your learning progress and performance across different topics</p>
+        </div>
+      </section>
+
+      <section class="date-band">
+        <label class="date-filter">
+          <span>All Time</span>
+          <i data-icon="calendar"></i>
+        </label>
+      </section>
+
+      <section class="content">
+        <div class="tabs" role="tablist" aria-label="Performance analytics views">
+          <button class="tab active" data-tab="knowledge">PALS Knowledge</button>
+          <button class="tab" data-tab="skills">Skills</button>
+        </div>
+
+        <div id="breadcrumb" class="breadcrumb"></div>
+        <div id="appView"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
