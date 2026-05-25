@@ -930,13 +930,13 @@ td:last-child .progress-wrap {
 
 .radar polygon.grid {
   fill: none;
-  stroke: #dfe5ec;
-  stroke-width: 1;
+  stroke: #edf0f3;
+  stroke-width: 4;
 }
 
 .radar line {
-  stroke: #e4e9ef;
-  stroke-width: 1;
+  stroke: #eef1f4;
+  stroke-width: 4;
 }
 
 .radar polygon.value {
@@ -1157,3 +1157,233 @@ svg {
     grid-template-columns: 1fr;
   }
 }
+
+/* Admin PALS spider chart variant styles */
+.pals-progress-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.pals-progress-head h2 {
+  margin: 0;
+}
+
+.pals-progress-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.pals-progress-count {
+  min-width: 96px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  text-align: center;
+}
+
+.pals-progress-count strong {
+  display: block;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 22px;
+  line-height: 1;
+}
+
+.pals-progress-count span {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pals-spider-card {
+  min-height: 560px;
+}
+
+.pals-spider-layout {
+  display: grid;
+  grid-template-columns: minmax(480px, 1fr) minmax(360px, .85fr);
+  gap: 30px;
+  align-items: center;
+  margin-top: 22px;
+}
+
+.pals-spider-wrap {
+  min-height: 430px;
+}
+
+.pals-spider-wrap .radar {
+  width: 500px;
+  height: 470px;
+}
+
+.pals-spider-wrap .radar polygon.grid {
+  stroke: #edf0f3;
+  stroke-width: 4;
+}
+
+.pals-spider-wrap .radar line {
+  stroke: #eef1f4;
+  stroke-width: 4;
+}
+
+.pals-spider-legend {
+  display: grid;
+  gap: 12px;
+}
+
+.pals-spider-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 1fr) minmax(150px, 190px);
+  gap: 16px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.pals-spider-row:last-child {
+  border-bottom: 0;
+}
+
+.pals-spider-row strong {
+  display: block;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 14px;
+}
+
+.pals-spider-row span {
+  display: block;
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pals-progress-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 18px 0 14px;
+}
+
+.pals-progress-toolbar span {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pals-filter {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pals-filter.active {
+  border-color: #bfe3ed;
+  background: #eaf8fc;
+  color: var(--blue);
+}
+
+.pals-course-table {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.pals-course-table-head,
+.pals-course-row {
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(220px, 340px) 110px 110px;
+  align-items: center;
+  gap: 20px;
+}
+
+.pals-course-table-head {
+  min-height: 44px;
+  padding: 0 18px;
+  background: #f8fafc;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pals-course-table-head span:nth-child(n + 3) {
+  text-align: center;
+}
+
+.pals-course-list {
+  display: grid;
+}
+
+.pals-course-row {
+  min-height: 72px;
+  border-top: 1px solid var(--line);
+  padding: 15px 18px;
+}
+
+.pals-course-row:first-child {
+  border-top: 0;
+}
+
+.pals-course-row strong {
+  display: block;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.pals-course-row span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.pals-course-row .progress-wrap {
+  grid-template-columns: minmax(150px, 1fr) 44px;
+}
+
+.pals-number {
+  color: var(--text) !important;
+  font-size: 14px !important;
+  font-weight: 800;
+  text-align: center;
+}
+
+@media (max-width: 980px) {
+  .pals-spider-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .pals-spider-row {
+    grid-template-columns: 1fr;
+  }
+
+  .pals-course-table-head {
+    display: none;
+  }
+
+  .pals-course-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .pals-number {
+    text-align: left;
+  }
+
+  .pals-progress-head,
+  .pals-progress-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .pals-progress-toolbar span {
+    margin-left: 0;
+  }
+}
+

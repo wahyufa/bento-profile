@@ -6,15 +6,15 @@ const icons = {
 };
 
 const courses = [
-  { id: "customer-service", name: "Customer Service PALS Course", progress: 33, activity: "Last activity 2 days ago" },
+  { id: "customer-service", name: "Customer Service PALS Course", progress: 96, activity: "Last activity 2 days ago" },
   { id: "exam-anxiety", name: "Exam Anxiety", progress: 22, activity: "Last activity 1 week ago" },
-  { id: "communication", name: "Communication Essentials", progress: 48, activity: "Last activity yesterday" },
+  { id: "communication", name: "Communication Essentials", progress: 84, activity: "Last activity yesterday" },
   { id: "workplace", name: "Workplace Readiness", progress: 17, activity: "Last activity 12 days ago" }
 ];
 
 const strands = [
-  { name: "Foundations", progress: 76, sub: [["Service mindset", [["Recognise learner needs", 82], ["Explain service standards", 74]]], ["Core concepts", [["Define key terms", 78], ["Identify good practice", 69]]]] },
-  { name: "Application", progress: 63, sub: [["Scenario response", [["Choose a response", 68], ["Apply support steps", 61]]], ["Practice transfer", [["Use course resources", 59], ["Complete practice task", 65]]]] },
+  { name: "Foundations", progress: 96, sub: [["Service mindset", [["Recognise learner needs", 98], ["Explain service standards", 94]]], ["Core concepts", [["Define key terms", 97], ["Identify good practice", 93]]]] },
+  { name: "Application", progress: 88, sub: [["Scenario response", [["Choose a response", 91], ["Apply support steps", 86]]], ["Practice transfer", [["Use course resources", 84], ["Complete practice task", 90]]]] },
   { name: "Analysis", progress: 52, sub: [["Problem framing", [["Compare options", 56], ["Spot root cause", 48]]], ["Decision quality", [["Prioritise action", 55], ["Justify answer", 50]]]] },
   { name: "Communication", progress: 71, sub: [["Message clarity", [["Use plain language", 75], ["Ask follow-up questions", 70]]], ["Tone", [["Respond with empathy", 77], ["Manage concerns", 62]]]] },
   { name: "Reflection", progress: 58, sub: [["Self review", [["Check confidence", 60], ["Review feedback", 57]]], ["Next steps", [["Set improvement goal", 63], ["Track progress", 51]]]] },
@@ -22,8 +22,8 @@ const strands = [
 ];
 
 const skills = [
-  { name: "Sales Communication", label: "Sales Communication", progress: 74, questions: 12 },
-  { name: "Customer Relationship Management", label: "Customer Relation", progress: 81, questions: 15 },
+  { name: "Sales Communication", label: "Sales Communication", progress: 95, questions: 12 },
+  { name: "Customer Relationship Management", label: "Customer Relation", progress: 89, questions: 15 },
   { name: "Negotiation", progress: 62, questions: 9 },
   { name: "Business Presentation", label: "Business Present.", progress: 69, questions: 11 },
   { name: "Service Excellence", progress: 77, questions: 14 },
@@ -52,7 +52,15 @@ function hydrateIcons() {
 }
 
 function progress(value) {
-  return `<div class="progress-wrap"><div class="progress"><span style="--value:${value}%"></span></div><b>${value}%</b></div>`;
+  return `<div class="progress-wrap"><div class="progress"><span style="--value:${value}%; --bar-color:${completionColor(value)}"></span></div><b>${value}%</b></div>`;
+}
+
+function completionColor(value) {
+  const low = [114, 198, 231];
+  const high = [18, 112, 78];
+  const ratio = Math.max(0, Math.min(1, value / 100));
+  const channel = (index) => Math.round(low[index] + (high[index] - low[index]) * ratio);
+  return `rgb(${channel(0)}, ${channel(1)}, ${channel(2)})`;
 }
 
 function average(values) {
@@ -63,10 +71,6 @@ function subStrandScore(topics) {
   return average(topics.map(([, value]) => value));
 }
 
-function courseAverage() {
-  return Math.round(courses.reduce((total, course) => total + course.progress, 0) / courses.length);
-}
-
 function renderBreadcrumb() {
   if (state.tab === "skills") {
     breadcrumb.innerHTML = "<strong>Skills Analytics</strong>";
@@ -74,33 +78,32 @@ function renderBreadcrumb() {
   }
 
   if (state.level === "overview") {
-    breadcrumb.innerHTML = "<strong>Overall PALS Progress</strong>";
+    breadcrumb.innerHTML = "<strong>PALS Courses</strong>";
     return;
   }
 
-  breadcrumb.innerHTML = `<button data-action="overview">Overall PALS Progress</button><span>/</span><strong>${state.selectedCourse.name}</strong>`;
+  breadcrumb.innerHTML = `<button data-action="overview">PALS Courses</button><span>/</span><strong>${state.selectedCourse.name}</strong>`;
 }
 
 function renderOverview() {
-  const avg = courseAverage();
   appView.innerHTML = `
-    <section class="summary-grid">
-      <article class="panel donut-card">
-        <h2>Overall PALS Progress</h2>
-        <div class="donut-wrap">
-          <div class="donut" style="--value:${avg}">
-            <div class="donut-content"><strong>${avg}%</strong><span>Completed</span></div>
-          </div>
-        </div>
-      </article>
-      <article class="panel">
+    <section>
+      <article class="panel course-overview-panel">
         <h2>Completion by PALS Course</h2>
-        <div class="course-list">
+        <div class="course-tile-grid">
           ${courses.map((course) => `
-            <button class="course-row" type="button" data-course="${course.id}">
-              <span><strong>${course.name}</strong><small>${course.activity}</small></span>
-              ${progress(course.progress)}
-              <span class="course-row-action">View details</span>
+            <button class="course-tile" type="button" data-course="${course.id}">
+              <div class="course-tile-ring">
+                <div class="ring" style="--value:${course.progress}; --ring-color:${completionColor(course.progress)}"><b>${course.progress}%</b></div>
+              </div>
+              <div class="course-tile-copy">
+                <strong>${course.name}</strong>
+                <span>${course.activity}</span>
+              </div>
+              <div class="course-tile-footer">
+                ${progress(course.progress)}
+                <span>View details</span>
+              </div>
             </button>
           `).join("")}
         </div>

@@ -297,49 +297,77 @@ select {
   font-size: 14px;
 }
 
-.course-list {
+.course-tile-grid {
   display: grid;
-  gap: 14px;
+  grid-template-columns: repeat(4, minmax(210px, 1fr));
+  gap: 18px;
   margin-top: 24px;
 }
 
-.course-row {
-  width: 100%;
-  min-height: 78px;
+.course-tile {
+  min-height: 250px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 14px;
   background: #fff;
-  display: grid;
-  grid-template-columns: 1fr 260px 118px;
-  align-items: center;
-  gap: 20px;
-  padding: 16px 18px;
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.04);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
   text-align: left;
   cursor: pointer;
   transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
 }
 
-.course-row:hover {
+.course-tile:hover {
   border-color: #8ccedf;
-  box-shadow: 0 10px 20px rgba(20, 127, 164, .1);
-  transform: translateY(-1px);
+  box-shadow: 0 14px 28px rgba(20, 127, 164, .13);
+  transform: translateY(-2px);
 }
 
-.course-row strong {
+.course-tile:focus-visible {
+  outline: 3px solid rgba(20, 127, 164, .25);
+  outline-offset: 3px;
+}
+
+.course-tile-ring {
+  display: grid;
+  place-items: center;
+  min-height: 116px;
+}
+
+.course-tile-copy {
+  margin-top: 6px;
+}
+
+.course-tile-copy strong {
   display: block;
   font-family: "Space Grotesk", Inter, sans-serif;
-  font-size: 15px;
+  font-size: 14px;
+  line-height: 1.25;
 }
 
-.course-row small {
+.course-tile-copy span {
+  display: block;
+  margin-top: 6px;
   color: var(--muted);
   font-size: 12px;
 }
 
-.course-row-action {
+.course-tile-footer {
+  margin-top: auto;
+  display: grid;
+  gap: 12px;
+}
+
+.course-tile-footer > span {
+  justify-self: end;
   color: var(--blue);
+  font-size: 12px;
   font-weight: 800;
-  text-align: right;
+}
+
+.course-tile .progress-wrap {
+  grid-template-columns: 1fr 38px;
 }
 
 .course-grid {
@@ -381,7 +409,7 @@ select {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: conic-gradient(var(--blue) calc(var(--value) * 1%), #e7ebf0 0);
+  background: conic-gradient(var(--ring-color, var(--blue)) calc(var(--value) * 1%), #e7ebf0 0);
   position: relative;
 }
 
@@ -467,11 +495,13 @@ select {
 
 .radar polygon.grid {
   fill: none;
-  stroke: #dfe6ee;
+  stroke: #edf0f3;
+  stroke-width: 4;
 }
 
 .radar line {
-  stroke: #e5ebf2;
+  stroke: #eef1f4;
+  stroke-width: 4;
 }
 
 .radar polygon.value {
@@ -575,8 +605,13 @@ select {
   display: block;
   width: var(--value);
   height: 100%;
-  background: var(--blue);
+  background: var(--bar-color, var(--blue));
 }
+
+.course-overview-panel {
+  max-width: none;
+}
+
 
 .progress-wrap b {
   text-align: right;
@@ -707,7 +742,8 @@ svg {
     grid-template-columns: 1fr;
   }
 
-  .course-grid {
+  .course-grid,
+  .course-tile-grid {
     grid-template-columns: repeat(2, minmax(220px, 1fr));
   }
 }
@@ -759,7 +795,7 @@ svg {
     grid-template-columns: 1fr;
   }
 
-  .course-row {
+  .course-tile-grid {
     grid-template-columns: 1fr;
   }
 
