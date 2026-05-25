@@ -630,17 +630,66 @@
     }
 
     .question-matrix-wrap {
-      margin-top: 18px;
+      margin-top: 0;
       overflow-x: auto;
       border: 1px solid var(--line);
-      border-radius: 16px;
+      border-top: 0;
+      border-radius: 0 0 16px 16px;
       background: #fff;
+    }
+
+    .scale-sticky {
+      position: sticky;
+      z-index: 8;
+      top: 0;
+      display: grid;
+      grid-template-columns: 44% repeat(6, minmax(0, 1fr));
+      align-items: stretch;
+      min-width: 820px;
+      margin-top: 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px 16px 0 0;
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .scale-sticky-spacer,
+    .scale-sticky-item {
+      padding: 12px 14px;
+    }
+
+    .scale-sticky-spacer {
+      display: flex;
+      align-items: center;
+      color: rgba(255,255,255,.8);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .scale-sticky-item {
+      display: grid;
+      gap: 3px;
+      justify-items: center;
+      text-align: center;
+      line-height: 1.15;
+      font-weight: 700;
+    }
+
+    .scale-sticky-item strong {
+      font-size: 13px;
+    }
+
+    .scale-sticky-item span {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 10px;
     }
 
     .question-matrix {
       width: 100%;
       min-width: 820px;
       border-collapse: collapse;
+      table-layout: fixed;
     }
 
     .question-matrix th {
@@ -656,6 +705,15 @@
     .question-matrix th:first-child {
       width: 44%;
       text-align: left;
+    }
+
+    .question-matrix th:not(:first-child),
+    .question-matrix td:not(:first-child) {
+      width: 9.333%;
+    }
+
+    .question-matrix td:first-child {
+      width: 44%;
     }
 
     .scale-head {
@@ -908,6 +966,10 @@
       color: var(--brand-dark);
       font-size: 12px;
       font-weight: 700;
+    }
+
+    .question-matrix thead {
+      display: none;
     }
 
     .snapshot-grid {
@@ -2181,6 +2243,14 @@
     };
 
     const perPage = 10;
+    const scaleOptions = [
+      { value: 1, label: 'Strongly disagree' },
+      { value: 2, label: 'Disagree' },
+      { value: 3, label: 'Slightly disagree' },
+      { value: 4, label: 'Slightly agree' },
+      { value: 5, label: 'Agree' },
+      { value: 6, label: 'Strongly agree' }
+    ];
     const screenEl = document.getElementById('screen');
     const progressLabel = document.getElementById('progressLabel');
     const progressPercent = document.getElementById('progressPercent');
@@ -2353,6 +2423,10 @@
           <button class="demo-button" type="button" data-fill-all>Fill all & submit</button>
         </div>
         <div class="matrix-note">Select one response for each statement. The scale moves from strongly disagree to strongly agree.</div>
+        <div class="scale-sticky" aria-hidden="true">
+          <div class="scale-sticky-spacer">Statement</div>
+          ${scaleOptions.map((option) => `<div class="scale-sticky-item"><strong>${option.value}</strong><span>${option.label}</span></div>`).join('')}
+        </div>
         <div class="question-matrix-wrap">
           <table class="question-matrix">
             <thead>
