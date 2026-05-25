@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ATLAS Dashboard Prototype</title>
+  <style>
+    :root {
+      --bg: #f6f8fa;
+      --panel: #ffffff;
+      --text: #12263f;
+      --muted: #66738a;
+      --line: #dbe4ec;
+      --brand: #0fb0f8;
+      --brand-dark: #0c789d;
+      --navy: #31445f;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button, a { font: inherit; }
+
+    .topbar {
+      min-height: 66px;
+      background: #fff;
+      border-bottom: 1px solid #e7edf3;
+    }
+
+    .topbar-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      width: min(1250px, calc(100% - 40px));
+      min-height: inherit;
+      margin: 0 auto;
+    }
+
+    .atlas-brand {
+      display: inline-flex;
+      align-items: center;
+      min-width: 145px;
+    }
+
+    .atlas-logo {
+      display: block;
+      width: 149px;
+      height: auto;
+    }
+
+    .top-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 30px;
+      color: #687386;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .top-nav span { position: relative; white-space: nowrap; }
+    .top-nav .active { color: var(--brand-dark); font-weight: 700; }
+    .top-nav .active::after {
+      position: absolute;
+      left: 50%;
+      bottom: -22px;
+      width: 31px;
+      height: 4px;
+      border-radius: 999px;
+      background: #ffb000;
+      content: "";
+      transform: translateX(-50%);
+    }
+
+    .top-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: var(--brand-dark);
+    }
+
+    .icon-only {
+      display: inline-grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--brand-dark);
+    }
+
+    .help-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: var(--brand-dark);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .user-dot {
+      display: inline-grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 999px;
+      background: #20b7c6;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .banner {
+      position: relative;
+      overflow: hidden;
+      min-height: 228px;
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .banner-inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(260px, 390px);
+      align-items: center;
+      width: min(1250px, calc(100% - 40px));
+      min-height: 228px;
+      margin: 0 auto;
+      gap: 32px;
+    }
+
+    .banner-copy {
+      align-self: center;
+      max-width: 760px;
+      padding: 28px 0;
+    }
+
+    .banner-art {
+      align-self: end;
+      justify-self: end;
+      display: block;
+      width: min(390px, 100%);
+      max-height: 228px;
+      object-fit: contain;
+      object-position: right bottom;
+    }
+
+    .banner h1 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-size: clamp(31px, 4vw, 40px);
+      line-height: 1.12;
+      font-weight: 700;
+    }
+
+    .banner p {
+      max-width: 620px;
+      margin: 0;
+      color: rgba(255,255,255,.92);
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    .banner-result {
+      display: none;
+      margin-top: 18px;
+    }
+
+    .banner-result.visible {
+      display: inline-flex;
+    }
+
+    .type-pill {
+      display: inline-flex;
+      min-height: 34px;
+      align-items: center;
+      padding: 0 13px;
+      border: 0;
+      border-radius: 999px;
+      background: #fff;
+      color: var(--brand-dark);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .welcome {
+      width: min(840px, calc(100% - 40px));
+      margin: 26px auto 30px;
+      text-align: center;
+    }
+
+    .assistant-avatar {
+      display: block;
+      width: 78px;
+      height: 78px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    .welcome h2 {
+      margin: 0 0 8px;
+      font-size: clamp(25px, 3vw, 32px);
+      line-height: 1.12;
+      font-weight: 700;
+    }
+
+    .welcome p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .ask-box {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 42px;
+      gap: 8px;
+      width: min(670px, 100%);
+      margin: 30px auto 12px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .ask-placeholder {
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 12px;
+      border-radius: 10px;
+      background: #f2f4f7;
+      color: #7a8394;
+      text-align: left;
+      font-size: 15px;
+    }
+
+    .send-button {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 0;
+      border-radius: 12px;
+      background: #89bdd0;
+      color: #fff;
+    }
+
+    .prompt-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 9px;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    .prompt-chip {
+      min-height: 34px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: #66738a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      width: min(1250px, calc(100% - 40px));
+      margin: 0 auto 58px;
+    }
+
+    .card {
+      display: grid;
+      gap: 12px;
+      min-height: 184px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      text-align: left;
+      text-decoration: none;
+    }
+
+    .card-icon {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .card h3 {
+      margin: 2px 0 0;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .card span.link {
+      align-self: end;
+      justify-self: start;
+      color: var(--brand-dark);
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .top-nav { display: none; }
+      .banner-inner { grid-template-columns: 1fr; }
+      .banner-art { display: none; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 650px) {
+      .topbar-inner, .banner-inner, .welcome, .grid { width: min(100% - 24px, 1250px); }
+      .top-actions { display: none; }
+      .atlas-logo { width: 132px; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="atlas-brand" aria-label="ATLAS by HeyHi">
+        <img class="atlas-logo" src="atlaslogo.png" alt="ATLAS by HeyHi" />
+      </div>
+      <nav class="top-nav" aria-label="Main navigation">
+        <span class="active">Dashboard</span>
+        <span>Courses</span>
+        <span>Assessments</span>
+        <span>CBL</span>
+        <span>Performance</span>
+        <span>PALS</span>
+      </nav>
+      <div class="top-actions">
+        <button class="icon-only" type="button" aria-label="Notifications">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none">
+            <path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <span class="help-pill">? Help</span>
+        <span class="user-dot">O</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="banner">
+      <div class="banner-inner">
+        <div class="banner-copy">
+          <h1>Welcome back, Olivia</h1>
+          <p>Start exploring courses to continue your learning journey.</p>
+          <div class="banner-result" id="bannerResult">
+            <a class="type-pill" id="typePill" href="psychometric-assessment-prototype.html?summary=1" aria-label="View personality test summary"></a>
+          </div>
+        </div>
+        <img class="banner-art" src="admin/student/banner-right.png" alt="" aria-hidden="true" />
+      </div>
+    </section>
+
+    <section class="welcome">
+      <img class="assistant-avatar" src="admin/student/avatar-jen.png" alt="Jen assistant avatar" />
+      <h2>What would you like to do next?</h2>
+      <p>I can help you find courses, review progress, or understand your personality result.</p>
+      <div class="ask-box">
+        <div class="ask-placeholder">Ask me anything about your courses, skills, or learning...</div>
+        <button class="send-button" type="button" aria-label="Send">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none">
+            <path d="m5 12 14-7-7 14-2-5-5-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+      <div class="prompt-chips">
+        <button class="prompt-chip" type="button">What courses should I take next?</button>
+        <button class="prompt-chip" type="button">Summarize my learning progress</button>
+        <button class="prompt-chip" type="button">Explain a concept I'm struggling with</button>
+      </div>
+    </section>
+
+    <section class="grid">
+      <a class="card" href="#" aria-label="Courses">
+        <span class="card-icon" style="background:#edf4ff;color:#2f6fe4">▣</span>
+        <div><h3>Courses</h3><p>Browse and continue your enrolled courses</p></div>
+        <span class="link">Explore -></span>
+      </a>
+      <a class="card" href="#" aria-label="Assessments">
+        <span class="card-icon" style="background:#fff0f3;color:#e44868">☑</span>
+        <div><h3>Assessments</h3><p>Take assessments to evaluate your skills</p></div>
+        <span class="link">Explore -></span>
+      </a>
+      <a class="card" href="#" aria-label="Evaluate My Skills">
+        <span class="card-icon" style="background:#eafff7;color:#16a37e">◎</span>
+        <div><h3>Evaluate My Skills</h3><p>Test your knowledge and track mastery</p></div>
+        <span class="link">Explore -></span>
+      </a>
+      <a class="card" href="#" aria-label="PALS">
+        <span class="card-icon" style="background:#f3edff;color:#8b4fe8">⌘</span>
+        <div><h3>PALS</h3><p>Follow your personalized learning journey</p></div>
+        <span class="link">Explore -></span>
+      </a>
+      <a class="card" href="psychometric-assessment-prototype.html" aria-label="Personality Test">
+        <span class="card-icon" style="background:#fff7e6;color:#d99117">☷</span>
+        <div><h3>Personality Test</h3><p>Discover your learning style with the Interest and Preference Profile</p></div>
+        <span class="link">Start Assessment -></span>
+      </a>
+      <a class="card" href="#" aria-label="CBL">
+        <span class="card-icon" style="background:#eafffb;color:#159a9a">▤</span>
+        <div><h3>CBL</h3><p>Practice real-world scenarios with AI role-play</p></div>
+        <span class="link">Explore -></span>
+      </a>
+    </section>
+  </main>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const typeFromUrl = params.get("type");
+    if (typeFromUrl) {
+      localStorage.setItem("psychometricPreferenceCode", typeFromUrl);
+    }
+    const savedType = typeFromUrl || localStorage.getItem("psychometricPreferenceCode");
+    const bannerResult = document.getElementById("bannerResult");
+    const typePill = document.getElementById("typePill");
+    if (savedType) {
+      typePill.textContent = savedType;
+      typePill.href = `psychometric-assessment-prototype.html?summary=1&type=${encodeURIComponent(savedType)}`;
+      bannerResult.classList.add("visible");
+    }
+  </script>
+</body>
+</html>
