@@ -101,7 +101,6 @@ function renderOverview() {
                 <span>${course.activity}</span>
               </div>
               <div class="course-tile-footer">
-                ${progress(course.progress)}
                 <span>View details</span>
               </div>
             </button>

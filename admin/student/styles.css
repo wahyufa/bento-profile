@@ -355,8 +355,8 @@ select {
 
 .course-tile-footer {
   margin-top: auto;
-  display: grid;
-  gap: 12px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .course-tile-footer > span {

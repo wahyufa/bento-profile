@@ -1237,6 +1237,13 @@
       font-weight: 700;
     }
 
+    .preference-card p {
+      margin: 4px 0 0;
+      color: #3d4856;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
     .split-labels,
     .split-values {
       display: flex;
@@ -2702,20 +2709,6 @@
 
       screenEl.innerHTML = `
         <div class="report-shell">
-          <details class="personality-result">
-            <summary>
-              <span class="personality-result-title">
-                <span>Personality test result</span>
-                <strong>${pCode} Preference Profile</strong>
-              </span>
-              <span class="personality-code">${pCode}</span>
-            </summary>
-            <div class="personality-detail">
-              <p>Your preference type is a guide to how you may prefer to use energy, process information, make decisions, and organise your learning. Click the label any time to open or close this detail.</p>
-              ${listHtml(typeNotes, 3)}
-            </div>
-          </details>
-
           <div class="report-pages">
             <section class="report-page">
               <div class="report-page-header">
@@ -2737,6 +2730,20 @@
               <div class="insight-grid">${interestCards(iScores)}</div>
               <div class="definition-block">Interest Profile uses the RIASEC model: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional. Your highest areas can guide career exploration, project choices, and learning activities.</div>
             </section>
+
+            <details class="personality-result">
+              <summary>
+                <span class="personality-result-title">
+                  <span>Personality test result</span>
+                  <strong>${pCode} Preference Profile</strong>
+                </span>
+                <span class="personality-code">${pCode}</span>
+              </summary>
+              <div class="personality-detail">
+                <p>Your preference type is a guide to how you may prefer to use energy, process information, make decisions, and organise your learning. Click the label any time to open or close this detail.</p>
+                ${listHtml(typeNotes, 3)}
+              </div>
+            </details>
 
             <section class="report-page">
               <div class="report-page-header">
