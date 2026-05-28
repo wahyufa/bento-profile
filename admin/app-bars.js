@@ -344,7 +344,7 @@ function renderAdminDetail() {
           ${strands.map((strand) => `
             <article class="strand-card">
               <div class="strand-head"><div><strong>${strand.name}</strong><small>${strand.sub.length} sub-strands</small></div>${progress(strand.progress)}</div>
-              <div class="topic-list">${strand.sub.map(([subName, topics]) => `<div><strong>${subName}</strong>${topics.map(([topic, value]) => `<div class="topic-row"><span>${topic}</span><div class="progress"><span style="--value:${value}%"></span></div><b>${value}%</b></div>`).join("")}</div>`).join("")}</div>
+              <div class="topic-list">${strand.sub.map(([subName, topics]) => `<div><strong>${subName}</strong>${topics.map(([topic, value]) => `<div class="topic-row"><span>${topic}</span><div class="progress"><span style="--value:${value}%; --bar-color:${completionColor(value)}"></span></div><b>${value}%</b></div>`).join("")}</div>`).join("")}</div>
             </article>
           `).join("")}
         </div></section>

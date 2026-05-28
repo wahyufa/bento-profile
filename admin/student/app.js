@@ -168,7 +168,7 @@ function renderCourseDetail() {
                     <details class="substrand-card">
                       <summary class="substrand-head"><strong>${subName}</strong>${progress(subStrandScore(topics))}<span class="chevron">${svgIcon("chevronDown")}</span></summary>
                       <div class="topic-rows">
-                        ${topics.map(([topic, value]) => `<div class="topic-row"><span>${topic}</span><div class="progress"><span style="--value:${value}%"></span></div><b>${value}%</b></div>`).join("")}
+                        ${topics.map(([topic, value]) => `<div class="topic-row"><span>${topic}</span><div class="progress"><span style="--value:${value}%; --bar-color:${completionColor(value)}"></span></div><b>${value}%</b></div>`).join("")}
                       </div>
                     </details>
                   `).join("")}
