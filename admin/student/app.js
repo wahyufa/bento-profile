@@ -56,11 +56,9 @@ function progress(value) {
 }
 
 function completionColor(value) {
-  const low = [114, 198, 231];
-  const high = [18, 112, 78];
-  const ratio = Math.max(0, Math.min(1, value / 100));
-  const channel = (index) => Math.round(low[index] + (high[index] - low[index]) * ratio);
-  return `rgb(${channel(0)}, ${channel(1)}, ${channel(2)})`;
+  if (value < 50) return "#EF4444";
+  if (value <= 75) return "#F5B83D";
+  return "#5EC26A";
 }
 
 function average(values) {

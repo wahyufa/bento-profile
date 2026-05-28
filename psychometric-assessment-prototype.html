@@ -1250,9 +1250,18 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      color: var(--muted);
       font-size: 11px;
       font-weight: 700;
+    }
+
+    .split-labels span:first-child,
+    .split-values span:first-child {
+      color: var(--left-color);
+    }
+
+    .split-labels span:last-child,
+    .split-values span:last-child {
+      color: var(--right-color);
     }
 
     .split-bar {
@@ -1265,12 +1274,12 @@
 
     .split-bar span:first-child {
       border-radius: 999px 0 0 999px;
-      background: var(--brand);
+      background: linear-gradient(90deg, var(--left-start), var(--left-color));
     }
 
     .split-bar span:last-child {
       border-radius: 0 999px 999px 0;
-      background: #bde8fb;
+      background: linear-gradient(90deg, var(--right-fill, var(--right-color)), var(--right-end));
     }
 
     .result-code {
@@ -2648,12 +2657,55 @@
 
     function preferenceDimensionRows(scores) {
       const rows = [
-        ['Energy', 'E', 'Extravert', 'I', 'Introvert'],
-        ['Perception', 'S', 'Sensing', 'N', 'Intuitive'],
-        ['Judgement', 'T', 'Thinking', 'F', 'Feeling'],
-        ['Lifestyle', 'J', 'Judging', 'P', 'Perceiving']
+        {
+          dimension: 'Energy',
+          leftCode: 'E',
+          leftName: 'Extravert',
+          rightCode: 'I',
+          rightName: 'Introvert',
+          leftStart: '#f414d7',
+          leftColor: '#f414d7',
+          rightColor: '#f282f0',
+          rightEnd: '#f282f0'
+        },
+        {
+          dimension: 'Perception',
+          leftCode: 'S',
+          leftName: 'Sensing',
+          rightCode: 'N',
+          rightName: 'Intuitive',
+          leftStart: '#ff5b00',
+          leftColor: '#ff5b00',
+          rightColor: '#ff9364',
+          rightEnd: '#ff9364'
+        },
+        {
+          dimension: 'Judgement',
+          leftCode: 'T',
+          leftName: 'Thinking',
+          rightCode: 'F',
+          rightName: 'Feeling',
+          leftStart: '#399be5',
+          leftColor: '#399be5',
+          rightText: '#4a9bc7',
+          rightColor: '#d9effb',
+          rightEnd: '#d9effb'
+        },
+        {
+          dimension: 'Lifestyle',
+          leftCode: 'J',
+          leftName: 'Judging',
+          rightCode: 'P',
+          rightName: 'Perceiving',
+          leftStart: '#69ad3e',
+          leftColor: '#69ad3e',
+          rightText: '#72a957',
+          rightColor: '#d4ecc5',
+          rightEnd: '#d4ecc5'
+        }
       ];
-      return rows.map(([dimension, leftCode, leftName, rightCode, rightName]) => {
+      return rows.map((row) => {
+        const { dimension, leftCode, leftName, rightCode, rightName, leftStart, leftColor, rightColor, rightEnd, rightText } = row;
         const leftScore = scores[leftName] || 0;
         const rightScore = scores[rightName] || 0;
         const total = Math.max(1, leftScore + rightScore);
@@ -2662,7 +2714,7 @@
         const winnerCode = leftPct >= rightPct ? leftCode : rightCode;
         const winner = preferenceInfo[winnerCode];
         return `
-          <section class="preference-card">
+          <section class="preference-card" style="--left-start:${leftStart}; --left-color:${leftColor}; --right-color:${rightText || rightColor}; --right-fill:${rightColor}; --right-end:${rightEnd};">
             <h4>${dimension}: ${winner.label}</h4>
             <div class="split-labels"><span>${leftName}</span><span>${rightName}</span></div>
             <div class="split-bar"><span style="width:${leftPct}%"></span><span style="width:${rightPct}%"></span></div>
@@ -2809,13 +2861,13 @@
         const type = dashboardButton.dataset.backDashboard;
         if (type) {
           try { localStorage.setItem('psychometricPreferenceCode', type); } catch (error) {}
-          window.location.href = `atlas-student-dashboard.html?type=${encodeURIComponent(type)}`;
+          window.location.href = `atlas-student-dashboard?type=${encodeURIComponent(type)}`;
         } else {
-          window.location.href = 'atlas-student-dashboard.html';
+          window.location.href = 'atlas-student-dashboard';
         }
         return;
       }
-      if (event.target.closest('#backToDashboard')) { window.location.href = 'atlas-student-dashboard.html'; return; }
+      if (event.target.closest('#backToDashboard')) { window.location.href = 'atlas-student-dashboard'; return; }
       const answer = event.target.closest('[data-answer-id]');
       if (answer) { setAnswer(answer.dataset.answerId, Number(answer.dataset.answerValue)); return; }
       if (event.target.closest('[data-start]')) { state.screen = 'questions'; state.assessment = 'interest'; state.page = 0; render(); return; }

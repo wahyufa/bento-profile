@@ -118,7 +118,13 @@ function hydrateIcons(root = document) {
 }
 
 function progress(value) {
-  return `<div class="progress-wrap"><div class="progress"><span style="--value:${value}%"></span></div><b>${value}%</b></div>`;
+  return `<div class="progress-wrap"><div class="progress"><span style="--value:${value}%; --bar-color:${completionColor(value)}"></span></div><b>${value}%</b></div>`;
+}
+
+function completionColor(value) {
+  if (value < 50) return "#EF4444";
+  if (value <= 75) return "#F5B83D";
+  return "#5EC26A";
 }
 
 function rangeAdjustedCompletion(value) {
@@ -139,7 +145,7 @@ function renderCourseMastery() {
       <div class="hbar-chart kp-chart">
         ${["Digital Marketing St...", "Character Education:...", "Build online audienc...", "Introduction to Sale"].map((label, index) => `
           <div class="hbar-label" style="grid-row:${index + 1}">${label}</div>
-          <div class="hbar-track" style="grid-row:${index + 1}"><span style="--value:${index === 1 ? 3 : 0}%"></span></div>
+          <div class="hbar-track" style="grid-row:${index + 1}"><span style="--value:${index === 1 ? 3 : 0}%; --bar-color:${completionColor(index === 1 ? 3 : 0)}"></span></div>
         `).join("")}
         <div class="axis axis-0">0%</div><div class="axis axis-25">25%</div><div class="axis axis-50">50%</div><div class="axis axis-75">75%</div><div class="axis axis-100">100%</div>
       </div>
@@ -285,7 +291,7 @@ function renderAdminCourses() {
           const value = adjustedCourse(course, index);
           return `
             <article class="course-card" data-course="${course.id}">
-              <div class="course-ring-wrap"><div class="ring" style="--value:${value}"><b>${value}%</b></div></div>
+              <div class="course-ring-wrap"><div class="ring" style="--value:${value}; --ring-color:${completionColor(value)}"><b>${value}%</b></div></div>
               <div class="course-copy"><h3>${course.name}</h3><p>${state.adminView === "group" ? course.enrolments + " enrolments" : "Last activity 3 days ago"}</p></div>
             </article>
           `;
