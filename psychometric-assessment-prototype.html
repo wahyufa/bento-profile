@@ -1500,6 +1500,12 @@
       list-style: none;
     }
 
+    .personality-result summary:hover .personality-code,
+    .personality-result[open] .personality-code {
+      background: #088fcb;
+      transform: translateY(-1px);
+    }
+
     .personality-result summary::-webkit-details-marker {
       display: none;
     }
@@ -1523,9 +1529,17 @@
       font-weight: 700;
     }
 
+    .personality-result-title em {
+      color: var(--brand-dark);
+      font-style: normal;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
     .personality-code {
       display: inline-flex;
       align-items: center;
+      gap: 8px;
       min-height: 38px;
       padding: 0 14px;
       border-radius: 999px;
@@ -1533,6 +1547,21 @@
       color: #fff;
       font-size: 15px;
       font-weight: 700;
+      transition: background .18s ease, transform .18s ease;
+    }
+
+    .personality-code::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform .18s ease;
+    }
+
+    .personality-result[open] .personality-code::after {
+      transform: rotate(225deg) translateY(-2px);
     }
 
     .personality-detail {
@@ -2595,14 +2624,14 @@
     };
 
     const preferenceInfo = {
-      E: { label: 'Extravert', dimension: 'Energy', summary: 'You may build energy through interaction, teamwork, variety, and face-to-face communication.' },
-      I: { label: 'Introvert', dimension: 'Energy', summary: 'You may build energy through focus time, reflection, independence, and written communication.' },
-      S: { label: 'Sensing', dimension: 'Perception', summary: 'You may prefer facts, practical work, clear goals, routines, and familiar methods.' },
-      N: { label: 'Intuitive', dimension: 'Perception', summary: 'You may prefer ideas, possibilities, innovation, creative problem-solving, and future planning.' },
-      T: { label: 'Thinking', dimension: 'Judgement', summary: 'You may prefer logic, objective analysis, fair principles, and decisions based on facts.' },
-      F: { label: 'Feeling', dimension: 'Judgement', summary: 'You may prefer personal values, harmony, empathy, and decisions that consider people.' },
-      J: { label: 'Judging', dimension: 'Lifestyle', summary: 'You may prefer order, structure, clear deadlines, established plans, and completed decisions.' },
-      P: { label: 'Perceiving', dimension: 'Lifestyle', summary: 'You may prefer flexibility, open options, process, spontaneity, and adapting as things change.' }
+      E: { label: 'Extravert', dimension: 'Energy', summary: 'The Extravert type is often characterized as: Sociable, enthusiastic, proactive.' },
+      I: { label: 'Introvert', dimension: 'Energy', summary: 'The Introvert type is often characterized as: Persistent, determined, thorough.' },
+      S: { label: 'Sensing', dimension: 'Perception', summary: 'The Sensing type is often characterized as: Sturdy, sensible, practical.' },
+      N: { label: 'Intuitive', dimension: 'Perception', summary: 'The iNtuitive type is often characterized as: Visionary, innovative, creative.' },
+      T: { label: 'Thinking', dimension: 'Judgement', summary: 'The Thinking type is often characterized as: Logical, fair, critical.' },
+      F: { label: 'Feeling', dimension: 'Judgement', summary: 'The Feeling type is often characterized as: Warm, friendly, emotion-based.' },
+      J: { label: 'Judging', dimension: 'Lifestyle', summary: 'The Judging type is often characterized as: Hardworking, efficient, goal-oriented.' },
+      P: { label: 'Perceiving', dimension: 'Lifestyle', summary: 'The Perceiving type is often characterized as: Flexible, spontaneous, freely expressive.' }
     };
 
     const preferenceTypeNotes = {
@@ -2622,6 +2651,45 @@
       ISFP: ['Practical, sensitive, and flexible', 'Motivated by freedom, values, and hands-on expression', 'May need support with direct conflict and long-term structure'],
       ISTJ: ['Reliable, precise, and orderly', 'Motivated by facts, clear rules, and responsible completion', 'May need care when change, ambiguity, or abstract ideas dominate'],
       ISTP: ['Practical, calm, and problem-focused', 'Motivated by independence, action, and troubleshooting', 'May need support with long-term plans and people-centred communication']
+    };
+
+    const latestPreferenceProfiles = {
+      ENTJ: {
+        overview: 'People whose preferred functions are Thinking and iNtuitive develop their natural skill sets by comprehending and developing theoretical connections. They usually organize groups and events, and enjoy competitive sports. These skills and preferences will evolve in jobs with theoretical/technical development.',
+        characterised: ['Sociable, independent, rational, knowledgeable, theoretical, strategic, ambitious, logical, critical, fair, goal-oriented, charismatic, decisive, structured, and systematic'],
+        motivated: ['lead and take control', 'focus on results and make decisions', 'work independently'],
+        environment: ['Intellectual challenges', 'Room for long-term planning', 'Discussions with creative and charismatic people', 'Respect and recognition from people they hold in high regard', 'Logical, competent, and result-oriented people'],
+        strengths: ['Logic and analysis', 'Goal-oriented actions and implementations', 'Visions and new opportunities', 'High sense of standards and quality', 'Ability to develop new ideas', 'Clear communication'],
+        challenges: ['Emotional issues', 'Showing appreciation and giving recognition', 'Making rushed decisions', 'Neglecting consideration for other people and their feelings'],
+        demotivated: ['Incompetence', 'Lack of action', 'Lack of intellectual challenges and ambitions', 'Dependence on others']
+      },
+      INTJ: {
+        overview: 'People whose preferred functions are Intuitive and Thinking often develop strengths through theoretical connections, strategy, systems, analysis, and technical or intellectual problem-solving.',
+        characterised: ['Visionary, intellectual, systematic, and logical', 'Ambitious, competitive, organised, independent, and determined', 'Goal-oriented, decisive, impatient, and argumentative'],
+        motivated: ['Create new ideas of high quality', 'Focus on tasks and results before people and feelings', 'Concentrate and work without distractions'],
+        environment: ['Respect and recognition from valued people', 'Room to work independently', 'Logical and innovative people', 'Creative and intellectual challenges', 'Space to concentrate without distractions'],
+        strengths: ['Visionary thinking', 'Seeing opportunities and relations', 'Problem-solving', 'Building systems or organisations', 'High standards and quality', 'Decisive implementation'],
+        challenges: ['Staying grounded and pragmatic', 'Focusing case by case', 'Practical routine work', 'Emotional problems and personal crises'],
+        demotivated: ['Incompetence', 'Lack of action', 'Lack of intellectual challenges and ambition', 'Strong dependence on others', 'Too much focus on feelings']
+      },
+      ISTJ: {
+        overview: 'People whose preferred functions are Sensing and Thinking often develop strengths through practical facts, experience, attention to detail, and immediate action.',
+        characterised: ['Sturdy, practical, rule-aware, and factual', 'Traditional, organised, accurate, conscientious, and reliable', 'Sensible, stable, loyal to authority, and trustworthy'],
+        motivated: ['Concentrate and perform without distractions', 'Focus on details', 'Complete tasks in structured, orderly, and stable surroundings'],
+        environment: ['Clear deadlines and outcomes', 'Long-term planning', 'Safety and security', 'Pragmatic decision-makers', 'Hardworking and results-oriented people'],
+        strengths: ['Awareness of relevant facts', 'Identifying necessary actions', 'Stability and structure', 'Understanding financial literacy', 'Procedural work', 'Responsibility'],
+        challenges: ['Changes and insecurity', 'Creativity and innovation', 'Long-term perspectives', 'Consideration for others', 'Being flexible and open-minded'],
+        demotivated: ['Disorder', 'Ambiguous decisions', 'Lack of structure', 'Unpredictable environments']
+      },
+      ESFJ: {
+        overview: 'People whose preferred functions are Feeling and Sensing often develop strengths by responding to other people needs through hands-on service, assistance, care, and practical support.',
+        characterised: ['Helpful, loyal, sympathetic, compassionate, and cooperative', 'Dutiful, responsible, steadfast, accurate, and respectful', 'Detail-oriented and efficient'],
+        motivated: ['Help others', 'Focus on details', 'Finalise tasks in structured and steady surroundings'],
+        environment: ['Clear deadlines and results', 'Safety and security', 'Warm and caring people', 'Opportunities for long-term planning', 'Efficient systems', 'Pragmatic decision-makers'],
+        strengths: ['Compassion', 'Understanding and empathy', 'Support and desire to help others', 'Contributing to stability and harmony', 'Seeing what must be done and doing it', 'Sense of responsibility'],
+        challenges: ['Acting too quickly without a holistic understanding', 'Being emotionally distant in objective analysis', 'Responding firmly and directly to conflicts', 'Overlooking own needs and interests'],
+        demotivated: ['Criticism', 'Lack of feedback', 'Lack of structure', 'Unpredictable situations']
+      }
     };
 
     function topScoreEntries(scores, limit = 3) {
@@ -2734,6 +2802,19 @@
       return notes;
     }
 
+    function latestPreferenceProfile(code) {
+      const notes = preferenceTypeDetail(code);
+      return latestPreferenceProfiles[code] || {
+        overview: 'Your preference type is a guide to how you may prefer to use energy, take in information, make decisions, and organise your work. It describes natural preferences, not fixed ability.',
+        characterised: [notes[0], preferenceInfo[code[0]].summary, preferenceInfo[code[1]].summary],
+        motivated: [notes[1], preferenceInfo[code[2]].summary, preferenceInfo[code[3]].summary],
+        environment: ['Work settings that fit your strongest preferences', 'Tasks that let you use your natural strengths', 'Support when a task requires your less preferred side'],
+        strengths: [notes[0], preferenceInfo[code[1]].summary, preferenceInfo[code[2]].summary],
+        challenges: [notes[2], 'Situations that require sustained use of the opposite preferences'],
+        demotivated: ['Low fit between the task and your natural preferences', 'Unclear expectations or limited support']
+      };
+    }
+
     function showSavedSummaryFromUrl() {
       const params = new URLSearchParams(window.location.search);
       if (params.get('summary') !== '1') return;
@@ -2758,6 +2839,7 @@
       const topInterestPct = Math.round(topInterest[1] / 60 * 100);
       const topInterestInfo = interestInfo[topInterest[0]] || { short: '', detail: '' };
       const typeNotes = preferenceTypeDetail(pCode);
+      const preferenceProfile = latestPreferenceProfile(pCode);
 
       screenEl.innerHTML = `
         <div class="report-shell">
@@ -2788,12 +2870,13 @@
                 <span class="personality-result-title">
                   <span>Personality test result</span>
                   <strong>${pCode} Preference Profile</strong>
+                  <em>Click to view details</em>
                 </span>
                 <span class="personality-code">${pCode}</span>
               </summary>
               <div class="personality-detail">
-                <p>Your preference type is a guide to how you may prefer to use energy, process information, make decisions, and organise your learning. Click the label any time to open or close this detail.</p>
-                ${listHtml(typeNotes, 3)}
+                <p>${preferenceProfile.overview}</p>
+                ${listHtml(preferenceProfile.characterised, 3)}
               </div>
             </details>
 
@@ -2802,7 +2885,7 @@
                 <div>
                   <p class="report-page-label">Preference overview</p>
                   <h2 class="report-page-title">Preference Profile</h2>
-                  <p class="report-page-subtitle">Your preference profile shows how you may prefer to use energy, take in information, make decisions, and organise your day-to-day work.</p>
+                  <p class="report-page-subtitle">Your preference profile shows how you may prefer to use energy, take in information, make decisions, and organise your work.</p>
                 </div>
                 <span class="page-chip">${pCode}</span>
               </div>
@@ -2810,7 +2893,7 @@
                 <article class="result-big-card">
                   <span>Your preference type</span>
                   <strong>${pCode}</strong>
-                  <p>This is a guide to your natural preferences. It is not a fixed label and can change by situation.</p>
+                  <p>${preferenceProfile.overview}</p>
                 </article>
                 <div class="type-summary">${typeLetters(pCode)}</div>
               </div>
@@ -2822,19 +2905,21 @@
                 <div>
                   <p class="report-page-label">Preference detail</p>
                   <h2 class="report-page-title">${pCode} Detail</h2>
-                  <p class="report-page-subtitle">Your preference type is translated into practical notes for learning, teamwork, and career reflection.</p>
+                  <p class="report-page-subtitle">This section translates your preference type into practical notes from the latest detailed type description.</p>
                 </div>
                 <span class="page-chip">Preference detail</span>
               </div>
               <section class="quick-summary">
                 <h3>How to read this result</h3>
-                <p>Your profile describes preferences, not ability. Use it to notice what gives you energy, what helps you learn well, and what situations may need extra support.</p>
+                <p>Your profile describes preferences, not ability. Use it to notice what gives you energy, where you may thrive, and which situations may need extra support.</p>
               </section>
               <section class="profile-panels">
-                <article class="profile-panel"><div class="panel-icon">1</div><h3>Likely strengths</h3>${listHtml([typeNotes[0], preferenceInfo[pCode[1]].summary, preferenceInfo[pCode[2]].summary], 4)}</article>
-                <article class="profile-panel"><div class="panel-icon">2</div><h3>What may motivate you</h3>${listHtml([typeNotes[1], preferenceInfo[pCode[0]].summary, preferenceInfo[pCode[3]].summary], 4)}</article>
-                <article class="profile-panel"><div class="panel-icon">3</div><h3>Possible challenges</h3>${listHtml([typeNotes[2], 'You may need to practise using the opposite preferences when a task requires them.'], 4)}</article>
-                <article class="profile-panel"><div class="panel-icon">4</div><h3>Helpful next step</h3>${listHtml(['Compare this result with the activities you enjoy most.', 'Look for learning tasks that match both your interest profile and your preference profile.'], 4)}</article>
+                <article class="profile-panel"><div class="panel-icon">1</div><h3>Often characterised as</h3>${listHtml(preferenceProfile.characterised, 4)}</article>
+                <article class="profile-panel"><div class="panel-icon">2</div><h3>What may motivate you</h3>${listHtml(preferenceProfile.motivated, 4)}</article>
+                <article class="profile-panel"><div class="panel-icon">3</div><h3>Work environments you may thrive in</h3>${listHtml(preferenceProfile.environment, 5)}</article>
+                <article class="profile-panel"><div class="panel-icon">4</div><h3>Strengths</h3>${listHtml(preferenceProfile.strengths, 6)}</article>
+                <article class="profile-panel"><div class="panel-icon">5</div><h3>Possible challenges</h3>${listHtml(preferenceProfile.challenges, 5)}</article>
+                <article class="profile-panel"><div class="panel-icon">6</div><h3>Demotivated by</h3>${listHtml(preferenceProfile.demotivated, 5)}</article>
               </section>
             </section>
           </div>
@@ -2861,13 +2946,13 @@
         const type = dashboardButton.dataset.backDashboard;
         if (type) {
           try { localStorage.setItem('psychometricPreferenceCode', type); } catch (error) {}
-          window.location.href = `atlas-student-dashboard?type=${encodeURIComponent(type)}`;
+          window.location.href = `atlas-student-dashboard.html?type=${encodeURIComponent(type)}`;
         } else {
-          window.location.href = 'atlas-student-dashboard';
+          window.location.href = 'atlas-student-dashboard.html';
         }
         return;
       }
-      if (event.target.closest('#backToDashboard')) { window.location.href = 'atlas-student-dashboard'; return; }
+      if (event.target.closest('#backToDashboard')) { window.location.href = 'atlas-student-dashboard.html'; return; }
       const answer = event.target.closest('[data-answer-id]');
       if (answer) { setAnswer(answer.dataset.answerId, Number(answer.dataset.answerValue)); return; }
       if (event.target.closest('[data-start]')) { state.screen = 'questions'; state.assessment = 'interest'; state.page = 0; render(); return; }
