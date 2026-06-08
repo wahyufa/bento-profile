@@ -1,0 +1,589 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AML/CFT Learning Module</title>
+    <style>
+      :root {
+        --navy: #344966;
+        --blue: #5a78d3;
+        --progress: #0f7798;
+        --track: #c5dae2;
+        --canvas: #f5f5f5;
+        --white: #ffffff;
+        --ink: #262626;
+        --muted: #7c7c7c;
+        font-family: "Trebuchet MS", Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-width: 320px;
+        min-height: 100vh;
+        color: var(--ink);
+        background: var(--canvas);
+      }
+
+      button {
+        border: 0;
+        font: inherit;
+      }
+
+      .course-header {
+        height: 96px;
+        display: grid;
+        grid-template-columns: 92px 1fr 92px;
+        align-items: center;
+        padding: 0 30px;
+        color: var(--white);
+        background: var(--navy);
+      }
+
+      .close {
+        width: 38px;
+        height: 38px;
+        padding: 0;
+        display: grid;
+        place-items: center;
+        color: var(--white);
+        background: transparent;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: background 160ms ease, transform 160ms ease;
+      }
+
+      .close:hover,
+      .close:focus-visible {
+        background: rgba(255, 255, 255, 0.13);
+        outline: none;
+        transform: scale(1.05);
+      }
+
+      .close::before,
+      .close::after {
+        position: absolute;
+        width: 25px;
+        height: 3px;
+        content: "";
+        background: currentColor;
+        border-radius: 999px;
+      }
+
+      .close::before {
+        transform: rotate(45deg);
+      }
+
+      .close::after {
+        transform: rotate(-45deg);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 29px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+        text-align: center;
+      }
+
+      .progress-band {
+        min-height: 46px;
+        display: grid;
+        grid-template-columns: auto minmax(120px, 1fr) auto;
+        gap: 22px;
+        align-items: center;
+        padding: 0 32px;
+        background: var(--white);
+        box-shadow: 0 5px 13px rgba(0, 0, 0, 0.07);
+      }
+
+      .progress-label,
+      .progress-value {
+        font-size: 19px;
+        font-weight: 700;
+      }
+
+      .progress-label {
+        letter-spacing: 0.15px;
+      }
+
+      .progress-value {
+        min-width: 88px;
+        text-align: right;
+      }
+
+      .progress-track {
+        height: 10px;
+        overflow: hidden;
+        background: var(--track);
+        border-radius: 999px;
+      }
+
+      .progress-fill {
+        height: 100%;
+        width: 8%;
+        background: var(--progress);
+        border-radius: inherit;
+        transition: width 300ms ease;
+      }
+
+      main {
+        --stage-vertical-space: clamp(40px, 12vh, 184px);
+        min-height: calc(100dvh - 142px);
+        display: grid;
+        grid-template-columns: minmax(88px, 1fr) minmax(620px, 980px) minmax(88px, 1fr);
+        gap: 50px;
+        align-items: center;
+        padding: calc(var(--stage-vertical-space) / 2) 54px;
+      }
+
+      .stage {
+        grid-column: 2;
+        width: min(100%, 980px, calc((100dvh - 142px - var(--stage-vertical-space)) * 1.114));
+        justify-self: center;
+        aspect-ratio: 980 / 880;
+        padding: 20px;
+        background: var(--white);
+        border-radius: 30px;
+      }
+
+      .lesson-card {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+        color: var(--white);
+        background: var(--blue);
+        border-radius: 20px;
+      }
+
+      .copy {
+        width: min(91%, 850px);
+        display: grid;
+        gap: 34px;
+        transform: translateY(-9px);
+        text-align: center;
+        animation: reveal 360ms ease both;
+      }
+
+      .copy p {
+        margin: 0;
+        font-size: clamp(20px, 1.65vw, 26px);
+        font-weight: 700;
+        line-height: 1.48;
+        letter-spacing: -0.3px;
+      }
+
+      .pagination {
+        position: absolute;
+        bottom: 22px;
+        left: 50%;
+        display: flex;
+        gap: 13px;
+        transform: translateX(-50%);
+      }
+
+      .dot {
+        width: 21px;
+        height: 21px;
+        padding: 0;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.34);
+        cursor: pointer;
+        transition: background 180ms ease, transform 180ms ease;
+      }
+
+      .dot:hover,
+      .dot:focus-visible {
+        background: rgba(255, 255, 255, 0.7);
+        outline: 3px solid rgba(255, 255, 255, 0.35);
+        outline-offset: 3px;
+        transform: scale(1.06);
+      }
+
+      .dot.active {
+        background: var(--white);
+      }
+
+      .arrow {
+        width: 94px;
+        height: 94px;
+        display: grid;
+        place-items: center;
+        color: #111111;
+        background: rgba(255, 255, 255, 0.88);
+        border-radius: 50%;
+        cursor: pointer;
+        transition: box-shadow 180ms ease, transform 180ms ease, opacity 180ms ease;
+      }
+
+      .arrow:hover,
+      .arrow:focus-visible {
+        outline: none;
+        box-shadow: 0 10px 22px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+      }
+
+      .arrow:disabled {
+        color: var(--muted);
+        cursor: not-allowed;
+        opacity: 0.58;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .arrow svg {
+        width: 36px;
+        height: 36px;
+        stroke: currentColor;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 1.7;
+      }
+
+      .previous {
+        justify-self: end;
+      }
+
+      .next {
+        grid-column: 3;
+        justify-self: start;
+      }
+
+      .exit-message {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        color: var(--white);
+        background: rgba(52, 73, 102, 0.96);
+        text-align: center;
+      }
+
+      .exit-message[hidden] {
+        display: none;
+      }
+
+      .exit-message div {
+        max-width: 520px;
+      }
+
+      .exit-message h2 {
+        margin: 0 0 10px;
+        font-size: 32px;
+      }
+
+      .exit-message p {
+        margin: 0 0 24px;
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      .resume {
+        padding: 13px 22px;
+        color: var(--navy);
+        background: var(--white);
+        border-radius: 999px;
+        cursor: pointer;
+        font-weight: 700;
+      }
+
+      @keyframes reveal {
+        from {
+          opacity: 0;
+          transform: translateY(2px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(-9px);
+        }
+      }
+
+      @media (max-width: 900px) {
+        .course-header {
+          height: 78px;
+          grid-template-columns: 50px 1fr 50px;
+          padding: 0 18px;
+        }
+
+        h1 {
+          font-size: 20px;
+        }
+
+        .progress-band {
+          min-height: 42px;
+          gap: 12px;
+          padding: 0 18px;
+        }
+
+        .progress-label,
+        .progress-value {
+          font-size: 14px;
+        }
+
+        main {
+          --stage-vertical-space: clamp(28px, 7vh, 64px);
+          min-height: calc(100dvh - 120px);
+          grid-template-columns: 1fr 1fr;
+          gap: 18px;
+          align-content: center;
+          padding: calc(var(--stage-vertical-space) / 2) 18px;
+        }
+
+        .stage {
+          grid-column: 1 / -1;
+          grid-row: 1;
+          width: min(100%, calc((100dvh - 120px - var(--stage-vertical-space) - 82px) * 1.114));
+          min-width: min(100%, 310px);
+          aspect-ratio: 980 / 880;
+          padding: 12px;
+          border-radius: 22px;
+        }
+
+        .lesson-card {
+          border-radius: 14px;
+        }
+
+        .copy {
+          gap: 24px;
+        }
+
+        .copy p {
+          font-size: clamp(17px, 3.7vw, 22px);
+        }
+
+        .arrow {
+          width: 64px;
+          height: 64px;
+        }
+
+        .previous,
+        .next {
+          grid-column: auto;
+          grid-row: 2;
+          justify-self: center;
+        }
+
+        .dot {
+          width: 16px;
+          height: 16px;
+        }
+      }
+
+      @media (max-height: 700px) {
+        .copy {
+          width: min(94%, 850px);
+          gap: 11px;
+          transform: translateY(-4px);
+        }
+
+        .copy p {
+          font-size: clamp(12px, 2.2vw, 17px);
+          line-height: 1.28;
+        }
+
+        .pagination {
+          bottom: 10px;
+          gap: 9px;
+        }
+
+        .dot {
+          width: 13px;
+          height: 13px;
+        }
+
+        @keyframes reveal {
+          from {
+            opacity: 0;
+            transform: translateY(2px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(-4px);
+          }
+        }
+      }
+
+      @media (max-height: 520px) {
+        .copy {
+          gap: 6px;
+          transform: translateY(-8px);
+        }
+
+        .copy p {
+          font-size: clamp(10px, 1.8vw, 13px);
+          line-height: 1.18;
+        }
+
+        .pagination {
+          bottom: 7px;
+          gap: 7px;
+        }
+
+        .dot {
+          width: 10px;
+          height: 10px;
+        }
+
+        @keyframes reveal {
+          from {
+            opacity: 0;
+            transform: translateY(2px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(-8px);
+          }
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="course-header">
+      <button class="close" type="button" aria-label="Close lesson"></button>
+      <h1>What AML/CFT Is and What It Aims to Prevent</h1>
+    </header>
+
+    <section class="progress-band" aria-label="Course progress">
+      <span class="progress-label">PROGRESS:</span>
+      <div class="progress-track" role="progressbar" aria-valuemin="1" aria-valuemax="13" aria-valuenow="1">
+        <div class="progress-fill"></div>
+      </div>
+      <span class="progress-value">1/13 (8%)</span>
+    </section>
+
+    <main>
+      <button class="arrow previous" type="button" aria-label="Previous slide" disabled>
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path d="M29 12 17 24l12 12"></path>
+          <path d="M18 24h19"></path>
+        </svg>
+      </button>
+
+      <section class="stage" aria-live="polite">
+        <article class="lesson-card">
+          <div class="copy"></div>
+          <nav class="pagination" aria-label="Lesson slides"></nav>
+        </article>
+      </section>
+
+      <button class="arrow next" type="button" aria-label="Next slide">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <path d="m19 12 12 12-12 12"></path>
+          <path d="M30 24H11"></path>
+        </svg>
+      </button>
+    </main>
+
+    <section class="exit-message" hidden>
+      <div>
+        <h2>Lesson paused</h2>
+        <p>Your progress has been kept in this prototype.</p>
+        <button class="resume" type="button">Resume lesson</button>
+      </div>
+    </section>
+
+    <script>
+      const slides = [
+        [
+          "AML means Anti Money Laundering; CFT means Counter Financing of Terrorism.",
+          "Both are regulatory frameworks to prevent criminals and terrorist organisations from using the financial system.",
+          "Their goal is to stop hiding illegal funds or financing unlawful activities through banks.",
+          "They exist to detect, disrupt, and prevent misuse of bank products and services."
+        ],
+        [
+          "Money laundering makes criminal proceeds appear legitimate.",
+          "It often involves moving money through several transactions to obscure where it came from.",
+          "Banks monitor unusual patterns so suspicious activity can be investigated early."
+        ],
+        [
+          "Terrorist financing may involve funds from legal or illegal sources.",
+          "The concern is how money is collected, moved, and used to support unlawful activity.",
+          "Strong controls help prevent financial services from being misused."
+        ],
+        [
+          "Know Your Customer checks help banks understand who they are serving.",
+          "Customers may be asked to confirm their identity, occupation, and source of funds.",
+          "Keeping information accurate protects both the bank and its customers."
+        ],
+        [
+          "Monitoring is an ongoing responsibility.",
+          "Transactions that do not match an expected pattern may require closer review.",
+          "A single unusual transaction is a signal to assess, not an automatic conclusion."
+        ],
+        [
+          "Everyone has a role in preventing misuse of financial services.",
+          "Follow internal procedures and escalate concerns through the proper reporting channels.",
+          "Do not alert a customer when an activity is under review."
+        ]
+      ];
+
+      const copy = document.querySelector(".copy");
+      const pagination = document.querySelector(".pagination");
+      const previous = document.querySelector(".previous");
+      const next = document.querySelector(".next");
+      const fill = document.querySelector(".progress-fill");
+      const progress = document.querySelector(".progress-track");
+      const progressValue = document.querySelector(".progress-value");
+      const exitMessage = document.querySelector(".exit-message");
+      let activeSlide = 0;
+
+      function render() {
+        const percent = Math.round(((activeSlide + 1) / 13) * 100);
+        copy.innerHTML = slides[activeSlide]
+          .map((line) => `<p>&bull; ${line}</p>`)
+          .join("");
+        copy.style.animation = "none";
+        copy.offsetHeight;
+        copy.style.animation = "";
+
+        pagination.innerHTML = slides
+          .map(
+            (_, index) =>
+              `<button class="dot${index === activeSlide ? " active" : ""}" type="button" aria-label="Go to slide ${index + 1}" aria-current="${index === activeSlide ? "step" : "false"}"></button>`
+          )
+          .join("");
+
+        fill.style.width = `${percent}%`;
+        progress.setAttribute("aria-valuenow", activeSlide + 1);
+        progressValue.textContent = `${activeSlide + 1}/13 (${percent}%)`;
+        previous.disabled = activeSlide === 0;
+        next.disabled = activeSlide === slides.length - 1;
+      }
+
+      function showSlide(index) {
+        activeSlide = Math.min(Math.max(index, 0), slides.length - 1);
+        render();
+      }
+
+      previous.addEventListener("click", () => showSlide(activeSlide - 1));
+      next.addEventListener("click", () => showSlide(activeSlide + 1));
+      pagination.addEventListener("click", (event) => {
+        const dots = [...pagination.querySelectorAll(".dot")];
+        const index = dots.indexOf(event.target);
+        if (index >= 0) showSlide(index);
+      });
+      document.querySelector(".close").addEventListener("click", () => {
+        exitMessage.hidden = false;
+      });
+      document.querySelector(".resume").addEventListener("click", () => {
+        exitMessage.hidden = true;
+      });
+      document.addEventListener("keydown", (event) => {
+        if (!exitMessage.hidden) return;
+        if (event.key === "ArrowLeft") showSlide(activeSlide - 1);
+        if (event.key === "ArrowRight") showSlide(activeSlide + 1);
+        if (event.key === "Escape") exitMessage.hidden = false;
+      });
+
+      render();
+    </script>
+  </body>
+</html>

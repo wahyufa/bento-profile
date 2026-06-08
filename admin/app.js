@@ -24,7 +24,9 @@ const icons = {
   cap: '<path d="m22 10-10-5-10 5 10 5 10-5Z"></path><path d="M6 12v5c3 2 9 2 12 0v-5"></path>',
   filter: '<path d="M22 3H2l8 9.5V20l4 2v-9.5L22 3Z"></path>',
   arrow: '<path d="m15 18-6-6 6-6"></path>',
-  trend: '<path d="m3 17 6-6 4 4 8-8"></path><path d="M14 7h7v7"></path>'
+  trend: '<path d="m3 17 6-6 4 4 8-8"></path><path d="M14 7h7v7"></path>',
+  mic: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path>',
+  message: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"></path>'
 };
 
 const courseRows = [
@@ -94,6 +96,30 @@ const skillTags = [
   { name: "Digital Collaboration", label: "Digital Collab.", progress: 71, questions: 7 }
 ];
 
+const cblEntities = {
+  group: [
+    { id: "sales", name: "Sales Enablement", learners: 32, practised: 24, attempts: 67, score: 78, time: "6h 42m" },
+    { id: "service", name: "Customer Service", learners: 28, practised: 21, attempts: 52, score: 72, time: "5h 18m" },
+    { id: "marketing", name: "Marketing Team", learners: 19, practised: 11, attempts: 24, score: 61, time: "2h 46m" },
+    { id: "operations", name: "Operations", learners: 41, practised: 17, attempts: 36, score: 54, time: "4h 11m" }
+  ],
+  individual: [
+    { id: "rock01", name: "rockwills_student01", learners: 1, practised: 4, attempts: 12, score: 80, time: "1h 26m" },
+    { id: "amira", name: "amira_student", learners: 1, practised: 3, attempts: 7, score: 74, time: "54m" },
+    { id: "elena", name: "elena_student", learners: 1, practised: 4, attempts: 9, score: 69, time: "1h 08m" },
+    { id: "ben", name: "benjamin_student", learners: 1, practised: 2, attempts: 4, score: 58, time: "37m" },
+    { id: "darren", name: "darren_student", learners: 1, practised: 1, attempts: 2, score: 42, time: "19m" },
+    { id: "datolow", name: "datolow_student", learners: 1, practised: 0, attempts: 0, score: null, time: "0m" }
+  ]
+};
+
+const cblCases = [
+  { name: "Banking Client Review Session", role: "Financial Services Specialist", attempted: 18, attempts: 42, score: 76, live: 26, turn: 16 },
+  { name: "Responding to a Renewal Risk", role: "Customer Success Manager", attempted: 15, attempts: 31, score: 68, live: 12, turn: 19 },
+  { name: "Managing a Project Delay", role: "Project Lead", attempted: 12, attempts: 22, score: 57, live: 14, turn: 8 },
+  { name: "Handling an Escalated Customer Complaint", role: "Customer Experience Specialist", attempted: 7, attempts: 11, score: 48, live: 4, turn: 7 }
+];
+
 const state = {
   mainTab: "pals",
   adminView: "group",
@@ -101,7 +127,9 @@ const state = {
   dateRange: "all",
   entityFilter: "all",
   selectedEntity: null,
-  selectedCourse: null
+  selectedCourse: null,
+  selectedCblCase: null,
+  selectedCblGroup: null
 };
 
 const appView = document.querySelector("#appView");
@@ -125,6 +153,17 @@ function completionColor(value) {
   if (value < 50) return "#EF4444";
   if (value <= 75) return "#F5B83D";
   return "#5EC26A";
+}
+
+function average(values) {
+  if (!values.length) return 0;
+  return Math.round(values.reduce((total, value) => total + value, 0) / values.length);
+}
+
+function weightedAverage(items) {
+  const totalAttempts = items.reduce((total, item) => total + item.attempts, 0);
+  if (!totalAttempts) return 0;
+  return Math.round(items.reduce((total, item) => total + (item.score * item.attempts), 0) / totalAttempts);
 }
 
 function rangeAdjustedCompletion(value) {
@@ -392,6 +431,117 @@ function renderSkillAnalytics() {
   `;
 }
 
+function renderAdminCBLOverview() {
+  const totalAttempts = cblCases.reduce((total, item) => total + item.attempts, 0);
+  const averageHighestScore = weightedAverage(cblCases);
+  const learnersAttempted = cblCases.reduce((highest, item) => Math.max(highest, item.attempted), 0);
+  return `
+    <section class="panel cbl-overview-panel">
+      <div class="cbl-admin-head">
+        <div>
+          <h2>CBL Analytics</h2>
+          <p>Review case-based learning practice and roleplay performance across your organization. Scores are averages from all attempts.</p>
+        </div>
+      </div>
+      <section class="cbl-admin-summary">
+        <article><span>Available cases</span><strong>${cblCases.length}</strong></article>
+        <article><span>Learners attempted</span><strong>${learnersAttempted}</strong></article>
+        <article><span>Total attempts</span><strong>${totalAttempts}</strong></article>
+        <article><span>Average highest score</span><strong>${averageHighestScore}%</strong></article>
+      </section>
+    </section>
+    <section class="panel cbl-admin-panel">
+      <div class="cbl-admin-list-head">
+        <div>
+          <h2><span class="title-icon">${svgIcon("trophy")}</span>Practice and Roleplay Cases</h2>
+        </div>
+      </div>
+      <div class="cbl-admin-tile-grid">
+        ${cblCases.map((item, index) => `
+          <article class="cbl-admin-tile">
+            <div class="cbl-admin-tile-ring"><div class="ring" style="--value:${item.score}; --ring-color:${completionColor(item.score)}"><b>${item.score}%</b></div></div>
+            <div class="cbl-admin-name"><strong>${item.name}</strong><span>Role: ${item.role}</span></div>
+            <div class="cbl-admin-tile-meta"><span>Average highest score</span><strong>${item.attempted} learners</strong></div>
+            <button class="view-button" data-cbl-case="${index}">View Details</button>
+          </article>
+        `).join("")}
+      </div>
+    </section>
+    ${renderAdminCBLModal()}
+  `;
+}
+
+function renderAdminCBLModal() {
+  const item = state.selectedCblCase;
+  if (!item) return "";
+  const selectedGroup = state.selectedCblGroup;
+  const groupBreakdown = cblEntities.group.map((group, index) => ({
+    id: group.id,
+    name: group.name,
+    learners: group.learners,
+    attempts: Math.max(1, Math.round(item.attempts * [.35, .28, .2, .17][index])),
+    score: Math.max(22, Math.min(96, item.score + [7, 2, -5, -10][index]))
+  }));
+  const learnerBreakdown = cblEntities.individual.slice(0, 5).map((learner, index) => ({
+    name: learner.name,
+    attempts: Math.max(1, Math.round((selectedGroup ? selectedGroup.attempts : item.attempts) / 12) + (index % 3)),
+    score: Math.max(18, Math.min(96, item.score + [9, 4, -2, -7, 1][index]))
+  }));
+  return `
+    <dialog class="cbl-report-modal" id="cblReportModal">
+      <form method="dialog">
+        <div class="cbl-modal-head">
+          <div>
+            <h2>${item.name}</h2>
+            <p>${selectedGroup ? `${selectedGroup.name} learner breakdown` : `Role: ${item.role}`}. Scores represent highest scores.</p>
+          </div>
+          <button class="cbl-modal-close" value="close" aria-label="Close">x</button>
+        </div>
+        <section class="cbl-modal-summary">
+          <article><span>Average highest score</span><strong>${selectedGroup ? selectedGroup.score : item.score}%</strong></article>
+          <article><span>Total attempts</span><strong>${selectedGroup ? selectedGroup.attempts : item.attempts}</strong></article>
+          <article><span>Learners attempted</span><strong>${selectedGroup ? selectedGroup.learners : item.attempted}</strong></article>
+        </section>
+        <div class="cbl-modal-modes">
+          <span>${svgIcon("mic")} ${item.live} Live</span>
+          <span>${svgIcon("message")} ${item.turn} Turn-based</span>
+        </div>
+        ${selectedGroup ? `
+          <section class="cbl-modal-section">
+            <button class="cbl-modal-back" type="button" data-cbl-group-back>${svgIcon("arrow")}Back to groups</button>
+            <h3>Learner Performance</h3>
+            <div class="cbl-modal-list learner-breakdown">
+              ${learnerBreakdown.map((entry) => `
+                <article>
+                  <div><strong>${entry.name}</strong><span>${entry.attempts} attempts</span></div>
+                  <div><span>Highest score</span>${progress(entry.score)}</div>
+                </article>
+              `).join("")}
+            </div>
+          </section>
+        ` : `
+          <section class="cbl-modal-section">
+            <h3>Group Performance</h3>
+            <div class="cbl-modal-list group-breakdown">
+              ${groupBreakdown.map((entry) => `
+                <article>
+                  <div><strong>${entry.name}</strong><span>${entry.learners} learners - ${entry.attempts} attempts</span></div>
+                  <div><span>Average highest score</span>${progress(entry.score)}</div>
+                  <button class="view-button" type="button" data-cbl-group="${entry.id}">View learners</button>
+                </article>
+              `).join("")}
+            </div>
+          </section>
+        `}
+      </form>
+    </dialog>
+  `;
+}
+
+function renderAdminCBL() {
+  return renderAdminCBLOverview();
+}
+
 function renderPlaceholder(title) {
   return `<section class="panel empty-panel"><h2>${title}</h2><p>Analytics for this area will appear here.</p></section>`;
 }
@@ -402,6 +552,7 @@ function render() {
   if (state.mainTab === "courses") appView.innerHTML = renderCourseMastery();
   if (state.mainTab === "pals") appView.innerHTML = renderPalsTab();
   if (state.mainTab === "skills") appView.innerHTML = renderSkillAnalytics();
+  if (state.mainTab === "cbl") appView.innerHTML = renderAdminCBL();
   if (state.mainTab === "assessments") appView.innerHTML = renderPlaceholder("Assessments");
   if (state.mainTab === "trends") appView.innerHTML = renderPlaceholder("Trends");
 }
@@ -414,6 +565,8 @@ document.addEventListener("click", (event) => {
     state.entityFilter = "all";
     state.selectedEntity = null;
     state.selectedCourse = null;
+    state.selectedCblCase = null;
+    state.selectedCblGroup = null;
     render();
     return;
   }
@@ -424,7 +577,40 @@ document.addEventListener("click", (event) => {
     state.proposalLevel = "overview";
     state.entityFilter = "all";
     state.selectedEntity = null;
+    state.selectedCblCase = null;
+    state.selectedCblGroup = null;
     render();
+    return;
+  }
+
+  const cblCase = event.target.closest("[data-cbl-case]");
+  if (cblCase) {
+    state.selectedCblCase = cblCases[Number(cblCase.dataset.cblCase)];
+    state.selectedCblGroup = null;
+    render();
+    document.querySelector("#cblReportModal")?.showModal();
+    return;
+  }
+
+  const cblGroup = event.target.closest("[data-cbl-group]");
+  if (cblGroup) {
+    state.selectedCblGroup = cblEntities.group.find((group) => group.id === cblGroup.dataset.cblGroup);
+    const groupIndex = cblEntities.group.findIndex((group) => group.id === cblGroup.dataset.cblGroup);
+    state.selectedCblGroup = {
+      ...state.selectedCblGroup,
+      attempts: Math.max(1, Math.round(state.selectedCblCase.attempts * [.35, .28, .2, .17][groupIndex])),
+      score: Math.max(22, Math.min(96, state.selectedCblCase.score + [7, 2, -5, -10][groupIndex]))
+    };
+    render();
+    document.querySelector("#cblReportModal")?.showModal();
+    return;
+  }
+
+  const cblGroupBack = event.target.closest("[data-cbl-group-back]");
+  if (cblGroupBack) {
+    state.selectedCblGroup = null;
+    render();
+    document.querySelector("#cblReportModal")?.showModal();
     return;
   }
 
