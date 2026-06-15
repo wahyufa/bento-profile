@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS Learn — Prototype v4 (Full Flow)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F5F6F8; --white: #FFFFFF; --border: #E4E7EC; --border-light: #EEF0F4;
+  --text: #101828; --text-sec: #475467; --text-muted: #98A2B3;
+  --teal: #10759D; --teal-dark: #0C5D80; --teal-btn: #0F6B8E;
+  --teal-light: #E6F4FA; --teal-mid: #9CCDE4; --teal-text: #10759D;
+  --green: #22C55E; --green-dark: #16A34A;
+  --amber: #F59E0B; --amber-bg: #FFFBEB; --amber-border: #FDE68A; --amber-dark: #D97706; --amber-text: #92400E;
+  --red: #EF4444; --purple: #6941C6; --blue: #3B82F6;
+  --strand-color: #0F6B8E; --substrand-color: #6941C6; --topic-color: #027A48;
+  --widget-bg: #0D3451; --widget-bg-dark: #0A2438;
+  --sidebar-w: 200px;
+  --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(16,24,40,0.05);
+  --shadow: 0 1px 3px rgba(16,24,40,0.1), 0 1px 2px rgba(16,24,40,0.06);
+  --shadow-md: 0 4px 8px rgba(16,24,40,0.08), 0 2px 4px rgba(16,24,40,0.06);
+  --shadow-lg: 0 12px 32px rgba(16,24,40,0.14), 0 4px 8px rgba(16,24,40,0.08);
+  --tr: 0.18s ease;
+}
+
+/* ── BASE ── */
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; font-size: 14px; -webkit-font-smoothing: antialiased; }
+
+/* Space Grotesk for headings & labels */
+.sg, .logo-text, .page-topbar-title, .sec-title,
+.wiz-card-title, .strand-name, .sub-name, .topic-name,
+.running-label, .done-title, .stat-num, .review-intro-title,
+.lc-strand-name, .q-topic-name, .lang-name, .lang-info-val,
+.kb-name, .toggle-label, .bw-title,
+.wiz-steps-label, .nav-sec { font-family: 'Space Grotesk', sans-serif; }
+
+/* ── TOPBAR ── */
+.topbar { height: 56px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; flex-shrink: 0; z-index: 20; box-shadow: var(--shadow-sm); }
+.topbar-logo-area { width: var(--sidebar-w); display: flex; align-items: center; padding: 0 16px; gap: 8px; border-right: 1px solid var(--border); height: 100%; flex-shrink: 0; }
+.logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #1A9FCC 0%, #10759D 50%, #0A4F6E 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; }
+.logo-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 16px; color: var(--text); letter-spacing: -0.3px; line-height: 1; }
+.logo-by { font-family: 'Inter', sans-serif; font-size: 9px; color: var(--text-muted); font-weight: 500; display: block; margin-top: 1px; }
+.topbar-right { margin-left: auto; padding-right: 16px; display: flex; align-items: center; gap: 8px; }
+.help-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-sec); padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all var(--tr); }
+.help-btn:hover { background: var(--bg); }
+
+/* ── LAYOUT ── */
+.layout { display: flex; flex: 1; overflow: hidden; }
+
+/* ── SIDEBAR ── */
+.sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 12px 8px 8px; flex-shrink: 0; overflow-y: auto; }
+.nav-sec { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-muted); padding: 10px 8px 5px; margin-top: 2px; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; font-size: 13px; font-weight: 500; color: var(--text-sec); border-radius: 6px; cursor: pointer; transition: all var(--tr); position: relative; line-height: 1.4; }
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--teal-light); color: var(--teal); font-weight: 600; }
+.nav-item svg, .nav-item i { width: 16px; height: 16px; flex-shrink: 0; }
+.nav-item i { display: inline-flex; }
+.nav-dot { width: 7px; height: 7px; background: var(--amber); border-radius: 50%; margin-left: auto; display: none; animation: blink 1.5s ease infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+.sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding: 10px 4px 4px; }
+.user-row { display: flex; align-items: center; gap: 9px; padding: 8px 6px; border-radius: 6px; cursor: pointer; }
+.user-row:hover { background: var(--bg); }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; flex-shrink: 0; }
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+/* ── MAIN ── */
+.main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.page.active { display: flex; }
+
+/* ── PAGE TOPBAR ── */
+.page-topbar { height: 56px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+.back-btn { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; padding: 6px 4px; transition: color var(--tr); }
+.back-btn:hover { color: var(--text); }
+.back-btn svg, .back-btn i { width: 16px; height: 16px; flex-shrink: 0; }
+.page-topbar-title { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+
+/* ── BUTTONS ── */
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 18px; height: 40px; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; font-family: 'Inter', sans-serif; transition: all var(--tr); letter-spacing: -0.1px; white-space: nowrap; }
+.btn-teal { background: var(--teal-btn); color: white; box-shadow: 0 1px 2px rgba(11,130,130,0.3); }
+.btn-teal:hover { background: var(--teal-dark); box-shadow: 0 2px 4px rgba(11,130,130,0.4); transform: translateY(-1px); }
+.btn-white { background: white; color: var(--text); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.btn-white:hover { background: var(--bg); }
+.btn-green { background: var(--green-dark); color: white; }
+.btn-green:hover { background: #14532d; }
+.btn-sm { height: 34px; padding: 0 14px; font-size: 13px; }
+.btn-xs { height: 28px; padding: 0 10px; font-size: 12px; border-radius: 6px; }
+
+/* ── KB LIST ── */
+.page-body { padding: 24px; flex: 1; overflow-y: auto; }
+.sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.sec-title { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.kb-table { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.kb-thead { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr 150px; padding: 10px 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg); }
+.kb-tr { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 1fr 150px; padding: 14px 20px; border-bottom: 1px solid var(--border-light); align-items: center; transition: background var(--tr); cursor: pointer; }
+.kb-tr:last-child { border-bottom: none; }
+.kb-tr:hover { background: #FAFBFC; }
+.kb-title-wrap { display: flex; align-items: center; gap: 10px; }
+.file-icon { width: 34px; height: 34px; background: var(--teal-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(16,117,157,0.12); color: var(--teal); }
+.kb-name { font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; font-weight: 600; color: var(--text); }
+.kb-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.cell { font-size: 13.5px; color: var(--text-sec); }
+.badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 600; }
+.badge-green { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+.badge-amber { background: var(--amber-bg); color: var(--amber-text); border: 1px solid var(--amber-border); }
+.badge-blue { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+
+/* ── ADD KB FORM ── */
+.form-wrap { padding: 28px 24px; max-width: 760px; overflow-y: auto; flex: 1; }
+.form-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); }
+.fg { margin-bottom: 20px; }
+.fl { font-size: 13.5px; font-weight: 600; color: var(--text); display: block; margin-bottom: 7px; }
+.fi { width: 100%; height: 42px; border: 1px solid var(--border); border-radius: var(--radius); padding: 0 13px; font-size: 14px; font-family: 'Inter', sans-serif; outline: none; color: var(--text); background: var(--white); transition: border-color var(--tr), box-shadow var(--tr); }
+.fi:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(11,123,123,0.1); }
+.fi::placeholder { color: var(--text-muted); }
+select.fi { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+.tabs-row { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 10px; background: var(--bg); }
+.tab-o { flex: 1; padding: 10px; text-align: center; font-size: 13.5px; font-weight: 600; cursor: pointer; color: var(--text-sec); border-right: 1px solid var(--border); transition: all var(--tr); display: flex; align-items: center; justify-content: center; gap: 6px; }
+.tab-o:last-child { border-right: none; }
+.tab-o.active { background: var(--white); color: var(--text); box-shadow: var(--shadow-sm); }
+.file-preview { background: #FAFBFC; border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; display: flex; align-items: center; gap: 12px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+
+/* ── WIZARD ── */
+.wizard-layout { display: flex; flex: 1; overflow: hidden; }
+.wiz-steps { width: 248px; background: var(--white); border-right: 1px solid var(--border); padding: 20px 10px; flex-shrink: 0; overflow-y: auto; }
+.wiz-steps-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-muted); padding: 0 6px; margin-bottom: 12px; }
+.ws { display: flex; align-items: flex-start; gap: 10px; padding: 9px 8px; border-radius: 6px; cursor: default; }
+.ws-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; flex-shrink: 0; margin-top: 1px; }
+.ws-num.done { background: var(--teal); color: white; }
+.ws-num.active { background: var(--teal); color: white; }
+.ws-num.warn { background: var(--amber); color: white; }
+.ws-num.pending { background: var(--bg); color: var(--text-muted); border: 1.5px solid var(--border); }
+.ws-text { font-size: 13px; font-weight: 500; color: var(--text-muted); line-height: 1.4; }
+.ws.active .ws-text, .ws.warn-state .ws-text { color: var(--text); font-weight: 600; }
+.ws.done .ws-text { color: var(--text-sec); }
+.ws-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.ws.active .ws-hint { color: var(--teal); }
+.ws.warn-state .ws-hint { color: var(--amber-dark); font-weight: 600; }
+.wc { width: 2px; height: 16px; background: var(--border); margin: 1px 0 1px 21px; border-radius: 1px; }
+.wc.done { background: var(--teal); }
+
+/* Wizard panel right */
+.wiz-panel { flex: 1; overflow-y: auto; padding: 24px; background: var(--bg); }
+.wiz-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.wiz-card-head { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); }
+.wiz-card-title { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+.wiz-card-sub { font-size: 13px; color: var(--text-sec); margin-top: 5px; line-height: 1.5; }
+
+/* Running state */
+.running-box { padding: 40px 32px; text-align: center; }
+.spinner { width: 34px; height: 34px; border: 3px solid var(--teal-light); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.85s linear infinite; margin: 0 auto 16px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.running-label { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; color: var(--teal); letter-spacing: -0.1px; }
+.running-desc { font-size: 13px; color: var(--text-muted); margin-top: 6px; line-height: 1.5; }
+.running-bar-wrap { height: 4px; background: var(--teal-light); border-radius: 2px; margin: 18px 0 7px; overflow: hidden; }
+.running-bar { height: 100%; background: var(--teal); border-radius: 2px; transition: width 0.4s ease; }
+.running-pct { font-size: 12.5px; color: var(--text-muted); font-weight: 500; }
+
+/* Review pill */
+.review-pill { display: inline-flex; align-items: center; gap: 5px; background: var(--amber-bg); color: var(--amber-text); border: 1px solid var(--amber-border); padding: 3px 11px; border-radius: 99px; font-size: 12px; font-weight: 600; margin-bottom: 12px; }
+
+/* Wizard actions footer */
+.wiz-actions { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: #FAFBFC; }
+
+/* ── GENERATION LANGUAGE ── */
+.lang-body { padding: 24px; }
+.lang-options { display: flex; flex-direction: column; gap: 10px; }
+.lang-option { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all var(--tr); background: var(--white); }
+.lang-option:hover { border-color: var(--teal-mid); background: #FAFCFC; }
+.lang-option.selected { border-color: var(--teal); background: var(--teal-light); }
+.lang-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all var(--tr); }
+.lang-option.selected .lang-radio { border-color: var(--teal); background: var(--teal); }
+.lang-option.selected .lang-radio::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; }
+.lang-name { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); }
+.lang-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── SKILL TREE ── */
+.review-intro { padding: 16px 24px; border-bottom: 1px solid var(--border); }
+.review-intro-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.review-intro-desc { font-size: 13px; color: var(--text-sec); line-height: 1.55; }
+.strand-block { border-bottom: 1px solid var(--border); }
+.strand-row { display: flex; align-items: center; gap: 10px; padding: 12px 24px; background: #F8FAFA; cursor: default; }
+.strand-icon { color: var(--teal); font-size: 16px; flex-shrink: 0; }
+.strand-meta { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--strand-color); }
+.strand-name { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 700; color: var(--text); margin-top: 1px; }
+.row-actions { margin-left: auto; display: flex; gap: 4px; }
+.icon-btn { width: 28px; height: 28px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 13px; color: var(--text-muted); transition: all var(--tr); }
+.icon-btn:hover { background: var(--border); color: var(--text-sec); }
+.icon-btn.del:hover { background: #FEE2E2; color: var(--red); }
+.sub-block { padding: 4px 24px 8px 46px; }
+.sub-row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--radius); }
+.sub-row:hover { background: var(--bg); }
+.sub-meta { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--substrand-color); }
+.sub-name { font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; font-weight: 600; color: var(--text); margin-top: 1px; }
+.topic-row { display: flex; align-items: center; gap: 10px; padding: 6px 10px 6px 32px; border-radius: var(--radius); }
+.topic-row:hover { background: var(--bg); }
+.topic-check { width: 20px; height: 20px; background: var(--teal); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; flex-shrink: 0; }
+.topic-check svg { width: 10px; height: 10px; stroke: white; stroke-width: 3; }
+.topic-meta { font-family: 'Space Grotesk', sans-serif; font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--topic-color); }
+.topic-name { font-size: 13px; color: var(--text); margin-top: 1px; }
+.add-topic { display: flex; align-items: center; gap: 7px; padding: 5px 10px 9px 44px; font-size: 13px; color: var(--text-muted); cursor: pointer; transition: color var(--tr); }
+.add-topic:hover { color: var(--teal); }
+
+/* ── QUESTION REVIEW ── */
+.q-strand-block { border-bottom: 1px solid var(--border); }
+.q-strand-header { display: flex; align-items: center; gap: 10px; padding: 12px 24px; background: #F8FAFA; cursor: pointer; }
+.q-strand-header:hover { background: #F3F6F6; }
+.q-sub-block { padding: 4px 24px 8px 46px; }
+.q-sub-header { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius); cursor: pointer; margin-bottom: 4px; }
+.q-sub-header:hover { background: var(--bg); }
+.q-topic-row { display: flex; align-items: center; gap: 12px; padding: 11px 14px; border: 1px solid var(--border); border-radius: var(--radius); margin: 5px 0 5px 28px; background: var(--white); transition: border-color var(--tr), box-shadow var(--tr); }
+.q-topic-row:hover { border-color: var(--teal-mid); box-shadow: 0 0 0 3px rgba(11,123,123,0.06); }
+.q-topic-icon { color: var(--text-muted); font-size: 15px; flex-shrink: 0; }
+.q-topic-info { flex: 1; min-width: 0; }
+.q-topic-meta { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: var(--topic-color); }
+.q-topic-name { font-family: 'Space Grotesk', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); margin-top: 2px; }
+.q-count { font-size: 13px; color: var(--text-sec); font-weight: 500; white-space: nowrap; padding-right: 10px; }
+.regen-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid var(--border); background: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 15px; color: var(--text-muted); transition: all var(--tr); flex-shrink: 0; }
+.regen-btn:hover { background: var(--bg); border-color: var(--text-muted); color: var(--text-sec); }
+.eye-btn { width: 32px; height: 32px; border-radius: 50%; border: none; background: var(--teal-btn); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px; color: white; transition: all var(--tr); flex-shrink: 0; box-shadow: 0 1px 3px rgba(11,130,130,0.35); }
+.eye-btn:hover { background: var(--teal-dark); }
+.more-hint { padding: 11px 24px; font-size: 13px; color: var(--text-muted); border-top: 1px solid var(--border-light); background: #FAFBFC; }
+.more-hint a { color: var(--teal); text-decoration: none; font-weight: 600; }
+
+/* ── REVIEW LEARNING CONTENT ── */
+.lc-strand-row { display: flex; align-items: center; gap: 14px; padding: 16px 24px; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background var(--tr); }
+.lc-strand-row:last-child { border-bottom: none; }
+.lc-strand-row:hover { background: #FAFBFC; }
+.lc-strand-icon { width: 38px; height: 38px; background: var(--teal-light); border-radius: var(--radius); display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(16,117,157,0.12); }
+.lc-strand-meta { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; color: var(--strand-color); }
+.lc-strand-name { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-top: 2px; }
+.lc-chevron { margin-left: auto; color: var(--text-muted); font-size: 16px; }
+
+/* ── TRANSLATE ── */
+.translate-body { padding: 24px; }
+.translate-desc { font-size: 13.5px; color: var(--text-sec); line-height: 1.65; margin-bottom: 20px; }
+.toggle-card { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); box-shadow: var(--shadow-sm); }
+.toggle-label { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); }
+.toggle-sub { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track { position: absolute; inset: 0; background: #D1D5DB; border-radius: 99px; cursor: pointer; transition: background 0.2s; }
+.toggle input:checked + .toggle-track { background: var(--teal); }
+.toggle-thumb { position: absolute; width: 18px; height: 18px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); pointer-events: none; }
+.toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
+/* ── CONFIRM & SAVE ── */
+.confirm-body { padding: 24px; }
+.stat-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 20px; }
+.stat-card { border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; text-align: center; box-shadow: var(--shadow-sm); }
+.stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 34px; font-weight: 700; color: var(--text); letter-spacing: -1.5px; }
+.stat-label { font-size: 13px; color: var(--text-sec); margin-top: 5px; font-weight: 500; }
+.confirm-desc { font-size: 13.5px; color: var(--text-sec); line-height: 1.65; margin-bottom: 18px; }
+.lang-info-card { border: 1px solid var(--border); border-radius: var(--radius); padding: 16px 18px; background: #FAFBFC; }
+.lang-info-title { font-size: 12px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.lang-info-val { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; color: var(--text); }
+.lang-info-note { font-size: 12.5px; color: var(--text-muted); margin-top: 5px; line-height: 1.5; }
+
+/* ── DONE ── */
+.done-box { padding: 52px 32px; text-align: center; }
+.done-icon { font-size: 52px; margin-bottom: 16px; }
+.done-title { font-family: 'Space Grotesk', sans-serif; font-size: 22px; font-weight: 700; color: var(--green-dark); margin-bottom: 8px; letter-spacing: -0.3px; }
+.done-sub { font-size: 14px; color: var(--text-sec); line-height: 1.6; }
+.done-stats { display: flex; justify-content: center; gap: 32px; margin: 24px 0; }
+.done-stat { text-align: center; }
+.done-stat-num { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 700; color: var(--teal); letter-spacing: -0.5px; }
+.done-stat-label { font-size: 12px; color: var(--text-muted); margin-top: 3px; }
+
+/* ── BG WIDGET ── */
+.bg-widget { position: fixed; bottom: 20px; right: 20px; width: 280px; background: var(--teal); border-radius: var(--radius-lg); box-shadow: 0 8px 28px rgba(16,117,157,0.4), 0 2px 6px rgba(0,0,0,0.15); z-index: 500; overflow: hidden; transform: translateY(130%); opacity: 0; transition: transform 0.4s cubic-bezier(.4,0,.2,1), opacity 0.3s; cursor: pointer; }
+.bg-widget.show { transform: translateY(0); opacity: 1; }
+.bg-widget.review-state { background: var(--amber-dark); animation: w-alert 2s ease infinite; }
+.bg-widget.done-state { background: var(--green-dark); }
+@keyframes w-alert { 0%,100%{box-shadow:0 0 0 3px rgba(217,119,6,0.4),0 8px 28px rgba(16,117,157,0.3)} 50%{box-shadow:0 0 0 8px rgba(217,119,6,0.1),0 8px 28px rgba(16,117,157,0.3)} }
+.bw-head { padding: 12px 14px 10px; display: flex; align-items: flex-start; gap: 10px; }
+.bw-spinner { width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.85s linear infinite; flex-shrink: 0; margin-top: 3px; }
+.bw-title { font-family: 'Space Grotesk', sans-serif; font-size: 13.5px; font-weight: 700; color: white; line-height: 1.3; }
+.bw-sub { font-size: 11.5px; color: rgba(255,255,255,0.72); margin-top: 1px; }
+.bw-btns { display: flex; gap: 4px; margin-left: auto; flex-shrink: 0; }
+.bw-btn { width: 22px; height: 22px; border: none; background: rgba(255,255,255,0.15); border-radius: 5px; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 10px; transition: background var(--tr); }
+.bw-btn:hover { background: rgba(255,255,255,0.28); }
+.bw-body { background: white; padding: 6px 14px 4px; }
+.bw-body.hidden { display: none; }
+.bw-row { display: flex; align-items: center; gap: 9px; padding: 4px 0; font-size: 12.5px; color: var(--text-muted); font-family: 'Inter', sans-serif; }
+.bw-row.bw-done { color: var(--text-sec); }
+.bw-row.bw-active { color: var(--text); font-weight: 600; }
+.bw-row.bw-review { color: var(--amber-dark); font-weight: 600; }
+.bw-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+.bw-dot.done { background: var(--green); }
+.bw-dot.active { background: var(--teal); animation: blink 1s ease infinite; }
+.bw-dot.review { background: var(--amber); }
+.bw-right { margin-left: auto; font-size: 11.5px; font-weight: 600; color: var(--text-sec); }
+.bw-row.bw-active .bw-right { color: var(--teal); }
+.bw-row.bw-review .bw-right { color: var(--amber-dark); }
+.bw-footer { padding: 8px 14px 12px; text-align: right; border-top: 1px solid var(--border-light); background: white; }
+.bw-footer a { font-size: 12px; font-weight: 600; color: var(--teal); text-decoration: none; font-family: 'Inter', sans-serif; }
+.bw-footer a:hover { color: var(--teal-dark); }
+
+/* ── OTHER PAGES ── */
+.empty-center { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; color: var(--text-muted); }
+.empty-center .eic { font-size: 34px; opacity: 0.3; }
+.empty-center h3 { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 600; color: var(--text-sec); }
+
+/* ── TOAST ── */
+.toast { position: fixed; top: 66px; left: 50%; transform: translateX(-50%) translateY(-8px); padding: 9px 20px; border-radius: 8px; font-size: 13.5px; font-weight: 600; color: white; z-index: 600; pointer-events: none; opacity: 0; transition: all 0.25s; white-space: nowrap; box-shadow: var(--shadow-md); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-logo-area">
+    <img src="https://demo.atlaslearn.ai/assets/atlas-branch-logo-B7aM78TE.png" alt="ATLAS" style="height:28px;width:auto;object-fit:contain;flex-shrink:0">
+  </div>
+  <div class="topbar-right">
+    <div class="help-btn"><i data-feather="help-circle" style="width:14px;height:14px"></i>Help</div>
+  </div>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="nav-sec">NAVIGATION</div>
+    <div class="nav-item" onclick="go('dashboard')"><i data-feather="grid"></i>Dashboard</div>
+    <div class="nav-item" onclick="go('users')"><i data-feather="users"></i>Users</div>
+    <div class="nav-item" onclick="go('courses')"><i data-feather="book-open"></i>Courses</div>
+    <div class="nav-item" onclick="go('sharing')"><i data-feather="share-2"></i>Content Sharing</div>
+    <div class="nav-item" onclick="go('jobroles')"><i data-feather="briefcase"></i>Job Roles</div>
+    <div class="nav-item" onclick="go('cbl')"><i data-feather="clipboard"></i>CBL</div>
+    <div class="nav-item" onclick="go('pals')"><i data-feather="play-circle"></i>PALS Course</div>
+    <div class="nav-item" onclick="go('groups')"><i data-feather="user-check"></i>Groups</div>
+    <div class="nav-item" onclick="go('classes')"><i data-feather="home"></i>Classes</div>
+    <div class="nav-item" onclick="go('assess')"><i data-feather="check-square"></i>Assessments</div>
+    <div class="nav-item" onclick="go('qbank')"><i data-feather="help-circle"></i>Question Bank</div>
+    <div class="nav-item active" id="navKB" onclick="go('kb')"><i data-feather="layers"></i>Knowledge Base<span class="nav-dot" id="kbDot"></span></div>
+    <div class="nav-item" onclick="go('analytics')"><i data-feather="bar-chart-2"></i>Analytics</div>
+    <div class="nav-item" onclick="go('settings')"><i data-feather="settings"></i>Settings</div>
+    <div class="sidebar-footer">
+      <div class="user-row"><div class="avatar">W</div><div><div class="user-name">Wahyu</div><div class="user-role">Org Admin</div></div></div>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- KB LIST -->
+    <div class="page active" id="page-kb">
+      <div class="page-body">
+        <div class="sec-header">
+          <div class="sec-title">Knowledge Base</div>
+          <button class="btn btn-teal" onclick="go('add-kb')">+ Add Knowledge Base</button>
+        </div>
+        <div class="kb-table">
+          <div class="kb-thead"><div>Title</div><div>Domain</div><div>Skills</div><div>Questions</div><div>Sessions</div><div>Status</div></div>
+          <div class="kb-tr">
+            <div class="kb-title-wrap"><div class="file-icon"><i data-feather="file-text" style="width:16px;height:16px"></i></div><div><div class="kb-name">Solana Whitepaper</div><div class="kb-sub">PDF · 673 KB</div></div></div>
+            <div class="cell">Blockchain</div><div class="cell">18</div><div class="cell">430</div><div class="cell">54</div>
+            <div><span class="badge badge-green">✓ Generated</span></div>
+          </div>
+          <div class="kb-tr" id="newRow" style="display:none" onclick="go('wizard')">
+            <div class="kb-title-wrap"><div class="file-icon"><i data-feather="file-text" style="width:16px;height:16px"></i></div><div><div class="kb-name">Solana Protocol Deep Dive</div><div class="kb-sub">PDF · 1.2 MB</div></div></div>
+            <div class="cell">Blockchain</div>
+            <div class="cell" id="nSkills">—</div><div class="cell" id="nQ">—</div><div class="cell" id="nS">—</div>
+            <div id="nBadge"><span class="badge badge-blue">⟳ Processing</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADD KB -->
+    <div class="page" id="page-add-kb">
+      <div class="page-topbar"><div class="back-btn" onclick="go('kb')"><i data-feather="chevron-left" style="width:16px;height:16px"></i>Back</div><div class="page-topbar-title">Add Knowledge Base</div></div>
+      <div class="form-wrap">
+        <div class="form-card">
+          <div class="fg"><label class="fl">Title</label><input class="fi" value="Solana Protocol Deep Dive"></div>
+          <div class="fg"><label class="fl">Domain</label><input class="fi" value="Blockchain" placeholder="e.g. Healthcare"></div>
+          <div class="fg"><label class="fl">Language of Knowledge Base</label><select class="fi"><option>English</option><option>Indonesian</option><option>Mandarin</option></select></div>
+          <div class="fg"><label class="fl">Tags (comma separated)</label><select class="fi"><option>solana, blockchain, crypto</option></select></div>
+          <div class="fg">
+            <label class="fl">Content</label>
+            <div class="tabs-row">
+              <div class="tab-o"><i data-feather="edit-3" style="width:13px;height:13px"></i> Text</div>
+              <div class="tab-o active"><i data-feather="file" style="width:13px;height:13px"></i> File</div>
+              <div class="tab-o"><i data-feather="link" style="width:13px;height:13px"></i> URL</div>
+            </div>
+            <div class="file-preview">
+              <i data-feather="file-text" style="width:20px;height:20px;color:var(--teal)"></i>
+              <div><div style="font-size:13px;font-weight:600">solana-protocol.pdf</div><div style="font-size:11.5px;color:var(--text-muted)">1.2 MB · Ready</div></div>
+              <i data-feather="check-circle" style="width:18px;height:18px;color:var(--green-dark);margin-left:auto;flex-shrink:0"></i>
+            </div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-white" onclick="go('kb')">Save as Knowledge Base</button>
+            <button class="btn btn-teal" onclick="startFlow()">✦ Save &amp; Generate Knowledge Points</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WIZARD -->
+    <div class="page" id="page-wizard">
+      <div class="page-topbar"><div class="back-btn" onclick="go('kb')"><i data-feather="chevron-left" style="width:16px;height:16px"></i>Back</div><div class="page-topbar-title">Generate Knowledge Points</div><span style="font-size:12px;color:var(--text-muted);background:var(--bg);border:1px solid var(--border);padding:4px 10px;border-radius:99px;margin-left:8px;">Solana Protocol Deep Dive</span></div>
+      <div class="wizard-layout">
+
+        <!-- LEFT STEPPER -->
+        <div class="wiz-steps">
+          <div class="wiz-steps-label">Steps</div>
+
+          <div class="ws done" id="s1"><div class="ws-num done">✓</div><div><div class="ws-text">Add Knowledge Base</div></div></div>
+          <div class="wc done"></div>
+          <div class="ws active" id="s2"><div class="ws-num active" id="s2n">2</div><div><div class="ws-text">Generation Language</div><div class="ws-hint" id="s2h">Select language</div></div></div>
+          <div class="wc" id="c2"></div>
+          <div class="ws" id="s3"><div class="ws-num pending" id="s3n">3</div><div><div class="ws-text">Extract Knowledge Points</div><div class="ws-hint" id="s3h"></div></div></div>
+          <div class="wc" id="c3"></div>
+          <div class="ws" id="s4"><div class="ws-num pending" id="s4n">4</div><div><div class="ws-text">Generate &amp; Review Questions</div><div class="ws-hint" id="s4h"></div></div></div>
+          <div class="wc" id="c4"></div>
+          <div class="ws" id="s5"><div class="ws-num pending" id="s5n">5</div><div><div class="ws-text">Generate &amp; Review Learning Content</div><div class="ws-hint" id="s5h"></div></div></div>
+          <div class="wc" id="c5"></div>
+          <div class="ws" id="s6"><div class="ws-num pending" id="s6n">6</div><div><div class="ws-text">Translate Content</div></div></div>
+          <div class="wc" id="c6"></div>
+          <div class="ws" id="s7"><div class="ws-num pending" id="s7n">7</div><div><div class="ws-text">Confirm &amp; Save</div></div></div>
+          <div class="wc" id="c7"></div>
+          <div class="ws" id="s8"><div class="ws-num pending" id="s8n">8</div><div><div class="ws-text">Setup Complete</div></div></div>
+        </div>
+
+        <!-- RIGHT PANEL -->
+        <div class="wiz-panel">
+          <div class="wiz-card">
+            <div class="wiz-card-head">
+              <div class="wiz-card-title" id="panelTitle">Generation Language</div>
+              <div class="wiz-card-sub" id="panelSub">Choose the language for generating knowledge points</div>
+            </div>
+
+            <!-- ── STEP 2: LANGUAGE ── -->
+            <div id="st-lang">
+              <div class="lang-body">
+                <div class="lang-options">
+                  <div class="lang-option selected" onclick="selectLang(this,'English')">
+                    <div class="lang-radio"></div>
+                    <div><div class="lang-name">English</div><div class="lang-sub">Generate in English (recommended)</div></div>
+                  </div>
+                  <div class="lang-option" onclick="selectLang(this,'Indonesian')">
+                    <div class="lang-radio"></div>
+                    <div><div class="lang-name">Indonesian</div><div class="lang-sub">Bahasa Indonesia</div></div>
+                  </div>
+                  <div class="lang-option" onclick="selectLang(this,'Mandarin')">
+                    <div class="lang-radio"></div>
+                    <div><div class="lang-name">Mandarin</div><div class="lang-sub">中文 (Chinese Simplified)</div></div>
+                  </div>
+                </div>
+              </div>
+              <div class="wiz-actions">
+                <button class="btn btn-teal" onclick="startExtract()">Next: Extract Knowledge Points →</button>
+              </div>
+            </div>
+
+            <!-- ── STEP 3: EXTRACTING ── -->
+            <div id="st-extracting" style="display:none">
+              <div class="running-box">
+                <div class="spinner"></div>
+                <div class="running-label" id="extLabel">Extracting knowledge points in the selected language</div>
+                <div class="running-desc">You can navigate away — we'll notify you when review is needed</div>
+                <div class="running-bar-wrap"><div class="running-bar" id="extBar" style="width:0%"></div></div>
+                <div class="running-pct" id="extPct">0%</div>
+              </div>
+            </div>
+
+            <!-- ── STEP 3: REVIEW SKILLS ── -->
+            <div id="st-review-skills" style="display:none">
+              <div class="review-intro">
+                <div class="review-pill">⚠️ Review required</div>
+                <div class="review-intro-title">Review Extracted Skills</div>
+                <div class="review-intro-desc">17 knowledge points extracted across 4 strands. Edit names or deselect topics you don't want.</div>
+              </div>
+              <!-- Strand 1 -->
+              <div class="strand-block">
+                <div class="strand-row">
+                  <i data-feather="folder" class="strand-icon" style="width:18px;height:18px;color:#F97316;flex-shrink:0"></i>
+                  <div><div class="strand-meta">STRAND 1</div><div class="strand-name">Solana Network Architecture</div></div>
+                  <div class="row-actions">
+                    <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                    <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                    <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                  </div>
+                </div>
+                <div class="sub-block">
+                  <div class="sub-row">
+                    <i data-feather="file-text" style="width:15px;height:15px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div class="sub-meta">SUBSTRAND 1.1</div><div class="sub-name">Proof of History Mechanism</div></div>
+                    <div class="row-actions" style="margin-left:auto">
+                      <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                      <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                      <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                    </div>
+                  </div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 1.1.1</div><div class="topic-name">Cryptographic Clock and Sequential Hashing</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 1.1.2</div><div class="topic-name">Verifiable Delay Function (VDF)</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 1.1.3</div><div class="topic-name">Leader Schedule and Block Production</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="add-topic"><i data-feather="plus" style="width:13px;height:13px"></i> Add Topic</div>
+                  <div class="sub-row">
+                    <i data-feather="file-text" style="width:15px;height:15px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div class="sub-meta">SUBSTRAND 1.2</div><div class="sub-name">Tower BFT Consensus</div></div>
+                    <div class="row-actions" style="margin-left:auto">
+                      <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                      <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                      <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                    </div>
+                  </div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 1.2.1</div><div class="topic-name">Optimistic Confirmation and Rollback</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="add-topic"><i data-feather="plus" style="width:13px;height:13px"></i> Add Topic</div>
+                </div>
+              </div>
+              <div class="more-hint">+ 3 more strands · <a href="#">Expand all</a></div>
+              <div class="wiz-actions">
+                <button class="btn btn-white">Back</button>
+                <button class="btn btn-teal" onclick="doApproveSkills()">Next: Generate Questions →</button>
+              </div>
+            </div>
+
+            <!-- ── STEP 4: GENERATING QUESTIONS ── -->
+            <div id="st-gen-q" style="display:none">
+              <div class="running-box">
+                <div class="spinner"></div>
+                <div class="running-label">Generating questions for each skill</div>
+                <div class="running-desc">Running in background — feel free to navigate</div>
+                <div class="running-bar-wrap"><div class="running-bar" id="qBar" style="width:0%"></div></div>
+                <div class="running-pct" id="qPct">0%</div>
+              </div>
+            </div>
+
+            <!-- ── STEP 4: REVIEW QUESTIONS ── -->
+            <div id="st-review-q" style="display:none">
+              <div class="review-intro">
+                <div class="review-pill">⚠️ Review required</div>
+                <div class="review-intro-title">Review Generated Questions</div>
+                <div class="review-intro-desc">422 questions generated. Click the preview button to view questions for each topic.</div>
+              </div>
+              <!-- Strand 1 questions -->
+              <div class="q-strand-block">
+                <div class="q-strand-header">
+                  <i data-feather="folder" style="width:16px;height:16px;color:#F97316;flex-shrink:0"></i>
+                  <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal)">STRAND 1</div><div style="font-size:14px;font-weight:700">Solana Network Architecture</div></div>
+                  <i data-feather="chevron-down" style="width:15px;height:15px;color:var(--text-muted);margin-left:auto"></i>
+                </div>
+                <div class="q-sub-block">
+                  <div class="q-sub-header">
+                    <i data-feather="file-text" style="width:14px;height:14px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple)">SUBSTRAND 1.1</div><div style="font-size:13px;font-weight:600">Proof of History Mechanism</div></div>
+                    <i data-feather="chevron-down" style="width:14px;height:14px;color:var(--text-muted);margin-left:auto"></i>
+                  </div>
+                  <div class="q-topic-row">
+                    <i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i>
+                    <div class="q-topic-info"><div class="q-topic-meta">TOPIC 1.1.1</div><div class="q-topic-name">Cryptographic Clock and Sequential Hashing</div></div>
+                    <div class="q-count">25 questions</div>
+                    <button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button>
+                    <button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button>
+                  </div>
+                  <div class="q-topic-row">
+                    <i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i>
+                    <div class="q-topic-info"><div class="q-topic-meta">TOPIC 1.1.2</div><div class="q-topic-name">Verifiable Delay Function (VDF)</div></div>
+                    <div class="q-count">24 questions</div>
+                    <button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button>
+                    <button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button>
+                  </div>
+                  <div class="q-topic-row">
+                    <i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i>
+                    <div class="q-topic-info"><div class="q-topic-meta">TOPIC 1.1.3</div><div class="q-topic-name">Leader Schedule and Block Production</div></div>
+                    <div class="q-count">25 questions</div>
+                    <button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button>
+                    <button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button>
+                  </div>
+                  <!-- Substrand 1.2 -->
+                  <div class="q-sub-header" style="margin-top:6px">
+                    <i data-feather="file-text" style="width:14px;height:14px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple)">SUBSTRAND 1.2</div><div style="font-size:13px;font-weight:600">Tower BFT Consensus</div></div>
+                    <i data-feather="chevron-down" style="width:14px;height:14px;color:var(--text-muted);margin-left:auto"></i>
+                  </div>
+                  <div class="q-topic-row">
+                    <i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i>
+                    <div class="q-topic-info"><div class="q-topic-meta">TOPIC 1.2.1</div><div class="q-topic-name">Optimistic Confirmation and Rollback</div></div>
+                    <div class="q-count">23 questions</div>
+                    <button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button>
+                    <button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button>
+                  </div>
+                </div>
+              </div>
+              <div class="more-hint">+ 3 more strands with 325 questions · <a href="#">Expand all</a></div>
+              <div class="wiz-actions">
+                <button class="btn btn-white">Back</button>
+                <button class="btn btn-teal" onclick="doApproveQ()">Next: Generate Learning Content →</button>
+              </div>
+            </div>
+
+            <!-- ── STEP 5: GENERATING CONTENT ── -->
+            <div id="st-gen-lc" style="display:none">
+              <div class="running-box">
+                <div class="spinner"></div>
+                <div class="running-label">Generating learning sessions for each skill</div>
+                <div class="running-desc">Running in background — feel free to navigate</div>
+                <div class="running-bar-wrap"><div class="running-bar" id="lcBar" style="width:0%"></div></div>
+                <div class="running-pct" id="lcPct">0%</div>
+              </div>
+            </div>
+
+            <!-- ── STEP 5: REVIEW LEARNING CONTENT ── -->
+            <div id="st-review-lc" style="display:none">
+              <div class="review-intro">
+                <div class="review-pill">⚠️ Review required</div>
+                <div class="review-intro-title">Review Learning Content</div>
+                <div class="review-intro-desc">51 sessions generated across 17 skills.</div>
+              </div>
+              <div class="lc-strand-row"><div class="lc-strand-icon"><i data-feather="folder" style="width:18px;height:18px;color:#F97316"></i></div><div><div class="lc-strand-meta">STRAND 1</div><div class="lc-strand-name">Solana Network Architecture</div></div><i data-feather="chevron-right" class="lc-chevron" style="width:16px;height:16px"></i></div>
+              <div class="lc-strand-row"><div class="lc-strand-icon"><i data-feather="folder" style="width:18px;height:18px;color:#F97316"></i></div><div><div class="lc-strand-meta">STRAND 2</div><div class="lc-strand-name">Gulf Stream &amp; Turbine Protocol</div></div><i data-feather="chevron-right" class="lc-chevron" style="width:16px;height:16px"></i></div>
+              <div class="lc-strand-row"><div class="lc-strand-icon"><i data-feather="folder" style="width:18px;height:18px;color:#F97316"></i></div><div><div class="lc-strand-meta">STRAND 3</div><div class="lc-strand-name">Sealevel Parallel Smart Contracts</div></div><i data-feather="chevron-right" class="lc-chevron" style="width:16px;height:16px"></i></div>
+              <div class="lc-strand-row" style="border-bottom:none"><div class="lc-strand-icon"><i data-feather="folder" style="width:18px;height:18px;color:#F97316"></i></div><div><div class="lc-strand-meta">STRAND 4</div><div class="lc-strand-name">Proof of Stake &amp; Tokenomics</div></div><i data-feather="chevron-right" class="lc-chevron" style="width:16px;height:16px"></i></div>
+              <div class="wiz-actions">
+                <button class="btn btn-white">Back</button>
+                <button class="btn btn-teal" onclick="doApproveLC()">Next: Translate →</button>
+              </div>
+            </div>
+
+            <!-- ── STEP 6: TRANSLATE ── -->
+            <div id="st-translate" style="display:none">
+              <div class="translate-body">
+                <div class="translate-desc">Optionally generate a translated version of all questions and learning content. Both the original and the translated versions will be saved, and the translated version will become the default. You'll be able to toggle between languages later.</div>
+                <div class="toggle-card">
+                  <div><div class="toggle-label">Also translate this content</div><div class="toggle-sub">Source language: English</div></div>
+                  <label class="toggle">
+                    <input type="checkbox" id="translateToggle">
+                    <div class="toggle-track"></div>
+                    <div class="toggle-thumb"></div>
+                  </label>
+                </div>
+              </div>
+              <div class="wiz-actions">
+                <button class="btn btn-white">Back</button>
+                <button class="btn btn-teal" onclick="doSkipTranslate()">Skip &amp; Continue →</button>
+              </div>
+            </div>
+
+            <!-- ── STEP 7: CONFIRM & SAVE ── -->
+            <div id="st-confirm" style="display:none">
+              <div class="confirm-body">
+                <div class="stat-row">
+                  <div class="stat-card"><div class="stat-num">17</div><div class="stat-label">Skills</div></div>
+                  <div class="stat-card"><div class="stat-num">422</div><div class="stat-label">Questions</div></div>
+                  <div class="stat-card"><div class="stat-num">51</div><div class="stat-label">Sessions</div></div>
+                </div>
+                <div class="confirm-desc">The above skills, questions, and learning sessions will be saved and attached to this knowledge base.</div>
+                <div class="lang-info-card">
+                  <div class="lang-info-title">Generated in</div>
+                  <div class="lang-info-val">English</div>
+                  <div class="lang-info-note">To also save another language version, enable Translate in the previous step.</div>
+                </div>
+              </div>
+              <div class="wiz-actions">
+                <button class="btn btn-white">Back</button>
+                <button class="btn btn-teal" onclick="doConfirmSave()">⊙ Confirm &amp; Save</button>
+              </div>
+            </div>
+
+            <!-- ── STEP 8: DONE ── -->
+            <div id="st-done" style="display:none">
+              <div class="done-box">
+                <div class="done-icon" style="display:flex;justify-content:center"><i data-feather="check-circle" style="width:52px;height:52px;color:var(--green-dark)"></i></div>
+                <div class="done-title">Setup Complete!</div>
+                <div class="done-sub">Knowledge Base has been successfully generated and saved.</div>
+                <div class="done-stats">
+                  <div class="done-stat"><div class="done-stat-num">17</div><div class="done-stat-label">Skills</div></div>
+                  <div class="done-stat"><div class="done-stat-num">422</div><div class="done-stat-label">Questions</div></div>
+                  <div class="done-stat"><div class="done-stat-num">51</div><div class="done-stat-label">Sessions</div></div>
+                </div>
+                <button class="btn btn-teal" onclick="go('kb')">View in Knowledge Base →</button>
+              </div>
+            </div>
+
+          </div><!-- /wiz-card -->
+        </div><!-- /wiz-panel -->
+      </div><!-- /wizard-layout -->
+    </div><!-- /page-wizard -->
+
+    <!-- OTHER PAGES -->
+    <div class="page" id="page-dashboard"><div class="empty-center"><div class="eic">📊</div><h3>Dashboard</h3></div></div>
+    <div class="page" id="page-users"><div class="empty-center"><div class="eic">👥</div><h3>Users</h3></div></div>
+    <div class="page" id="page-courses"><div class="empty-center"><div class="eic">📚</div><h3>Courses</h3></div></div>
+    <div class="page" id="page-sharing"><div class="empty-center"><div class="eic">🔗</div><h3>Content Sharing</h3></div></div>
+    <div class="page" id="page-jobroles"><div class="empty-center"><div class="eic">💼</div><h3>Job Roles</h3></div></div>
+    <div class="page" id="page-cbl"><div class="empty-center"><div class="eic">📋</div><h3>CBL</h3></div></div>
+    <div class="page" id="page-pals"><div class="empty-center"><div class="eic">▶️</div><h3>PALS Course</h3></div></div>
+    <div class="page" id="page-groups"><div class="empty-center"><div class="eic">👥</div><h3>Groups</h3></div></div>
+    <div class="page" id="page-classes"><div class="empty-center"><div class="eic">🏫</div><h3>Classes</h3></div></div>
+    <div class="page" id="page-assess"><div class="empty-center"><div class="eic">✅</div><h3>Assessments</h3></div></div>
+    <div class="page" id="page-qbank"><div class="empty-center"><div class="eic">❓</div><h3>Question Bank</h3></div></div>
+    <div class="page" id="page-analytics"><div class="empty-center"><div class="eic">📈</div><h3>Analytics</h3></div></div>
+    <div class="page" id="page-settings"><div class="empty-center"><div class="eic">⚙️</div><h3>Settings</h3></div></div>
+  </main>
+</div>
+
+<!-- ── BACKGROUND WIDGET ── -->
+<div class="bg-widget" id="bgW" onclick="handleWidgetClick()">
+  <div class="bw-head">
+    <div class="bw-spinner" id="bwSpin"></div>
+    <div>
+      <div class="bw-title" id="bwTitle">Processing...</div>
+      <div class="bw-sub" id="bwSub">Solana Protocol Deep Dive</div>
+    </div>
+    <div class="bw-btns">
+      <button class="bw-btn" id="bwMin" onclick="toggleMin(event)" title="Minimize">—</button>
+    </div>
+  </div>
+  <div class="bw-body" id="bwBody">
+    <div class="bw-row bw-done"><div class="bw-dot done"></div>Add Knowledge Base<span class="bw-right">✓</span></div>
+    <div class="bw-row" id="bwr2"><div class="bw-dot"></div>Generation Language</div>
+    <div class="bw-row" id="bwr3"><div class="bw-dot"></div>Extract Knowledge Points</div>
+    <div class="bw-row" id="bwr4"><div class="bw-dot"></div>Generate Questions</div>
+    <div class="bw-row" id="bwr5"><div class="bw-dot"></div>Generate Learning Content</div>
+    <div class="bw-row" id="bwr6"><div class="bw-dot"></div>Translate Content</div>
+    <div class="bw-row" id="bwr7"><div class="bw-dot"></div>Confirm &amp; Save</div>
+    <div class="bw-row" id="bwr8"><div class="bw-dot"></div>Setup Complete</div>
+  </div>
+  <div class="bw-footer"><a href="#" onclick="handleWidgetClick();return false">View details →</a></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+const ALL_PAGES = ['dashboard','users','courses','sharing','jobroles','cbl','pals','groups','classes','assess','qbank','kb','add-kb','wizard','analytics','settings'];
+let appState = 'idle';
+let wMin = false;
+
+function go(page) {
+  ALL_PAGES.forEach(p => { const el = document.getElementById('page-'+p); if(el) el.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('page-'+page); if(el) el.classList.add('active');
+  if(['kb','add-kb','wizard'].includes(page)) document.getElementById('navKB').classList.add('active');
+  else {
+    const map = {dashboard:0,users:1,courses:2,sharing:3,jobroles:4,cbl:5,pals:6,groups:7,classes:8,assess:9,qbank:10,analytics:12,settings:13};
+    const items = document.querySelectorAll('.nav-item');
+    if(map[page]!==undefined) items[map[page]]?.classList.add('active');
+  }
+}
+
+function toast(msg, color='#0D7F7F', dur=3000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = color;
+  t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), dur);
+}
+
+function showState(id) {
+  ['st-lang','st-extracting','st-review-skills','st-gen-q','st-review-q','st-gen-lc','st-review-lc','st-translate','st-confirm','st-done'].forEach(s => {
+    document.getElementById(s).style.display = 'none';
+  });
+  document.getElementById(id).style.display = 'block';
+}
+
+function setStep(n, state) { // state: 'done'|'active'|'warn'|'pending'
+  const s = document.getElementById('s'+n);
+  const num = document.getElementById('s'+n+'n');
+  s.className = 'ws ' + (state==='done'?'done':state==='active'?'active':state==='warn'?'warn-state':'');
+  if(state==='done') { num.className='ws-num done'; num.textContent='✓'; }
+  else if(state==='active') { num.className='ws-num active'; num.textContent=n; }
+  else if(state==='warn') { num.className='ws-num warn'; num.textContent='!'; }
+  else { num.className='ws-num pending'; num.textContent=n; }
+}
+function setConn(n, done) {
+  const c = document.getElementById('c'+n); if(c) c.className = 'wc'+(done?' done':'');
+}
+function setStepHint(n, txt) { const h = document.getElementById('s'+n+'h'); if(h) h.textContent = txt; }
+
+function bwRow(id, type, rightText='') {
+  const el = document.getElementById(id); if(!el) return;
+  const dot = el.querySelector('.bw-dot');
+  el.className = 'bw-row ' + (type==='done'?'bw-done':type==='active'?'bw-active':type==='review'?'bw-review':'');
+  if(dot) dot.className = 'bw-dot '+(type==='done'?'done':type==='active'?'active':type==='review'?'review':'');
+  // update right text
+  let right = el.querySelector('.bw-right');
+  if(!right) { right = document.createElement('span'); right.className='bw-right'; el.appendChild(right); }
+  right.textContent = rightText;
+}
+
+// ── FLOW ──
+function selectLang(el) {
+  document.querySelectorAll('.lang-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function startFlow() {
+  document.getElementById('newRow').style.display = 'grid';
+  go('wizard');
+  showState('st-lang');
+  setPanelHead('Generation Language','Choose the language for generating knowledge points');
+  setStep(2,'active'); setStepHint(2,'Select language');
+  // widget
+  const w = document.getElementById('bgW');
+  w.classList.add('show');
+  bwRow('bwr2','active','');
+  appState = 'lang';
+}
+
+function startExtract() {
+  appState = 'extracting';
+  setStep(2,'done'); setConn(2,true); setStepHint(2,'');
+  setStep(3,'active'); setStepHint(3,'Running in background...');
+  bwRow('bwr2','done','✓');
+  bwRow('bwr3','active','');
+  setPanelHead('Extract Knowledge Points','');
+  showState('st-extracting');
+  // show widget
+  document.getElementById('bgW').classList.add('show');
+  toast('Generation started — you can navigate freely', '#0D7F7F', 4000);
+  runExtract();
+}
+
+function runExtract() {
+  let p = 0;
+  const t = setInterval(()=>{
+    p += 2;
+    document.getElementById('extBar').style.width = p + '%';
+    document.getElementById('extPct').textContent = p + '%';
+    const el = document.getElementById('bwr3').querySelector('.bw-right');
+    if(el) el.textContent = p+'%';
+    document.getElementById('extLabel').textContent = p<40?'Analyzing document structure...':p<75?'Extracting knowledge points...':'Organizing strands and topics...';
+    if(p>=100) { clearInterval(t); setTimeout(triggerReview1,400); }
+  }, 70);
+}
+
+function triggerReview1() {
+  appState = 'review-skills';
+  setStep(3,'warn'); setStepHint(3,'Review required');
+  bwRow('bwr3','review','Review!');
+  widgetAlert(true,'⚠️ Review Required','Skills extracted — approval needed');
+  document.getElementById('kbDot').style.display = 'block';
+  document.getElementById('nBadge').innerHTML = '<span class="badge badge-amber">⏸ Review</span>';
+  document.getElementById('nSkills').textContent = '17';
+  if(document.getElementById('page-wizard').classList.contains('active')) {
+    showReviewSkills();
+  }
+  if(wMin) { wMin=false; document.getElementById('bwBody').classList.remove('hidden'); document.getElementById('bwMin').textContent='—'; }
+  toast('⚠️ Skills extracted — review needed', '#D97706', 5000);
+}
+
+function showReviewSkills() {
+  setPanelHead('Extract Knowledge Points','');
+  showState('st-review-skills');
+}
+
+function doApproveSkills() {
+  appState = 'gen-q';
+  setStep(3,'done'); setConn(3,true); setStepHint(3,'');
+  setStep(4,'active'); setStepHint(4,'Running in background...');
+  bwRow('bwr3','done','✓');
+  bwRow('bwr4','active','');
+  widgetAlert(false,'Processing...','Solana Protocol Deep Dive');
+  document.getElementById('kbDot').style.display = 'none';
+  document.getElementById('nBadge').innerHTML = '<span class="badge badge-blue">⟳ Generating</span>';
+  setPanelHead('Generate & Review Questions','');
+  showState('st-gen-q');
+  toast('Skills approved — generating questions', '#0D7F7F', 3000);
+  runGenQ();
+}
+
+function runGenQ() {
+  let p = 0;
+  const t = setInterval(()=>{
+    p += 2;
+    document.getElementById('qBar').style.width = p + '%';
+    document.getElementById('qPct').textContent = p + '%';
+    const el = document.getElementById('bwr4').querySelector('.bw-right');
+    if(el) el.textContent = p+'%';
+    if(p>=100) { clearInterval(t); setTimeout(triggerReview2,400); }
+  }, 100);
+}
+
+function triggerReview2() {
+  appState = 'review-q';
+  setStep(4,'warn'); setStepHint(4,'Review required');
+  bwRow('bwr4','review','Review!');
+  widgetAlert(true,'⚠️ Review Required','422 questions ready for review');
+  document.getElementById('kbDot').style.display = 'block';
+  document.getElementById('nBadge').innerHTML = '<span class="badge badge-amber">⏸ Review</span>';
+  document.getElementById('nQ').textContent = '422';
+  if(document.getElementById('page-wizard').classList.contains('active')) {
+    setPanelHead('Generate & Review Questions',''); showState('st-review-q');
+  }
+  if(wMin) { wMin=false; document.getElementById('bwBody').classList.remove('hidden'); document.getElementById('bwMin').textContent='—'; }
+  toast('⚠️ 422 questions ready — review needed', '#D97706', 5000);
+}
+
+function doApproveQ() {
+  appState = 'gen-lc';
+  setStep(4,'done'); setConn(4,true); setStepHint(4,'');
+  setStep(5,'active'); setStepHint(5,'Running in background...');
+  bwRow('bwr4','done','✓');
+  bwRow('bwr5','active','');
+  widgetAlert(false,'Processing...','Solana Protocol Deep Dive');
+  document.getElementById('kbDot').style.display = 'none';
+  document.getElementById('nBadge').innerHTML = '<span class="badge badge-blue">⟳ Generating</span>';
+  setPanelHead('Generate & Review Learning Content','');
+  showState('st-gen-lc');
+  toast('Questions approved — generating learning content', '#0D7F7F', 3000);
+  runGenLC();
+}
+
+function runGenLC() {
+  let p = 0;
+  const t = setInterval(()=>{
+    p += 2;
+    document.getElementById('lcBar').style.width = p + '%';
+    document.getElementById('lcPct').textContent = p + '%';
+    const el = document.getElementById('bwr5').querySelector('.bw-right');
+    if(el) el.textContent = p+'%';
+    if(p>=100) { clearInterval(t); setTimeout(triggerReview3,400); }
+  }, 110);
+}
+
+function triggerReview3() {
+  appState = 'review-lc';
+  setStep(5,'warn'); setStepHint(5,'Review required');
+  bwRow('bwr5','review','Review!');
+  widgetAlert(true,'⚠️ Review Required','51 learning sessions ready');
+  document.getElementById('kbDot').style.display = 'block';
+  document.getElementById('nBadge').innerHTML = '<span class="badge badge-amber">⏸ Review</span>';
+  document.getElementById('nS').textContent = '51';
+  if(document.getElementById('page-wizard').classList.contains('active')) {
+    setPanelHead('Generate & Review Learning Content',''); showState('st-review-lc');
+  }
+  if(wMin) { wMin=false; document.getElementById('bwBody').classList.remove('hidden'); document.getElementById('bwMin').textContent='—'; }
+  toast('⚠️ Learning content ready — review needed', '#D97706', 5000);
+}
+
+function doApproveLC() {
+  appState = 'translate';
+  setStep(5,'done'); setConn(5,true); setStepHint(5,'');
+  setStep(6,'active');
+  bwRow('bwr5','done','✓');
+  bwRow('bwr6','active','');
+  widgetAlert(false,'Processing...','Solana Protocol Deep Dive');
+  document.getElementById('kbDot').style.display = 'none';
+  document.getElementById('nBadge').innerHTML = '<span class="badge badge-blue">⟳ Processing</span>';
+  setPanelHead('Translate Content (Optional)','');
+  showState('st-translate');
+}
+
+function doSkipTranslate() {
+  appState = 'confirm';
+  setStep(6,'done'); setConn(6,true);
+  setStep(7,'active');
+  bwRow('bwr6','done','✓');
+  bwRow('bwr7','active','');
+  setPanelHead('Confirm & Save','');
+  showState('st-confirm');
+}
+
+function doConfirmSave() {
+  appState = 'done';
+  setStep(7,'done'); setConn(7,true);
+  setStep(8,'active');
+  bwRow('bwr7','done','✓');
+  bwRow('bwr8','done','✓');
+  document.getElementById('nBadge').innerHTML = '<span class="badge badge-green">✓ Generated</span>';
+  widgetAlert(false,'✓ Complete!','17 Skills · 422 Questions · 51 Sessions');
+  document.getElementById('bgW').classList.remove('review-state');
+  document.getElementById('bgW').classList.add('done-state');
+  document.getElementById('bwSpin').style.display = 'none';
+  document.getElementById('kbDot').style.display = 'none';
+  setPanelHead('Setup Complete','');
+  showState('st-done');
+  toast('✓ Knowledge Base saved successfully!', '#16A34A', 4000);
+  setTimeout(()=>{ document.getElementById('bgW').style.opacity='0'; document.getElementById('bgW').style.transform='translateY(120%)'; }, 9000);
+}
+
+function widgetAlert(on, title, sub) {
+  const w = document.getElementById('bgW');
+  const spin = document.getElementById('bwSpin');
+  if(on) {
+    w.classList.add('review-state');
+    spin.style.display = 'none';
+    spin.insertAdjacentHTML('beforebegin','<span id="bwWarnIcon" style="font-size:15px;flex-shrink:0">⚠️</span>');
+  } else {
+    w.classList.remove('review-state');
+    spin.style.display = 'block';
+    const wi = document.getElementById('bwWarnIcon');
+    if(wi) wi.remove();
+  }
+  document.getElementById('bwTitle').textContent = title;
+  document.getElementById('bwSub').textContent = sub;
+}
+
+function setPanelHead(title, sub) {
+  document.getElementById('panelTitle').textContent = title;
+  document.getElementById('panelSub').textContent = sub;
+}
+
+function handleWidgetClick() {
+  go('wizard');
+  const stateMap = {
+    lang:'st-lang', extracting:'st-extracting', 'review-skills':'st-review-skills',
+    'gen-q':'st-gen-q', 'review-q':'st-review-q', 'gen-lc':'st-gen-lc',
+    'review-lc':'st-review-lc', translate:'st-translate', confirm:'st-confirm', done:'st-done'
+  };
+  if(stateMap[appState]) showState(stateMap[appState]);
+  // also sync panel head
+  const headMap = {
+    lang:'Generation Language', extracting:'Extract Knowledge Points', 'review-skills':'Extract Knowledge Points',
+    'gen-q':'Generate & Review Questions', 'review-q':'Generate & Review Questions',
+    'gen-lc':'Generate & Review Learning Content', 'review-lc':'Generate & Review Learning Content',
+    translate:'Translate Content (Optional)', confirm:'Confirm & Save', done:'Setup Complete'
+  };
+  if(headMap[appState]) setPanelHead(headMap[appState],'');
+}
+
+function toggleMin(e) {
+  e.stopPropagation();
+  wMin = !wMin;
+  document.getElementById('bwBody').classList.toggle('hidden', wMin);
+  document.getElementById('bwMin').textContent = wMin ? '▲' : '—';
+}
+
+
+// Init Feather icons
+document.addEventListener('DOMContentLoaded', () => { if(window.feather) feather.replace({ 'stroke-width': 1.75 }); });
+</script>
+</body>
+</html>
