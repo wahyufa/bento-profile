@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS Learn — CBL Scenario Creation Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F5F6F8; --white: #FFFFFF; --border: #E4E7EC; --border-light: #EEF0F4;
+  --text: #101828; --text-sec: #475467; --text-muted: #98A2B3;
+  --teal: #10759D; --teal-dark: #0C5D80; --teal-btn: #0F6B8E;
+  --teal-light: #E6F4FA; --teal-mid: #9CCDE4; --teal-text: #10759D;
+  --green: #22C55E; --green-dark: #16A34A;
+  --amber: #F59E0B; --amber-bg: #FFFBEB; --amber-border: #FDE68A; --amber-dark: #D97706; --amber-text: #92400E;
+  --red: #EF4444; --purple: #6941C6; --blue: #3B82F6;
+  --sidebar-w: 200px;
+  --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(16,24,40,0.05);
+  --shadow: 0 1px 3px rgba(16,24,40,0.1), 0 1px 2px rgba(16,24,40,0.06);
+  --shadow-md: 0 4px 8px rgba(16,24,40,0.08), 0 2px 4px rgba(16,24,40,0.06);
+  --tr: 0.18s ease;
+}
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; font-size: 14px; -webkit-font-smoothing: antialiased; }
+.logo-text, .page-topbar-title, .sec-title, .case-name, .toggle-label, .nav-sec, .form-sec-title, .kb-domain-label, .lp-title, .lp-card-title, .cbl-tab, .rb-comp-label, .rb-metric-label, .wiz-card-title, .wiz-steps-label, .ws-text { font-family: 'Space Grotesk', sans-serif; }
+
+.topbar { height: 56px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; flex-shrink: 0; z-index: 20; box-shadow: var(--shadow-sm); }
+.topbar-logo-area { width: var(--sidebar-w); display: flex; align-items: center; padding: 0 16px; gap: 8px; border-right: 1px solid var(--border); height: 100%; flex-shrink: 0; }
+.logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, #1A9FCC 0%, #10759D 50%, #0A4F6E 100%); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: white; }
+.logo-text { font-weight: 700; font-size: 16px; color: var(--text); letter-spacing: -0.3px; line-height: 1; }
+.topbar-right { margin-left: auto; padding-right: 16px; display: flex; align-items: center; gap: 8px; }
+.help-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-sec); padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all var(--tr); }
+.help-btn:hover { background: var(--bg); }
+
+.layout { display: flex; flex: 1; overflow: hidden; }
+.sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 12px 8px 8px; flex-shrink: 0; overflow-y: auto; }
+.nav-sec { font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-muted); padding: 10px 8px 5px; margin-top: 2px; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; font-size: 13px; font-weight: 500; color: var(--text-sec); border-radius: 6px; cursor: pointer; transition: all var(--tr); position: relative; line-height: 1.4; }
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--teal-light); color: var(--teal); font-weight: 600; }
+.nav-item svg, .nav-item i { width: 16px; height: 16px; flex-shrink: 0; }
+.sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding: 10px 4px 4px; }
+.user-row { display: flex; align-items: center; gap: 9px; padding: 8px 6px; border-radius: 6px; cursor: pointer; }
+.user-row:hover { background: var(--bg); }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+.main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.page.active { display: flex; }
+.page-topbar { height: 56px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+.back-btn { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; padding: 6px 4px; transition: color var(--tr); }
+.back-btn:hover { color: var(--text); }
+.back-btn svg, .back-btn i { width: 16px; height: 16px; flex-shrink: 0; }
+.page-topbar-title { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 18px; height: 40px; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; font-family: 'Inter', sans-serif; transition: all var(--tr); letter-spacing: -0.1px; white-space: nowrap; }
+.btn-teal { background: var(--teal-btn); color: white; box-shadow: 0 1px 2px rgba(11,130,130,0.3); }
+.btn-teal:hover { background: var(--teal-dark); box-shadow: 0 2px 4px rgba(11,130,130,0.4); transform: translateY(-1px); }
+.btn-white { background: white; color: var(--text); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.btn-white:hover { background: var(--bg); }
+.btn-link { background: none; border: none; color: var(--teal); font-weight: 600; font-size: 13px; cursor: pointer; display: inline-flex; align-items: center; gap: 5px; }
+.btn-link:hover { color: var(--teal-dark); }
+
+.page-body { padding: 24px; flex: 1; overflow-y: auto; }
+.sec-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.sec-title { font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.sec-sub { font-size: 13px; color: var(--text-sec); margin-top: 3px; }
+
+.case-table { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.case-thead { display: grid; grid-template-columns: 2.4fr 1.3fr 1.6fr 1fr 1fr 120px; padding: 10px 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg); }
+.case-tr { display: grid; grid-template-columns: 2.4fr 1.3fr 1.6fr 1fr 1fr 120px; padding: 14px 20px; border-bottom: 1px solid var(--border-light); align-items: center; transition: background var(--tr); }
+.case-tr:last-child { border-bottom: none; }
+.case-tr:hover { background: #FAFBFC; }
+.case-title-wrap { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.file-icon { width: 34px; height: 34px; background: var(--teal-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; border: 1px solid rgba(16,117,157,0.12); color: var(--teal); }
+.case-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
+.cell { font-size: 13.5px; color: var(--text-sec); }
+.pill-tag { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 99px; font-size: 11.5px; font-weight: 600; background: var(--white); color: var(--text-sec); border: 1px solid var(--border); white-space: nowrap; }
+.row-actions { display: flex; gap: 2px; justify-content: flex-end; }
+.icon-btn { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all var(--tr); }
+.icon-btn:hover { background: var(--bg); color: var(--text-sec); }
+.icon-btn.del:hover { background: #FEE2E2; color: var(--red); }
+
+.form-wrap { padding: 24px; max-width: 760px; overflow-y: auto; flex: 1; margin: 0 auto; width: 100%; }
+.form-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); margin-bottom: 18px; }
+.form-sec-head { margin-bottom: 18px; }
+.form-sec-title-row { display: flex; align-items: center; justify-content: space-between; }
+.form-sec-title { font-size: 15.5px; font-weight: 700; color: var(--text); letter-spacing: -0.1px; }
+.form-sec-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 3px; }
+.fg { margin-bottom: 18px; }
+.fg:last-child { margin-bottom: 0; }
+.fl { font-size: 13.5px; font-weight: 600; color: var(--text); display: block; margin-bottom: 7px; }
+.fi { width: 100%; height: 42px; border: 1px solid var(--border); border-radius: var(--radius); padding: 0 13px; font-size: 14px; font-family: 'Inter', sans-serif; outline: none; color: var(--text); background: var(--white); transition: border-color var(--tr), box-shadow var(--tr); }
+.fi:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(11,123,123,0.1); }
+textarea.fi { height: auto; min-height: 90px; padding: 11px 13px; resize: vertical; line-height: 1.5; font-family: 'Inter', sans-serif; }
+select.fi { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+.fg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.fl-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; }
+.form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 4px; padding-bottom: 8px; }
+
+.toggle-card { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border: 1px solid var(--border); border-radius: var(--radius); background: #FAFBFC; }
+.toggle-label { font-size: 13.5px; font-weight: 600; color: var(--text); }
+.toggle-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; line-height: 1.45; }
+.toggle { position: relative; width: 44px; height: 24px; flex-shrink: 0; margin-left: 16px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track { position: absolute; inset: 0; background: #D1D5DB; border-radius: 99px; cursor: pointer; transition: background 0.2s; }
+.toggle input:checked + .toggle-track { background: var(--teal); }
+.toggle-thumb { position: absolute; width: 18px; height: 18px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); pointer-events: none; }
+.toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
+.crit-row { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
+.crit-row .fi { flex: 1; }
+.crit-remove { width: 36px; height: 36px; flex-shrink: 0; border: 1px solid var(--border); background: var(--white); border-radius: var(--radius); color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--tr); }
+.crit-remove:hover { background: #FEE2E2; color: var(--red); border-color: #FECACA; }
+.add-crit { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--teal); cursor: pointer; padding: 6px 2px; margin-top: 4px; }
+.add-crit:hover { color: var(--teal-dark); }
+
+.kb-search-bar { display: flex; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: var(--radius); padding: 9px 13px; background: var(--white); margin-bottom: 14px; }
+.kb-search-bar input { border: none; outline: none; flex: 1; font-size: 13.5px; font-family: 'Inter', sans-serif; color: var(--text); background: transparent; }
+.kb-check-scroll { max-height: 460px; overflow-y: auto; border: 1px solid var(--border-light); border-radius: var(--radius); padding: 4px 10px; }
+.kb-domain-label { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: var(--text-muted); padding: 10px 6px 6px; }
+.lang-check-row { display: flex; align-items: center; gap: 12px; padding: 10px 8px; border-radius: 6px; cursor: pointer; transition: all var(--tr); }
+.lang-check-row:hover { background: var(--bg); }
+.lang-check-row.checked { background: var(--teal-light); }
+.lang-checkbox { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all var(--tr); color: white; background: var(--white); }
+.lang-checkbox i { display: none; }
+.lang-check-row.checked .lang-checkbox { border-color: var(--teal); background: var(--teal); }
+.lang-check-row.checked .lang-checkbox i { display: block; }
+.kb-row-name { font-size: 13.5px; font-weight: 500; color: var(--text); }
+.kb-row-tag { font-size: 11px; color: var(--text-muted); margin-left: auto; flex-shrink: 0; }
+.kb-selected-count { font-size: 12px; color: var(--text-muted); margin-top: 10px; }
+
+.empty-center { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; color: var(--text-muted); }
+.empty-center .eic { font-size: 34px; opacity: 0.3; }
+.empty-center h3 { font-size: 15px; font-weight: 600; color: var(--text-sec); }
+
+.toast { position: fixed; top: 66px; left: 50%; transform: translateX(-50%) translateY(-8px); padding: 9px 20px; border-radius: 8px; font-size: 13.5px; font-weight: 600; color: white; z-index: 600; pointer-events: none; opacity: 0; transition: all 0.25s; white-space: nowrap; box-shadow: var(--shadow-md); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* CBL tab nav — matches kb-tabs underline style */
+.cbl-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border); padding: 0 24px; flex-shrink: 0; background: var(--white); }
+.cbl-tab { padding: 13px 2px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all var(--tr); margin-bottom: -1px; }
+.cbl-tab.active { color: var(--text); border-bottom-color: var(--teal); }
+.cbl-tab-panel { display: none; flex: 1; overflow-y: auto; flex-direction: column; }
+.cbl-tab-panel.active { display: flex; }
+
+/* ── WIZARD (Create Scenario — mirrors KB's step-by-step pattern) ── */
+.wizard-layout { display: flex; flex: 1; overflow: hidden; }
+.wiz-steps { width: 248px; background: var(--white); border-right: 1px solid var(--border); padding: 20px 10px; flex-shrink: 0; overflow-y: auto; }
+.wiz-steps-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-muted); padding: 0 6px; margin-bottom: 12px; }
+.ws { display: flex; align-items: flex-start; gap: 10px; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+.ws:hover .ws-text { color: var(--text-sec); }
+.ws-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; flex-shrink: 0; margin-top: 1px; }
+.ws-num.done { background: var(--teal); color: white; }
+.ws-num.active { background: var(--teal); color: white; }
+.ws-num.pending { background: var(--bg); color: var(--text-muted); border: 1.5px solid var(--border); }
+.ws-text { font-size: 13px; font-weight: 500; color: var(--text-muted); line-height: 1.4; }
+.ws.active .ws-text { color: var(--text); font-weight: 600; }
+.ws.done .ws-text { color: var(--text-sec); }
+.ws-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.ws.active .ws-hint { color: var(--teal); }
+.wc { width: 2px; height: 8px; background: var(--border); margin: 0 0 0 21px; border-radius: 1px; }
+.wc.done { background: var(--teal); }
+.wiz-panel { flex: 1; overflow-y: auto; padding: 24px; background: var(--bg); }
+.wiz-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.wiz-card-head { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); background: var(--white); }
+.wiz-card-title { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+.wiz-card-sub { font-size: 13px; color: var(--text-sec); margin-top: 5px; line-height: 1.5; }
+.wiz-actions-top { padding: 14px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: #FAFBFC; position: sticky; top: 0; z-index: 5; }
+.wiz-step-body { padding: 24px; }
+.wiz-summary-row { display: flex; justify-content: space-between; padding: 11px 0; border-bottom: 1px solid var(--border-light); font-size: 13.5px; }
+.wiz-summary-row:last-child { border-bottom: none; }
+.wiz-summary-label { color: var(--text-muted); }
+.wiz-summary-value { color: var(--text); font-weight: 600; text-align: right; max-width: 60%; }
+
+/* Learning tab */
+.lp-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; }
+.lp-title { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.4px; }
+.lp-sub { font-size: 13.5px; color: var(--text-sec); margin-top: 5px; }
+.lp-note { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+.lp-mysessions { margin-bottom: 20px; }
+.lp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.lp-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; }
+.lp-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 4px; }
+.lp-card-title { font-size: 14.5px; font-weight: 700; color: var(--text); letter-spacing: -0.1px; line-height: 1.35; }
+.lp-card-role { font-size: 12.5px; color: var(--text-sec); margin-top: 4px; }
+.lp-card-role b { color: var(--text); font-weight: 600; }
+.lp-card-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; margin-top: 10px; flex: 1; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.lp-card-stats { display: flex; align-items: center; gap: 14px; font-size: 12px; color: var(--text-sec); margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--border-light); }
+.lp-card-stats b { color: var(--green-dark); }
+.lp-card-actions { display: flex; gap: 8px; margin-top: 14px; }
+.lp-card-actions .btn { flex: 1; height: 36px; font-size: 12.5px; }
+
+/* Rubrics tab */
+.rb-table { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.rb-thead { display: grid; grid-template-columns: 2.6fr 1fr 1fr 0.8fr 1fr 90px; padding: 10px 20px; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); border-bottom: 1px solid var(--border); background: var(--bg); }
+.rb-tr { display: grid; grid-template-columns: 2.6fr 1fr 1fr 0.8fr 1fr 90px; padding: 14px 20px; border-bottom: 1px solid var(--border-light); align-items: center; transition: background var(--tr); }
+.rb-tr:last-child { border-bottom: none; }
+.rb-tr:hover { background: #FAFBFC; }
+
+/* Rubric builder */
+.rb-mode-tabs { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; width: fit-content; margin-bottom: 20px; background: var(--bg); }
+.rb-mode-tab { padding: 9px 16px; font-size: 13px; font-weight: 600; cursor: pointer; color: var(--text-sec); display: flex; align-items: center; gap: 6px; transition: all var(--tr); }
+.rb-mode-tab.active { background: var(--white); color: var(--text); box-shadow: var(--shadow-sm); }
+.rb-title-row { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.rb-title-row .fi { flex: 1; }
+.rb-total { font-size: 13.5px; font-weight: 600; color: var(--text-sec); white-space: nowrap; }
+.rb-component { border: 1px solid var(--border); border-radius: var(--radius-lg); margin-bottom: 14px; background: var(--white); }
+.rb-component-head { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--border-light); }
+.rb-component-head .fi { flex: 1; height: 38px; }
+.rb-comp-label { font-size: 13px; font-weight: 700; color: var(--text); white-space: nowrap; }
+.rb-metric { margin: 14px 16px; border: 1px solid var(--border-light); border-radius: var(--radius); padding: 14px; background: #FAFBFC; }
+.rb-metric-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.rb-metric-head .fi { flex: 1; height: 38px; }
+.rb-metric-label { font-size: 12.5px; font-weight: 700; color: var(--text-sec); white-space: nowrap; }
+.rb-opt-row { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
+.rb-opt-row .fi { flex: 1; height: 36px; }
+.rb-opt-marks { width: 64px !important; flex: 0 0 64px; text-align: center; }
+.rb-opt-label { font-size: 12px; color: var(--text-muted); width: 52px; flex-shrink: 0; }
+.rb-add-link { display: flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 600; color: var(--teal); cursor: pointer; padding: 4px 2px; margin-top: 2px; }
+.rb-add-link:hover { color: var(--teal-dark); }
+.rb-add-component { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 600; color: var(--teal); cursor: pointer; padding: 10px 2px; }
+.rb-add-component:hover { color: var(--teal-dark); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo-area">
+    <img src="https://demo.atlaslearn.ai/assets/atlas-branch-logo-B7aM78TE.png" alt="ATLAS" style="height:28px;width:auto;object-fit:contain;flex-shrink:0">
+  </div>
+  <div class="topbar-right"><div class="help-btn"><i data-feather="help-circle" style="width:14px;height:14px"></i>Help</div></div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-sec">NAVIGATION</div>
+    <div class="nav-item" onclick="go('dashboard')"><i data-feather="grid"></i>Dashboard</div>
+    <div class="nav-item" onclick="go('users')"><i data-feather="users"></i>Users</div>
+    <div class="nav-item" onclick="go('courses')"><i data-feather="book-open"></i>Courses</div>
+    <div class="nav-item" onclick="go('content-sharing')"><i data-feather="share-2"></i>Content Sharing</div>
+    <div class="nav-item" onclick="go('job-roles')"><i data-feather="briefcase"></i>Job Roles</div>
+    <div class="nav-item active" id="navCBL" onclick="go('cbl')"><i data-feather="award"></i>CBL</div>
+    <div class="nav-item" onclick="go('pals')"><i data-feather="play-circle"></i>PALS Course</div>
+    <div class="nav-item" onclick="go('groups')"><i data-feather="user-check"></i>Groups</div>
+    <div class="nav-item" onclick="go('classes')"><i data-feather="home"></i>Classes</div>
+    <div class="nav-item" onclick="go('assess')"><i data-feather="check-square"></i>Assessments</div>
+    <div class="nav-item" onclick="go('qbank')"><i data-feather="help-circle"></i>Question Bank</div>
+    <div class="nav-item" onclick="go('kb')"><i data-feather="layers"></i>Knowledge Base</div>
+    <div class="nav-item" onclick="go('analytics')"><i data-feather="bar-chart-2"></i>Analytics</div>
+    <div class="nav-item" onclick="go('settings')"><i data-feather="settings"></i>Settings</div>
+    <div class="sidebar-footer"><div class="user-row"><div class="avatar">W</div><div><div class="user-name">Wahyu</div><div class="user-role">Org Admin</div></div></div></div>
+  </aside>
+
+  <main class="main">
+
+    <!-- CBL (matches real product: Learning | Manage Scenarios | Rubrics tabs) -->
+    <div class="page active" id="page-cbl">
+      <div class="cbl-tabs">
+        <div class="cbl-tab" id="cblTab-learning" onclick="switchCblTab('learning')">Learning</div>
+        <div class="cbl-tab active" id="cblTab-manage" onclick="switchCblTab('manage')">Manage Scenarios</div>
+        <div class="cbl-tab" id="cblTab-rubrics" onclick="switchCblTab('rubrics')">Rubrics</div>
+      </div>
+
+      <!-- LEARNING TAB -->
+      <div class="cbl-tab-panel" id="cblPanel-learning">
+        <div class="page-body">
+          <div class="lp-header">
+            <div>
+              <div class="lp-title">Practice &amp; Role-Play</div>
+              <div class="lp-sub">Practice real-world scenarios with an AI role-play partner</div>
+              <div class="lp-note">Scenarios are personalized based on your assigned job role</div>
+            </div>
+            <button class="btn btn-white lp-mysessions" style="margin-bottom:0" onclick="toast('My Sessions — coming soon', '#0D7F7F', 2500)"><i data-feather="clock" style="width:14px;height:14px"></i> My Sessions</button>
+          </div>
+          <div class="lp-grid">
+            <div class="lp-card">
+              <div class="lp-card-top"><div class="lp-card-title">Handling an upset parent due to child's poor performance</div></div>
+              <div class="lp-card-role">Role: <b>Training &amp; Adult Education Specialist</b></div>
+              <div class="lp-card-desc">A parent is upset about their child's recent academic performance and is requesting an explanation along with an improvement plan.</div>
+              <div class="lp-card-actions"><button class="btn btn-teal" style="width:100%" onclick="toast('Practice session — coming soon', '#0D7F7F', 2500)"><i data-feather="play" style="width:13px;height:13px"></i> Start Practice</button></div>
+            </div>
+            <div class="lp-card">
+              <div class="lp-card-top"><div class="lp-card-title">Banking Client review session - Understanding Client's mismatched business model</div></div>
+              <div class="lp-card-role">Role: <b>Financial Services Specialist</b></div>
+              <div class="lp-card-desc">Review a discrepancy between a client's reported business model and their actual transaction activity, and determine next steps.</div>
+              <div class="lp-card-stats">✅ Completed · Attempts: <b>3</b> · Best score: <b>88%</b></div>
+              <div class="lp-card-actions">
+                <button class="btn btn-white" onclick="toast('History — coming soon', '#0D7F7F', 2500)"><i data-feather="bar-chart-2" style="width:13px;height:13px"></i> History</button>
+                <button class="btn btn-teal" onclick="toast('Practice session — coming soon', '#0D7F7F', 2500)"><i data-feather="repeat" style="width:13px;height:13px"></i> Practice Again</button>
+              </div>
+            </div>
+            <div class="lp-card">
+              <div class="lp-card-top"><div class="lp-card-title">Detect and Report AML/CFT staff training</div></div>
+              <div class="lp-card-role">Role: <b>Compliance Officer</b></div>
+              <div class="lp-card-desc">Identify suspicious transaction patterns during a client interview and decide whether the activity should be escalated for reporting.</div>
+              <div class="lp-card-actions"><button class="btn btn-teal" style="width:100%" onclick="toast('Practice session — coming soon', '#0D7F7F', 2500)"><i data-feather="play" style="width:13px;height:13px"></i> Start Practice</button></div>
+            </div>
+            <div class="lp-card">
+              <div class="lp-card-top"><div class="lp-card-title">Handling Parents concerns</div></div>
+              <div class="lp-card-role">Role: <b>Learning Manager</b></div>
+              <div class="lp-card-desc">A parent raises concerns about classroom safety policy and expects a calm, clear, policy-aligned response.</div>
+              <div class="lp-card-stats">✅ Completed · Attempts: <b>1</b> · Best score: <b>76%</b></div>
+              <div class="lp-card-actions">
+                <button class="btn btn-white" onclick="toast('History — coming soon', '#0D7F7F', 2500)"><i data-feather="bar-chart-2" style="width:13px;height:13px"></i> History</button>
+                <button class="btn btn-teal" onclick="toast('Practice session — coming soon', '#0D7F7F', 2500)"><i data-feather="repeat" style="width:13px;height:13px"></i> Practice Again</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MANAGE SCENARIOS TAB -->
+      <div class="cbl-tab-panel active" id="cblPanel-manage">
+        <div class="page-body">
+          <div class="sec-header">
+            <div><div class="sec-title">Manage Scenarios</div><div class="sec-sub">Create and manage training scenarios · <span id="scenarioCount">15</span> scenarios available</div></div>
+            <button class="btn btn-teal" onclick="go('add-cbl')"><i data-feather="plus" style="width:14px;height:14px"></i> Create Scenario</button>
+          </div>
+          <div class="case-table">
+            <div class="case-thead"><div>Title</div><div>AI Role</div><div>User Role</div><div>Language</div><div>Created</div><div></div></div>
+            <div class="case-tr">
+              <div class="case-title-wrap"><div class="file-icon"><i data-feather="message-circle" style="width:16px;height:16px"></i></div><div class="case-name">Handling an upset parent due to child's poor performance</div></div>
+              <div class="cell">Upset parent</div><div class="cell">Training &amp; Adult Education Specialist</div><div class="cell"><span class="pill-tag">English</span></div><div class="cell">Jun 18, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Assign"><i data-feather="user-plus" style="width:15px;height:15px"></i></button><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="case-tr">
+              <div class="case-title-wrap"><div class="file-icon"><i data-feather="message-circle" style="width:16px;height:16px"></i></div><div class="case-name">Banking Client review session - Test 12/6</div></div>
+              <div class="cell">Disgruntled Client</div><div class="cell">Financial Services Specialist</div><div class="cell"><span class="pill-tag">English</span></div><div class="cell">Jun 12, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Assign"><i data-feather="user-plus" style="width:15px;height:15px"></i></button><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="case-tr">
+              <div class="case-title-wrap"><div class="file-icon"><i data-feather="message-circle" style="width:16px;height:16px"></i></div><div class="case-name">Handling an Angry parent v2</div></div>
+              <div class="cell">Angry Parent</div><div class="cell">Learning Manager</div><div class="cell"><span class="pill-tag">English</span></div><div class="cell">Jun 3, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Assign"><i data-feather="user-plus" style="width:15px;height:15px"></i></button><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="case-tr">
+              <div class="case-title-wrap"><div class="file-icon"><i data-feather="message-circle" style="width:16px;height:16px"></i></div><div class="case-name">Banking Client review session - Understanding Client's mismatched business model</div></div>
+              <div class="cell">Banking Client</div><div class="cell">Financial Services Specialist</div><div class="cell"><span class="pill-tag">English</span></div><div class="cell">May 21, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Assign"><i data-feather="user-plus" style="width:15px;height:15px"></i></button><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="case-tr" id="newRow" style="display:none">
+              <div class="case-title-wrap"><div class="file-icon"><i data-feather="message-circle" style="width:16px;height:16px"></i></div><div class="case-name" id="newRowName">—</div></div>
+              <div class="cell" id="newRowAI">—</div><div class="cell" id="newRowUser">—</div><div class="cell" id="newRowLang"><span class="pill-tag">English</span></div><div class="cell" id="newRowDate">—</div>
+              <div class="row-actions"><button class="icon-btn" title="Assign"><i data-feather="user-plus" style="width:15px;height:15px"></i></button><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RUBRICS TAB -->
+      <div class="cbl-tab-panel" id="cblPanel-rubrics">
+        <div class="page-body">
+          <div class="sec-header">
+            <div><div class="sec-title">Rubrics</div><div class="sec-sub">Build scoring rubrics to grade scenario sessions</div></div>
+            <button class="btn btn-teal" onclick="go('add-rubric')"><i data-feather="plus" style="width:14px;height:14px"></i> Create Rubric</button>
+          </div>
+          <div class="sec-title" style="font-size:15px;margin-bottom:12px">Saved Rubrics</div>
+          <div class="rb-table">
+            <div class="rb-thead"><div>Title</div><div>Components</div><div>Total Marks</div><div>Automate</div><div>Created</div><div></div></div>
+            <div class="rb-tr">
+              <div class="case-name">Banking Client review session - Understanding Client's mismatched business model</div>
+              <div class="cell">3</div><div class="cell">20</div><div class="cell"><span class="pill-tag" style="background:var(--teal-light);color:var(--teal);border-color:transparent">On</span></div><div class="cell">Jun 18, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="rb-tr">
+              <div class="case-name">Detect and Report AML/CFT staff training</div>
+              <div class="cell">2</div><div class="cell">10</div><div class="cell"><span class="pill-tag" style="background:var(--teal-light);color:var(--teal);border-color:transparent">On</span></div><div class="cell">Jun 10, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="rb-tr">
+              <div class="case-name">Handling Parents concerns</div>
+              <div class="cell">4</div><div class="cell">25</div><div class="cell"><span class="pill-tag">Off</span></div><div class="cell">Jun 5, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="rb-tr">
+              <div class="case-name">Customer Identity Verification Assessment</div>
+              <div class="cell">3</div><div class="cell">15</div><div class="cell"><span class="pill-tag" style="background:var(--teal-light);color:var(--teal);border-color:transparent">On</span></div><div class="cell">May 28, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="rb-tr">
+              <div class="case-name">De-escalation Skills Evaluation</div>
+              <div class="cell">2</div><div class="cell">12</div><div class="cell"><span class="pill-tag">Off</span></div><div class="cell">May 22, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="rb-tr">
+              <div class="case-name">KYC / Customer Due Diligence Review</div>
+              <div class="cell">3</div><div class="cell">18</div><div class="cell"><span class="pill-tag" style="background:var(--teal-light);color:var(--teal);border-color:transparent">On</span></div><div class="cell">May 14, 2026</div>
+              <div class="row-actions"><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+            <div class="rb-tr" id="newRubricRow" style="display:none">
+              <div class="case-name" id="newRubricName">—</div>
+              <div class="cell" id="newRubricComp">—</div><div class="cell" id="newRubricMarks">—</div><div class="cell"><span class="pill-tag">Off</span></div><div class="cell" id="newRubricDate">—</div>
+              <div class="row-actions"><button class="icon-btn" title="Edit"><i data-feather="edit-2" style="width:14px;height:14px"></i></button><button class="icon-btn del" title="Delete"><i data-feather="trash-2" style="width:14px;height:14px"></i></button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATE SCENARIO — step-by-step wizard, mirrors KB's wizard pattern -->
+    <div class="page" id="page-add-cbl">
+      <div class="page-topbar"><div class="back-btn" onclick="goToCblTab('manage')"><i data-feather="chevron-left" style="width:16px;height:16px"></i>Back</div><div class="page-topbar-title">Create New Scenario</div></div>
+      <div class="wizard-layout">
+        <div class="wiz-steps">
+          <div class="wiz-steps-label">Steps</div>
+          <div class="ws active" id="cs1" onclick="goCsStep(1)"><div class="ws-num active" id="cs1n">1</div><div><div class="ws-text">Basic Information</div><div class="ws-hint" id="cs1h">Title &amp; roles</div></div></div>
+          <div class="wc" id="csc2"></div>
+          <div class="ws" id="cs2" onclick="goCsStep(2)"><div class="ws-num pending" id="cs2n">2</div><div><div class="ws-text">Description &amp; Success Criteria</div><div class="ws-hint" id="cs2h"></div></div></div>
+          <div class="wc" id="csc3"></div>
+          <div class="ws" id="cs3" onclick="goCsStep(3)"><div class="ws-num pending" id="cs3n">3</div><div><div class="ws-text">Grading Rubric</div><div class="ws-hint" id="cs3h"></div></div></div>
+          <div class="wc" id="csc4"></div>
+          <div class="ws" id="cs4" onclick="goCsStep(4)"><div class="ws-num pending" id="cs4n">4</div><div><div class="ws-text">Knowledge Base</div><div class="ws-hint" id="cs4h"></div></div></div>
+          <div class="wc" id="csc5"></div>
+          <div class="ws" id="cs5" onclick="goCsStep(5)"><div class="ws-num pending" id="cs5n">5</div><div><div class="ws-text">Review &amp; Create</div><div class="ws-hint" id="cs5h"></div></div></div>
+        </div>
+
+        <div class="wiz-panel">
+          <div class="wiz-card">
+
+            <!-- STEP 1: Basic Information -->
+            <div class="cs-step" id="csStep1">
+              <div class="wiz-card-head"><div class="wiz-card-title">Basic Information</div><div class="wiz-card-sub">Define the scenario title and roles</div></div>
+              <div class="wiz-actions-top"><button class="btn btn-white" onclick="goToCblTab('manage')">Cancel</button><button class="btn btn-teal" onclick="goCsStep(2)">Next</button></div>
+              <div class="wiz-step-body">
+                <div class="fg"><label class="fl">Scenario Title *</label><input class="fi" id="fTitle" placeholder="e.g., Handling Customer Complaints"></div>
+                <div class="fg-row">
+                  <div class="fg">
+                    <div class="fl-row"><label class="fl" style="margin-bottom:0">User Role *</label><span class="btn-link" style="font-size:12px"><i data-feather="plus" style="width:11px;height:11px"></i>Create Job Role</span></div>
+                    <select class="fi" id="fUserRole">
+                      <option value="">Select a job role</option>
+                      <option>Accountancy Specialist</option>
+                      <option>Financial Services Specialist</option>
+                      <option>Human Resource Specialist</option>
+                      <option>Learning Manager</option>
+                      <option>Training &amp; Adult Education Specialist</option>
+                    </select>
+                  </div>
+                  <div class="fg"><label class="fl">AI Role *</label><input class="fi" id="fAiRole" placeholder="e.g., Customer Service Agent"></div>
+                </div>
+                <div class="fg-row">
+                  <div class="fg"><label class="fl">Language</label>
+                    <select class="fi" id="fLanguage">
+                      <option>English</option><option>Indonesian</option><option>Chinese (Mandarin)</option><option>Chinese (Cantonese)</option><option>Thai</option>
+                    </select>
+                  </div>
+                  <div class="fg"><label class="fl">AI Voice</label>
+                    <select class="fi" id="fVoice">
+                      <option value="">Select voice</option>
+                      <option>Adult Male (English, Singaporean)</option>
+                      <option>Adult Female (English, Singaporean)</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="toggle-card">
+                  <div><div class="toggle-label">Enable Live Conversation Mode Option</div><div class="toggle-sub">Allows real-time, continuous conversation. Feels more natural but requires quick responses.</div></div>
+                  <label class="toggle"><input type="checkbox" id="fLiveMode"><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 2: Description & Success Criteria -->
+            <div class="cs-step" id="csStep2" style="display:none">
+              <div class="wiz-card-head"><div class="wiz-card-title">Description &amp; Success Criteria</div><div class="wiz-card-sub">Define what this scenario is about</div></div>
+              <div class="wiz-actions-top"><button class="btn btn-white" onclick="goCsStep(1)">Back</button><button class="btn btn-teal" onclick="goCsStep(3)">Next</button></div>
+              <div class="wiz-step-body">
+                <div class="fg-row" style="grid-template-columns:1fr;margin-bottom:8px">
+                  <button class="btn btn-white" style="width:fit-content" onclick="generateWithAI()"><i data-feather="zap" style="width:13px;height:13px"></i> Generate with AI</button>
+                </div>
+                <div class="fg"><label class="fl">Scenario Description *</label><textarea class="fi" id="fDesc" placeholder="Describe the scenario..."></textarea></div>
+                <div class="fg">
+                  <label class="fl">Success Criteria *</label>
+                  <div id="critList">
+                    <div class="crit-row"><input class="fi" placeholder="Criterion 1"><button class="crit-remove" onclick="removeCrit(this)" title="Remove"><i data-feather="x" style="width:14px;height:14px"></i></button></div>
+                  </div>
+                  <div class="add-crit" onclick="addCrit()"><i data-feather="plus" style="width:14px;height:14px"></i> Add Criterion</div>
+                </div>
+                <div class="toggle-card" style="margin-top:18px">
+                  <div><div class="toggle-label">Auto-end session when all criteria are met</div><div class="toggle-sub">When off, learners must manually end the session even after achieving every criterion. Progress will still be tracked and visible.</div></div>
+                  <label class="toggle"><input type="checkbox" id="fAutoEnd" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label>
+                </div>
+              </div>
+            </div>
+
+            <!-- STEP 3: Grading Rubric -->
+            <div class="cs-step" id="csStep3" style="display:none">
+              <div class="wiz-card-head"><div class="wiz-card-title">Grading Rubric</div><div class="wiz-card-sub">Optionally attach a rubric to score sessions instead of using success criteria</div></div>
+              <div class="wiz-actions-top"><button class="btn btn-white" onclick="goCsStep(2)">Back</button><button class="btn btn-teal" onclick="goCsStep(4)">Next</button></div>
+              <div class="wiz-step-body">
+                <div class="fg" style="margin-bottom:8px">
+                  <div class="fl-row"><label class="fl" style="margin-bottom:0">Rubric</label><span class="btn-link" style="font-size:12px" onclick="go('add-rubric')"><i data-feather="plus" style="width:11px;height:11px"></i>Create Rubric</span></div>
+                  <select class="fi" id="fRubric">
+                    <option>None (use success criteria)</option>
+                    <option>Client review session - Understanding Client's mismatched business model · 20 marks</option>
+                    <option>Detect and Report AML/CFT staff training · 10 marks</option>
+                    <option>Handling Parents concerns · 25 marks</option>
+                  </select>
+                </div>
+                <div class="toggle-sub">When selected, the AI evaluator will grade the conversation against this rubric at the end of the session.</div>
+              </div>
+            </div>
+
+            <!-- STEP 4: Knowledge Base -->
+            <div class="cs-step" id="csStep4" style="display:none">
+              <div class="wiz-card-head"><div class="wiz-card-title">Knowledge Base</div><div class="wiz-card-sub">Attach knowledge articles for the AI to reference during conversations</div></div>
+              <div class="wiz-actions-top"><button class="btn btn-white" onclick="goCsStep(3)">Back</button><button class="btn btn-teal" onclick="goCsStep(5)">Next</button></div>
+              <div class="wiz-step-body">
+                <div class="kb-search-bar"><i data-feather="search" style="width:14px;height:14px;color:var(--text-muted)"></i><input id="kbSearch" placeholder="Search articles..." oninput="filterKb(this.value)"></div>
+                <div class="kb-check-scroll" id="kbScroll">
+                  <div class="kb-domain-label">BANKING</div>
+                  <div class="lang-check-row" onclick="toggleKb(this)"><div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div><div class="kb-row-name">Anti Money Laundering and Combating Financial Terrorism (June)</div></div>
+                  <div class="lang-check-row" onclick="toggleKb(this)"><div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div><div class="kb-row-name">Customer Identity Verification Standards</div><div class="kb-row-tag">Customer Service</div></div>
+                  <div class="lang-check-row" onclick="toggleKb(this)"><div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div><div class="kb-row-name">Effective De-escalation Techniques for Banking Professionals</div><div class="kb-row-tag">Customer Service</div></div>
+                  <div class="lang-check-row" onclick="toggleKb(this)"><div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div><div class="kb-row-name">Identifying and Reporting Suspicious Activity (AML/CTF)</div><div class="kb-row-tag">Compliance</div></div>
+                  <div class="lang-check-row" onclick="toggleKb(this)"><div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div><div class="kb-row-name">KYC and Customer Due Diligence Standards</div><div class="kb-row-tag">Compliance</div></div>
+                  <div class="kb-domain-label">FINANCE</div>
+                  <div class="lang-check-row" onclick="toggleKb(this)"><div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div><div class="kb-row-name">Bank Indonesia</div></div>
+                  <div class="lang-check-row" onclick="toggleKb(this)"><div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div><div class="kb-row-name">Know your Customer (KYC) and CDD (Customer Due Diligence)</div></div>
+                  <div class="kb-domain-label">LEGAL</div>
+                  <div class="lang-check-row" onclick="toggleKb(this)"><div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div><div class="kb-row-name">New Employee Onboarding (Legal)</div></div>
+                </div>
+                <div class="kb-selected-count" id="kbCount">0 articles selected</div>
+              </div>
+            </div>
+
+            <!-- STEP 5: Review & Create -->
+            <div class="cs-step" id="csStep5" style="display:none">
+              <div class="wiz-card-head"><div class="wiz-card-title">Review &amp; Create</div><div class="wiz-card-sub">Confirm the details before creating this scenario</div></div>
+              <div class="wiz-actions-top"><button class="btn btn-white" onclick="goCsStep(4)">Back</button><button class="btn btn-teal" onclick="createScenario()">Create Scenario</button></div>
+              <div class="wiz-step-body">
+                <div class="form-card" style="margin-bottom:0;box-shadow:none">
+                  <div class="wiz-summary-row"><span class="wiz-summary-label">Scenario Title</span><span class="wiz-summary-value" id="rvTitle">—</span></div>
+                  <div class="wiz-summary-row"><span class="wiz-summary-label">User Role</span><span class="wiz-summary-value" id="rvUserRole">—</span></div>
+                  <div class="wiz-summary-row"><span class="wiz-summary-label">AI Role</span><span class="wiz-summary-value" id="rvAiRole">—</span></div>
+                  <div class="wiz-summary-row"><span class="wiz-summary-label">Language</span><span class="wiz-summary-value" id="rvLanguage">—</span></div>
+                  <div class="wiz-summary-row"><span class="wiz-summary-label">Description</span><span class="wiz-summary-value" id="rvDesc">—</span></div>
+                  <div class="wiz-summary-row"><span class="wiz-summary-label">Success Criteria</span><span class="wiz-summary-value" id="rvCrit">—</span></div>
+                  <div class="wiz-summary-row"><span class="wiz-summary-label">Grading Rubric</span><span class="wiz-summary-value" id="rvRubric">—</span></div>
+                  <div class="wiz-summary-row"><span class="wiz-summary-label">Knowledge Base Articles</span><span class="wiz-summary-value" id="rvKb">—</span></div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CREATE RUBRIC (component → metric → option builder, top action bar like KB) -->
+    <div class="page" id="page-add-rubric">
+      <div class="page-topbar">
+        <div class="back-btn" onclick="goToCblTab('rubrics')"><i data-feather="chevron-left" style="width:16px;height:16px"></i>Back</div>
+        <div class="page-topbar-title">Create Rubric</div>
+        <button class="btn btn-teal" style="margin-left:auto" onclick="createRubric()"><i data-feather="check" style="width:14px;height:14px"></i> Create Rubric</button>
+      </div>
+      <div class="form-wrap" style="max-width:820px">
+
+        <div class="rb-mode-tabs">
+          <div class="rb-mode-tab active" id="rbModeAI" onclick="setRubricMode('ai')"><i data-feather="zap" style="width:13px;height:13px"></i> Generate using AI</div>
+          <div class="rb-mode-tab" id="rbModeManual" onclick="setRubricMode('manual')"><i data-feather="edit-3" style="width:13px;height:13px"></i> Manual</div>
+        </div>
+
+        <div class="form-card">
+          <div class="rb-title-row">
+            <div class="fg" style="margin-bottom:0;flex:1"><label class="fl">Rubric Title *</label><input class="fi" id="rbTitle" placeholder="e.g., Handling Client Escalation - Assessment"></div>
+            <div class="rb-total">Total Marks: <span id="rbTotalMarks">0</span></div>
+          </div>
+
+          <div id="rbComponents"></div>
+
+          <div class="rb-add-component" onclick="addComponent()"><i data-feather="plus" style="width:15px;height:15px"></i> Add Component</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="page" id="page-dashboard"><div class="empty-center"><div class="eic">📊</div><h3>Dashboard</h3></div></div>
+    <div class="page" id="page-users"><div class="empty-center"><div class="eic">👥</div><h3>Users</h3></div></div>
+    <div class="page" id="page-courses"><div class="empty-center"><div class="eic">📚</div><h3>Courses</h3></div></div>
+    <div class="page" id="page-content-sharing"><div class="empty-center"><div class="eic">🔗</div><h3>Content Sharing</h3></div></div>
+    <div class="page" id="page-job-roles"><div class="empty-center"><div class="eic">💼</div><h3>Job Roles</h3></div></div>
+    <div class="page" id="page-pals"><div class="empty-center"><div class="eic">▶️</div><h3>PALS Course</h3></div></div>
+    <div class="page" id="page-groups"><div class="empty-center"><div class="eic">👥</div><h3>Groups</h3></div></div>
+    <div class="page" id="page-classes"><div class="empty-center"><div class="eic">🏫</div><h3>Classes</h3></div></div>
+    <div class="page" id="page-assess"><div class="empty-center"><div class="eic">✅</div><h3>Assessments</h3></div></div>
+    <div class="page" id="page-qbank"><div class="empty-center"><div class="eic">❓</div><h3>Question Bank</h3></div></div>
+    <div class="page" id="page-kb"><div class="empty-center"><div class="eic">🗂️</div><h3>Knowledge Base</h3></div></div>
+    <div class="page" id="page-analytics"><div class="empty-center"><div class="eic">📈</div><h3>Analytics</h3></div></div>
+    <div class="page" id="page-settings"><div class="empty-center"><div class="eic">⚙️</div><h3>Settings</h3></div></div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ALL_PAGES = ['dashboard','users','courses','content-sharing','job-roles','cbl','pals','groups','classes','assess','qbank','kb','add-cbl','add-rubric','analytics','settings'];
+let scenarioCounter = 16;
+let rubricCounter = 7;
+
+function go(page) {
+  ALL_PAGES.forEach(p => { const el = document.getElementById('page-'+p); if(el) el.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('page-'+page); if(el) el.classList.add('active');
+  if(['cbl','add-cbl','add-rubric'].includes(page)) document.getElementById('navCBL').classList.add('active');
+  else {
+    const map = {dashboard:0,users:1,courses:2,'content-sharing':3,'job-roles':4,pals:6,groups:7,classes:8,assess:9,qbank:10,kb:11,analytics:12,settings:13};
+    const items = document.querySelectorAll('.nav-item');
+    if(map[page]!==undefined) items[map[page]]?.classList.add('active');
+  }
+  if(page==='add-cbl') resetForm();
+  if(page==='add-rubric') resetRubricForm();
+}
+
+function switchCblTab(tab) {
+  ['learning','manage','rubrics'].forEach(t => {
+    document.getElementById('cblTab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('cblPanel-'+t).classList.toggle('active', t===tab);
+  });
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+function goToCblTab(tab) {
+  go('cbl');
+  switchCblTab(tab);
+}
+
+function toast(msg, color='#0D7F7F', dur=3000, textColor='white') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = color; t.style.color = textColor; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), dur);
+}
+
+function addCrit() {
+  const list = document.getElementById('critList');
+  const n = list.children.length + 1;
+  const row = document.createElement('div');
+  row.className = 'crit-row';
+  row.innerHTML = `<input class="fi" placeholder="Criterion ${n}"><button class="crit-remove" onclick="removeCrit(this)" title="Remove"><i data-feather="x" style="width:14px;height:14px"></i></button>`;
+  list.appendChild(row);
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+function removeCrit(btn) {
+  const list = document.getElementById('critList');
+  if(list.children.length > 1) btn.closest('.crit-row').remove();
+  else toast('At least one success criterion is required', '#D97706', 2500);
+}
+
+function toggleKb(el) {
+  el.classList.toggle('checked');
+  const count = document.querySelectorAll('#kbScroll .lang-check-row.checked').length;
+  document.getElementById('kbCount').textContent = count + (count===1 ? ' article selected' : ' articles selected');
+}
+function filterKb(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('#kbScroll .lang-check-row').forEach(row => {
+    const name = row.querySelector('.kb-row-name').textContent.toLowerCase();
+    row.style.display = name.includes(q) ? 'flex' : 'none';
+  });
+}
+
+function generateWithAI() {
+  document.getElementById('fDesc').value = "The learner, acting as a Financial Services Specialist, must calmly review a discrepancy in a client's reported business model versus their actual transaction activity, gather clarifying information, and determine whether an escalation for further compliance review is warranted.";
+  toast('Description generated with AI', '#ECFDF3', 3000, '#067647');
+}
+
+function resetForm() {
+  document.getElementById('fTitle').value = '';
+  document.getElementById('fUserRole').value = '';
+  document.getElementById('fAiRole').value = '';
+  document.getElementById('fLanguage').value = 'English';
+  document.getElementById('fVoice').value = '';
+  document.getElementById('fLiveMode').checked = false;
+  document.getElementById('fDesc').value = '';
+  document.getElementById('fAutoEnd').checked = true;
+  document.getElementById('fRubric').value = 'None (use success criteria)';
+  document.getElementById('critList').innerHTML = '<div class="crit-row"><input class="fi" placeholder="Criterion 1"><button class="crit-remove" onclick="removeCrit(this)" title="Remove"><i data-feather="x" style="width:14px;height:14px"></i></button></div>';
+  document.querySelectorAll('#kbScroll .lang-check-row.checked').forEach(r => r.classList.remove('checked'));
+  document.getElementById('kbCount').textContent = '0 articles selected';
+  goCsStep(1);
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+
+const CS_STEPS = 5;
+const CS_HINTS = { 1:'Title & roles', 2:'Description & criteria', 3:'Attach a rubric', 4:'Attach articles', 5:'Confirm details' };
+let csCurrentStep = 1;
+function goCsStep(n) {
+  csCurrentStep = n;
+  for(let i=1; i<=CS_STEPS; i++) {
+    const stepEl = document.getElementById('csStep'+i);
+    if(stepEl) stepEl.style.display = (i===n) ? 'block' : 'none';
+    const ws = document.getElementById('cs'+i);
+    const num = document.getElementById('cs'+i+'n');
+    const hint = document.getElementById('cs'+i+'h');
+    if(!ws || !num) continue;
+    ws.classList.remove('active','done');
+    num.classList.remove('active','done','pending');
+    if(i < n) { ws.classList.add('done'); num.classList.add('done'); num.textContent = '✓'; if(hint) hint.textContent = ''; }
+    else if(i === n) { ws.classList.add('active'); num.classList.add('active'); num.textContent = i; if(hint) hint.textContent = CS_HINTS[i] || ''; }
+    else { num.classList.add('pending'); num.textContent = i; if(hint) hint.textContent = ''; }
+  }
+  for(let i=2; i<=CS_STEPS; i++) {
+    const conn = document.getElementById('csc'+i);
+    if(conn) conn.classList.toggle('done', i <= n);
+  }
+  if(n === CS_STEPS) updateCsReview();
+  document.querySelector('.wiz-panel').scrollTop = 0;
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+
+function updateCsReview() {
+  document.getElementById('rvTitle').textContent = document.getElementById('fTitle').value.trim() || '—';
+  document.getElementById('rvUserRole').textContent = document.getElementById('fUserRole').value || '—';
+  document.getElementById('rvAiRole').textContent = document.getElementById('fAiRole').value.trim() || '—';
+  document.getElementById('rvLanguage').textContent = document.getElementById('fLanguage').value;
+  document.getElementById('rvDesc').textContent = document.getElementById('fDesc').value.trim() || '—';
+  const crits = Array.from(document.querySelectorAll('#critList .fi')).map(i => i.value.trim()).filter(Boolean);
+  document.getElementById('rvCrit').textContent = crits.length ? crits.length + ' defined' : '—';
+  document.getElementById('rvRubric').textContent = document.getElementById('fRubric').value;
+  const kbCount = document.querySelectorAll('#kbScroll .lang-check-row.checked').length;
+  document.getElementById('rvKb').textContent = kbCount + (kbCount===1 ? ' article' : ' articles');
+}
+
+function createScenario() {
+  const title = document.getElementById('fTitle').value.trim();
+  const userRole = document.getElementById('fUserRole').value;
+  const aiRole = document.getElementById('fAiRole').value.trim();
+  const desc = document.getElementById('fDesc').value.trim();
+  if(!title || !userRole || !aiRole || !desc) {
+    toast('Please fill in all required fields', '#D97706', 3000);
+    return;
+  }
+  document.getElementById('newRowName').textContent = title;
+  document.getElementById('newRowAI').textContent = aiRole;
+  document.getElementById('newRowUser').textContent = userRole;
+  document.getElementById('newRowLang').innerHTML = '<span class="pill-tag">' + document.getElementById('fLanguage').value + '</span>';
+  document.getElementById('newRowDate').textContent = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  document.getElementById('newRow').style.display = 'grid';
+  scenarioCounter++;
+  document.getElementById('scenarioCount').textContent = scenarioCounter;
+  goToCblTab('manage');
+  toast('Scenario created successfully!', '#ECFDF3', 4000, '#067647');
+}
+
+function setRubricMode(mode) {
+  document.getElementById('rbModeAI').classList.toggle('active', mode==='ai');
+  document.getElementById('rbModeManual').classList.toggle('active', mode==='manual');
+}
+
+function recalcRubricTotal() {
+  let total = 0;
+  document.querySelectorAll('#rbComponents .rb-opt-marks').forEach(inp => { total += parseFloat(inp.value) || 0; });
+  document.getElementById('rbTotalMarks').textContent = total;
+}
+
+function addComponent() {
+  const wrap = document.getElementById('rbComponents');
+  const idx = wrap.children.length + 1;
+  const comp = document.createElement('div');
+  comp.className = 'rb-component';
+  comp.innerHTML = `
+    <div class="rb-component-head">
+      <span class="rb-comp-label">Component ${idx}</span>
+      <input class="fi" placeholder="e.g., Communication Clarity">
+      <button class="crit-remove" title="Remove Component" onclick="this.closest('.rb-component').remove(); recalcRubricTotal();"><i data-feather="x" style="width:14px;height:14px"></i></button>
+    </div>
+    <div class="rb-metrics"></div>
+    <div class="rb-add-link" style="margin-left:16px" onclick="addMetric(this)"><i data-feather="plus" style="width:13px;height:13px"></i> Add Metric</div>
+  `;
+  wrap.appendChild(comp);
+  addMetric(comp.querySelector('.rb-add-link'));
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+
+function addMetric(linkEl) {
+  const metricsWrap = linkEl.closest('.rb-component').querySelector('.rb-metrics');
+  const idx = metricsWrap.children.length + 1;
+  const metric = document.createElement('div');
+  metric.className = 'rb-metric';
+  metric.innerHTML = `
+    <div class="rb-metric-head">
+      <span class="rb-metric-label">Metric ${idx}</span>
+      <input class="fi" placeholder="e.g., Used active listening phrases">
+      <button class="crit-remove" title="Remove Metric" onclick="this.closest('.rb-metric').remove(); recalcRubricTotal();"><i data-feather="x" style="width:14px;height:14px"></i></button>
+    </div>
+    <div class="rb-options"></div>
+    <div class="rb-add-link" onclick="addOption(this)"><i data-feather="plus" style="width:13px;height:13px"></i> Add Descriptor</div>
+  `;
+  metricsWrap.appendChild(metric);
+  addOption(metric.querySelector('.rb-add-link'));
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+
+function addOption(linkEl) {
+  const optsWrap = linkEl.closest('.rb-metric').querySelector('.rb-options');
+  const row = document.createElement('div');
+  row.className = 'rb-opt-row';
+  row.innerHTML = `
+    <input class="fi" placeholder="Descriptor, e.g., Fully met expectations">
+    <span class="rb-opt-label">Marks</span>
+    <input class="fi rb-opt-marks" type="number" min="0" value="0" oninput="recalcRubricTotal()">
+    <button class="crit-remove" title="Remove" onclick="this.closest('.rb-opt-row').remove(); recalcRubricTotal();"><i data-feather="x" style="width:14px;height:14px"></i></button>
+  `;
+  optsWrap.appendChild(row);
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+  recalcRubricTotal();
+}
+
+function resetRubricForm() {
+  document.getElementById('rbTitle').value = '';
+  document.getElementById('rbComponents').innerHTML = '';
+  document.getElementById('rbTotalMarks').textContent = '0';
+  setRubricMode('ai');
+  addComponent();
+}
+
+function createRubric() {
+  const title = document.getElementById('rbTitle').value.trim();
+  const components = document.querySelectorAll('#rbComponents .rb-component').length;
+  const total = document.getElementById('rbTotalMarks').textContent;
+  if(!title || components === 0) {
+    toast('Please add a title and at least one component', '#D97706', 3000);
+    return;
+  }
+  document.getElementById('newRubricName').textContent = title;
+  document.getElementById('newRubricComp').textContent = components;
+  document.getElementById('newRubricMarks').textContent = total;
+  document.getElementById('newRubricDate').textContent = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+  document.getElementById('newRubricRow').style.display = 'grid';
+  rubricCounter++;
+  goToCblTab('rubrics');
+  toast('Rubric created successfully!', '#ECFDF3', 4000, '#067647');
+}
+
+document.addEventListener('DOMContentLoaded', () => { if(window.feather) feather.replace({ 'stroke-width': 1.75 }); });
+</script>
+</body>
+</html>

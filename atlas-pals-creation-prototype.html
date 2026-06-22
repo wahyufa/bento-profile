@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS Learn — PALS Course Creation Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.29.0/feather.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #F5F6F8; --white: #FFFFFF; --border: #E4E7EC; --border-light: #EEF0F4;
+  --text: #101828; --text-sec: #475467; --text-muted: #98A2B3;
+  --teal: #10759D; --teal-dark: #0C5D80; --teal-btn: #0F6B8E;
+  --teal-light: #E6F4FA; --teal-mid: #9CCDE4; --teal-text: #10759D;
+  --green: #22C55E; --green-dark: #16A34A;
+  --amber: #F59E0B; --amber-bg: #FFFBEB; --amber-border: #FDE68A; --amber-dark: #D97706; --amber-text: #92400E;
+  --red: #EF4444; --purple: #6941C6; --blue: #3B82F6;
+  --sidebar-w: 200px;
+  --radius: 8px; --radius-lg: 12px; --radius-xl: 16px;
+  --shadow-sm: 0 1px 2px rgba(16,24,40,0.05);
+  --shadow: 0 1px 3px rgba(16,24,40,0.1), 0 1px 2px rgba(16,24,40,0.06);
+  --shadow-md: 0 4px 8px rgba(16,24,40,0.08), 0 2px 4px rgba(16,24,40,0.06);
+  --tr: 0.18s ease;
+}
+body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; display: flex; flex-direction: column; font-size: 14px; -webkit-font-smoothing: antialiased; }
+.sg, .page-topbar-title, .sec-title, .wiz-card-title, .pals-name, .pc-name, .lc-title,
+.done-title, .stat-num, .wiz-steps-label, .nav-sec, .pce-title { font-family: 'Space Grotesk', sans-serif; }
+
+.topbar { height: 56px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; flex-shrink: 0; z-index: 20; box-shadow: var(--shadow-sm); }
+.topbar-logo-area { width: var(--sidebar-w); display: flex; align-items: center; padding: 0 16px; gap: 8px; border-right: 1px solid var(--border); height: 100%; flex-shrink: 0; }
+.topbar-right { margin-left: auto; padding-right: 16px; display: flex; align-items: center; gap: 8px; }
+.help-btn { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 500; color: var(--text-sec); padding: 7px 12px; border: 1px solid var(--border); border-radius: 8px; cursor: pointer; transition: all var(--tr); }
+.help-btn:hover { background: var(--bg); }
+
+.layout { display: flex; flex: 1; overflow: hidden; }
+.sidebar { width: var(--sidebar-w); background: var(--white); border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 12px 8px 8px; flex-shrink: 0; overflow-y: auto; }
+.nav-sec { font-size: 10px; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-muted); padding: 10px 8px 5px; margin-top: 2px; }
+.nav-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; font-size: 13px; font-weight: 500; color: var(--text-sec); border-radius: 6px; cursor: pointer; transition: all var(--tr); position: relative; line-height: 1.4; }
+.nav-item:hover { background: var(--bg); color: var(--text); }
+.nav-item.active { background: var(--teal-light); color: var(--teal); font-weight: 600; }
+.nav-item svg, .nav-item i { width: 16px; height: 16px; flex-shrink: 0; }
+.sidebar-footer { margin-top: auto; border-top: 1px solid var(--border); padding: 10px 4px 4px; }
+.user-row { display: flex; align-items: center; gap: 9px; padding: 8px 6px; border-radius: 6px; cursor: pointer; }
+.user-row:hover { background: var(--bg); }
+.avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--teal); display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+.user-name { font-size: 13px; font-weight: 600; }
+.user-role { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+.main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+.page { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+.page.active { display: flex; }
+.page-topbar { height: 56px; background: var(--white); border-bottom: 1px solid var(--border); display: flex; align-items: center; padding: 0 24px; gap: 12px; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+.back-btn { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; padding: 6px 4px; transition: color var(--tr); }
+.back-btn:hover { color: var(--text); }
+.back-btn svg, .back-btn i { width: 16px; height: 16px; flex-shrink: 0; }
+.page-topbar-title { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+
+.btn { display: inline-flex; align-items: center; gap: 6px; padding: 0 18px; height: 40px; border-radius: 8px; font-size: 13.5px; font-weight: 600; cursor: pointer; border: none; font-family: 'Inter', sans-serif; transition: all var(--tr); letter-spacing: -0.1px; white-space: nowrap; }
+.btn-teal { background: var(--teal-btn); color: white; box-shadow: 0 1px 2px rgba(11,130,130,0.3); }
+.btn-teal:hover { background: var(--teal-dark); box-shadow: 0 2px 4px rgba(11,130,130,0.4); transform: translateY(-1px); }
+.btn-teal:disabled { background: var(--teal-mid); cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-white { background: white; color: var(--text); border: 1px solid var(--border); box-shadow: var(--shadow-sm); }
+.btn-white:hover { background: var(--bg); }
+.btn-sm { height: 34px; padding: 0 14px; font-size: 13px; }
+.btn-danger-ghost { background: white; color: var(--text-sec); border: 1px solid var(--border); }
+.btn-danger-ghost:hover { background: var(--bg); }
+.icon-btn { width: 30px; height: 30px; border: none; background: none; cursor: pointer; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); transition: all var(--tr); flex-shrink: 0; }
+.icon-btn:hover { background: var(--border); color: var(--text-sec); }
+.icon-btn.del:hover { background: #FEE2E2; color: var(--red); }
+.icon-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.icon-btn:disabled:hover { background: none; color: var(--text-muted); }
+
+.page-body { padding: 24px; flex: 1; overflow-y: auto; }
+.sec-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 20px; }
+.sec-title { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: -0.3px; }
+.sec-sub { font-size: 13.5px; color: var(--text-sec); margin-top: 3px; }
+.sec-header-actions { display: flex; align-items: center; gap: 10px; }
+
+.pals-list { display: flex; flex-direction: column; gap: 12px; }
+.pals-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 20px; display: flex; align-items: center; gap: 16px; box-shadow: var(--shadow-sm); }
+.pals-card-main { flex: 1; min-width: 0; }
+.pals-name-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.pals-name { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.1px; }
+.status-pill { display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.02em; }
+.status-pill.published { background: var(--teal); color: white; }
+.status-pill.draft { background: #CCFBF1; color: #0F766E; }
+.status-pill.generating { background: var(--amber-bg); color: var(--amber-text); border: 1px solid var(--amber-border); }
+.role-tags { display: flex; gap: 6px; margin-top: 7px; flex-wrap: wrap; }
+.role-tag { font-size: 12px; font-weight: 600; color: var(--text-sec); background: var(--bg); border: 1px solid var(--border); padding: 2px 10px; border-radius: 99px; }
+.pals-meta { font-size: 12.5px; color: var(--text-muted); margin-top: 7px; }
+.pals-card-actions { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.pub-toggle-wrap { display: flex; align-items: center; gap: 8px; }
+.pub-toggle-label { font-size: 12.5px; font-weight: 600; color: var(--text-sec); }
+
+.toggle { position: relative; width: 40px; height: 22px; flex-shrink: 0; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track { position: absolute; inset: 0; background: #D1D5DB; border-radius: 99px; cursor: pointer; transition: background 0.2s; }
+.toggle input:checked + .toggle-track { background: var(--teal); }
+.toggle input:disabled + .toggle-track { opacity: 0.5; cursor: not-allowed; }
+.toggle-thumb { position: absolute; width: 16px; height: 16px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); pointer-events: none; }
+.toggle input:checked ~ .toggle-thumb { transform: translateX(18px); }
+
+/* ── WIZARD (New PALS Course — mirrors KB/CBL's step-by-step pattern) ── */
+.wizard-layout { display: flex; flex: 1; overflow: hidden; }
+.wiz-steps { width: 248px; background: var(--white); border-right: 1px solid var(--border); padding: 20px 10px; flex-shrink: 0; overflow-y: auto; }
+.wiz-steps-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-muted); padding: 0 6px; margin-bottom: 12px; }
+.ws { display: flex; align-items: flex-start; gap: 10px; padding: 6px 8px; border-radius: 6px; cursor: pointer; }
+.ws:hover .ws-text { color: var(--text-sec); }
+.ws-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; flex-shrink: 0; margin-top: 1px; }
+.ws-num.done { background: var(--teal); color: white; }
+.ws-num.active { background: var(--teal); color: white; }
+.ws-num.pending { background: var(--bg); color: var(--text-muted); border: 1.5px solid var(--border); }
+.ws-text { font-size: 13px; font-weight: 500; color: var(--text-muted); line-height: 1.4; }
+.ws.active .ws-text { color: var(--text); font-weight: 600; }
+.ws.done .ws-text { color: var(--text-sec); }
+.ws-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.ws.active .ws-hint { color: var(--teal); }
+.wc { width: 2px; height: 8px; background: var(--border); margin: 0 0 0 21px; border-radius: 1px; }
+.wc.done { background: var(--teal); }
+.wiz-panel { flex: 1; overflow-y: auto; padding: 24px; background: var(--bg); }
+.wiz-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+.wiz-card-head { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); background: var(--white); }
+.wiz-card-title { font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+.wiz-card-sub { font-size: 13px; color: var(--text-sec); margin-top: 5px; line-height: 1.5; }
+.wiz-actions-top { padding: 14px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: #FAFBFC; position: sticky; top: 0; z-index: 5; }
+.wiz-step-body { padding: 24px; }
+
+.fg { margin-bottom: 18px; }
+.fl { font-size: 13.5px; font-weight: 600; color: var(--text); display: block; margin-bottom: 7px; }
+.fl-sub { font-size: 12px; color: var(--text-muted); font-weight: 400; margin-top: 3px; line-height: 1.5; }
+.fi { width: 100%; height: 42px; border: 1px solid var(--border); border-radius: var(--radius); padding: 0 13px; font-size: 14px; font-family: 'Inter', sans-serif; outline: none; color: var(--text); background: var(--white); transition: border-color var(--tr), box-shadow var(--tr); }
+.fi:focus { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(11,123,123,0.1); }
+textarea.fi { height: auto; padding: 10px 13px; resize: vertical; min-height: 72px; }
+select.fi { appearance: none; cursor: pointer; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 20 20' fill='%236B7280'%3E%3Cpath d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; }
+
+.scroll-pick { border: 1px solid var(--border); border-radius: var(--radius); max-height: 130px; overflow-y: auto; }
+.pick-row { display: flex; align-items: center; gap: 10px; padding: 9px 12px; font-size: 13.5px; color: var(--text); cursor: pointer; transition: background var(--tr); border-bottom: 1px solid var(--border-light); }
+.pick-row:last-child { border-bottom: none; }
+.pick-row:hover { background: var(--bg); }
+.radio-dot, .check-box { width: 16px; height: 16px; border-radius: 50%; border: 1.5px solid var(--border); flex-shrink: 0; transition: all var(--tr); }
+.check-box { border-radius: 4px; }
+.pick-row.checked .radio-dot, .pick-row.checked .check-box { border-color: var(--teal); background: var(--teal); position: relative; }
+.pick-row.checked .check-box::after { content: ''; position: absolute; left: 4px; top: 1px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+.pick-row.checked .radio-dot::after { content: ''; position: absolute; left: 4px; top: 4px; width: 6px; height: 6px; border-radius: 50%; background: white; }
+
+.kp-search { position: relative; margin: 16px 0 12px; }
+.kp-search i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: var(--text-muted); }
+.kp-search input { padding-left: 13px; }
+.kp-count-label { font-size: 12.5px; color: var(--text-sec); font-weight: 600; margin-bottom: 8px; }
+.kp-tree-hint { font-size: 12px; color: var(--text-muted); margin: -4px 0 10px; line-height: 1.5; }
+.kp-tree { border: 1px solid var(--border); border-radius: var(--radius); max-height: 360px; overflow-y: auto; }
+.kp-tree-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 14px; background: var(--white); position: sticky; top: 0; z-index: 2; border-bottom: 1px solid var(--border); font-size: 13.5px; font-weight: 700; color: var(--text); }
+.kp-cat-group { border-bottom: 1px solid var(--border-light); }
+.kp-cat-group:last-child { border-bottom: none; }
+.kp-cat-group.no-match { display: none; }
+.kp-cat-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 14px 8px 24px; background: #FAFBFC; position: sticky; top: 38px; z-index: 1; border-bottom: 1px solid var(--border-light); }
+.kp-cat-name { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-sec); }
+.kp-cat-head-right { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.kp-cat-selectall { font-size: 11.5px; font-weight: 600; color: var(--teal); cursor: pointer; }
+.kp-cat-selectall:hover { text-decoration: underline; }
+.kp-cat-badge { font-size: 11px; font-weight: 700; padding: 2px 9px; border-radius: 99px; background: var(--white); color: var(--text-muted); border: 1px solid var(--border); }
+.kp-cat-badge.has-selected { background: var(--teal-light); color: var(--teal); border-color: var(--teal-mid); }
+.kp-row { display: flex; align-items: center; gap: 11px; padding: 10px 14px 10px 24px; cursor: pointer; transition: background var(--tr); border-bottom: 1px solid var(--border-light); }
+.kp-row:last-child { border-bottom: none; }
+.kp-row:hover { background: var(--bg); }
+.kp-row-main { flex: 1; min-width: 0; }
+.kp-row-name { font-size: 13.5px; font-weight: 600; color: var(--text); line-height: 1.4; }
+.kp-row-tag { flex-shrink: 0; font-size: 11.5px; color: var(--text-muted); text-align: right; }
+.kp-row.hidden-row { display: none; }
+
+/* Order step */
+.order-list { display: flex; flex-direction: column; gap: 8px; }
+.order-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); }
+.order-handle { color: var(--text-muted); cursor: grab; flex-shrink: 0; }
+.order-num { width: 24px; height: 24px; border-radius: 50%; background: var(--teal-light); color: var(--teal); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.order-info { flex: 1; min-width: 0; }
+.order-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
+.order-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+.order-actions { display: flex; gap: 2px; flex-shrink: 0; }
+
+/* Languages & default variant step */
+.lang-pick-list { border: 1px solid var(--border); border-radius: var(--radius); max-height: 220px; overflow-y: auto; }
+.lang-pick-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background var(--tr); }
+.lang-pick-row:last-child { border-bottom: none; }
+.lang-pick-row:hover { background: var(--bg); }
+.lang-pick-name { font-size: 13.5px; color: var(--text); flex: 1; }
+.lang-pick-default { font-size: 11.5px; color: var(--text-muted); font-weight: 600; }
+.lang-pick-ready { font-size: 11.5px; color: var(--text-muted); }
+.variant-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 6px; }
+.variant-card { border: 1.5px solid var(--border); border-radius: var(--radius); padding: 16px; cursor: pointer; transition: all var(--tr); background: var(--white); }
+.variant-card:hover { border-color: var(--teal-mid); }
+.variant-card.selected { border-color: var(--teal); background: var(--teal-light); }
+.variant-card-title { font-size: 13.5px; font-weight: 700; color: var(--text); margin-bottom: 5px; }
+.variant-card-desc { font-size: 12px; color: var(--text-sec); line-height: 1.5; }
+
+/* Review variants step */
+.review-layout { display: flex; gap: 0; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; height: calc(100vh - 300px); min-height: 460px; }
+.rv-list { width: 230px; border-right: 1px solid var(--border); overflow-y: auto; flex-shrink: 0; background: #FAFBFC; }
+.rv-item { padding: 12px 14px; border-bottom: 1px solid var(--border-light); cursor: pointer; transition: background var(--tr); }
+.rv-item:hover { background: var(--bg); }
+.rv-item.active { background: var(--teal-light); border-left: 3px solid var(--teal); }
+.rv-item-idx { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+.rv-item-name { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 2px; }
+.rv-preview { flex: 1; padding: 20px; overflow-y: auto; display: flex; flex-direction: column; }
+.rv-variant-tabs { display: flex; gap: 6px; margin-bottom: 16px; }
+.rv-vtab { padding: 7px 14px; font-size: 13px; font-weight: 600; border-radius: 99px; border: 1px solid var(--border); color: var(--text-sec); cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all var(--tr); }
+.rv-vtab i { width: 13px; height: 13px; }
+.rv-vtab.selected { background: var(--teal); color: white; border-color: var(--teal); }
+.rv-preview-name { font-size: 16px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.rv-preview-sub { font-size: 12.5px; color: var(--text-muted); margin-bottom: 16px; }
+.rv-preview-box { flex: 1; display: flex; align-items: center; justify-content: center; border: 1px dashed var(--border); border-radius: var(--radius); padding: 24px; text-align: center; color: var(--text-muted); font-size: 13.5px; line-height: 1.6; }
+
+/* Generating step */
+.gen-box { padding: 12px 0; }
+.gen-progress-wrap { height: 6px; background: var(--teal-light); border-radius: 3px; overflow: hidden; margin-bottom: 18px; }
+.gen-progress-bar { height: 100%; background: var(--teal); border-radius: 3px; transition: width 0.3s ease; width: 0%; }
+.gen-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; }
+.gen-spinner { width: 16px; height: 16px; border: 2px solid var(--teal-light); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.85s linear infinite; flex-shrink: 0; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.gen-row-name { font-size: 13.5px; font-weight: 600; color: var(--text); }
+.gen-row-sub { font-size: 11.5px; color: var(--text-muted); margin-top: 1px; }
+.gen-check { width: 16px; height: 16px; color: var(--green-dark); flex-shrink: 0; display: none; }
+.gen-note { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; margin-top: 4px; }
+
+.done-box { padding: 36px 20px; text-align: center; }
+.done-title { font-size: 19px; font-weight: 700; color: var(--text); margin-bottom: 6px; letter-spacing: -0.2px; }
+.done-sub { font-size: 13.5px; color: var(--text-sec); line-height: 1.6; }
+
+.toast { position: fixed; top: 66px; left: 50%; transform: translateX(-50%) translateY(-8px); padding: 9px 20px; border-radius: 8px; font-size: 13.5px; font-weight: 600; color: white; z-index: 600; pointer-events: none; opacity: 0; transition: all 0.25s; white-space: nowrap; box-shadow: var(--shadow-md); }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Edit PALS Course page */
+.pce-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 24px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--white); }
+.pce-title-wrap { display: flex; align-items: center; gap: 12px; }
+.pce-title { font-size: 18px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+.pce-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+.pals-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border); padding: 0 24px; flex-shrink: 0; background: var(--white); }
+.pals-tab { padding: 13px 2px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all var(--tr); margin-bottom: -1px; }
+.pals-tab.active { color: var(--text); border-bottom-color: var(--teal); }
+.pals-tab-panel { display: none; flex: 1; overflow-y: auto; flex-direction: column; padding: 24px; background: var(--bg); }
+.pals-tab-panel.active { display: flex; }
+
+.gs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px 24px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-sm); }
+.gs-grid .fg.full { grid-column: 1 / -1; }
+.variant-set-pill { display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; background: var(--teal-light); color: var(--teal); font-size: 12.5px; font-weight: 700; }
+.gs-section-title { font-size: 13px; font-weight: 700; color: var(--text); margin: 22px 0 10px; text-transform: uppercase; letter-spacing: 0.05em; }
+.linked-assess-empty { border: 1px dashed var(--border); border-radius: var(--radius); padding: 18px; text-align: center; color: var(--text-muted); font-size: 13px; }
+
+.subtab-row { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; width: fit-content; margin-bottom: 18px; background: var(--white); }
+.subtab-o { padding: 8px 18px; font-size: 13px; font-weight: 600; color: var(--text-sec); cursor: pointer; transition: all var(--tr); border-right: 1px solid var(--border); }
+.subtab-o:last-child { border-right: none; }
+.subtab-o.active { background: var(--teal-light); color: var(--teal); }
+
+.kp-editor-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.kp-editor-list { display: flex; flex-direction: column; gap: 8px; }
+.kp-edit-row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--white); box-shadow: var(--shadow-sm); }
+.kp-edit-row .order-num { background: var(--teal-light); }
+.kp-edit-actions { display: flex; gap: 2px; flex-shrink: 0; }
+
+.taxonomy-list { display: flex; flex-direction: column; gap: 10px; }
+.tax-group { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; }
+.tax-group-name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--teal); margin-bottom: 8px; }
+.tax-kp-pill { display: inline-flex; align-items: center; font-size: 12.5px; font-weight: 500; color: var(--text-sec); background: var(--bg); border: 1px solid var(--border); padding: 3px 10px; border-radius: 99px; margin: 0 6px 6px 0; }
+
+.lc-back { display: flex; align-items: center; gap: 5px; font-size: 13px; font-weight: 500; color: var(--text-sec); cursor: pointer; margin-bottom: 14px; }
+.lc-back:hover { color: var(--text); }
+.lc-back i { width: 15px; height: 15px; }
+.lc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.lc-title { font-size: 16px; font-weight: 700; color: var(--text); }
+.lc-head-actions { display: flex; align-items: center; gap: 10px; }
+.lc-vtabs { display: flex; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 16px; background: var(--white); width: fit-content; }
+.lc-vtab { padding: 9px 18px; font-size: 13px; font-weight: 600; color: var(--text-sec); cursor: pointer; border-right: 1px solid var(--border); transition: all var(--tr); }
+.lc-vtab:last-child { border-right: none; }
+.lc-vtab.active { background: var(--bg); color: var(--text); }
+.lc-panel { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 32px; box-shadow: var(--shadow-sm); min-height: 220px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 14px; text-align: center; }
+.lc-panel.has-content { align-items: flex-start; text-align: left; justify-content: flex-start; }
+.lc-empty-text { font-size: 13.5px; color: var(--text-muted); }
+.lc-content-text { font-size: 13.5px; color: var(--text-sec); line-height: 1.7; white-space: pre-line; }
+
+.empty-center { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 12px; color: var(--text-muted); }
+.empty-center .eic { font-size: 34px; opacity: 0.3; }
+.empty-center h3 { font-size: 15px; font-weight: 600; color: var(--text-sec); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo-area">
+    <img src="https://demo.atlaslearn.ai/assets/atlas-branch-logo-B7aM78TE.png" alt="ATLAS" style="height:28px;width:auto;object-fit:contain;flex-shrink:0">
+  </div>
+  <div class="topbar-right"><div class="help-btn"><i data-feather="help-circle" style="width:14px;height:14px"></i>Help</div></div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="nav-sec">NAVIGATION</div>
+    <div class="nav-item" onclick="go('dashboard')"><i data-feather="grid"></i>Dashboard</div>
+    <div class="nav-item" onclick="go('users')"><i data-feather="users"></i>Users</div>
+    <div class="nav-item" onclick="go('courses')"><i data-feather="book-open"></i>Courses</div>
+    <div class="nav-item" onclick="go('content-sharing')"><i data-feather="share-2"></i>Content Sharing</div>
+    <div class="nav-item" onclick="go('job-roles')"><i data-feather="briefcase"></i>Job Roles</div>
+    <div class="nav-item" onclick="go('cbl')"><i data-feather="clipboard"></i>CBL</div>
+    <div class="nav-item active" id="navPALS" onclick="go('pals')"><i data-feather="play-circle"></i>PALS Course</div>
+    <div class="nav-item" onclick="go('groups')"><i data-feather="user-check"></i>Groups</div>
+    <div class="nav-item" onclick="go('classes')"><i data-feather="home"></i>Classes</div>
+    <div class="nav-item" onclick="go('assess')"><i data-feather="check-square"></i>Assessments</div>
+    <div class="nav-item" onclick="go('qbank')"><i data-feather="help-circle"></i>Question Bank</div>
+    <div class="nav-item" onclick="go('kb')"><i data-feather="layers"></i>Knowledge Base</div>
+    <div class="nav-item" onclick="go('analytics')"><i data-feather="bar-chart-2"></i>Analytics</div>
+    <div class="nav-item" onclick="go('settings')"><i data-feather="settings"></i>Settings</div>
+    <div class="sidebar-footer"><div class="user-row"><div class="avatar">W</div><div><div class="user-name">Wahyu</div><div class="user-role">Org Admin</div></div></div></div>
+  </aside>
+
+  <main class="main">
+
+    <!-- PALS LIST -->
+    <div class="page active" id="page-pals">
+      <div class="page-body">
+        <div class="sec-header">
+          <div>
+            <div class="sec-title">PALS Course</div>
+            <div class="sec-sub">Create and manage learning paths for your learners</div>
+          </div>
+          <div class="sec-header-actions">
+            <button class="btn btn-white"><i data-feather="trash-2" style="width:14px;height:14px"></i>Trash (0)</button>
+            <button class="btn btn-teal" onclick="go('pals-wizard')"><i data-feather="plus" style="width:14px;height:14px"></i>New PALS Course</button>
+          </div>
+        </div>
+
+        <div class="pals-list" id="palsList">
+          <div class="pals-card">
+            <div class="pals-card-main">
+              <div class="pals-name-row"><span class="pals-name">AML and CFL Course (10/6)</span><span class="status-pill published">Published</span></div>
+              <div class="pals-meta">15 Knowledge Points · Updated Jun 10, 2026</div>
+            </div>
+            <div class="pals-card-actions">
+              <div class="pub-toggle-wrap"><span class="pub-toggle-label">Published</span><label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+              <button class="btn btn-white btn-sm"><i data-feather="user-plus" style="width:13px;height:13px"></i>Assign</button>
+              <button class="icon-btn"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+              <button class="icon-btn del"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+            </div>
+          </div>
+
+          <div class="pals-card">
+            <div class="pals-card-main">
+              <div class="pals-name-row"><span class="pals-name">AML and CFT Training (2/6)</span><span class="status-pill draft">Draft</span></div>
+              <div class="role-tags"><span class="role-tag">Accountancy Specialist</span></div>
+              <div class="pals-meta">15 Knowledge Points · Updated Jun 10, 2026</div>
+            </div>
+            <div class="pals-card-actions">
+              <div class="pub-toggle-wrap"><span class="pub-toggle-label">Published</span><label class="toggle"><input type="checkbox"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+              <button class="icon-btn"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+              <button class="icon-btn del"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+            </div>
+          </div>
+
+          <div class="pals-card">
+            <div class="pals-card-main">
+              <div class="pals-name-row"><span class="pals-name">Customer Service Fundamentals</span><span class="status-pill draft">Draft</span></div>
+              <div class="pals-meta">19 Knowledge Points · Updated May 29, 2026</div>
+            </div>
+            <div class="pals-card-actions">
+              <div class="pub-toggle-wrap"><span class="pub-toggle-label">Published</span><label class="toggle"><input type="checkbox"><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+              <button class="icon-btn"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+              <button class="icon-btn del"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+            </div>
+          </div>
+
+          <div class="pals-card">
+            <div class="pals-card-main">
+              <div class="pals-name-row"><span class="pals-name">Advanced HR Management</span><span class="status-pill published">Published</span></div>
+              <div class="role-tags"><span class="role-tag">Human Resource Specialist</span></div>
+              <div class="pals-meta">4 Knowledge Points · Updated Apr 24, 2026</div>
+            </div>
+            <div class="pals-card-actions">
+              <div class="pub-toggle-wrap"><span class="pub-toggle-label">Published</span><label class="toggle"><input type="checkbox" checked><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+              <button class="btn btn-white btn-sm"><i data-feather="user-plus" style="width:13px;height:13px"></i>Assign</button>
+              <button class="icon-btn"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+              <button class="icon-btn del"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT PALS COURSE -->
+    <div class="page" id="page-pals-edit">
+      <div class="pce-head">
+        <div class="pce-title-wrap">
+          <div class="back-btn" onclick="go('pals')"><i data-feather="chevron-left" style="width:16px;height:16px"></i>Back</div>
+          <div><div class="pce-title">Edit PALS Course</div><div class="pce-sub" id="pceCourseName">Test PALS Course</div></div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-white" onclick="go('pals')">Cancel</button>
+          <button class="btn btn-teal" onclick="savePceChanges()">Save</button>
+        </div>
+      </div>
+
+      <div class="pals-tabs">
+        <div class="pals-tab active" id="pceTab-general" onclick="switchPceTab('general')">General Setting</div>
+        <div class="pals-tab" id="pceTab-kp" onclick="switchPceTab('kp')">Knowledge Points (<span id="pceKpCount">0</span>)</div>
+      </div>
+
+      <div class="pals-tab-panel active" id="pcePanel-general">
+        <div class="gs-grid">
+          <div class="fg full"><label class="fl">Title</label><input class="fi" id="pceTitle"></div>
+          <div class="fg"><label class="fl">Language</label><select class="fi" id="pceLanguage"><option>English</option><option>Bahasa Indonesia</option><option>Malay</option><option>Chinese</option></select><div class="fl-sub">Preview and learner content follow this language.</div></div>
+          <div class="fg"><label class="fl">Learning Objectives</label><input class="fi" placeholder="e.g. Understand key customer service principles"></div>
+          <div class="fg full"><label class="fl">Description</label><textarea class="fi" id="pceDesc" placeholder="Optional description..."></textarea></div>
+          <div class="fg full">
+            <label class="fl">Default content variant</label>
+            <span class="variant-set-pill" id="pceVariantPill">Standard</span>
+            <div class="fl-sub">Set when this course was created. Used as the starting variant for new Knowledge Points.</div>
+          </div>
+          <div class="fg full">
+            <label class="fl">Target Job Roles</label>
+            <div class="scroll-pick">
+              <div class="pick-row" onclick="toggleCheck(this)"><div class="check-box"></div>Accountancy Specialist</div>
+              <div class="pick-row" onclick="toggleCheck(this)"><div class="check-box"></div>Financial Services Specialist</div>
+              <div class="pick-row" onclick="toggleCheck(this)"><div class="check-box"></div>Human Resource Specialist</div>
+              <div class="pick-row" onclick="toggleCheck(this)"><div class="check-box"></div>Learning Manager</div>
+              <div class="pick-row" onclick="toggleCheck(this)"><div class="check-box"></div>Training &amp; Adult Education Specialist</div>
+            </div>
+          </div>
+        </div>
+        <div class="gs-section-title">Linked Assessments</div>
+        <div class="linked-assess-empty">Learners are automatically assigned these assessments when they complete this PALS course. None linked yet.</div>
+      </div>
+
+      <div class="pals-tab-panel" id="pcePanel-kp">
+        <div class="subtab-row">
+          <div class="subtab-o active" id="pceSub-path" onclick="switchPceSub('path')">Learning Path</div>
+          <div class="subtab-o" id="pceSub-tax" onclick="switchPceSub('tax')">Taxonomy</div>
+        </div>
+
+        <div id="pceView-path">
+          <div class="kp-editor-head">
+            <div class="kp-count-label">Knowledge Points (<span id="pceKpCount2">0</span>)</div>
+            <button class="btn btn-white btn-sm" onclick="toast('Add Node — opens the Knowledge Point picker', '#0D7F7F', 2500)"><i data-feather="plus" style="width:13px;height:13px"></i>Add Node</button>
+          </div>
+          <div class="kp-editor-list" id="pceKpList"></div>
+        </div>
+
+        <div id="pceView-tax" style="display:none">
+          <div class="taxonomy-list" id="pceTaxList"></div>
+        </div>
+
+        <!-- Learning Cards drill-down -->
+        <div id="pceView-cards" style="display:none">
+          <div class="lc-back" onclick="closeLearningCards()"><i data-feather="arrow-left"></i>Back to Knowledge Points</div>
+          <div class="lc-head">
+            <div class="lc-title" id="lcTitle">Learning Cards — Performance Management</div>
+            <div class="lc-head-actions">
+              <select class="fi" style="width:140px;height:36px" disabled><option>English</option></select>
+              <button class="btn btn-teal btn-sm" onclick="toast('Cards saved', '#ECFDF3', 3000, '#067647')">Save Cards</button>
+            </div>
+          </div>
+          <div class="lc-vtabs">
+            <div class="lc-vtab active" id="lcVtab-simplified" onclick="switchLcVariant('simplified')">Simplified <span id="lcWords-simplified">(0 words)</span></div>
+            <div class="lc-vtab" id="lcVtab-standard" onclick="switchLcVariant('standard')">Standard <span id="lcWords-standard">(0 words)</span></div>
+            <div class="lc-vtab" id="lcVtab-comprehensive" onclick="switchLcVariant('comprehensive')">Comprehensive <span id="lcWords-comprehensive">(0 words)</span></div>
+          </div>
+          <div class="lc-panel" id="lcPanel">
+            <div class="lc-empty-text" id="lcEmptyText">No Simplified content yet for this Knowledge Point.</div>
+            <button class="btn btn-teal" id="lcGenBtn" onclick="generateLcContent()"><i data-feather="zap" style="width:14px;height:14px"></i>Generate Simplified with AI</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="page-dashboard"><div class="empty-center"><div class="eic">📊</div><h3>Dashboard</h3></div></div>
+    <div class="page" id="page-users"><div class="empty-center"><div class="eic">👥</div><h3>Users</h3></div></div>
+    <div class="page" id="page-courses"><div class="empty-center"><div class="eic">📚</div><h3>Courses</h3></div></div>
+    <div class="page" id="page-content-sharing"><div class="empty-center"><div class="eic">🔗</div><h3>Content Sharing</h3></div></div>
+    <div class="page" id="page-job-roles"><div class="empty-center"><div class="eic">💼</div><h3>Job Roles</h3></div></div>
+    <div class="page" id="page-cbl"><div class="empty-center"><div class="eic">📋</div><h3>CBL</h3></div></div>
+    <div class="page" id="page-groups"><div class="empty-center"><div class="eic">👥</div><h3>Groups</h3></div></div>
+    <div class="page" id="page-classes"><div class="empty-center"><div class="eic">🏫</div><h3>Classes</h3></div></div>
+    <div class="page" id="page-assess"><div class="empty-center"><div class="eic">✅</div><h3>Assessments</h3></div></div>
+    <div class="page" id="page-qbank"><div class="empty-center"><div class="eic">❓</div><h3>Question Bank</h3></div></div>
+    <div class="page" id="page-kb"><div class="empty-center"><div class="eic">🗂️</div><h3>Knowledge Base</h3></div></div>
+    <div class="page" id="page-analytics"><div class="empty-center"><div class="eic">📈</div><h3>Analytics</h3></div></div>
+    <div class="page" id="page-settings"><div class="empty-center"><div class="eic">⚙️</div><h3>Settings</h3></div></div>
+
+    <!-- NEW PALS COURSE — step-by-step wizard, mirrors KB/CBL's wizard pattern -->
+    <div class="page" id="page-pals-wizard">
+      <div class="page-topbar"><div class="back-btn" onclick="go('pals')"><i data-feather="chevron-left" style="width:16px;height:16px"></i>Back</div><div class="page-topbar-title">New PALS Course</div></div>
+      <div class="wizard-layout">
+    <div class="wiz-steps">
+      <div class="wiz-steps-label">Steps</div>
+      <div class="ws active" id="pw1" onclick="goPwStep(1)"><div class="ws-num active" id="pw1n">1</div><div><div class="ws-text">Select Knowledge Points</div><div class="ws-hint" id="pw1h">Choose what to teach</div></div></div>
+      <div class="wc" id="pwc2"></div>
+      <div class="ws" id="pw2" onclick="goPwStep(2)"><div class="ws-num pending" id="pw2n">2</div><div><div class="ws-text">Order Knowledge Points</div><div class="ws-hint" id="pw2h"></div></div></div>
+      <div class="wc" id="pwc3"></div>
+      <div class="ws" id="pw3" onclick="goPwStep(3)"><div class="ws-num pending" id="pw3n">3</div><div><div class="ws-text">Languages &amp; Default Variant</div><div class="ws-hint" id="pw3h"></div></div></div>
+      <div class="wc" id="pwc4"></div>
+      <div class="ws" id="pw4" onclick="goPwStep(4)"><div class="ws-num pending" id="pw4n">4</div><div><div class="ws-text">Review Variants</div><div class="ws-hint" id="pw4h">Per Knowledge Point</div></div></div>
+      <div class="wc" id="pwc5"></div>
+      <div class="ws" id="pw5" onclick="goPwStep(5)"><div class="ws-num pending" id="pw5n">5</div><div><div class="ws-text">Generating Content</div><div class="ws-hint" id="pw5h"></div></div></div>
+    </div>
+
+    <div class="wiz-panel">
+      <div class="wiz-card">
+
+        <!-- STEP 1: Select Knowledge Points -->
+        <div class="pw-step" id="pwStep1">
+          <div class="wiz-card-head"><div class="wiz-card-title">Select Knowledge Points</div><div class="wiz-card-sub">Choose the topics this PALS course should teach</div></div>
+          <div class="wiz-actions-top"><button class="btn btn-white" onclick="go('pals')">Cancel</button><button class="btn btn-teal" onclick="pwNext()">Next — Order Nodes</button></div>
+          <div class="wiz-step-body">
+            <div class="fg"><label class="fl">Course Name</label><input class="fi" id="pwCourseName" placeholder="e.g. Customer Service Fundamentals"></div>
+            <div class="fg">
+              <label class="fl">Default language</label>
+              <select class="fi" id="pwDefaultLang"><option>English</option><option>Bahasa Indonesia</option><option>Malay</option><option>Chinese</option><option>Vietnamese</option><option>Cantonese</option><option>Thai</option></select>
+              <div class="fl-sub">Used as the canonical version and the fallback when a learner's language isn't available. You'll pick which other languages to include in the next step.</div>
+            </div>
+            <div class="fg">
+              <label class="fl">Target Job Roles <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+              <div class="scroll-pick">
+                <div class="pick-row" onclick="toggleCheck(this)"><div class="check-box"></div>Accountancy Specialist</div>
+                <div class="pick-row" onclick="toggleCheck(this)"><div class="check-box"></div>Financial Services Specialist</div>
+                <div class="pick-row" onclick="toggleCheck(this)"><div class="check-box"></div>Human Resource Specialist</div>
+              </div>
+            </div>
+            <div class="fg">
+              <div class="fl-sub" style="margin-bottom:10px">Knowledge Points are the building blocks of this course — each one becomes a learning module learners must complete. Select every topic this course should teach; you'll set the order next.</div>
+              <div class="kp-search"><input class="fi" placeholder="Search knowledge points..." oninput="filterKpTree(this.value)"></div>
+              <div class="kp-tree-hint">Grouped by category. Each row is a Knowledge Point — click to add it, or use "Select all" to add an entire category at once.</div>
+              <div class="kp-tree" id="pwKpTree"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: Order Knowledge Points -->
+        <div class="pw-step" id="pwStep2" style="display:none">
+          <div class="wiz-card-head"><div class="wiz-card-title">Order Knowledge Points</div><div class="wiz-card-sub">Set the learning order for the selected knowledge points</div></div>
+          <div class="wiz-actions-top"><button class="btn btn-white" onclick="goPwStep(1)">Back</button><button class="btn btn-teal" onclick="pwNext()">Next</button></div>
+          <div class="wiz-step-body">
+            <div class="fl-sub" style="margin-bottom:14px">Drag or use arrows to set the learning order for <span id="pwOrderCount">0</span> knowledge points.</div>
+            <div class="order-list" id="pwOrderList"></div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Languages & Default Variant -->
+        <div class="pw-step" id="pwStep3" style="display:none">
+          <div class="wiz-card-head"><div class="wiz-card-title">Languages &amp; Default Variant</div><div class="wiz-card-sub">Choose which languages to generate and the starting content depth</div></div>
+          <div class="wiz-actions-top"><button class="btn btn-white" onclick="goPwStep(2)">Back</button><button class="btn btn-teal" onclick="pwNext()">Next</button></div>
+          <div class="wiz-step-body">
+            <div class="fg">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><label class="fl" style="margin-bottom:0">Languages</label><span class="fl-sub" style="margin:0">Default: <span id="pwDefaultLangEcho">English</span></span></div>
+              <div class="fl-sub" style="margin-bottom:10px">Pick every language this course should be available in. The default language is always included; for other languages, any Knowledge Points without existing content will be generated in the background.</div>
+              <div class="lang-pick-list" id="pwLangList"></div>
+            </div>
+            <div class="fg">
+              <label class="fl">Default content variant</label>
+              <div class="fl-sub" style="margin-bottom:10px">Used for all Knowledge Points in this course. You can change it per KP later in the editor.</div>
+              <div class="variant-grid">
+                <div class="variant-card" data-variant="simplified" onclick="selectVariant(this,'simplified')"><div class="variant-card-title">Simplified</div><div class="variant-card-desc">Shorter, easier reading. Best for quick overviews or refresher learners.</div></div>
+                <div class="variant-card selected" data-variant="standard" onclick="selectVariant(this,'standard')"><div class="variant-card-title">Standard</div><div class="variant-card-desc">Balanced depth. Recommended for most learners.</div></div>
+                <div class="variant-card" data-variant="comprehensive" onclick="selectVariant(this,'comprehensive')"><div class="variant-card-title">Comprehensive</div><div class="variant-card-desc">Longer, more detailed explanations. Best for deep mastery.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: Review Variants per Knowledge Point -->
+        <div class="pw-step" id="pwStep4" style="display:none">
+          <div class="wiz-card-head"><div class="wiz-card-title">Review Variants per Knowledge Point</div><div class="wiz-card-sub">Variants that don't yet exist will be generated in the next step</div></div>
+          <div class="wiz-actions-top"><button class="btn btn-white" onclick="goPwStep(3)">Back</button><button class="btn btn-teal" onclick="pwNext()">Create Course</button></div>
+          <div class="wiz-step-body">
+            <div class="review-layout">
+              <div class="rv-list" id="rvList"></div>
+              <div class="rv-preview" id="rvPreview"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: Generating Content -->
+        <div class="pw-step" id="pwStep5" style="display:none">
+          <div class="wiz-card-head"><div class="wiz-card-title" id="pw5Title">Generating Content</div><div class="wiz-card-sub" id="pw5Sub">Your knowledge points are being generated</div></div>
+          <div class="wiz-actions-top" id="pw5Actions">
+            <button class="btn btn-white" onclick="go('pals')">Close — continue in background</button>
+          </div>
+          <div class="wiz-step-body">
+            <div id="pwGenerating">
+              <div class="gen-box">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><span class="fl" style="margin-bottom:0">Generating content variants...</span><span class="fl-sub" id="genCounter" style="margin:0">0 / 0</span></div>
+                <div class="gen-progress-wrap"><div class="gen-progress-bar" id="genProgressBar"></div></div>
+                <div class="gen-note">The course already appears in your PALS course list as "Generating..." — publishing is disabled until all selected variants finish. You can safely leave this page; generation continues in the background, and a notification will appear when the course is ready.</div>
+                <div id="genRows" style="margin-top:16px"></div>
+              </div>
+            </div>
+            <div id="pwGenDone" style="display:none">
+              <div class="done-box">
+                <div style="display:flex;justify-content:center;margin-bottom:14px"><i data-feather="check-circle" style="width:46px;height:46px;color:var(--green-dark)"></i></div>
+                <div class="done-title">Course is ready</div>
+                <div class="done-sub" id="genDoneSub">"Course Name" is now available in your PALS course list.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ALL_PAGES = ['dashboard','users','courses','content-sharing','job-roles','cbl','pals','pals-wizard','pals-edit','groups','classes','assess','qbank','kb','analytics','settings'];
+
+function go(page) {
+  ALL_PAGES.forEach(p => { const el = document.getElementById('page-'+p); if(el) el.classList.remove('active'); });
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const el = document.getElementById('page-'+page); if(el) el.classList.add('active');
+  if(page === 'pals-wizard') openPalsWizard();
+  if(['pals','pals-wizard','pals-edit'].includes(page)) document.getElementById('navPALS').classList.add('active');
+  else {
+    const map = {dashboard:0,users:1,courses:2,'content-sharing':3,'job-roles':4,cbl:5,groups:7,classes:8,assess:9,qbank:10,kb:11,analytics:12,settings:13};
+    const items = document.querySelectorAll('.nav-item');
+    if(map[page]!==undefined) items[map[page]]?.classList.add('active');
+  }
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+
+function toast(msg, color='#0D7F7F', dur=3000, textColor='white') {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.background = color; t.style.color = textColor; t.classList.add('show');
+  setTimeout(()=> t.classList.remove('show'), dur);
+}
+
+function toggleCheck(el) { el.classList.toggle('checked'); }
+
+/* ---------- Knowledge Point catalog (sample data) ---------- */
+const KP_CATALOG = [
+  { topic: 'Quality Assurance and Call Review Standards', icon: 'book-open', kp: { name: 'Performance Management', cat: 'Human Capital Mgmt' } },
+  { topic: 'Customer Satisfaction Survey and Feedback Handling', icon: 'book-open', kp: { name: 'Performance Management', cat: 'Human Capital Mgmt' } },
+  { topic: 'Effective De-escalation Techniques for Banking Professionals', icon: 'book-open', kp: { name: 'Coaching and Mentoring', cat: 'Learning & Development' } },
+  { topic: 'Dealing with Abusive or Threatening Customers', icon: 'book-open', kp: { name: 'Conflict Resolution', cat: 'Human Capital Mgmt' } },
+  { topic: 'AML Red Flags in Customer Onboarding', icon: 'book-open', kp: { name: 'AML Risk Assessment', cat: 'Compliance' } },
+  { topic: 'CFT Reporting Obligations to Regulators', icon: 'book-open', kp: { name: 'Regulatory Reporting', cat: 'Compliance' } },
+  { topic: 'Building Rapport in Difficult Conversations', icon: 'book-open', kp: { name: 'Communication Skills', cat: 'Learning & Development' } },
+  { topic: 'Data Privacy in Customer Interactions', icon: 'book-open', kp: { name: 'Data Protection Compliance', cat: 'Compliance' } },
+  { topic: 'Know Your Customer (KYC) Document Verification', icon: 'book-open', kp: { name: 'KYC Procedures', cat: 'Compliance' } },
+  { topic: 'Suspicious Transaction Pattern Recognition', icon: 'book-open', kp: { name: 'AML Risk Assessment', cat: 'Compliance' } },
+  { topic: 'Cross-Border Wire Transfer Screening', icon: 'book-open', kp: { name: 'Sanctions Screening', cat: 'Compliance' } },
+  { topic: 'Whistleblowing and Internal Escalation Channels', icon: 'book-open', kp: { name: 'Regulatory Reporting', cat: 'Compliance' } },
+  { topic: 'Setting SMART Goals for Direct Reports', icon: 'book-open', kp: { name: 'Performance Management', cat: 'Human Capital Mgmt' } },
+  { topic: 'Conducting Effective One-on-One Check-ins', icon: 'book-open', kp: { name: 'Coaching and Mentoring', cat: 'Learning & Development' } },
+  { topic: 'Recognizing and Preventing Workplace Burnout', icon: 'book-open', kp: { name: 'Employee Wellbeing', cat: 'Human Capital Mgmt' } },
+  { topic: 'Mediating Disputes Between Team Members', icon: 'book-open', kp: { name: 'Conflict Resolution', cat: 'Human Capital Mgmt' } },
+  { topic: 'Active Listening in High-Pressure Conversations', icon: 'book-open', kp: { name: 'Communication Skills', cat: 'Learning & Development' } },
+  { topic: 'Writing Clear and Concise Business Emails', icon: 'book-open', kp: { name: 'Communication Skills', cat: 'Learning & Development' } },
+  { topic: 'Handling Multi-Channel Customer Complaints', icon: 'book-open', kp: { name: 'Customer Service Excellence', cat: 'Customer Experience' } },
+  { topic: 'Upselling and Cross-Selling Best Practices', icon: 'book-open', kp: { name: 'Customer Service Excellence', cat: 'Customer Experience' } },
+  { topic: 'Mapping the End-to-End Customer Journey', icon: 'book-open', kp: { name: 'Customer Journey Mapping', cat: 'Customer Experience' } },
+  { topic: 'GDPR and Personal Data Handling Obligations', icon: 'book-open', kp: { name: 'Data Protection Compliance', cat: 'Compliance' } },
+  { topic: 'Incident Response for Data Breaches', icon: 'book-open', kp: { name: 'Data Protection Compliance', cat: 'Compliance' } },
+  { topic: 'Phishing and Social Engineering Awareness', icon: 'book-open', kp: { name: 'Information Security Awareness', cat: 'Compliance' } },
+  { topic: 'Password Hygiene and Multi-Factor Authentication', icon: 'book-open', kp: { name: 'Information Security Awareness', cat: 'Compliance' } },
+  { topic: 'Onboarding New Hires in Their First 90 Days', icon: 'book-open', kp: { name: 'Talent Onboarding', cat: 'Human Capital Mgmt' } },
+  { topic: 'Designing Individual Development Plans', icon: 'book-open', kp: { name: 'Coaching and Mentoring', cat: 'Learning & Development' } },
+  { topic: 'Facilitating Inclusive Team Meetings', icon: 'book-open', kp: { name: 'Diversity and Inclusion', cat: 'Human Capital Mgmt' } },
+  { topic: 'Recognizing Unconscious Bias in Hiring', icon: 'book-open', kp: { name: 'Diversity and Inclusion', cat: 'Human Capital Mgmt' } },
+  { topic: 'Basic Financial Statement Interpretation', icon: 'book-open', kp: { name: 'Financial Literacy', cat: 'Compliance' } },
+  { topic: 'Fraud Indicators in Loan Applications', icon: 'book-open', kp: { name: 'AML Risk Assessment', cat: 'Compliance' } }
+];
+const LANGUAGES = ['English','Bahasa Indonesia','Malay','Chinese','Vietnamese','Cantonese','Thai'];
+const VARIANTS = [
+  { key: 'simplified', label: 'Simplified' },
+  { key: 'standard', label: 'Standard' },
+  { key: 'comprehensive', label: 'Comprehensive' }
+];
+
+let pwSelected = [];       // ordered array of {id, name, cat, topic}
+let pwDefaultVariant = 'standard';
+let pwPerKpVariant = {};   // id -> variant key
+let pwSelectedLangs = ['English'];
+let pwStep = 1;
+let rvActiveId = null;
+let pceKpData = [];        // KPs attached to the course currently open in the editor
+let lcActiveVariant = 'simplified';
+let lcGeneratedWords = { simplified: 0, standard: 0, comprehensive: 0 };
+
+function kpId(topic, name) { return topic + '|' + name; }
+
+function buildKpTree() {
+  const tree = document.getElementById('pwKpTree');
+  const cats = {};
+  KP_CATALOG.forEach(row => { (cats[row.kp.cat] = cats[row.kp.cat] || []).push(row); });
+  const titleBar = `<div class="kp-tree-title">Knowledge Points<span class="fl-sub" style="margin:0;font-weight:600">${pwSelected.length}/${KP_CATALOG.length}</span></div>`;
+  tree.innerHTML = titleBar + Object.keys(cats).map(cat => {
+    const rows = cats[cat];
+    const selectedCount = rows.filter(r => pwSelected.some(k => k.id === kpId(r.topic, r.kp.name))).length;
+    const allSelected = selectedCount === rows.length;
+    return `
+      <div class="kp-cat-group" data-cat="${cat.replace(/"/g,'&quot;')}">
+        <div class="kp-cat-head">
+          <div class="kp-cat-name">${cat}</div>
+          <div class="kp-cat-head-right">
+            <span class="kp-cat-selectall" onclick="toggleCategoryAll('${cat.replace(/'/g,"\\'")}')">${allSelected ? 'Deselect all' : 'Select all'}</span>
+            <span class="kp-cat-badge ${selectedCount?'has-selected':''}">${selectedCount}/${rows.length}</span>
+          </div>
+        </div>
+        ${rows.map(row => {
+          const id = kpId(row.topic, row.kp.name);
+          const checked = pwSelected.some(k => k.id === id);
+          return `
+            <div class="kp-row" data-kp-id="${id}" onclick="toggleKpSelection('${id}','${row.topic.replace(/'/g,"\\'")}','${row.kp.name.replace(/'/g,"\\'")}','${row.kp.cat}')">
+              <div class="check-box ${checked?'checked':''}" style="${checked?'border-color:var(--teal);background:var(--teal);position:relative':''}">${checked?'<span style="position:absolute;left:3px;top:0;width:4px;height:8px;border:solid white;border-width:0 2px 2px 0;transform:rotate(45deg)"></span>':''}</div>
+              <div class="kp-row-main">
+                <div class="kp-row-name">${row.kp.name}</div>
+              </div>
+              <div class="kp-row-tag">${row.topic}</div>
+            </div>`;
+        }).join('')}
+      </div>`;
+  }).join('');
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+
+function toggleKpSelection(id, topic, name, cat) {
+  const idx = pwSelected.findIndex(k => k.id === id);
+  if(idx >= 0) pwSelected.splice(idx, 1);
+  else pwSelected.push({ id, name, cat, topic });
+  buildKpTree();
+}
+
+function toggleCategoryAll(cat) {
+  const rows = KP_CATALOG.filter(r => r.kp.cat === cat);
+  const allSelected = rows.every(r => pwSelected.some(k => k.id === kpId(r.topic, r.kp.name)));
+  rows.forEach(r => {
+    const id = kpId(r.topic, r.kp.name);
+    const idx = pwSelected.findIndex(k => k.id === id);
+    if(allSelected) { if(idx >= 0) pwSelected.splice(idx, 1); }
+    else { if(idx < 0) pwSelected.push({ id, name: r.kp.name, cat: r.kp.cat, topic: r.topic }); }
+  });
+  buildKpTree();
+}
+
+function filterKpTree(q) {
+  q = q.toLowerCase();
+  document.querySelectorAll('#pwKpTree .kp-cat-group').forEach(g => {
+    let anyVisible = false;
+    g.querySelectorAll('.kp-row').forEach(row => {
+      const match = row.textContent.toLowerCase().includes(q);
+      row.classList.toggle('hidden-row', !match);
+      if(match) anyVisible = true;
+    });
+    g.classList.toggle('no-match', !anyVisible);
+  });
+}
+
+function buildOrderList() {
+  document.getElementById('pwOrderCount').textContent = pwSelected.length;
+  document.getElementById('pwOrderList').innerHTML = pwSelected.map((k, i) => `
+    <div class="order-row">
+      <i data-feather="more-vertical" class="order-handle" style="width:14px;height:14px"></i>
+      <div class="order-num">${i+1}</div>
+      <div class="order-info"><div class="order-name">${k.name}</div><div class="order-sub">${k.topic} · ${k.cat}</div></div>
+      <div class="order-actions">
+        <button class="icon-btn" onclick="moveKp(${i},-1)" ${i===0?'disabled':''}><i data-feather="arrow-up" style="width:14px;height:14px"></i></button>
+        <button class="icon-btn" onclick="moveKp(${i},1)" ${i===pwSelected.length-1?'disabled':''}><i data-feather="arrow-down" style="width:14px;height:14px"></i></button>
+        <button class="icon-btn del" onclick="removeKpFromOrder(${i})"><i data-feather="trash-2" style="width:14px;height:14px"></i></button>
+      </div>
+    </div>`).join('');
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+
+function moveKp(i, dir) {
+  const j = i + dir;
+  if(j < 0 || j >= pwSelected.length) return;
+  [pwSelected[i], pwSelected[j]] = [pwSelected[j], pwSelected[i]];
+  buildOrderList();
+}
+function removeKpFromOrder(i) {
+  pwSelected.splice(i,1);
+  buildOrderList();
+}
+
+function buildLangList() {
+  document.getElementById('pwDefaultLangEcho').textContent = document.getElementById('pwDefaultLang').value;
+  const def = document.getElementById('pwDefaultLang').value;
+  document.getElementById('pwLangList').innerHTML = LANGUAGES.map(l => {
+    const isDefault = l === def;
+    const checked = isDefault || pwSelectedLangs.includes(l);
+    return `
+      <div class="lang-pick-row" data-lang="${l}" data-is-default="${isDefault?'1':'0'}" onclick="handleLangRowClick(this)">
+        <div class="check-box ${checked?'checked':''}" style="${checked?'border-color:var(--teal);background:var(--teal);position:relative':''}">${checked?'<span style="position:absolute;left:3px;top:0;width:4px;height:8px;border:solid white;border-width:0 2px 2px 0;transform:rotate(45deg)"></span>':''}</div>
+        <span class="lang-pick-name">${l}${isDefault?' <span class="lang-pick-default">(default)</span>':''}</span>
+        <span class="lang-pick-ready">${pwSelected.length} / ${pwSelected.length} ready</span>
+      </div>`;
+  }).join('');
+}
+function toggleLang(el, lang) {
+  const idx = pwSelectedLangs.indexOf(lang);
+  if(idx >= 0) pwSelectedLangs.splice(idx,1);
+  else pwSelectedLangs.push(lang);
+  buildLangList();
+}
+function handleLangRowClick(el) {
+  if(el.dataset.isDefault === '1') return;
+  toggleLang(el, el.dataset.lang);
+}
+
+function selectVariant(el, key) {
+  document.querySelectorAll('.variant-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  pwDefaultVariant = key;
+  pwSelected.forEach(k => { if(!pwPerKpVariant[k.id]) pwPerKpVariant[k.id] = key; });
+}
+
+function buildReviewStep() {
+  pwSelected.forEach(k => { if(!pwPerKpVariant[k.id]) pwPerKpVariant[k.id] = pwDefaultVariant; });
+  document.getElementById('rvList').innerHTML = pwSelected.map((k,i) => `
+    <div class="rv-item ${k.id===rvActiveId?'active':''}" onclick="selectRvItem('${k.id}')">
+      <div class="rv-item-idx">${i+1}. ${k.cat}</div>
+      <div class="rv-item-name">${k.name}</div>
+    </div>`).join('');
+  if(!rvActiveId && pwSelected.length) rvActiveId = pwSelected[0].id;
+  renderRvPreview();
+}
+
+function selectRvItem(id) { rvActiveId = id; buildReviewStep(); }
+
+function renderRvPreview() {
+  const k = pwSelected.find(x => x.id === rvActiveId);
+  if(!k) { document.getElementById('rvPreview').innerHTML = ''; return; }
+  const activeVariant = pwPerKpVariant[k.id] || pwDefaultVariant;
+  document.getElementById('rvPreview').innerHTML = `
+    <div class="rv-variant-tabs">
+      ${VARIANTS.map(v => `<div class="rv-vtab ${v.key===activeVariant?'selected':''}" onclick="setRvVariant('${k.id}','${v.key}')"><i data-feather="zap"></i>${v.label}</div>`).join('')}
+    </div>
+    <div class="rv-preview-name">${k.name}</div>
+    <div class="rv-preview-sub">Preview · ${VARIANTS.find(v=>v.key===activeVariant).label} Variant (Will Be Generated)</div>
+    <div class="rv-preview-box">This variant will be generated when you create the course.<br>Pick another variant if you want to preview existing content.</div>`;
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+function setRvVariant(id, key) { pwPerKpVariant[id] = key; renderRvPreview(); }
+
+/* ---------- Wizard navigation (step-rail pattern, mirrors goCsStep in CBL) ---------- */
+const PW_STEPS = 5;
+
+function openPalsWizard() {
+  pwSelected = []; pwPerKpVariant = {}; pwSelectedLangs = ['English']; pwDefaultVariant = 'standard'; rvActiveId = null;
+  document.getElementById('pwCourseName').value = '';
+  document.getElementById('pwDefaultLang').value = 'English';
+  document.querySelectorAll('#pwStep1 .pick-row').forEach(r => r.classList.remove('checked'));
+  document.querySelectorAll('.variant-card').forEach(c => c.classList.toggle('selected', c.dataset.variant==='standard'));
+  document.getElementById('pw5Title').textContent = 'Generating Content';
+  document.getElementById('pw5Sub').textContent = 'Your knowledge points are being generated';
+  document.getElementById('pw5Actions').innerHTML = '<button class="btn btn-white" onclick="go(\'pals\')">Close — continue in background</button>';
+  buildKpTree();
+  goPwStep(1);
+}
+
+function goPwStep(n) {
+  pwStep = n;
+  for(let i=1;i<=PW_STEPS;i++) {
+    const stepEl = document.getElementById('pwStep'+i);
+    if(stepEl) stepEl.style.display = (i===n) ? 'block' : 'none';
+    const ws = document.getElementById('pw'+i);
+    const num = document.getElementById('pw'+i+'n');
+    if(!ws || !num) continue;
+    ws.classList.remove('active','done');
+    num.classList.remove('active','done','pending');
+    if(i < n) { ws.classList.add('done'); num.classList.add('done'); num.textContent = '✓'; }
+    else if(i === n) { ws.classList.add('active'); num.classList.add('active'); num.textContent = i; }
+    else { num.classList.add('pending'); num.textContent = i; }
+  }
+  for(let i=2;i<=PW_STEPS;i++) {
+    const conn = document.getElementById('pwc'+i);
+    if(conn) conn.classList.toggle('done', i <= n);
+  }
+  if(n===2) buildOrderList();
+  if(n===3) buildLangList();
+  if(n===4) buildReviewStep();
+  document.querySelector('#page-pals-wizard .wiz-panel').scrollTop = 0;
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+
+function pwNext() {
+  if(pwStep===1) {
+    if(!document.getElementById('pwCourseName').value.trim()) { toast('Please enter a course name', '#D97706', 2500); return; }
+    if(pwSelected.length===0) { toast('Select at least one knowledge point', '#D97706', 2500); return; }
+    goPwStep(2);
+  } else if(pwStep===2) {
+    goPwStep(3);
+  } else if(pwStep===3) {
+    goPwStep(4);
+  } else if(pwStep===4) {
+    goPwStep(5);
+    startGenerating();
+  }
+}
+
+function startGenerating() {
+  document.getElementById('pwGenerating').style.display = 'block';
+  document.getElementById('pwGenDone').style.display = 'none';
+  const total = pwSelected.length;
+  document.getElementById('genCounter').textContent = '0 / ' + total;
+  document.getElementById('genProgressBar').style.width = '0%';
+  document.getElementById('genRows').innerHTML = pwSelected.map((k,i) => `
+    <div class="gen-row" id="genRow${i}">
+      <div class="gen-spinner" id="genSpin${i}"></div>
+      <i data-feather="check-circle" class="gen-check" id="genCheck${i}"></i>
+      <div><div class="gen-row-name">${k.name}</div><div class="gen-row-sub">${(pwPerKpVariant[k.id]||pwDefaultVariant)} variant</div></div>
+    </div>`).join('');
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+  let done = 0;
+  function tick() {
+    if(done >= total) {
+      setTimeout(finishGenerating, 400);
+      return;
+    }
+    document.getElementById('genSpin'+done).style.display = 'none';
+    document.getElementById('genCheck'+done).style.display = 'block';
+    done++;
+    document.getElementById('genCounter').textContent = done + ' / ' + total;
+    document.getElementById('genProgressBar').style.width = Math.round(done/total*100) + '%';
+    setTimeout(tick, 500);
+  }
+  setTimeout(tick, 500);
+}
+
+function finishGenerating() {
+  document.getElementById('pwGenerating').style.display = 'none';
+  document.getElementById('pwGenDone').style.display = 'block';
+  const pw5n = document.getElementById('pw5n');
+  pw5n.classList.remove('active','pending'); pw5n.classList.add('done'); pw5n.textContent = '✓';
+  document.getElementById('pw5').classList.remove('active'); document.getElementById('pw5').classList.add('done');
+  document.getElementById('pw5Title').textContent = 'Course is Ready';
+  document.getElementById('pw5Sub').textContent = 'All selected variants have finished generating';
+  document.getElementById('pw5Actions').innerHTML = `
+    <button class="btn btn-white" onclick="go('pals')">Close</button>
+    <button class="btn btn-teal" onclick="openCreatedCourse()">Open Course</button>`;
+  const name = document.getElementById('pwCourseName').value.trim() || 'Untitled Course';
+  document.getElementById('genDoneSub').innerHTML = '"' + name + '" is now available in your PALS course list.';
+  addCourseToList(name);
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+
+function addCourseToList(name) {
+  const list = document.getElementById('palsList');
+  const card = document.createElement('div');
+  card.className = 'pals-card';
+  card.innerHTML = `
+    <div class="pals-card-main">
+      <div class="pals-name-row"><span class="pals-name">${name}</span><span class="status-pill draft">Draft</span></div>
+      <div class="pals-meta">${pwSelected.length} Knowledge Point${pwSelected.length===1?'':'s'} · Updated just now</div>
+    </div>
+    <div class="pals-card-actions">
+      <div class="pub-toggle-wrap"><span class="pub-toggle-label">Published</span><label class="toggle"><input type="checkbox" disabled><div class="toggle-track"></div><div class="toggle-thumb"></div></label></div>
+      <button class="icon-btn" onclick="openEditPals('${name.replace(/'/g,"\\'")}')"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+      <button class="icon-btn del"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+    </div>`;
+  list.insertBefore(card, list.firstChild);
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+  pceKpData = pwSelected.map(k => ({ ...k }));
+}
+
+function openCreatedCourse() {
+  const name = document.getElementById('pwCourseName').value.trim() || 'Untitled Course';
+  openEditPals(name);
+}
+
+/* ---------- Edit PALS Course page ---------- */
+function openEditPals(name) {
+  document.getElementById('pceCourseName').textContent = name;
+  document.getElementById('pceTitle').value = name;
+  document.getElementById('pceDesc').value = '';
+  if(pceKpData.length === 0 && KP_CATALOG.length) {
+    pceKpData = [{ id: kpId(KP_CATALOG[0].topic, KP_CATALOG[0].kp.name), name: KP_CATALOG[0].kp.name, cat: KP_CATALOG[0].kp.cat, topic: KP_CATALOG[0].topic }];
+  }
+  document.getElementById('pceKpCount').textContent = pceKpData.length;
+  document.getElementById('pceKpCount2').textContent = pceKpData.length;
+  buildPceKpList();
+  buildPceTaxonomy();
+  switchPceTab('general');
+  go('pals-edit');
+}
+
+function switchPceTab(tab) {
+  ['general','kp'].forEach(t => {
+    document.getElementById('pceTab-'+t).classList.toggle('active', t===tab);
+    document.getElementById('pcePanel-'+t).classList.toggle('active', t===tab);
+  });
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+function switchPceSub(sub) {
+  document.getElementById('pceSub-path').classList.toggle('active', sub==='path');
+  document.getElementById('pceSub-tax').classList.toggle('active', sub==='tax');
+  document.getElementById('pceView-path').style.display = sub==='path' ? 'block' : 'none';
+  document.getElementById('pceView-tax').style.display = sub==='tax' ? 'block' : 'none';
+  document.getElementById('pceView-cards').style.display = 'none';
+}
+
+function buildPceKpList() {
+  document.getElementById('pceKpList').innerHTML = pceKpData.map((k,i) => `
+    <div class="kp-edit-row">
+      <div class="order-num">${i+1}</div>
+      <div class="order-info"><div class="order-name">${k.name}</div><div class="order-sub">${k.cat} · FROM: ${k.topic}</div></div>
+      <div class="kp-edit-actions">
+        <button class="icon-btn" title="Learning Cards" onclick="openLearningCards(${i})"><i data-feather="book-open" style="width:14px;height:14px"></i></button>
+        <button class="icon-btn" title="Settings" onclick="toast('Knowledge Point settings — coming soon', '#0D7F7F', 2200)"><i data-feather="settings" style="width:14px;height:14px"></i></button>
+        <button class="icon-btn" onclick="movePceKp(${i},-1)" ${i===0?'disabled':''}><i data-feather="arrow-up" style="width:14px;height:14px"></i></button>
+        <button class="icon-btn" onclick="movePceKp(${i},1)" ${i===pceKpData.length-1?'disabled':''}><i data-feather="arrow-down" style="width:14px;height:14px"></i></button>
+        <button class="icon-btn del" onclick="removePceKp(${i})"><i data-feather="trash-2" style="width:14px;height:14px"></i></button>
+      </div>
+    </div>`).join('');
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+function movePceKp(i,dir) {
+  const j=i+dir; if(j<0||j>=pceKpData.length) return;
+  [pceKpData[i],pceKpData[j]] = [pceKpData[j],pceKpData[i]];
+  buildPceKpList();
+}
+function removePceKp(i) {
+  pceKpData.splice(i,1);
+  document.getElementById('pceKpCount').textContent = pceKpData.length;
+  document.getElementById('pceKpCount2').textContent = pceKpData.length;
+  buildPceKpList();
+  buildPceTaxonomy();
+}
+
+function buildPceTaxonomy() {
+  const groups = {};
+  pceKpData.forEach(k => { (groups[k.cat] = groups[k.cat] || []).push(k.name); });
+  const keys = Object.keys(groups);
+  document.getElementById('pceTaxList').innerHTML = keys.length ? keys.map(cat => `
+    <div class="tax-group">
+      <div class="tax-group-name">${cat}</div>
+      ${groups[cat].map(n => `<span class="tax-kp-pill">${n}</span>`).join('')}
+    </div>`).join('') : '<div class="linked-assess-empty">No Knowledge Points yet.</div>';
+}
+
+let lcActiveKpIndex = 0;
+function openLearningCards(i) {
+  lcActiveKpIndex = i;
+  const k = pceKpData[i];
+  document.getElementById('lcTitle').textContent = 'Learning Cards — ' + k.name;
+  document.getElementById('pceView-path').style.display = 'none';
+  document.getElementById('pceView-tax').style.display = 'none';
+  document.getElementById('pceView-cards').style.display = 'block';
+  lcGeneratedWords = { simplified: 0, standard: 0, comprehensive: 0 };
+  switchLcVariant('simplified');
+}
+function closeLearningCards() {
+  document.getElementById('pceView-cards').style.display = 'none';
+  switchPceSub('path');
+}
+function switchLcVariant(key) {
+  lcActiveVariant = key;
+  ['simplified','standard','comprehensive'].forEach(v => document.getElementById('lcVtab-'+v).classList.toggle('active', v===key));
+  renderLcPanel();
+}
+function renderLcPanel() {
+  const panel = document.getElementById('lcPanel');
+  const words = lcGeneratedWords[lcActiveVariant];
+  const label = lcActiveVariant.charAt(0).toUpperCase() + lcActiveVariant.slice(1);
+  if(words === 0) {
+    panel.classList.remove('has-content');
+    panel.innerHTML = `<div class="lc-empty-text">No ${label} content yet for this Knowledge Point.</div><button class="btn btn-teal" onclick="generateLcContent()"><i data-feather="zap" style="width:14px;height:14px"></i>Generate ${label} with AI</button>`;
+  } else {
+    panel.classList.add('has-content');
+    const k = pceKpData[lcActiveKpIndex];
+    panel.innerHTML = `<div class="lc-content-text">${label} learning card for "${k.name}":\n\nThis Knowledge Point covers the core concepts learners need to demonstrate competency in ${k.name.toLowerCase()}. Content is generated by AI and can be edited or regenerated at any time.</div>`;
+  }
+  document.getElementById('lcWords-'+lcActiveVariant).textContent = '(' + words + ' words)';
+  if(window.feather) feather.replace({ 'stroke-width': 1.75 });
+}
+function generateLcContent() {
+  toast('Generating ' + lcActiveVariant + ' content with AI...', '#0D7F7F', 2000);
+  setTimeout(() => {
+    lcGeneratedWords[lcActiveVariant] = 64;
+    renderLcPanel();
+    toast('Content generated', '#ECFDF3', 2500, '#067647');
+  }, 900);
+}
+
+function savePceChanges() {
+  toast('PALS course saved', '#ECFDF3', 3000, '#067647');
+  go('pals');
+}
+
+document.addEventListener('DOMContentLoaded', () => { if(window.feather) feather.replace({ 'stroke-width': 1.75 }); });
+</script>
+</body>
+</html>
