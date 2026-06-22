@@ -169,6 +169,7 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
 
 /* Wizard actions footer */
 .wiz-actions { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: #FAFBFC; }
+.wiz-actions-top { padding: 14px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: #FAFBFC; position: sticky; top: 0; z-index: 5; }
 
 /* ── GENERATION LANGUAGE ── */
 .lang-body { padding: 24px; }
@@ -439,6 +440,12 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
               <div class="wiz-card-sub" id="panelSub">Choose the language for generating knowledge points</div>
             </div>
 
+            <!-- ── SHARED STICKY ACTION BAR ── -->
+            <div class="wiz-actions-top" id="wizActionsTop">
+              <button class="btn btn-white" id="wizBackBtn">Back</button>
+              <button class="btn btn-teal" id="wizNextBtn" onclick="startExtract()">Next: Extract Knowledge Points →</button>
+            </div>
+
             <!-- ── STEP 2: LANGUAGE ── -->
             <div id="st-lang">
               <div class="lang-body">
@@ -456,9 +463,6 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
                     <div><div class="lang-name">Mandarin</div><div class="lang-sub">中文 (Chinese Simplified)</div></div>
                   </div>
                 </div>
-              </div>
-              <div class="wiz-actions">
-                <button class="btn btn-teal" onclick="startExtract()">Next: Extract Knowledge Points →</button>
               </div>
             </div>
 
@@ -518,10 +522,120 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
                   <div class="add-topic"><i data-feather="plus" style="width:13px;height:13px"></i> Add Topic</div>
                 </div>
               </div>
-              <div class="more-hint">+ 3 more strands · <a href="#">Expand all</a></div>
-              <div class="wiz-actions">
-                <button class="btn btn-white">Back</button>
-                <button class="btn btn-teal" onclick="doApproveSkills()">Next: Generate Questions →</button>
+              <!-- Strand 2 -->
+              <div class="strand-block">
+                <div class="strand-row">
+                  <i data-feather="folder" class="strand-icon" style="width:18px;height:18px;color:#F97316;flex-shrink:0"></i>
+                  <div><div class="strand-meta">STRAND 2</div><div class="strand-name">Gulf Stream &amp; Turbine Protocol</div></div>
+                  <div class="row-actions">
+                    <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                    <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                    <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                  </div>
+                </div>
+                <div class="sub-block">
+                  <div class="sub-row">
+                    <i data-feather="file-text" style="width:15px;height:15px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div class="sub-meta">SUBSTRAND 2.1</div><div class="sub-name">Gulf Stream Transaction Forwarding</div></div>
+                    <div class="row-actions" style="margin-left:auto">
+                      <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                      <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                      <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                    </div>
+                  </div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 2.1.1</div><div class="topic-name">Leader-Aware Transaction Routing</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 2.1.2</div><div class="topic-name">Reducing Confirmation Latency</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="add-topic"><i data-feather="plus" style="width:13px;height:13px"></i> Add Topic</div>
+                  <div class="sub-row">
+                    <i data-feather="file-text" style="width:15px;height:15px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div class="sub-meta">SUBSTRAND 2.2</div><div class="sub-name">Turbine Block Propagation</div></div>
+                    <div class="row-actions" style="margin-left:auto">
+                      <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                      <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                      <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                    </div>
+                  </div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 2.2.1</div><div class="topic-name">Shred-Based Data Propagation</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 2.2.2</div><div class="topic-name">Erasure Coding for Block Reconstruction</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="add-topic"><i data-feather="plus" style="width:13px;height:13px"></i> Add Topic</div>
+                </div>
+              </div>
+              <!-- Strand 3 -->
+              <div class="strand-block">
+                <div class="strand-row">
+                  <i data-feather="folder" class="strand-icon" style="width:18px;height:18px;color:#F97316;flex-shrink:0"></i>
+                  <div><div class="strand-meta">STRAND 3</div><div class="strand-name">Sealevel Parallel Smart Contracts</div></div>
+                  <div class="row-actions">
+                    <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                    <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                    <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                  </div>
+                </div>
+                <div class="sub-block">
+                  <div class="sub-row">
+                    <i data-feather="file-text" style="width:15px;height:15px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div class="sub-meta">SUBSTRAND 3.1</div><div class="sub-name">Parallel Transaction Execution</div></div>
+                    <div class="row-actions" style="margin-left:auto">
+                      <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                      <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                      <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                    </div>
+                  </div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 3.1.1</div><div class="topic-name">Account-Level Concurrency Model</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 3.1.2</div><div class="topic-name">Read/Write Lock Scheduling</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 3.1.3</div><div class="topic-name">Conflict Detection Across Transactions</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="add-topic"><i data-feather="plus" style="width:13px;height:13px"></i> Add Topic</div>
+                  <div class="sub-row">
+                    <i data-feather="file-text" style="width:15px;height:15px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div class="sub-meta">SUBSTRAND 3.2</div><div class="sub-name">Program Runtime Architecture</div></div>
+                    <div class="row-actions" style="margin-left:auto">
+                      <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                      <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                      <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                    </div>
+                  </div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 3.2.1</div><div class="topic-name">BPF Bytecode Execution</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="add-topic"><i data-feather="plus" style="width:13px;height:13px"></i> Add Topic</div>
+                </div>
+              </div>
+              <!-- Strand 4 -->
+              <div class="strand-block">
+                <div class="strand-row">
+                  <i data-feather="folder" class="strand-icon" style="width:18px;height:18px;color:#F97316;flex-shrink:0"></i>
+                  <div><div class="strand-meta">STRAND 4</div><div class="strand-name">Proof of Stake &amp; Tokenomics</div></div>
+                  <div class="row-actions">
+                    <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                    <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                    <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                  </div>
+                </div>
+                <div class="sub-block">
+                  <div class="sub-row">
+                    <i data-feather="file-text" style="width:15px;height:15px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div class="sub-meta">SUBSTRAND 4.1</div><div class="sub-name">Stake-Weighted Consensus</div></div>
+                    <div class="row-actions" style="margin-left:auto">
+                      <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                      <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                      <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                    </div>
+                  </div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 4.1.1</div><div class="topic-name">Validator Stake Delegation</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 4.1.2</div><div class="topic-name">Slashing and Penalty Conditions</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="add-topic"><i data-feather="plus" style="width:13px;height:13px"></i> Add Topic</div>
+                  <div class="sub-row">
+                    <i data-feather="file-text" style="width:15px;height:15px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div class="sub-meta">SUBSTRAND 4.2</div><div class="sub-name">SOL Token Economics</div></div>
+                    <div class="row-actions" style="margin-left:auto">
+                      <button class="icon-btn"><i data-feather="edit-2" style="width:13px;height:13px;color:#F97316"></i></button>
+                      <button class="icon-btn del"><i data-feather="trash-2" style="width:13px;height:13px"></i></button>
+                      <button class="icon-btn"><i data-feather="chevron-down" style="width:13px;height:13px"></i></button>
+                    </div>
+                  </div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 4.2.1</div><div class="topic-name">Inflation Schedule and Token Issuance</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 4.2.2</div><div class="topic-name">Transaction Fee Burning Mechanism</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="topic-row"><div class="topic-check"><i data-feather="check" style="width:10px;height:10px;stroke-width:3"></i></div><i data-feather="file" style="width:13px;height:13px;color:var(--text-muted);flex-shrink:0"></i><div><div class="topic-meta">TOPIC 4.2.3</div><div class="topic-name">Rent Exemption Mechanics</div></div><div class="row-actions" style="margin-left:auto"><button class="icon-btn"><i data-feather="edit-2" style="width:12px;height:12px;color:#F97316"></i></button><button class="icon-btn del"><i data-feather="trash-2" style="width:12px;height:12px"></i></button></div></div>
+                  <div class="add-topic"><i data-feather="plus" style="width:13px;height:13px"></i> Add Topic</div>
+                </div>
               </div>
             </div>
 
@@ -592,10 +706,78 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
                   </div>
                 </div>
               </div>
-              <div class="more-hint">+ 3 more strands with 325 questions · <a href="#">Expand all</a></div>
-              <div class="wiz-actions">
-                <button class="btn btn-white">Back</button>
-                <button class="btn btn-teal" onclick="doApproveQ()">Next: Generate Learning Content →</button>
+              <!-- Strand 2 questions -->
+              <div class="q-strand-block">
+                <div class="q-strand-header">
+                  <i data-feather="folder" style="width:16px;height:16px;color:#F97316;flex-shrink:0"></i>
+                  <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal)">STRAND 2</div><div style="font-size:14px;font-weight:700">Gulf Stream &amp; Turbine Protocol</div></div>
+                  <i data-feather="chevron-down" style="width:15px;height:15px;color:var(--text-muted);margin-left:auto"></i>
+                </div>
+                <div class="q-sub-block">
+                  <div class="q-sub-header">
+                    <i data-feather="file-text" style="width:14px;height:14px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple)">SUBSTRAND 2.1</div><div style="font-size:13px;font-weight:600">Gulf Stream Transaction Forwarding</div></div>
+                    <i data-feather="chevron-down" style="width:14px;height:14px;color:var(--text-muted);margin-left:auto"></i>
+                  </div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 2.1.1</div><div class="q-topic-name">Leader-Aware Transaction Routing</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 2.1.2</div><div class="q-topic-name">Reducing Confirmation Latency</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-sub-header" style="margin-top:6px">
+                    <i data-feather="file-text" style="width:14px;height:14px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple)">SUBSTRAND 2.2</div><div style="font-size:13px;font-weight:600">Turbine Block Propagation</div></div>
+                    <i data-feather="chevron-down" style="width:14px;height:14px;color:var(--text-muted);margin-left:auto"></i>
+                  </div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 2.2.1</div><div class="q-topic-name">Shred-Based Data Propagation</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 2.2.2</div><div class="q-topic-name">Erasure Coding for Block Reconstruction</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                </div>
+              </div>
+              <!-- Strand 3 questions -->
+              <div class="q-strand-block">
+                <div class="q-strand-header">
+                  <i data-feather="folder" style="width:16px;height:16px;color:#F97316;flex-shrink:0"></i>
+                  <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal)">STRAND 3</div><div style="font-size:14px;font-weight:700">Sealevel Parallel Smart Contracts</div></div>
+                  <i data-feather="chevron-down" style="width:15px;height:15px;color:var(--text-muted);margin-left:auto"></i>
+                </div>
+                <div class="q-sub-block">
+                  <div class="q-sub-header">
+                    <i data-feather="file-text" style="width:14px;height:14px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple)">SUBSTRAND 3.1</div><div style="font-size:13px;font-weight:600">Parallel Transaction Execution</div></div>
+                    <i data-feather="chevron-down" style="width:14px;height:14px;color:var(--text-muted);margin-left:auto"></i>
+                  </div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 3.1.1</div><div class="q-topic-name">Account-Level Concurrency Model</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 3.1.2</div><div class="q-topic-name">Read/Write Lock Scheduling</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 3.1.3</div><div class="q-topic-name">Conflict Detection Across Transactions</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-sub-header" style="margin-top:6px">
+                    <i data-feather="file-text" style="width:14px;height:14px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple)">SUBSTRAND 3.2</div><div style="font-size:13px;font-weight:600">Program Runtime Architecture</div></div>
+                    <i data-feather="chevron-down" style="width:14px;height:14px;color:var(--text-muted);margin-left:auto"></i>
+                  </div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 3.2.1</div><div class="q-topic-name">BPF Bytecode Execution</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                </div>
+              </div>
+              <!-- Strand 4 questions -->
+              <div class="q-strand-block">
+                <div class="q-strand-header">
+                  <i data-feather="folder" style="width:16px;height:16px;color:#F97316;flex-shrink:0"></i>
+                  <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal)">STRAND 4</div><div style="font-size:14px;font-weight:700">Proof of Stake &amp; Tokenomics</div></div>
+                  <i data-feather="chevron-down" style="width:15px;height:15px;color:var(--text-muted);margin-left:auto"></i>
+                </div>
+                <div class="q-sub-block">
+                  <div class="q-sub-header">
+                    <i data-feather="file-text" style="width:14px;height:14px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple)">SUBSTRAND 4.1</div><div style="font-size:13px;font-weight:600">Stake-Weighted Consensus</div></div>
+                    <i data-feather="chevron-down" style="width:14px;height:14px;color:var(--text-muted);margin-left:auto"></i>
+                  </div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 4.1.1</div><div class="q-topic-name">Validator Stake Delegation</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 4.1.2</div><div class="q-topic-name">Slashing and Penalty Conditions</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-sub-header" style="margin-top:6px">
+                    <i data-feather="file-text" style="width:14px;height:14px;color:var(--substrand-color);flex-shrink:0"></i>
+                    <div><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--purple)">SUBSTRAND 4.2</div><div style="font-size:13px;font-weight:600">SOL Token Economics</div></div>
+                    <i data-feather="chevron-down" style="width:14px;height:14px;color:var(--text-muted);margin-left:auto"></i>
+                  </div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 4.2.1</div><div class="q-topic-name">Inflation Schedule and Token Issuance</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 4.2.2</div><div class="q-topic-name">Transaction Fee Burning Mechanism</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                  <div class="q-topic-row"><i data-feather="file" class="q-topic-icon" style="width:15px;height:15px;flex-shrink:0"></i><div class="q-topic-info"><div class="q-topic-meta">TOPIC 4.2.3</div><div class="q-topic-name">Rent Exemption Mechanics</div></div><div class="q-count">25 questions</div><button class="regen-btn" title="Regenerate"><i data-feather="refresh-cw" style="width:13px;height:13px"></i></button><button class="eye-btn" title="Preview questions"><i data-feather="eye" style="width:14px;height:14px"></i></button></div>
+                </div>
               </div>
             </div>
 
@@ -621,10 +803,6 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
               <div class="lc-strand-row"><div class="lc-strand-icon"><i data-feather="folder" style="width:18px;height:18px;color:#F97316"></i></div><div><div class="lc-strand-meta">STRAND 2</div><div class="lc-strand-name">Gulf Stream &amp; Turbine Protocol</div></div><i data-feather="chevron-right" class="lc-chevron" style="width:16px;height:16px"></i></div>
               <div class="lc-strand-row"><div class="lc-strand-icon"><i data-feather="folder" style="width:18px;height:18px;color:#F97316"></i></div><div><div class="lc-strand-meta">STRAND 3</div><div class="lc-strand-name">Sealevel Parallel Smart Contracts</div></div><i data-feather="chevron-right" class="lc-chevron" style="width:16px;height:16px"></i></div>
               <div class="lc-strand-row" style="border-bottom:none"><div class="lc-strand-icon"><i data-feather="folder" style="width:18px;height:18px;color:#F97316"></i></div><div><div class="lc-strand-meta">STRAND 4</div><div class="lc-strand-name">Proof of Stake &amp; Tokenomics</div></div><i data-feather="chevron-right" class="lc-chevron" style="width:16px;height:16px"></i></div>
-              <div class="wiz-actions">
-                <button class="btn btn-white">Back</button>
-                <button class="btn btn-teal" onclick="doApproveLC()">Next: Translate →</button>
-              </div>
             </div>
 
             <!-- ── STEP 6: TRANSLATE ── -->
@@ -634,15 +812,21 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
                 <div class="toggle-card">
                   <div><div class="toggle-label">Also translate this content</div><div class="toggle-sub">Source language: English</div></div>
                   <label class="toggle">
-                    <input type="checkbox" id="translateToggle">
+                    <input type="checkbox" id="translateToggle" onchange="toggleTargetLang(this)">
                     <div class="toggle-track"></div>
                     <div class="toggle-thumb"></div>
                   </label>
                 </div>
-              </div>
-              <div class="wiz-actions">
-                <button class="btn btn-white">Back</button>
-                <button class="btn btn-teal" onclick="doSkipTranslate()">Skip &amp; Continue →</button>
+                <div class="fg" id="targetLangWrap" style="display:none; margin-top:18px">
+                  <label class="fl">Target Language</label>
+                  <select class="fi" id="targetLangSelect">
+                    <option>Bahasa Indonesia</option>
+                    <option>Mandarin (Simplified)</option>
+                    <option>Spanish</option>
+                    <option>Vietnamese</option>
+                    <option>Thai</option>
+                  </select>
+                </div>
               </div>
             </div>
 
@@ -660,10 +844,6 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
                   <div class="lang-info-val">English</div>
                   <div class="lang-info-note">To also save another language version, enable Translate in the previous step.</div>
                 </div>
-              </div>
-              <div class="wiz-actions">
-                <button class="btn btn-white">Back</button>
-                <button class="btn btn-teal" onclick="doConfirmSave()">⊙ Confirm &amp; Save</button>
               </div>
             </div>
 
@@ -747,12 +927,29 @@ function go(page) {
     const items = document.querySelectorAll('.nav-item');
     if(map[page]!==undefined) items[map[page]]?.classList.add('active');
   }
+  syncWidgetVisibility(page);
 }
 
-function toast(msg, color='#0D7F7F', dur=3000) {
+// Widget is a *background* progress notifier — it stays visible even while
+// the user is in the wizard, since it's the cue that they can navigate away
+// and come back. The Back/Next actions live in a sticky bar at the top of
+// the card instead, so the widget never has anything to cover.
+function syncWidgetVisibility(page) {
+  const w = document.getElementById('bgW');
+  if(appState !== 'idle' && appState !== 'done') {
+    w.classList.add('show');
+  }
+}
+
+function maybeShowWidget() {
+  document.getElementById('bgW').classList.add('show');
+}
+
+function toast(msg, color='#0D7F7F', dur=3000, textColor='white') {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.style.background = color;
+  t.style.color = textColor;
   t.classList.add('show');
   setTimeout(()=> t.classList.remove('show'), dur);
 }
@@ -801,9 +998,9 @@ function startFlow() {
   showState('st-lang');
   setPanelHead('Generation Language','Choose the language for generating knowledge points');
   setStep(2,'active'); setStepHint(2,'Select language');
+  setWizActions('Next: Extract Knowledge Points →', startExtract);
   // widget
-  const w = document.getElementById('bgW');
-  w.classList.add('show');
+  maybeShowWidget();
   bwRow('bwr2','active','');
   appState = 'lang';
 }
@@ -815,10 +1012,11 @@ function startExtract() {
   bwRow('bwr2','done','✓');
   bwRow('bwr3','active','');
   setPanelHead('Extract Knowledge Points','');
+  setWizActions(null);
   showState('st-extracting');
   // show widget
-  document.getElementById('bgW').classList.add('show');
-  toast('Generation started — you can navigate freely', '#0D7F7F', 4000);
+  maybeShowWidget();
+  toast('Generation started — you can navigate freely', '#ECFDF3', 4000, '#067647');
   runExtract();
 }
 
@@ -852,6 +1050,7 @@ function triggerReview1() {
 
 function showReviewSkills() {
   setPanelHead('Extract Knowledge Points','');
+  setWizActions('Next: Generate Questions →', doApproveSkills);
   showState('st-review-skills');
 }
 
@@ -865,8 +1064,9 @@ function doApproveSkills() {
   document.getElementById('kbDot').style.display = 'none';
   document.getElementById('nBadge').innerHTML = '<span class="badge badge-blue">⟳ Generating</span>';
   setPanelHead('Generate & Review Questions','');
+  setWizActions(null);
   showState('st-gen-q');
-  toast('Skills approved — generating questions', '#0D7F7F', 3000);
+  toast('Skills approved — generating questions', '#ECFDF3', 3000, '#067647');
   runGenQ();
 }
 
@@ -891,7 +1091,9 @@ function triggerReview2() {
   document.getElementById('nBadge').innerHTML = '<span class="badge badge-amber">⏸ Review</span>';
   document.getElementById('nQ').textContent = '422';
   if(document.getElementById('page-wizard').classList.contains('active')) {
-    setPanelHead('Generate & Review Questions',''); showState('st-review-q');
+    setPanelHead('Generate & Review Questions','');
+    setWizActions('Next: Generate Learning Content →', doApproveQ);
+    showState('st-review-q');
   }
   if(wMin) { wMin=false; document.getElementById('bwBody').classList.remove('hidden'); document.getElementById('bwMin').textContent='—'; }
   toast('⚠️ 422 questions ready — review needed', '#D97706', 5000);
@@ -907,8 +1109,9 @@ function doApproveQ() {
   document.getElementById('kbDot').style.display = 'none';
   document.getElementById('nBadge').innerHTML = '<span class="badge badge-blue">⟳ Generating</span>';
   setPanelHead('Generate & Review Learning Content','');
+  setWizActions(null);
   showState('st-gen-lc');
-  toast('Questions approved — generating learning content', '#0D7F7F', 3000);
+  toast('Questions approved — generating learning content', '#ECFDF3', 3000, '#067647');
   runGenLC();
 }
 
@@ -933,7 +1136,9 @@ function triggerReview3() {
   document.getElementById('nBadge').innerHTML = '<span class="badge badge-amber">⏸ Review</span>';
   document.getElementById('nS').textContent = '51';
   if(document.getElementById('page-wizard').classList.contains('active')) {
-    setPanelHead('Generate & Review Learning Content',''); showState('st-review-lc');
+    setPanelHead('Generate & Review Learning Content','');
+    setWizActions('Next: Translate →', doApproveLC);
+    showState('st-review-lc');
   }
   if(wMin) { wMin=false; document.getElementById('bwBody').classList.remove('hidden'); document.getElementById('bwMin').textContent='—'; }
   toast('⚠️ Learning content ready — review needed', '#D97706', 5000);
@@ -949,7 +1154,39 @@ function doApproveLC() {
   document.getElementById('kbDot').style.display = 'none';
   document.getElementById('nBadge').innerHTML = '<span class="badge badge-blue">⟳ Processing</span>';
   setPanelHead('Translate Content (Optional)','');
+  setWizActions('Skip & Continue →', doSkipTranslate);
   showState('st-translate');
+}
+
+function toggleTargetLang(el) {
+  const wrap = document.getElementById('targetLangWrap');
+  const btn = document.getElementById('wizNextBtn');
+  if(el.checked) {
+    wrap.style.display = 'block';
+    btn.textContent = 'Translate & Continue';
+    btn.onclick = doTranslateAndContinue;
+  } else {
+    wrap.style.display = 'none';
+    btn.textContent = 'Skip & Continue →';
+    btn.onclick = doSkipTranslate;
+  }
+}
+
+function doTranslateAndContinue() {
+  const lang = document.getElementById('targetLangSelect').value;
+  appState = 'confirm';
+  setStep(6,'done'); setConn(6,true);
+  setStep(7,'active');
+  bwRow('bwr6','done','✓');
+  bwRow('bwr7','active','');
+  setPanelHead('Confirm & Save','');
+  const val = document.querySelector('#st-confirm .lang-info-val');
+  const note = document.querySelector('#st-confirm .lang-info-note');
+  if(val) val.textContent = 'English + ' + lang;
+  if(note) note.textContent = 'Both language versions will be saved. ' + lang + ' will become the default.';
+  setWizActions('⊙ Confirm & Save', doConfirmSave);
+  showState('st-confirm');
+  toast('Translating to ' + lang + '...', '#ECFDF3', 3000, '#067647');
 }
 
 function doSkipTranslate() {
@@ -959,6 +1196,11 @@ function doSkipTranslate() {
   bwRow('bwr6','done','✓');
   bwRow('bwr7','active','');
   setPanelHead('Confirm & Save','');
+  const val = document.querySelector('#st-confirm .lang-info-val');
+  const note = document.querySelector('#st-confirm .lang-info-note');
+  if(val) val.textContent = 'English';
+  if(note) note.textContent = 'To also save another language version, enable Translate in the previous step.';
+  setWizActions('⊙ Confirm & Save', doConfirmSave);
   showState('st-confirm');
 }
 
@@ -975,8 +1217,9 @@ function doConfirmSave() {
   document.getElementById('bwSpin').style.display = 'none';
   document.getElementById('kbDot').style.display = 'none';
   setPanelHead('Setup Complete','');
+  setWizActions(null);
   showState('st-done');
-  toast('✓ Knowledge Base saved successfully!', '#16A34A', 4000);
+  toast('✓ Knowledge Base saved successfully!', '#ECFDF3', 4000, '#067647');
   setTimeout(()=>{ document.getElementById('bgW').style.opacity='0'; document.getElementById('bgW').style.transform='translateY(120%)'; }, 9000);
 }
 
@@ -1002,6 +1245,17 @@ function setPanelHead(title, sub) {
   document.getElementById('panelSub').textContent = sub;
 }
 
+// Shared sticky top action bar — keeps Back/Next out of the way of the
+// floating background-progress widget, which always stays on screen.
+function setWizActions(label, fn) {
+  const bar = document.getElementById('wizActionsTop');
+  if(label === null) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  const btn = document.getElementById('wizNextBtn');
+  btn.textContent = label;
+  btn.onclick = fn;
+}
+
 function handleWidgetClick() {
   go('wizard');
   const stateMap = {
@@ -1018,6 +1272,27 @@ function handleWidgetClick() {
     translate:'Translate Content (Optional)', confirm:'Confirm & Save', done:'Setup Complete'
   };
   if(headMap[appState]) setPanelHead(headMap[appState],'');
+  // also sync the sticky top action bar to match this step
+  const actionsMap = {
+    lang: ['Next: Extract Knowledge Points →', startExtract],
+    extracting: null,
+    'review-skills': ['Next: Generate Questions →', doApproveSkills],
+    'gen-q': null,
+    'review-q': ['Next: Generate Learning Content →', doApproveQ],
+    'gen-lc': null,
+    'review-lc': ['Next: Translate →', doApproveLC],
+    translate: [
+      document.getElementById('translateToggle') && document.getElementById('translateToggle').checked
+        ? 'Translate & Continue' : 'Skip & Continue →',
+      document.getElementById('translateToggle') && document.getElementById('translateToggle').checked
+        ? doTranslateAndContinue : doSkipTranslate
+    ],
+    confirm: ['⊙ Confirm & Save', doConfirmSave],
+    done: null
+  };
+  const a = actionsMap[appState];
+  if(a === null || a === undefined) setWizActions(null);
+  else setWizActions(a[0], a[1]);
 }
 
 function toggleMin(e) {
