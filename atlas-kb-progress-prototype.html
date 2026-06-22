@@ -112,6 +112,40 @@ body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans
 .badge-amber { background: var(--amber-bg); color: var(--amber-text); border: 1px solid var(--amber-border); }
 .badge-blue { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
 
+/* ── KB CARD LIST ── */
+.kb-page-sub { font-size: 13px; color: var(--text-sec); margin-top: 3px; }
+.kb-layout { display: flex; gap: 20px; align-items: flex-start; }
+.kb-domains { width: 216px; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 16px 12px; flex-shrink: 0; box-shadow: var(--shadow-sm); }
+.kb-domains-title { font-family: 'Space Grotesk', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-muted); padding: 0 8px 10px; }
+.kb-domain-item { display: flex; align-items: center; gap: 9px; padding: 8px 8px; border-radius: 6px; font-size: 13.5px; color: var(--text-sec); cursor: pointer; transition: all var(--tr); }
+.kb-domain-item:hover { background: var(--bg); }
+.kb-domain-item.active { background: var(--teal-light); color: var(--teal); font-weight: 600; }
+.kb-domain-count { margin-left: auto; font-size: 12px; color: var(--text-muted); }
+.kb-domain-item.active .kb-domain-count { color: var(--teal); }
+.kb-content { flex: 1; min-width: 0; }
+.kb-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--border); margin-bottom: 16px; }
+.kb-tab { padding: 9px 2px; font-size: 13.5px; font-weight: 600; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all var(--tr); }
+.kb-tab.active { color: var(--text); border-bottom-color: var(--teal); }
+.kb-search { display: flex; align-items: center; gap: 9px; border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 14px; background: var(--white); margin-bottom: 16px; box-shadow: var(--shadow-sm); }
+.kb-search input { border: none; outline: none; flex: 1; font-size: 13.5px; font-family: 'Inter', sans-serif; color: var(--text); background: transparent; }
+.kb-search input::placeholder { color: var(--text-muted); }
+.kb-card-list { display: flex; flex-direction: column; gap: 12px; }
+.kb-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 18px 20px; box-shadow: var(--shadow-sm); display: flex; align-items: flex-start; gap: 14px; transition: box-shadow var(--tr), border-color var(--tr); cursor: pointer; }
+.kb-card:hover { box-shadow: var(--shadow-md); border-color: var(--teal-mid); }
+.kb-card-icon { width: 36px; height: 36px; background: var(--teal-light); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--teal); flex-shrink: 0; border: 1px solid rgba(16,117,157,0.12); margin-top: 1px; }
+.kb-card-body { flex: 1; min-width: 0; }
+.kb-card-title { font-family: 'Space Grotesk', sans-serif; font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.kb-card-file { display: flex; align-items: center; gap: 5px; font-size: 12.5px; color: var(--text-muted); }
+.kb-card-date { font-size: 12px; color: var(--text-muted); margin-top: 6px; }
+.kb-card-tags { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin-top: 12px; }
+.kb-card-actions { display: flex; gap: 2px; flex-shrink: 0; }
+.pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 10px; border-radius: 99px; font-size: 11.5px; font-weight: 600; white-space: nowrap; }
+.pill-doc { background: #EFF6FF; color: #1D4ED8; border: 1px solid #BFDBFE; }
+.pill-domain { background: var(--teal); color: white; }
+.pill-lang { background: var(--white); color: var(--text-sec); border: 1px solid var(--border); }
+.pill-sync { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+.pill-kp { background: var(--teal-light); color: var(--teal); border: 1px solid rgba(16,117,157,0.2); }
+
 /* ── ADD KB FORM ── */
 .form-wrap { padding: 28px 24px; max-width: 760px; overflow-y: auto; flex: 1; }
 .form-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 28px; box-shadow: var(--shadow-sm); }
@@ -132,7 +166,7 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
 .wizard-layout { display: flex; flex: 1; overflow: hidden; }
 .wiz-steps { width: 248px; background: var(--white); border-right: 1px solid var(--border); padding: 20px 10px; flex-shrink: 0; overflow-y: auto; }
 .wiz-steps-label { font-family: 'Space Grotesk', sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--text-muted); padding: 0 6px; margin-bottom: 12px; }
-.ws { display: flex; align-items: flex-start; gap: 10px; padding: 9px 8px; border-radius: 6px; cursor: default; }
+.ws { display: flex; align-items: flex-start; gap: 10px; padding: 6px 8px; border-radius: 6px; cursor: default; }
 .ws-num { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700; font-family: 'Space Grotesk', sans-serif; flex-shrink: 0; margin-top: 1px; }
 .ws-num.done { background: var(--teal); color: white; }
 .ws-num.active { background: var(--teal); color: white; }
@@ -144,7 +178,7 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
 .ws-hint { font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
 .ws.active .ws-hint { color: var(--teal); }
 .ws.warn-state .ws-hint { color: var(--amber-dark); font-weight: 600; }
-.wc { width: 2px; height: 16px; background: var(--border); margin: 1px 0 1px 21px; border-radius: 1px; }
+.wc { width: 2px; height: 8px; background: var(--border); margin: 0 0 0 21px; border-radius: 1px; }
 .wc.done { background: var(--teal); }
 
 /* Wizard panel right */
@@ -182,6 +216,15 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
 .lang-option.selected .lang-radio::after { content: ''; width: 6px; height: 6px; background: white; border-radius: 50%; }
 .lang-name { font-family: 'Space Grotesk', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); }
 .lang-sub { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+
+.lang-check-list { display: flex; flex-direction: column; gap: 10px; }
+.lang-check-row { display: flex; align-items: center; gap: 14px; padding: 13px 16px; border: 1.5px solid var(--border); border-radius: var(--radius); cursor: pointer; transition: all var(--tr); background: var(--white); }
+.lang-check-row:hover { border-color: var(--teal-mid); background: #FAFCFC; }
+.lang-check-row.checked { border-color: var(--teal); background: var(--teal-light); }
+.lang-checkbox { width: 18px; height: 18px; border-radius: 5px; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all var(--tr); color: white; }
+.lang-checkbox i { display: none; }
+.lang-check-row.checked .lang-checkbox { border-color: var(--teal); background: var(--teal); }
+.lang-check-row.checked .lang-checkbox i { display: block; }
 
 /* ── SKILL TREE ── */
 .review-intro { padding: 16px 24px; border-bottom: 1px solid var(--border); }
@@ -356,21 +399,127 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
     <div class="page active" id="page-kb">
       <div class="page-body">
         <div class="sec-header">
-          <div class="sec-title">Knowledge Base</div>
-          <button class="btn btn-teal" onclick="go('add-kb')">+ Add Knowledge Base</button>
-        </div>
-        <div class="kb-table">
-          <div class="kb-thead"><div>Title</div><div>Domain</div><div>Skills</div><div>Questions</div><div>Sessions</div><div>Status</div></div>
-          <div class="kb-tr">
-            <div class="kb-title-wrap"><div class="file-icon"><i data-feather="file-text" style="width:16px;height:16px"></i></div><div><div class="kb-name">Solana Whitepaper</div><div class="kb-sub">PDF · 673 KB</div></div></div>
-            <div class="cell">Blockchain</div><div class="cell">18</div><div class="cell">430</div><div class="cell">54</div>
-            <div><span class="badge badge-green">✓ Generated</span></div>
+          <div>
+            <div class="sec-title">Knowledge Base</div>
+            <div class="kb-page-sub">All Articles · 4 articles</div>
           </div>
-          <div class="kb-tr" id="newRow" style="display:none" onclick="go('wizard')">
-            <div class="kb-title-wrap"><div class="file-icon"><i data-feather="file-text" style="width:16px;height:16px"></i></div><div><div class="kb-name">Solana Protocol Deep Dive</div><div class="kb-sub">PDF · 1.2 MB</div></div></div>
-            <div class="cell">Blockchain</div>
-            <div class="cell" id="nSkills">—</div><div class="cell" id="nQ">—</div><div class="cell" id="nS">—</div>
-            <div id="nBadge"><span class="badge badge-blue">⟳ Processing</span></div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-white"><i data-feather="zap" style="width:14px;height:14px"></i> AI Generate</button>
+            <button class="btn btn-teal" onclick="go('add-kb')">+ Add Knowledge Base</button>
+          </div>
+        </div>
+        <div class="kb-layout">
+          <div class="kb-domains">
+            <div class="kb-domains-title">Domains</div>
+            <div class="kb-domain-item active"><i data-feather="grid" style="width:14px;height:14px"></i>All Articles<span class="kb-domain-count">4</span></div>
+            <div class="kb-domain-item"><i data-feather="folder" style="width:14px;height:14px"></i>Blockchain<span class="kb-domain-count">1</span></div>
+            <div class="kb-domain-item"><i data-feather="folder" style="width:14px;height:14px"></i>Finance<span class="kb-domain-count">1</span></div>
+            <div class="kb-domain-item"><i data-feather="folder" style="width:14px;height:14px"></i>Banking<span class="kb-domain-count">1</span></div>
+            <div class="kb-domain-item"><i data-feather="folder" style="width:14px;height:14px"></i>Legal<span class="kb-domain-count">1</span></div>
+          </div>
+          <div class="kb-content">
+            <div class="kb-tabs">
+              <div class="kb-tab active">Active (4)</div>
+              <div class="kb-tab">Archived (1)</div>
+            </div>
+            <div class="kb-search"><i data-feather="search" style="width:15px;height:15px;color:var(--text-muted)"></i><input type="text" placeholder="Search articles or tags..."></div>
+            <div class="kb-card-list">
+              <div class="kb-card">
+                <div class="kb-card-icon"><i data-feather="file-text" style="width:17px;height:17px"></i></div>
+                <div class="kb-card-body">
+                  <div class="kb-card-title">Solana Whitepaper</div>
+                  <div class="kb-card-file"><i data-feather="paperclip" style="width:11px;height:11px"></i>solana-whitepaper.pdf</div>
+                  <div class="kb-card-date">Updated Jun 15, 2026</div>
+                  <div class="kb-card-tags">
+                    <span class="pill pill-doc">Document</span>
+                    <span class="pill pill-domain"><i data-feather="folder" style="width:10px;height:10px"></i> Blockchain</span>
+                    <span class="pill pill-lang">EN</span>
+                    <span class="pill pill-sync">✓ Synced</span>
+                    <span class="pill pill-kp">ⓘ Knowledge Points Generated</span>
+                    <span class="badge badge-green">✓ Generated</span>
+                  </div>
+                </div>
+                <div class="kb-card-actions">
+                  <button class="icon-btn"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+                  <button class="icon-btn"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+                </div>
+              </div>
+              <div class="kb-card">
+                <div class="kb-card-icon"><i data-feather="file-text" style="width:17px;height:17px"></i></div>
+                <div class="kb-card-body">
+                  <div class="kb-card-title">Bank Indonesia Regulations</div>
+                  <div class="kb-card-file"><i data-feather="paperclip" style="width:11px;height:11px"></i>knowledge_base_bank_indonesia_detailed.pdf</div>
+                  <div class="kb-card-date">Updated Jun 4, 2026</div>
+                  <div class="kb-card-tags">
+                    <span class="pill pill-doc">Document</span>
+                    <span class="pill pill-domain"><i data-feather="folder" style="width:10px;height:10px"></i> Finance</span>
+                    <span class="pill pill-lang">EN</span>
+                    <span class="pill pill-sync">✓ Synced</span>
+                    <span class="pill pill-kp">ⓘ Knowledge Points Generated</span>
+                  </div>
+                </div>
+                <div class="kb-card-actions">
+                  <button class="icon-btn"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+                  <button class="icon-btn"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+                </div>
+              </div>
+              <div class="kb-card">
+                <div class="kb-card-icon"><i data-feather="file-text" style="width:17px;height:17px"></i></div>
+                <div class="kb-card-body">
+                  <div class="kb-card-title">Anti Money Laundering and Combating Financial Terrorism (June)</div>
+                  <div class="kb-card-file"><i data-feather="paperclip" style="width:11px;height:11px"></i>AML_CFT Training Materials.docx</div>
+                  <div class="kb-card-date">Updated Jun 2, 2026</div>
+                  <div class="kb-card-tags">
+                    <span class="pill pill-doc">Document</span>
+                    <span class="pill pill-domain"><i data-feather="folder" style="width:10px;height:10px"></i> Banking</span>
+                    <span class="pill pill-lang">EN</span>
+                    <span class="pill pill-sync">✓ Synced</span>
+                    <span class="pill pill-kp">ⓘ Knowledge Points Generated</span>
+                  </div>
+                </div>
+                <div class="kb-card-actions">
+                  <button class="icon-btn"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+                  <button class="icon-btn"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+                </div>
+              </div>
+              <div class="kb-card">
+                <div class="kb-card-icon"><i data-feather="file-text" style="width:17px;height:17px"></i></div>
+                <div class="kb-card-body">
+                  <div class="kb-card-title">New Employee Onboarding (Legal)</div>
+                  <div class="kb-card-file"><i data-feather="paperclip" style="width:11px;height:11px"></i>Onboarding New Employees Content.pdf</div>
+                  <div class="kb-card-date">Updated May 29, 2026</div>
+                  <div class="kb-card-tags">
+                    <span class="pill pill-doc">Document</span>
+                    <span class="pill pill-domain"><i data-feather="folder" style="width:10px;height:10px"></i> Legal</span>
+                    <span class="pill pill-lang">EN</span>
+                    <span class="pill pill-sync">✓ Synced</span>
+                    <span class="pill pill-kp">ⓘ Knowledge Points Generated</span>
+                  </div>
+                </div>
+                <div class="kb-card-actions">
+                  <button class="icon-btn"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+                  <button class="icon-btn"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+                </div>
+              </div>
+              <div class="kb-card" id="newRow" style="display:none" onclick="go('wizard')">
+                <div class="kb-card-icon"><i data-feather="file-text" style="width:17px;height:17px"></i></div>
+                <div class="kb-card-body">
+                  <div class="kb-card-title">Solana Protocol Deep Dive</div>
+                  <div class="kb-card-file"><i data-feather="paperclip" style="width:11px;height:11px"></i>solana-protocol.pdf · 1.2 MB</div>
+                  <div class="kb-card-date" id="newRowStats"><span id="nSkills">—</span> Skills · <span id="nQ">—</span> Questions · <span id="nS">—</span> Sessions</div>
+                  <div class="kb-card-tags">
+                    <span class="pill pill-doc">Document</span>
+                    <span class="pill pill-domain"><i data-feather="folder" style="width:10px;height:10px"></i> Blockchain</span>
+                    <span class="pill pill-lang">EN</span>
+                    <span id="nBadge"><span class="badge badge-blue">⟳ Processing</span></span>
+                  </div>
+                </div>
+                <div class="kb-card-actions">
+                  <button class="icon-btn"><i data-feather="edit-2" style="width:15px;height:15px"></i></button>
+                  <button class="icon-btn"><i data-feather="trash-2" style="width:15px;height:15px"></i></button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -818,14 +967,29 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
                   </label>
                 </div>
                 <div class="fg" id="targetLangWrap" style="display:none; margin-top:18px">
-                  <label class="fl">Target Language</label>
-                  <select class="fi" id="targetLangSelect">
-                    <option>Bahasa Indonesia</option>
-                    <option>Mandarin (Simplified)</option>
-                    <option>Spanish</option>
-                    <option>Vietnamese</option>
-                    <option>Thai</option>
-                  </select>
+                  <label class="fl">Target Language(s)</label>
+                  <div class="lang-check-list" id="langCheckList">
+                    <div class="lang-check-row" onclick="toggleLangChoice(this)">
+                      <div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div>
+                      <div class="lang-name">Bahasa Indonesia</div>
+                    </div>
+                    <div class="lang-check-row" onclick="toggleLangChoice(this)">
+                      <div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div>
+                      <div class="lang-name">Mandarin (Simplified)</div>
+                    </div>
+                    <div class="lang-check-row" onclick="toggleLangChoice(this)">
+                      <div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div>
+                      <div class="lang-name">Spanish</div>
+                    </div>
+                    <div class="lang-check-row" onclick="toggleLangChoice(this)">
+                      <div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div>
+                      <div class="lang-name">Vietnamese</div>
+                    </div>
+                    <div class="lang-check-row" onclick="toggleLangChoice(this)">
+                      <div class="lang-checkbox"><i data-feather="check" style="width:11px;height:11px;stroke-width:3"></i></div>
+                      <div class="lang-name">Thai</div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -993,7 +1157,7 @@ function selectLang(el) {
 }
 
 function startFlow() {
-  document.getElementById('newRow').style.display = 'grid';
+  document.getElementById('newRow').style.display = 'flex';
   go('wizard');
   showState('st-lang');
   setPanelHead('Generation Language','Choose the language for generating knowledge points');
@@ -1037,7 +1201,7 @@ function triggerReview1() {
   appState = 'review-skills';
   setStep(3,'warn'); setStepHint(3,'Review required');
   bwRow('bwr3','review','Review!');
-  widgetAlert(true,'⚠️ Review Required','Skills extracted — approval needed');
+  widgetAlert(true,'Review Required','Skills extracted — approval needed');
   document.getElementById('kbDot').style.display = 'block';
   document.getElementById('nBadge').innerHTML = '<span class="badge badge-amber">⏸ Review</span>';
   document.getElementById('nSkills').textContent = '17';
@@ -1086,7 +1250,7 @@ function triggerReview2() {
   appState = 'review-q';
   setStep(4,'warn'); setStepHint(4,'Review required');
   bwRow('bwr4','review','Review!');
-  widgetAlert(true,'⚠️ Review Required','422 questions ready for review');
+  widgetAlert(true,'Review Required','422 questions ready for review');
   document.getElementById('kbDot').style.display = 'block';
   document.getElementById('nBadge').innerHTML = '<span class="badge badge-amber">⏸ Review</span>';
   document.getElementById('nQ').textContent = '422';
@@ -1131,7 +1295,7 @@ function triggerReview3() {
   appState = 'review-lc';
   setStep(5,'warn'); setStepHint(5,'Review required');
   bwRow('bwr5','review','Review!');
-  widgetAlert(true,'⚠️ Review Required','51 learning sessions ready');
+  widgetAlert(true,'Review Required','51 learning sessions ready');
   document.getElementById('kbDot').style.display = 'block';
   document.getElementById('nBadge').innerHTML = '<span class="badge badge-amber">⏸ Review</span>';
   document.getElementById('nS').textContent = '51';
@@ -1172,8 +1336,18 @@ function toggleTargetLang(el) {
   }
 }
 
+function toggleLangChoice(el) {
+  el.classList.toggle('checked');
+}
+
+function getSelectedLangs() {
+  return Array.from(document.querySelectorAll('#langCheckList .lang-check-row.checked .lang-name')).map(el => el.textContent);
+}
+
 function doTranslateAndContinue() {
-  const lang = document.getElementById('targetLangSelect').value;
+  const langs = getSelectedLangs();
+  if(langs.length === 0) { doSkipTranslate(); return; }
+  const langStr = langs.join(', ');
   appState = 'confirm';
   setStep(6,'done'); setConn(6,true);
   setStep(7,'active');
@@ -1182,11 +1356,11 @@ function doTranslateAndContinue() {
   setPanelHead('Confirm & Save','');
   const val = document.querySelector('#st-confirm .lang-info-val');
   const note = document.querySelector('#st-confirm .lang-info-note');
-  if(val) val.textContent = 'English + ' + lang;
-  if(note) note.textContent = 'Both language versions will be saved. ' + lang + ' will become the default.';
+  if(val) val.textContent = 'English + ' + langStr;
+  if(note) note.textContent = 'All ' + (langs.length+1) + ' language versions will be saved. ' + langs[0] + ' will become the default.';
   setWizActions('⊙ Confirm & Save', doConfirmSave);
   showState('st-confirm');
-  toast('Translating to ' + lang + '...', '#ECFDF3', 3000, '#067647');
+  toast('Translating to ' + langStr + '...', '#ECFDF3', 3000, '#067647');
 }
 
 function doSkipTranslate() {
