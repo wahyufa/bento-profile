@@ -78,7 +78,19 @@
     .logo img { height: 36px; width: auto; display: block; }
 
     /* ════════════ HERO ════════════ */
-    .hero { text-align: center; padding: 72px 0 0; }
+    .hero { text-align: center; padding: 72px 0 0; position: relative; }
+    /* faint decorative grid (from Figma — very thin, ~2% black) */
+    .hero::before {
+      content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(0,0,0,.028) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(0,0,0,.028) 1px, transparent 1px);
+      background-size: 92px 92px;
+      background-position: center top;
+      -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 95%);
+      mask-image: linear-gradient(to bottom, #000 55%, transparent 95%);
+    }
+    .hero > .wrap, .hero .hero-stage { position: relative; z-index: 1; }
     .pill-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-bottom: 26px; }
     .pill { display: inline-flex; align-items: center; gap: 7px; background: var(--surface); border: 1px solid var(--line); padding: 7px 14px; border-radius: 100px; font-size: 12px; font-weight: 500; color: var(--ink-strong); box-shadow: var(--shadow-sm); }
     .pill i { color: var(--brand); font-size: 13px; }
@@ -111,7 +123,7 @@
     .sec-head p { margin-top: 14px; font-size: 16px; }
 
     /* ════════════ EXISTING CONTENT ════════════ */
-    .split { display: grid; grid-template-columns: 0.8fr 1.32fr; gap: 40px; align-items: center; }
+    .split { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 40px; align-items: center; }
     .split h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; margin: 14px 0 18px; }
     .split p.lead { font-size: 16px; margin-bottom: 26px; }
     .checks { display: flex; flex-direction: column; gap: 12px; }
@@ -160,6 +172,7 @@
     .seq .anim.fromleft { transform: translateX(-22px); }
     .seq .anim.fromright { transform: translateX(26px); }
     .seq .anim.pop { transform: scale(.5); }
+    .seq .anim.emerge { transform: translateX(-48px) scale(.42); transform-origin: left center; }
     .seq.play .anim { opacity: 1; transform: none; }
     @media (prefers-reduced-motion: reduce) { .seq .anim { opacity: 1 !important; transform: none !important; } }
 
@@ -171,11 +184,20 @@
 
     /* existing-content animated panel */
     .ac-panel { background: var(--brand-soft); border-radius: var(--radius); padding: 18px; display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center; }
-    .ac-files { display: flex; flex-direction: column; gap: 12px; }
+    .ac-files { display: flex; flex-direction: column; gap: 0px; }
     .ac-files img { width: 100%; height: auto; display: block; }
-    .ac-mark { width: 82px; height: auto; justify-self: center; }
-    .ac-cards { display: grid; grid-template-columns: repeat(2, 152px); gap: 0; }
-    .ac-cards img { width: 100%; height: auto; display: block; margin: -6px; }
+    .ac-mark { width: 82px; justify-self: center; position: relative; }
+    .ac-mark img { width: 100%; height: auto; display: block; }
+    /* ATLAS "processing" ripple */
+    .ac-pulse { position: absolute; inset: 6px; border-radius: 20px; pointer-events: none; }
+    .seq.play .ac-pulse { animation: process-pulse 1.2s ease-out 1s 2; }
+    @keyframes process-pulse {
+      0%   { box-shadow: 0 0 0 0 rgba(13,113,154,.45); }
+      100% { box-shadow: 0 0 0 28px rgba(13,113,154,0); }
+    }
+    @media (prefers-reduced-motion: reduce) { .seq.play .ac-pulse { animation: none; } }
+    .ac-cards { display: grid; grid-template-columns: repeat(2, 140px); gap: 12px; }
+    .ac-cards img { width: 100%; height: auto; display: block; }
 
     /* hero laptop + floating cards */
     .hero-laptop { position: relative; z-index: 2; display: block; width: 100%; margin: 0 auto; height: auto; }
@@ -374,16 +396,19 @@
       <div class="ac-panel seq reveal" data-d="1">
         <div class="ac-files">
           <img class="anim fromleft" style="transition-delay:.15s" src="assets/ac-file-1.png" alt="Handbook.pdf">
-          <img class="anim fromleft" style="transition-delay:.28s" src="assets/ac-file-2.png" alt="SOP_v4.docx">
-          <img class="anim fromleft" style="transition-delay:.41s" src="assets/ac-file-3.png" alt="Onboarding.pptx">
-          <img class="anim fromleft" style="transition-delay:.54s" src="assets/ac-file-4.png" alt="Safety.mp4">
+          <img class="anim fromleft" style="transition-delay:.30s" src="assets/ac-file-2.png" alt="SOP_v4.docx">
+          <img class="anim fromleft" style="transition-delay:.45s" src="assets/ac-file-3.png" alt="Onboarding.pptx">
+          <img class="anim fromleft" style="transition-delay:.60s" src="assets/ac-file-4.png" alt="Safety.mp4">
         </div>
-        <img class="ac-mark anim pop" style="transition-delay:.78s" src="assets/ac-mark.png" alt="ATLAS">
+        <div class="ac-mark anim pop" style="transition-delay:.9s">
+          <img src="assets/ac-mark.png" alt="ATLAS">
+          <span class=""></span>
+        </div>
         <div class="ac-cards">
-          <img class="anim pop" style="transition-delay:1s"    src="assets/ac-card-1.png" alt="PALS Course — Patient Safety Essentials">
-          <img class="anim pop" style="transition-delay:1.13s" src="assets/ac-card-2.png" alt="CBL Module — Onboarding Pathway">
-          <img class="anim pop" style="transition-delay:1.26s" src="assets/ac-card-3.png" alt="Assessment — Customer Identity Verification">
-          <img class="anim pop" style="transition-delay:1.39s" src="assets/ac-card-4.png" alt="Insights — Performance Insights">
+          <img class="anim emerge" style="transition-delay:1.45s" src="assets/ac-card-1.png" alt="PALS Course — Patient Safety Essentials">
+          <img class="anim emerge" style="transition-delay:1.60s" src="assets/ac-card-2.png" alt="CBL Module — Onboarding Pathway">
+          <img class="anim emerge" style="transition-delay:1.75s" src="assets/ac-card-3.png" alt="Assessment — Customer Identity Verification">
+          <img class="anim emerge" style="transition-delay:1.90s" src="assets/ac-card-4.png" alt="Insights — Performance Insights">
         </div>
       </div>
     </div>
