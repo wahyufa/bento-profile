@@ -115,12 +115,12 @@
     .split h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; margin: 14px 0 18px; }
     .split p.lead { font-size: 16px; margin-bottom: 26px; }
     .checks { display: flex; flex-direction: column; gap: 12px; }
-    .check { display: inline-flex; align-items: center; gap: 11px; align-self: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 100px; padding: 11px 18px; font-size: 14px; font-weight: 500; color: var(--ink-strong); box-shadow: var(--shadow-sm); }
+    .check { display: inline-flex; align-items: center; gap: 11px; align-self: flex-start; background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 11px 18px; font-size: 14px; font-weight: 500; color: var(--ink-strong); box-shadow: var(--shadow-sm); }
     .check i { font-size: 17px; color: var(--brand); flex: 0 0 auto; }
     .panel-img { width: 100%; height: auto; display: block; border-radius: var(--radius); }
 
     /* ════════════ FEATURE ROWS ════════════ */
-    .feature { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; padding: 44px 0; }
+    .feature { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
     .feature.flip .f-text { order: 2; }
     .f-text .eyebrow { display: block; margin-bottom: 12px; }
     .f-text h2 { font-size: clamp(26px, 3.4vw, 40px); font-weight: 700; margin-bottom: 18px; }
@@ -216,7 +216,7 @@
 
     /* ════════════ FOOTER ════════════ */
     footer { background: var(--dark); margin-top: 64px; }
-    .footer-inner { display: flex; align-items: center; justify-content: space-between; padding: 30px 0; gap: 20px; flex-wrap: wrap; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; padding-top: 30px; padding-bottom: 30px; gap: 20px; flex-wrap: wrap; }
     .footer-inner small { color: rgba(255,255,255,.75); font-size: 14px; }
     .footer-links { display: flex; gap: 28px; }
     .footer-links a { color: rgba(255,255,255,.85); font-size: 14px; text-decoration: none; }
@@ -236,6 +236,32 @@
     /* feature band sections */
     .band { padding: 80px 0; }
     .band-grey { background: #dde3eb; }
+
+    /* ── looping / ambient animations ── */
+    /* 1. hero floating cards gentle bob (entrance on wrapper, bob on inner img) */
+    .hero-fc > img { width: 100%; height: auto; display: block; }
+    .bob { animation: bob 4.5s ease-in-out infinite; }
+    @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+
+    /* 2. ambient glow blobs behind the hero laptop */
+    .hero-stage .glow { position: absolute; z-index: 0; border-radius: 50%; filter: blur(64px); opacity: .5; pointer-events: none; }
+    .glow-a { width: 460px; height: 460px; left: 3%; top: 4%; background: radial-gradient(circle, rgba(13,113,154,.45), transparent 70%); animation: drift-a 15s ease-in-out infinite alternate; }
+    .glow-b { width: 420px; height: 420px; right: 3%; bottom: -4%; background: radial-gradient(circle, rgba(22,160,201,.42), transparent 70%); animation: drift-b 17s ease-in-out infinite alternate; }
+    @keyframes drift-a { from { transform: translate(0,0) scale(1); } to { transform: translate(44px,32px) scale(1.12); } }
+    @keyframes drift-b { from { transform: translate(0,0) scale(1); } to { transform: translate(-48px,-28px) scale(1.1); } }
+
+    /* 3. live pulsing dot */
+    .live-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: #19b36b; margin-right: 9px; position: relative; vertical-align: baseline; }
+    .live-dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: #19b36b; animation: ping 1.9s cubic-bezier(0,0,.2,1) infinite; }
+    @keyframes ping { 0% { transform: scale(1); opacity: .7; } 80%, 100% { transform: scale(2.8); opacity: 0; } }
+
+    /* 4. CTA button breathing glow */
+    .btn-glow { animation: breathe 2.8s ease-in-out infinite; }
+    @keyframes breathe { 0%, 100% { box-shadow: 0 12px 24px -12px rgba(13,113,154,.7); } 50% { box-shadow: 0 14px 44px -6px rgba(13,113,154,.95); } }
+
+    @media (prefers-reduced-motion: reduce) {
+      .bob, .glow-a, .glow-b, .live-dot::after, .btn-glow { animation: none !important; }
+    }
 
     /* ════════════ RESPONSIVE ════════════ */
     @media (max-width: 900px) {
@@ -274,8 +300,8 @@
     <div class="wrap">
       <div class="pill-row reveal">
         <span class="pill"><i class="ph-fill ph-circle"></i>AI-Powered Workforce Learning</span>
-        <span class="pill"><i class="ph-fill ph-circle"></i>Competency-Based Learning</span>
-        <span class="pill"><i class="ph-fill ph-circle"></i>AI Content Generation</span>
+        <span class="pill"><i class="ph-fill ph-circle" style="color: #F15D22;"></i>Competency-Based Learning</span>
+        <span class="pill"><i class="ph-fill ph-circle" style="color: #0CAD60;"></i>AI Content Generation</span>
       </div>
       <h1 class="reveal" data-d="1">Elevate Corporate Knowledge Into Personalised Learning</h1>
       <p class="sub reveal" data-d="2">ATLAS transforms your documents, SOPs, and decks into bite-sized, interactive learning — personalised to each employee, adaptive in real time, and built around real practice and proven mastery.</p>
@@ -283,10 +309,12 @@
     </div>
 
     <div class="hero-stage seq" data-d="3">
+      <span class="glow glow-a"></span>
+      <span class="glow glow-b"></span>
       <img class="hero-laptop anim" style="transition-delay:.1s" src="assets/hero-laptop.png" alt="ATLAS learner dashboard">
-      <img class="hero-fc hero-fc-left anim pop" style="transition-delay:.5s" src="assets/hero-card-left.png" alt="AI course recommendations">
-      <img class="hero-fc hero-fc-badge anim pop" style="transition-delay:.68s" src="assets/hero-badge.png" alt="">
-      <img class="hero-fc hero-fc-person anim pop" style="transition-delay:.86s" src="assets/hero-person.png" alt="Personalised learning">
+      <div class="hero-fc hero-fc-left anim pop" style="transition-delay:.5s"><img class="bob" style="animation-delay:0s" src="assets/hero-card-left.png" alt="AI course recommendations"></div>
+      <div class="hero-fc hero-fc-badge anim pop" style="transition-delay:.68s"><img class="bob" style="animation-delay:.9s" src="assets/hero-badge.png" alt=""></div>
+      <div class="hero-fc hero-fc-person anim pop" style="transition-delay:.86s"><img class="bob" style="animation-delay:1.7s" src="assets/hero-person.png" alt="Personalised learning"></div>
     </div>
   </header>
 
@@ -415,7 +443,7 @@
         <img class="l-card anim" style="left:4.3%;top:7.9%;width:41.1%;transition-delay:.55s" src="assets/pa-card.png" alt="Skill Analytics chart">
       </div>
       <div class="f-text reveal" data-d="1">
-        <span class="eyebrow">Performance Analytics</span>
+        <span class="eyebrow"><span class="live-dot"></span>Performance Analytics</span>
         <h2>Prove Training Works with Live Performance Analytics</h2>
         <p>Turn every learning interaction into measurable insight with per-employee skill mastery maps, team-wide gap reports, and board-ready ROI dashboards — so leadership sees exactly where skills are growing and where training spend is paying off.</p>
         <div class="checks">
@@ -487,7 +515,7 @@
         <div class="cta-inner">
           <h2>Let's grow together with ATLAS</h2>
           <p>4 out of 5 professionals master their learning faster with ATLAS. Stay ahead. Unlock tomorrow's growth, today.</p>
-          <a class="btn btn-brand" href="#">Book a Demo <i class="ph-bold ph-arrow-right"></i></a>
+          <a class="btn btn-brand btn-glow" href="#">Book a Demo <i class="ph-bold ph-arrow-right"></i></a>
         </div>
       </div>
     </div>
