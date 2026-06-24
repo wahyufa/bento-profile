@@ -111,7 +111,7 @@
     .sec-head p { margin-top: 14px; font-size: 16px; }
 
     /* ════════════ EXISTING CONTENT ════════════ */
-    .split { display: grid; grid-template-columns: 1fr 1.1fr; gap: 60px; align-items: center; }
+    .split { display: grid; grid-template-columns: 0.8fr 1.32fr; gap: 40px; align-items: center; }
     .split h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 700; margin: 14px 0 18px; }
     .split p.lead { font-size: 16px; margin-bottom: 26px; }
     .checks { display: flex; flex-direction: column; gap: 12px; }
@@ -170,12 +170,12 @@
     .f-visual.layered .l-person { left: 0; top: 0; width: 100%; height: 100%; object-fit: cover; }
 
     /* existing-content animated panel */
-    .ac-panel { background: var(--brand-soft); border-radius: var(--radius); padding: 34px; display: grid; grid-template-columns: 1fr auto 1fr; gap: 22px; align-items: center; }
-    .ac-files { display: flex; flex-direction: column; gap: 13px; }
+    .ac-panel { background: var(--brand-soft); border-radius: var(--radius); padding: 18px; display: grid; grid-template-columns: 1fr auto auto; gap: 14px; align-items: center; }
+    .ac-files { display: flex; flex-direction: column; gap: 12px; }
     .ac-files img { width: 100%; height: auto; display: block; }
-    .ac-mark { width: 66px; height: auto; justify-self: center; }
-    .ac-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 13px; }
-    .ac-cards img { width: 100%; height: auto; display: block; }
+    .ac-mark { width: 82px; height: auto; justify-self: center; }
+    .ac-cards { display: grid; grid-template-columns: repeat(2, 152px); gap: 0; }
+    .ac-cards img { width: 100%; height: auto; display: block; margin: -6px; }
 
     /* hero laptop + floating cards */
     .hero-laptop { position: relative; z-index: 2; display: block; width: 100%; margin: 0 auto; height: auto; }
@@ -200,8 +200,10 @@
     .uc-left p { font-size: 15px; margin-bottom: 22px; }
     .uc-tags { display: flex; gap: 10px; flex-wrap: wrap; }
     .uc-tags span { background: var(--brand-soft); color: var(--brand-2); font-size: 12px; font-weight: 600; padding: 8px 14px; border-radius: 100px; }
-    .uc-right { background: var(--cream); position: relative; }
-    .uc-right img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .uc-right { background: var(--cream); position: relative; aspect-ratio: 566 / 457; align-self: center; }
+    .uc-right img { position: absolute; height: auto; display: block; }
+    .uc-radar { left: 6%;  top: 4%;    width: 73.5%; }
+    .uc-pop   { left: 45%; top: 57.7%; width: 47%; }
 
     /* ════════════ CTA ════════════ */
     .cta-wrap { padding: 84px 0 0; }
@@ -231,20 +233,29 @@
     @keyframes marquee { to { transform: translateX(-50%); } }
     @media (prefers-reduced-motion: reduce) { .marquee-track { animation: none; } }
 
+    /* feature band sections */
+    .band { padding: 80px 0; }
+    .band-grey { background: #dde3eb; }
+
     /* ════════════ RESPONSIVE ════════════ */
     @media (max-width: 900px) {
-      .split, .feature, .uc-card { grid-template-columns: 1fr; }
+      .split, .feature, .uc-card { grid-template-columns: 1fr; gap: 36px; }
       .feature.flip .f-text { order: 0; }
       .intel-grid { grid-template-columns: 1fr; }
       .block-wrap { padding: 44px 22px; }
       .hero-stage { padding-bottom: 30px; }
-      .float { display: none; }
-      .uc-right { min-height: 360px; }
+      .float, .hero-fc { display: none; }
+      /* stack the existing-content panel vertically */
+      .ac-panel { grid-template-columns: 1fr; justify-items: center; gap: 24px; }
+      .ac-files { width: 100%; max-width: 380px; }
     }
     @media (max-width: 560px) {
       section { padding: 56px 0; }
+      .band { padding: 52px 0; }
       .footer-inner { flex-direction: column; align-items: flex-start; }
       .marquee-track img { height: 30px; margin-right: 44px; }
+      .hero h1 { font-size: 30px; }
+      .sec-head h2, .split h2, .f-text h2 { font-size: 26px; }
     }
   </style>
 </head>
@@ -327,9 +338,9 @@
         <h2>Existing content.<br>Extraordinary learning.</h2>
         <p class="lead">ATLAS digitises your Word docs, slides, SOPs, and videos with OCR and generative AI, then reshapes them into the formats that keep employees engaged — flashcards, flip cards, lessons, and assessments — on-brand and ready to launch in minutes.</p>
         <div class="checks">
-          <span class="check"><i class="ph-bold ph-check"></i>OCR + generative AI digitisation</span>
-          <span class="check"><i class="ph-bold ph-check"></i>Flashcards, flip cards, videos &amp; quizzes</span>
-          <span class="check"><i class="ph-bold ph-check"></i>On-brand content, ready in minutes</span>
+          <span class="check"><i class="ph-bold ph-file-magnifying-glass"></i>OCR + generative AI digitisation</span>
+          <span class="check"><i class="ph-bold ph-cards"></i>Flashcards, flip cards, videos &amp; quizzes</span>
+          <span class="check"><i class="ph-bold ph-lightning"></i>On-brand content, ready in minutes</span>
         </div>
       </div>
       <div class="ac-panel seq reveal" data-d="1">
@@ -351,7 +362,7 @@
   </section>
 
   <!-- ═══ FEATURE 1 — PALS ═══ -->
-  <section style="padding-top:24px;padding-bottom:24px;">
+  <section class="band band-grey">
     <div class="wrap feature">
       <div class="f-visual layered seq" aria-label="Personalised adaptive learning session">
         <img class="l-bg" src="assets/pl-bg.png" alt="">
@@ -363,25 +374,25 @@
         <h2>Bridge Skill Gaps with Personalised Adaptive Learning (PALS)</h2>
         <p>ATLAS maps each employee's competencies, pinpoints real skill gaps, and adapts their learning path in real time — delivering bite-sized, personalised content so every learner gets exactly what they need to grow.</p>
         <div class="checks">
-          <span class="check"><i class="ph-bold ph-check"></i>AI-powered paths per role and level</span>
-          <span class="check"><i class="ph-bold ph-check"></i>Bite-sized modules from your own documents</span>
-          <span class="check"><i class="ph-bold ph-check"></i>Real-time progress tracking per learner</span>
+          <span class="check"><i class="ph-bold ph-path"></i>AI-powered paths per role and level</span>
+          <span class="check"><i class="ph-bold ph-files"></i>Bite-sized modules from your own documents</span>
+          <span class="check"><i class="ph-bold ph-chart-line-up"></i>Real-time progress tracking per learner</span>
         </div>
       </div>
     </div>
   </section>
 
   <!-- ═══ FEATURE 2 — Role-play ═══ -->
-  <section style="padding-top:24px;padding-bottom:24px;">
-    <div class="wrap feature flip">
+  <section class="band">
+    <div class="wrap feature">
       <div class="f-text reveal">
         <span class="eyebrow">Competency-Based Learning</span>
         <h2>Master Real Skills with AI Scenario Role-Play</h2>
         <p>Let employees rehearse real workplace conversations with lifelike AI personas through text or speech, then receive rubric-based evaluation reports that show exactly where to improve — all in a safe-to-fail space before the stakes are real.</p>
         <div class="checks">
-          <span class="check"><i class="ph-bold ph-check"></i>Text or speech role-play with AI personas</span>
-          <span class="check"><i class="ph-bold ph-check"></i>Rubric-based evaluation reports</span>
-          <span class="check"><i class="ph-bold ph-check"></i>Safe-to-fail practice environment</span>
+          <span class="check"><i class="ph-bold ph-chats-circle"></i>Text or speech role-play with AI personas</span>
+          <span class="check"><i class="ph-bold ph-clipboard-text"></i>Rubric-based evaluation reports</span>
+          <span class="check"><i class="ph-bold ph-shield-check"></i>Safe-to-fail practice environment</span>
         </div>
       </div>
       <div class="f-visual rp" data-d="1" aria-label="AI scenario role-play conversation">
@@ -396,7 +407,7 @@
   </section>
 
   <!-- ═══ FEATURE 3 — Analytics ═══ -->
-  <section style="padding-top:24px;padding-bottom:60px;">
+  <section class="band band-grey">
     <div class="wrap feature">
       <div class="f-visual layered seq" aria-label="Live performance analytics">
         <img class="l-bg" src="assets/pa-bg.png" alt="">
@@ -408,9 +419,9 @@
         <h2>Prove Training Works with Live Performance Analytics</h2>
         <p>Turn every learning interaction into measurable insight with per-employee skill mastery maps, team-wide gap reports, and board-ready ROI dashboards — so leadership sees exactly where skills are growing and where training spend is paying off.</p>
         <div class="checks">
-          <span class="check"><i class="ph-bold ph-check"></i>Per-employee skill mastery maps</span>
-          <span class="check"><i class="ph-bold ph-check"></i>Team-wide skill gap reports</span>
-          <span class="check"><i class="ph-bold ph-check"></i>Board-ready ROI dashboards</span>
+          <span class="check"><i class="ph-bold ph-target"></i>Per-employee skill mastery maps</span>
+          <span class="check"><i class="ph-bold ph-chart-bar"></i>Team-wide skill gap reports</span>
+          <span class="check"><i class="ph-bold ph-presentation-chart"></i>Board-ready ROI dashboards</span>
         </div>
       </div>
     </div>
@@ -460,7 +471,10 @@
           <p class="anim" style="transition-delay:.25s">Keeping your workforce ahead of evolving industries — and your business ahead of the competition.</p>
           <div class="uc-tags anim" style="transition-delay:.4s"><span>Skills Analytics</span><span>AI Recommendations</span></div>
         </div>
-        <div class="uc-right"><img class="anim fromright" style="transition-delay:.35s" src="assets/section%20use%20cases.png" alt="Skills analytics and AI recommendations"></div>
+        <div class="uc-right">
+          <img class="uc-radar anim pop" style="transition-delay:.55s" src="assets/uc-card.png" alt="Skills analytics radar chart">
+          <img class="uc-pop anim fromright" style="transition-delay:.95s" src="assets/uc-popup.png" alt="ATLAS AI: skill gap detected">
+        </div>
       </div>
     </div>
   </section>
