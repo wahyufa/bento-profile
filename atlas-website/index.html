@@ -78,7 +78,7 @@
     .logo img { height: 36px; width: auto; display: block; }
 
     /* ════════════ HERO ════════════ */
-    .hero { text-align: center; padding: 72px 0 0; position: relative; }
+    .hero { text-align: center; padding: 72px 0 0; position: relative; overflow: hidden; }
     /* faint decorative grid (from Figma — very thin, ~2% black) */
     .hero::before {
       content: ""; position: absolute; inset: 0; z-index: 0; pointer-events: none;
@@ -337,6 +337,7 @@
       .block-wrap { padding: 44px 22px; }
       .hero-stage { padding-bottom: 30px; }
       .float, .hero-fc { display: none; }
+      .glow-a, .glow-b { width: 60vw; height: 60vw; filter: blur(40px); }
       /* stack the existing-content panel vertically */
       .ac-panel { grid-template-columns: 1fr; justify-items: center; gap: 24px; }
       .ac-files { width: 100%; max-width: 380px; }
