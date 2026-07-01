@@ -1,0 +1,3219 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atlas Learner Performance</title>
+    <style>
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap");
+
+@property --value {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --line: #dfe5ec;
+  --text: #162338;
+  --muted: #657184;
+  --navy: #31435e;
+  --blue: #147fa4;
+  --cyan: #20b9cb;
+  --yellow: #ffbf2e;
+  --shadow: 0 10px 24px rgba(16, 24, 40, 0.06);
+  font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  color: var(--text);
+}
+
+h1,
+h2,
+h3,
+.card-value,
+.course-card strong {
+  font-family: Montserrat, sans-serif;
+}
+
+button,
+a,
+select {
+  font: inherit;
+}
+
+.topnav {
+  height: 65px;
+  max-height: 65px;
+  background: #fff;
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-inner {
+  height: 100%;
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 0 72px;
+  display: grid;
+  grid-template-columns: 250px 1fr 120px;
+  align-items: center;
+}
+
+.brand {
+  width: 145px;
+}
+
+.topnav nav {
+  display: flex;
+  justify-content: center;
+  gap: 42px;
+  height: 100%;
+}
+
+.topnav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: #6b7280;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 500;
+}
+
+.topnav a.active {
+  color: #087ca5;
+  font-weight: 800;
+}
+
+.topnav a.active::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 42px;
+  height: 5px;
+  border-radius: 999px 999px 0 0;
+  background: var(--yellow);
+  transform: translateX(-50%);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 20px;
+}
+
+.nav-actions button {
+  width: 32px;
+  height: 32px;
+  border: 0;
+  background: transparent;
+  color: #087ca5;
+  cursor: pointer;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #22bfd0;
+  color: #fff;
+  font-weight: 800;
+}
+
+.hero {
+  min-height: 188px;
+  max-height: 188px;
+  background:
+    radial-gradient(ellipse at -6% 50%, transparent 0 17%, rgba(255,255,255,.08) 17.3% 17.6%, transparent 18% 100%),
+    repeating-radial-gradient(ellipse at -6% 50%, transparent 0 135px, rgba(255,255,255,.07) 137px 139px),
+    var(--navy);
+  color: #fff;
+}
+
+.hero-inner {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 42px 72px 28px;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: 38px;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+.hero p {
+  margin: 16px 0 0;
+  font-size: 18px;
+}
+
+.date-band {
+  height: 72px;
+  background: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.date-filter {
+  width: 380px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  color: #7a8495;
+  font-size: 16px;
+}
+
+.content {
+  max-width: 1700px;
+  margin: 0 auto;
+  padding: 24px 72px 80px;
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 8px;
+  padding: 6px;
+  border-radius: 14px;
+  background: #edf1f5;
+  margin-bottom: 16px;
+}
+
+.tab {
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  padding: 11px 22px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 2px 5px rgba(16, 24, 40, 0.08);
+}
+
+.breadcrumb {
+  min-height: 30px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.breadcrumb button,
+.back-button {
+  border: 1px solid var(--blue);
+  border-radius: 10px;
+  background: #fff;
+  color: var(--blue);
+  font-weight: 800;
+  cursor: pointer;
+  padding: 9px 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.breadcrumb button {
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: 30px;
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  padding: 32px;
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.donut-card {
+  min-height: 430px;
+}
+
+.donut-wrap {
+  min-height: 310px;
+  display: grid;
+  place-items: center;
+}
+
+.donut {
+  --size: 210px;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--ring-color, var(--blue)) calc(var(--value) * 1%), #e5e8ed 0);
+  position: relative;
+}
+
+.donut::before {
+  content: "";
+  position: absolute;
+  inset: 34px;
+  border-radius: inherit;
+  background: #fff;
+}
+
+.donut-content {
+  position: relative;
+  text-align: center;
+}
+
+.donut-content strong {
+  display: block;
+  font-size: 30px;
+  line-height: 1;
+}
+
+.donut-content span {
+  display: block;
+  margin-top: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.course-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(210px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+
+.course-tile {
+  min-height: 250px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(16, 24, 40, 0.04);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.course-tile:hover {
+  border-color: #8ccedf;
+  box-shadow: 0 14px 28px rgba(20, 127, 164, .13);
+  transform: translateY(-2px);
+}
+
+.course-tile:focus-visible {
+  outline: 3px solid rgba(20, 127, 164, .25);
+  outline-offset: 3px;
+}
+
+.course-tile-ring {
+  display: grid;
+  place-items: center;
+  min-height: 152px;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.course-tile-ring > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.course-tile-copy {
+  margin-top: 10px;
+}
+
+.course-tile-copy strong {
+  display: block;
+  font-family: Montserrat, sans-serif;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.course-tile-copy span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.course-tile-footer {
+  margin-top: auto;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.course-tile-footer > span {
+  justify-self: end;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.course-tile .progress-wrap {
+  grid-template-columns: 1fr 38px;
+}
+
+.course-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(220px, 1fr));
+  gap: 22px;
+}
+
+.course-card {
+  min-height: 254px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  position: relative;
+  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.course-card:hover {
+  border-color: #a9d8e7;
+  box-shadow: 0 12px 26px rgba(20, 127, 164, .12);
+  transform: translateY(-2px);
+}
+
+.ring-wrap {
+  display: grid;
+  place-items: center;
+  flex: 1;
+}
+
+.ring {
+  --size: 112px;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: conic-gradient(var(--ring-color, var(--blue)) calc(var(--value) * 1%), #e7ebf0 0);
+  position: relative;
+  animation: ring-grow 0.9s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes ring-grow {
+  from { --value: 0; }
+}
+
+.ring::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border-radius: inherit;
+  background: #fff;
+}
+
+.ring b {
+  position: relative;
+  font-size: 15px;
+}
+
+.course-card strong {
+  display: block;
+  font-size: 14px;
+}
+
+.course-card span {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.course-card::after {
+  content: "View details";
+  position: absolute;
+  right: 18px;
+  bottom: 18px;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.detail-head,
+.skills-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.detail-head p,
+.skills-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.detail-grid,
+.skills-grid {
+  display: grid;
+  grid-template-columns: minmax(480px, .95fr) minmax(430px, 1.05fr);
+  gap: 24px;
+}
+
+.detail-grid {
+  grid-template-columns: minmax(420px, .82fr) minmax(480px, 1.18fr);
+  align-items: start;
+}
+
+.sticky-radar {
+  position: sticky;
+  top: 24px;
+}
+
+.radar-wrap {
+  min-height: 360px;
+  display: grid;
+  place-items: center;
+}
+
+.radar {
+  width: 440px;
+  height: 420px;
+  overflow: visible;
+}
+
+.radar polygon.grid {
+  fill: none;
+  stroke: #edf0f3;
+  stroke-width: 4;
+}
+
+.radar line {
+  stroke: #eef1f4;
+  stroke-width: 4;
+}
+
+.radar polygon.value {
+  fill: rgba(20, 127, 164, .22);
+  stroke: var(--blue);
+  stroke-width: 3;
+  transform-origin: 200px 200px;
+  animation: radar-grow 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes radar-grow {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+.radar text {
+  fill: #344054;
+  stroke: none;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.breakdown {
+  display: grid;
+  gap: 14px;
+}
+
+.taxonomy-section {
+  margin-top: 0;
+}
+
+.sticky-radar h2,
+.taxonomy-section h2 {
+  font-size: 18px;
+  margin-bottom: 14px;
+}
+
+.strand-card {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.strand-card[open] {
+  background: #fff;
+}
+
+.strand-card summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.strand-card summary::-webkit-details-marker,
+.substrand-card summary::-webkit-details-marker {
+  display: none;
+}
+
+.strand-head {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 170px 18px;
+  gap: 16px;
+  align-items: center;
+  padding: 15px 16px;
+  background: #fbfcfd;
+}
+
+.chevron {
+  color: var(--blue);
+  display: inline-flex;
+  transition: transform .16s ease;
+}
+
+.chevron svg {
+  width: 16px;
+  height: 16px;
+}
+
+.strand-card:not([open]) .strand-head .chevron,
+.substrand-card:not([open]) .substrand-head .chevron {
+  transform: rotate(-90deg);
+}
+
+.strand-head strong,
+.skill-row strong {
+  display: block;
+  font-size: 12px;
+}
+
+.strand-head small,
+.skill-row span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.progress-wrap {
+  display: grid;
+  grid-template-columns: 1fr 38px;
+  align-items: center;
+  gap: 10px;
+}
+
+.progress {
+  height: 8px;
+  border-radius: 999px;
+  background: #e7ebf0;
+  overflow: hidden;
+}
+
+.progress span {
+  display: block;
+  width: var(--value);
+  height: 100%;
+  background: var(--bar-color, var(--blue));
+}
+
+.course-overview-panel {
+  max-width: none;
+}
+
+.progress-wrap b {
+  text-align: right;
+  font-size: 12px;
+}
+
+.topic-list {
+  padding: 8px 16px 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.substrand-card {
+  border-top: 1px solid #eef2f6;
+  padding: 10px 0;
+}
+
+.substrand-card:first-child {
+  border-top: 0;
+}
+
+.substrand-head {
+  display: grid;
+  grid-template-columns: minmax(230px, 1fr) 170px 18px;
+  align-items: center;
+  gap: 14px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.substrand-head strong {
+  display: block;
+  font-size: 14px;
+}
+
+.topic-rows {
+  display: grid;
+  gap: 7px;
+  margin-top: 8px;
+  padding-left: 14px;
+}
+
+.topic-row {
+  display: grid;
+  grid-template-columns: minmax(230px, 1fr) 150px 42px;
+  gap: 12px;
+  align-items: center;
+  font-size: 12px;
+  padding: 8px 0;
+}
+
+.topic-row span {
+  min-width: 0;
+  display: block;
+}
+
+.topic-row .progress,
+.substrand-head .progress,
+.strand-head .progress {
+  width: 100%;
+}
+
+.skills-summary {
+  min-width: 120px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 12px 14px;
+  text-align: center;
+}
+
+.skills-summary strong {
+  display: block;
+  font-size: 20px;
+  line-height: 1;
+}
+
+.skills-summary span {
+  color: var(--muted);
+  font-size: 11px;
+}
+
+.skill-list {
+  display: grid;
+  gap: 12px;
+}
+
+.skill-row {
+  display: grid;
+  grid-template-columns: 1fr 160px;
+  gap: 16px;
+  align-items: center;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.skill-row:last-child {
+  border-bottom: 0;
+}
+
+.cbl-head {
+  margin-bottom: 18px;
+}
+
+.cbl-head h2,
+.cbl-panel-head h2 {
+  margin: 0;
+  font-size: 21px;
+}
+
+.cbl-head p,
+.cbl-panel-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.cbl-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.cbl-stat {
+  min-height: 96px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+.cbl-stat span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cbl-stat strong {
+  display: block;
+  margin-top: 8px;
+  font-family: Montserrat, sans-serif;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.cbl-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: flex-start;
+  margin-bottom: 18px;
+}
+
+.cbl-panel-head > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cbl-list {
+  display: grid;
+  gap: 12px;
+}
+
+.cbl-tile-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(190px, 1fr));
+  gap: 14px;
+}
+
+.cbl-tile {
+  min-height: 286px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+.cbl-tile:hover {
+  border-color: #a7d3e3;
+  box-shadow: 0 12px 24px rgba(15, 23, 42, .07);
+  transform: translateY(-2px);
+}
+
+.cbl-tile-ring {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 10px;
+}
+
+.cbl-score-caption {
+  display: block;
+  margin-bottom: 20px;
+  color: var(--muted);
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.empty-ring {
+  background: conic-gradient(#e7ebf0 100%, #e7ebf0 0);
+}
+
+.cbl-tile-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cbl-tile-meta strong {
+  color: var(--ink);
+  font-size: 12px;
+  text-align: right;
+}
+
+.cbl-tile .cbl-action {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+.cbl-tile .cbl-action::before {
+  content: "";
+}
+
+.cbl-tile .cbl-action:has(.mode-pill)::before {
+  display: none;
+}
+
+.cbl-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 120px minmax(200px, 280px) 140px;
+  align-items: center;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.cbl-title strong,
+.cbl-stage strong {
+  display: block;
+  font-family: Montserrat, sans-serif;
+  font-size: 14px;
+}
+
+.mode-label {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+}
+
+.mode-label svg {
+  width: 15px;
+  height: 15px;
+  color: var(--blue);
+}
+
+.cbl-title span,
+.cbl-stage span,
+.cbl-milestone > span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cbl-title span {
+  margin-top: 5px;
+}
+
+.cbl-stage strong {
+  margin-top: 5px;
+}
+
+.cbl-milestone > span {
+  margin-bottom: 8px;
+}
+
+.cbl-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cbl-action .mode-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  background: #eef6f8;
+  color: var(--blue);
+  padding: 5px 9px;
+  font-size: 11px;
+  font-weight: 800;
+  text-align: right;
+}
+
+.cbl-action .mode-pill svg {
+  width: 13px;
+  height: 13px;
+}
+
+.no-attempt-score {
+  color: var(--muted);
+  font-size: 12px;
+  padding: 7px 0;
+}
+
+.cbl-action button {
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--blue);
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cbl-detail {
+  padding: 40px;
+}
+
+.cbl-detail .detail-head {
+  margin-bottom: 30px;
+}
+
+.cbl-detail .detail-head h2 {
+  max-width: 880px;
+  line-height: 1.28;
+}
+
+.cbl-detail .detail-head p {
+  margin-top: 10px;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.cbl-detail-summary {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(120px, 1fr));
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.cbl-detail-summary article {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 18px;
+  background: #fff;
+}
+
+.cbl-detail-summary span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.cbl-detail-summary strong {
+  display: block;
+  margin-top: 9px;
+  font-family: Montserrat, sans-serif;
+  font-size: 20px;
+}
+
+.cbl-detail-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(280px, .75fr);
+  gap: 32px;
+}
+
+.cbl-detail-actions {
+  display: flex;
+  gap: 10px;
+  margin: -10px 0 24px;
+}
+
+.case-context {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}
+
+.case-context {
+  margin-bottom: 26px;
+}
+
+.case-context summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 17px 18px;
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+  list-style: none;
+}
+
+.case-context summary::-webkit-details-marker {
+  display: none;
+}
+
+.case-context summary svg {
+  width: 16px;
+  height: 16px;
+  color: var(--blue);
+  transition: transform .18s ease;
+}
+
+.case-context[open] summary svg {
+  transform: rotate(180deg);
+}
+
+.case-context-body {
+  border-top: 1px solid var(--line);
+  padding: 20px 18px 22px;
+}
+
+.case-context-body p {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.case-context-body .role-grid {
+  margin: 0 0 24px;
+}
+
+.case-context-body h3 {
+  margin: 0 0 10px;
+  font-family: Montserrat, sans-serif;
+  font-size: 15px;
+}
+
+.case-context-body .criteria-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.feedback-summary {
+  margin-bottom: 32px;
+  border: 1px solid #c9e1ea;
+  border-radius: 12px;
+  background: #f6fbfd;
+  padding: 22px;
+}
+
+.feedback-summary h3 {
+  margin: 0;
+  font-family: Montserrat, sans-serif;
+  font-size: 17px;
+}
+
+.feedback-summary p {
+  max-width: 920px;
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.feedback-period {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.section-note {
+  margin: -5px 0 12px !important;
+  font-size: 12px !important;
+}
+
+.feedback-summary-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.feedback-summary-grid article {
+  border-radius: 9px;
+  background: #fff;
+  padding: 16px;
+}
+
+.feedback-summary-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.feedback-summary-grid strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.practice-button,
+.secondary-action {
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  padding: 9px 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.practice-button {
+  background: var(--blue);
+  color: #fff;
+}
+
+.secondary-action {
+  background: #fff;
+  color: var(--blue);
+}
+
+.cbl-detail-grid h3 {
+  margin: 0 0 14px;
+  font-family: Montserrat, sans-serif;
+  font-size: 17px;
+}
+
+.cbl-detail-grid p {
+  margin: 0 0 24px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.criteria-list,
+.attempt-list {
+  display: grid;
+  gap: 12px;
+}
+
+.criteria-row {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
+  align-items: start;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.criteria-row strong {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: -8px 0 22px;
+}
+
+.role-grid article {
+  border-radius: 10px;
+  background: #f3f5f8;
+  padding: 13px;
+}
+
+.role-grid span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.role-grid strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.criteria-row.demonstrated {
+  border-color: var(--line);
+  background: #fff;
+}
+
+.criteria-meta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.criteria-meta span,
+.criteria-meta b {
+  border-radius: 999px;
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.criteria-meta span {
+  border: 1px solid var(--line);
+  color: var(--muted);
+}
+
+.criteria-meta b {
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--blue);
+}
+
+.criteria-row:not(.demonstrated) .criteria-meta b {
+  background: #eef1f4;
+  color: var(--muted);
+}
+
+.criteria-number {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--blue);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.attempt-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 15px;
+}
+
+.attempt-row strong,
+.attempt-row span {
+  display: block;
+}
+
+.attempt-row strong {
+  font-size: 13px;
+}
+
+.attempt-row span {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.attempt-mode {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 7px;
+  color: var(--blue);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.attempt-mode svg {
+  width: 13px;
+  height: 13px;
+}
+
+.attempt-row b {
+  font-size: 14px;
+}
+
+.attempt-list.compact {
+  max-height: 390px;
+  overflow-y: auto;
+  padding-right: 6px;
+}
+
+.attempt-row-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.attempt-row-action button {
+  border: 1px solid var(--blue);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--blue);
+  padding: 6px 9px;
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.trend-chart {
+  height: 176px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 16px 16px 10px;
+  margin-bottom: 30px;
+}
+
+.trend-chart-inner {
+  min-width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+
+.trend-column {
+  height: 100%;
+  flex: 1 0 38px;
+  min-width: 38px;
+  max-width: 52px;
+  display: grid;
+  grid-template-rows: 20px 1fr 18px;
+  align-items: end;
+  justify-items: center;
+  gap: 4px;
+}
+
+.trend-column b,
+.trend-column small {
+  font-size: 11px;
+}
+
+.trend-column span {
+  width: min(40px, 80%);
+  height: var(--trend-value);
+  border-radius: 5px 5px 0 0;
+  background: var(--trend-color);
+}
+
+.feedback-section {
+  margin-top: 28px;
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+}
+
+.feedback-section h3 {
+  margin: 0;
+  font-family: Montserrat, sans-serif;
+  font-size: 17px;
+}
+
+.feedback-section p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.feedback-grid {
+  display: grid;
+  grid-template-columns: minmax(360px, .9fr) minmax(300px, 1.1fr);
+  gap: 28px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.feedback-radar {
+  min-height: 330px;
+}
+
+.feedback-radar .radar {
+  width: 360px;
+  height: 340px;
+}
+
+.feedback-list {
+  display: grid;
+  gap: 13px;
+}
+
+.feedback-list > div {
+  display: grid;
+  grid-template-columns: minmax(150px, 1fr) 180px;
+  gap: 14px;
+  align-items: center;
+}
+
+.feedback-list strong {
+  font-size: 13px;
+}
+
+.criteria-breakdown {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.detail-column-feedback {
+  margin-top: 0;
+}
+
+.breakdown-card {
+  border: 1px solid var(--line);
+  border-left: 4px solid #20b977;
+  border-radius: 10px;
+  padding: 18px;
+  background: #fff;
+}
+
+.breakdown-card-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.breakdown-card-head strong,
+.breakdown-card-head b {
+  font-size: 14px;
+}
+
+.breakdown-card-head span,
+.breakdown-feedback > span,
+.breakdown-insights span {
+  display: block;
+  color: #435269;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.breakdown-card-head span {
+  margin-top: 4px;
+}
+
+.breakdown-feedback {
+  margin-top: 16px;
+  border-radius: 8px;
+  background: #eef5f8;
+  border: 1px solid #d8e8ee;
+  padding: 14px;
+}
+
+.breakdown-card p {
+  margin: 7px 0 0;
+  color: #42516a;
+  font-size: 13px;
+  line-height: 1.62;
+}
+
+.breakdown-insights {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.breakdown-insights > div {
+  border: 1px solid #cfd9e5;
+  border-radius: 8px;
+  padding: 13px;
+  background: #fff;
+}
+
+.practice-modal {
+  width: min(640px, calc(100vw - 32px));
+  border: 0;
+  border-radius: 14px;
+  padding: 0;
+  box-shadow: 0 24px 60px rgba(16, 24, 40, .24);
+}
+
+.practice-modal::backdrop {
+  background: rgba(16, 24, 40, .42);
+}
+
+.practice-modal form {
+  padding: 22px;
+}
+
+.practice-modal-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.practice-modal-head h3 {
+  margin: 0;
+  font-family: Montserrat, sans-serif;
+  font-size: 18px;
+}
+
+.practice-modal-head p {
+  margin: 5px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.modal-close {
+  width: 30px;
+  height: 30px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.practice-mode-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.practice-mode-card {
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  background: #fff;
+  padding: 16px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.practice-mode-card:hover {
+  border-color: var(--blue);
+  background: #f3fbfd;
+}
+
+.practice-mode-card strong {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 14px;
+}
+
+.practice-mode-card strong svg {
+  width: 16px;
+  height: 16px;
+  color: var(--blue);
+}
+
+.practice-mode-card span {
+  display: block;
+  margin-top: 9px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+svg {
+  width: 1em;
+  height: 1em;
+  display: block;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.detail-head-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.scoring-note {
+  margin: 2px 0 14px !important;
+  font-size: 12px !important;
+  color: var(--muted);
+}
+
+.substrand-scoring {
+  padding: 10px 16px 14px;
+  border-top: 1px solid #eef2f6;
+}
+
+.substrand-scoring:first-child {
+  border-top: 0;
+}
+
+.substrand-scoring-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.scoring-topic-rows {
+  display: grid;
+  gap: 2px;
+}
+
+.scoring-topic-row {
+  display: grid;
+  grid-template-columns: minmax(160px, 1fr) 130px 36px auto;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  padding: 6px 0;
+  border-bottom: 1px solid #f2f4f7;
+}
+
+.scoring-topic-row:last-child {
+  border-bottom: 0;
+}
+
+.scoring-topic-row > span:first-child {
+  min-width: 0;
+}
+
+.scoring-topic-row b {
+  text-align: right;
+}
+
+.score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.score-badge.passed {
+  background: #e8f7ed;
+  color: #1a7a38;
+}
+
+.score-badge.not-passed {
+  background: #fff4e5;
+  color: #b45309;
+}
+
+.detail-divider {
+  border: 0;
+  border-top: 1px solid var(--line);
+  margin: 40px 0;
+}
+
+.detail-scoring-section > h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.scoring-layout {
+  display: grid;
+  grid-template-columns: minmax(420px, .82fr) minmax(480px, 1.18fr);
+  gap: 24px;
+  margin-top: 16px;
+  align-items: start;
+}
+
+.scoring-chart-panel {
+  position: sticky;
+  top: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.scoring-ring {
+  --size: 244px;
+}
+
+.scoring-ring::before {
+  inset: 32px;
+}
+
+.scoring-ring b {
+  font-size: 32px;
+  font-weight: 700;
+  font-family: Montserrat, sans-serif;
+}
+
+.scoring-ring-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  text-align: center;
+  margin-top: 4px;
+}
+
+[data-tooltip] {
+  position: relative;
+  cursor: help;
+  text-decoration: underline dotted currentColor;
+  text-underline-offset: 3px;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.5;
+  padding: 8px 12px;
+  border-radius: 8px;
+  width: 230px;
+  text-align: center;
+  white-space: normal;
+  text-transform: none;
+  letter-spacing: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s;
+  z-index: 200;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+}
+
+.scoring-legend-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  margin: 0 0 10px 0;
+}
+
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  color: #94a3b8;
+  margin-left: 3px;
+  vertical-align: middle;
+  cursor: help;
+  text-decoration: none !important;
+  line-height: 0;
+}
+
+.info-icon:hover {
+  color: var(--blue);
+}
+
+.scoring-legend {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  border-left-width: 4px;
+  background: #fff;
+}
+
+.legend-green { border-left-color: #0CAD60; }
+.legend-amber { border-left-color: #f59e0b; }
+.legend-gray  { border-left-color: #cbd5e1; }
+
+.legend-count {
+  font-size: 22px;
+  font-weight: 700;
+  font-family: Montserrat, sans-serif;
+  color: var(--navy);
+  min-width: 24px;
+  line-height: 1;
+}
+
+.legend-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.legend-info strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--navy);
+}
+
+.legend-info span {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.scoring-list-panel {
+  min-width: 0;
+}
+
+.scoring-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.scoring-table thead th {
+  padding: 0 10px 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: left;
+  border-bottom: 2px solid var(--line);
+}
+
+.sct-col-topic { width: auto; }
+.sct-col-num   { width: 100px; text-align: center !important; }
+.sct-col-status { width: 110px; text-align: center; }
+
+.sct-strand-row > td {
+  padding: 0;
+  background: #f8fafc;
+  border-top: 1px solid var(--line);
+}
+
+.sct-strand-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: Montserrat, sans-serif;
+}
+
+.sct-bubble {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.sct-strand-name {
+  flex: 1;
+  font-size: 13px;
+  color: var(--navy);
+  text-align: left;
+}
+
+.sct-strand-count {
+  font-size: 11px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.sct-chevron {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%2394a3b8'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z'/%3E%3C/svg%3E");
+  transition: transform 0.15s;
+}
+
+.sct-strand-toggle.collapsed .sct-chevron {
+  transform: rotate(-90deg);
+}
+
+.sct-topic-row td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f3f6f9;
+}
+
+.sct-topic-row:last-child td {
+  border-bottom: 0;
+}
+
+.sct-topic-name {
+  padding-left: 58px;
+  color: var(--text);
+  font-size: 12px;
+}
+
+.sct-pass {
+  background: #ecfdf5;
+  color: #059669;
+  font-weight: 600;
+}
+
+.sct-fail {
+  background: #fff7ed;
+  color: #ea580c;
+  font-weight: 600;
+}
+
+.sct-ns {
+  color: #b0bcc8;
+}
+
+.sct-muted {
+  color: var(--muted);
+  text-align: center;
+}
+
+.overview-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.overview-head p {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.view-mode-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 10px;
+  background: #edf1f5;
+  flex-shrink: 0;
+}
+
+.view-mode-toggle button {
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--muted);
+  padding: 8px 18px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.view-mode-toggle button.active {
+  background: #fff;
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(16, 24, 40, 0.1);
+}
+
+.course-accordion {
+  display: grid;
+  gap: 10px;
+}
+
+.course-row {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  transition: border-color .18s ease, box-shadow .18s ease;
+}
+
+.course-row.open {
+  border-color: #a8d4e4;
+  box-shadow: 0 4px 14px rgba(20, 127, 164, .08);
+}
+
+.course-row-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 16px 20px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.course-row-header:hover {
+  background: #fafbfc;
+}
+
+.course-row.open .course-row-header {
+  border-bottom: 1px solid var(--line);
+}
+
+.course-row-ring {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.course-row-ring > span {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.course-row-info {
+  min-width: 0;
+}
+
+.course-row-info strong {
+  display: block;
+  font-size: 15px;
+  font-family: Montserrat, sans-serif;
+  font-weight: 700;
+}
+
+.course-row-info > span {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.course-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.course-row-detail {
+  border: 1px solid var(--blue);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--blue);
+  padding: 7px 13px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background .14s ease;
+}
+
+.course-row-detail:hover {
+  background: #f0f9fd;
+}
+
+.course-row-chevron {
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--blue);
+  border-radius: 6px;
+  transition: transform .2s ease, background .14s ease;
+  flex-shrink: 0;
+}
+
+.course-row-chevron:hover {
+  background: #eef6f9;
+}
+
+.course-row-chevron svg {
+  width: 18px;
+  height: 18px;
+}
+
+.course-row.open .course-row-chevron {
+  transform: rotate(180deg);
+}
+
+.course-row-topics {
+  padding: 20px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 440px;
+  overflow-y: auto;
+}
+
+.topic-strand-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.topic-strand-header {
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  font-family: Montserrat, sans-serif;
+  color: var(--navy);
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.topic-strand-subs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+
+.topic-group {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.topic-group-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--blue);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.topic-item-row {
+  display: grid;
+  grid-template-columns: 1fr 90px 32px;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  padding: 5px 0;
+  border-bottom: 1px solid #f2f4f7;
+}
+
+.topic-item-row:last-child {
+  border-bottom: 0;
+}
+
+.topic-item-row > span {
+  min-width: 0;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.topic-item-row b {
+  font-size: 12px;
+  text-align: right;
+  color: var(--text);
+}
+
+@media (max-width: 1180px) {
+  .nav-inner {
+    grid-template-columns: 190px 1fr 100px;
+    padding: 0 28px;
+  }
+
+  .topnav nav {
+    gap: 22px;
+  }
+
+  .topnav a {
+    font-size: 14px;
+  }
+
+  .summary-grid,
+  .detail-grid,
+  .skills-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .course-grid,
+  .course-tile-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+
+  .cbl-tile-grid {
+    grid-template-columns: repeat(2, minmax(220px, 1fr));
+  }
+
+  .cbl-detail-summary {
+    grid-template-columns: repeat(3, minmax(160px, 1fr));
+  }
+
+  .cbl-detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cbl-row {
+    grid-template-columns: 1fr 110px minmax(190px, 250px);
+  }
+
+  .cbl-action {
+    grid-column: 1 / -1;
+    display: flex;
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 720px) {
+  .topnav {
+    height: 65px;
+    max-height: 65px;
+    overflow: hidden;
+  }
+
+  .nav-inner {
+    grid-template-columns: 130px 1fr 88px;
+    gap: 10px;
+    padding: 0 16px;
+  }
+
+  .topnav nav {
+    justify-content: flex-start;
+    overflow-x: auto;
+    height: 65px;
+  }
+
+  .nav-actions {
+    position: static;
+  }
+
+  .hero-inner,
+  .content {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .hero h1 {
+    font-size: 30px;
+  }
+
+  .hero {
+    min-height: 188px;
+    max-height: 188px;
+  }
+
+  .cbl-detail {
+    padding: 24px;
+  }
+
+  .date-filter {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .course-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .course-tile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cbl-tile-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cbl-summary,
+  .cbl-row,
+  .cbl-detail-summary,
+  .cbl-detail-grid,
+  .feedback-grid,
+  .feedback-summary-grid,
+  .breakdown-insights,
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .feedback-list > div {
+    grid-template-columns: 1fr;
+  }
+
+  .case-context-body .criteria-list {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-mode-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .radar {
+    width: 310px;
+    height: 310px;
+  }
+
+  .strand-head,
+  .topic-row,
+  .skill-row {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .sticky-radar {
+    position: static;
+  }
+
+  .taxonomy-section {
+    margin-top: 0;
+  }
+
+  .substrand-head {
+    grid-template-columns: 1fr;
+  }
+}
+    </style>
+  </head>
+  <body>
+    <header class="topnav">
+      <div class="nav-inner">
+        <img class="brand" src="../atlas-logo.png" alt="ATLAS by HeyHi" />
+        <nav aria-label="Learner navigation">
+          <a href="#">Dashboard</a>
+          <a href="#">Courses</a>
+          <a href="#">Assessments</a>
+          <a href="#">CBL</a>
+          <a class="active" href="#">Performance</a>
+          <a href="#">PALS</a>
+        </nav>
+        <div class="nav-actions">
+          <button aria-label="Notifications"><i data-icon="bell"></i></button>
+          <div class="avatar">L</div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-inner">
+          <h1>Performance Analytics</h1>
+          <p>Track your learning progress and performance across different topics</p>
+        </div>
+      </section>
+
+      <section class="date-band">
+        <label class="date-filter">
+          <span>All Time</span>
+          <i data-icon="calendar"></i>
+        </label>
+      </section>
+
+      <section class="content">
+        <div class="tabs" role="tablist" aria-label="Performance analytics views">
+          <button class="tab active" data-tab="knowledge">Knowledge</button>
+          <button class="tab" data-tab="skills">Skills</button>
+          <button class="tab" data-tab="cbl">CBL</button>
+        </div>
+
+        <div id="breadcrumb" class="breadcrumb"></div>
+        <div id="appView"></div>
+      </section>
+    </main>
+
+    <script>
+const icons = {
+  bell: '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path>',
+  calendar: '<rect x="3" y="4" width="18" height="18" rx="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path>',
+  arrow: '<path d="m15 18-6-6 6-6"></path>',
+  chevronDown: '<path d="m6 9 6 6 6-6"></path>',
+  mic: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path>',
+  message: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"></path>',
+  repeat: '<path d="m17 1 4 4-4 4"></path><path d="M3 11V9a4 4 0 0 1 4-4h14"></path><path d="m7 23-4-4 4-4"></path><path d="M21 13v2a4 4 0 0 1-4 4H3"></path>',
+  info: '<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>'
+};
+
+const courses = [
+  { id: "customer-service", name: "Customer Service PALS Course", progress: 96, avgScore: 84, activity: "Last activity 2 days ago" },
+  { id: "exam-anxiety", name: "Exam Anxiety", progress: 22, avgScore: 61, activity: "Last activity 1 week ago" },
+  { id: "communication", name: "Communication Essentials", progress: 84, avgScore: 78, activity: "Last activity yesterday" },
+  { id: "workplace", name: "Workplace Readiness", progress: 17, avgScore: 55, activity: "Last activity 12 days ago" }
+];
+
+// Topic tuple: ["name", completion%, reviewScore|null, attemptNumber|null]
+// null score/attempt = learner hasn't taken the review test yet (learning path not reached)
+const strands = [
+  { name: "Foundations", progress: 96, sub: [["Service mindset", [["Recognise learner needs", 98, 91, 1], ["Explain service standards", 94, 85, 2]]], ["Core concepts", [["Define key terms", 97, 92, 1], ["Identify good practice", 93, 88, 1]]]] },
+  { name: "Application", progress: 88, sub: [["Scenario response", [["Choose a response", 91, 84, 1], ["Apply support steps", 86, 79, 1]]], ["Practice transfer", [["Use course resources", 84, 76, 2], ["Complete practice task", 90, 85, 1]]]] },
+  { name: "Analysis", progress: 52, sub: [["Problem framing", [["Compare options", 56, 63, 3], ["Spot root cause", 48, 58, 2]]], ["Decision quality", [["Prioritise action", 55, null, null], ["Justify answer", 50, null, null]]]] },
+  { name: "Communication", progress: 71, sub: [["Message clarity", [["Use plain language", 75, 79, 1], ["Ask follow-up questions", 70, 72, 2]]], ["Tone", [["Respond with empathy", 77, 80, 1], ["Manage concerns", 62, 68, 1]]]] },
+  { name: "Reflection", progress: 58, sub: [["Self review", [["Check confidence", 60, 69, 2], ["Review feedback", 57, null, null]]], ["Next steps", [["Set improvement goal", 63, 71, 3], ["Track progress", 51, null, null]]]] },
+  { name: "Mastery", progress: 44, sub: [["Independent task", [["Complete challenge", 46, null, null], ["Explain tradeoffs", 41, null, null]]], ["Retention", [["Review checkpoint", 47, null, null], ["Maintain accuracy", 42, null, null]]]] }
+];
+
+const skills = [
+  { name: "Sales Communication", label: "Sales Communication", progress: 95, questions: 12 },
+  { name: "Customer Relationship Management", label: "Customer Relation", progress: 89, questions: 15 },
+  { name: "Negotiation", progress: 62, questions: 9 },
+  { name: "Business Presentation", label: "Business Present.", progress: 69, questions: 11 },
+  { name: "Service Excellence", progress: 77, questions: 14 },
+  { name: "Problem Solving", progress: 58, questions: 8 },
+  { name: "Data Interpretation", progress: 66, questions: 10 },
+  { name: "Digital Collaboration", label: "Digital Collab.", progress: 71, questions: 7 }
+];
+
+const cblChallenges = [
+  {
+    id: "corporate-client",
+    name: "Banking Client Review Session - Understanding Client's Mismatched Business Model",
+    role: "Financial Services Specialist",
+    aiRole: "Banking Client",
+    score: 80,
+    points: "16/20",
+    attempts: 12,
+    duration: "42m",
+    activity: "Last attempt yesterday",
+    description: "A client, Mr. Chen, is invited to do a review of his banking transactions. During a routine annual account review, you notice that all incoming wire transfers over the past year originate exclusively from companies registered as tech consulting firms, with no transactions resembling typical bakery income. Your job is to ask about the transactions professionally without tipping him off, gather a credible explanation, request supporting documents, and escalate internally if something does not add up.",
+    criteria: [
+      ["Gather a credible explanation about the transactions", 10, true],
+      ["Obtain Supporting Documents", 10, true]
+    ],
+    history: [
+      ["Attempt 12", "Yesterday", 80, "Live"], ["Attempt 11", "3 days ago", 78, "Turn-based"], ["Attempt 10", "5 days ago", 76, "Live"],
+      ["Attempt 9", "1 week ago", 74, "Turn-based"], ["Attempt 8", "9 days ago", 73, "Live"], ["Attempt 7", "2 weeks ago", 72, "Turn-based"],
+      ["Attempt 6", "3 weeks ago", 69, "Live"], ["Attempt 5", "1 month ago", 67, "Turn-based"], ["Attempt 4", "5 weeks ago", 63, "Live"],
+      ["Attempt 3", "6 weeks ago", 60, "Turn-based"], ["Attempt 2", "2 months ago", 57, "Live"], ["Attempt 1", "3 months ago", 54, "Turn-based"]
+    ],
+    feedbackSummary: "You handled the client conversation professionally and gathered the key supporting documents. Your next practice should focus on recognising when an unusual explanation needs to be escalated for internal review.",
+    strengths: "Professional tone and clear evidence gathering.",
+    nextFocus: "State the need for internal due diligence when the explanation does not add up.",
+    feedback: [["Information Gathering", 80], ["Compliance and Escalation", 80]],
+    breakdown: [
+      ["Information Gathering", 8, 10, "You maintained a generally professional and helpful tone throughout the conversation and asked relevant questions about the transactions and the business model.", "You asked about the purpose of the transactions and requested details about the vendor and payment flow.", "Use more open-ended questions so the client can explain the transaction pattern in their own words."],
+      ["Compliance and Escalation", 8, 10, "You clearly requested specific supporting documents linked to the transactions, including invoices and remittance details.", "You gathered evidence firmly and explained why the supporting documents were needed.", "State that the unusual business model mismatch requires internal due diligence or escalation."]
+    ]
+  },
+  {
+    id: "renewal-risk",
+    name: "Responding to a Renewal Risk",
+    role: "Customer Success Manager",
+    aiRole: "Concerned Client",
+    score: 64,
+    points: "16/25",
+    attempts: 2,
+    duration: "28m",
+    activity: "Last attempt 3 days ago",
+    description: "A long-term client reports low adoption in two departments and is considering reducing their subscription. Clarify the issues, rebuild confidence, and propose a practical recovery plan.",
+    criteria: [
+      ["Identify the client's underlying adoption barriers", 10, true],
+      ["Propose a measurable recovery plan", 10, false],
+      ["Respond to concerns with empathy and clarity", 10, true]
+    ],
+    history: [["Attempt 2", "3 days ago", 64, "Turn-based"], ["Attempt 1", "1 week ago", 51, "Live"]],
+    feedbackSummary: "You identified the client's concerns and responded with empathy. The recovery plan will be stronger when it includes clearer ownership, milestones, and measurable outcomes.",
+    strengths: "Relevant follow-up questions and a calm client-facing response.",
+    nextFocus: "Propose a measurable recovery plan with owners and milestones.",
+    feedback: [["Information Gathering", 68], ["Recovery Planning", 58], ["Client Communication", 74]],
+    breakdown: [
+      ["Information Gathering", 7, 10, "You identified several adoption barriers and asked relevant follow-up questions.", "You clarified which departments had low adoption and explored the client's concerns.", "Ask for specific usage patterns and the business impact before proposing a solution."],
+      ["Recovery Planning", 6, 10, "The proposed plan would benefit from clearer owners, milestones, and measurable outcomes.", "You proposed follow-up support and a recovery discussion.", "Define owners, a review date, and measurable adoption targets."]
+    ]
+  },
+  {
+    id: "project-delay",
+    name: "Managing a Project Delay",
+    role: "Project Lead",
+    aiRole: "Project Sponsor",
+    score: 43,
+    points: "13/30",
+    attempts: 1,
+    duration: "16m",
+    activity: "Last attempt 1 week ago",
+    description: "A key implementation milestone has slipped by two weeks. Explain the impact, reset expectations, and align stakeholders on the recovery plan.",
+    criteria: [
+      ["Explain the delay and its impact transparently", 10, true],
+      ["Present a realistic recovery timeline", 10, false],
+      ["Align stakeholders on clear next steps", 10, false]
+    ],
+    history: [["Attempt 1", "1 week ago", 43, "Live"]],
+    feedbackSummary: "You acknowledged the project delay, but the impact and recovery plan were not yet clear enough for stakeholders. Practise presenting a realistic timeline and confirming the next steps.",
+    strengths: "Transparent acknowledgement of the issue.",
+    nextFocus: "Explain the impact, dependencies, and recovery timeline more precisely.",
+    feedback: [["Stakeholder Communication", 49], ["Recovery Planning", 38], ["Decision Quality", 36]],
+    breakdown: [
+      ["Stakeholder Communication", 5, 10, "You explained the issue, but the impact and next steps need to be more precise.", "You acknowledged the delay and kept the conversation transparent.", "Explain the consequences for the client and confirm alignment on the revised plan."],
+      ["Recovery Planning", 4, 10, "Provide a concrete recovery timeline and clearly identify dependencies.", "You mentioned several corrective actions.", "Present dates, dependencies, accountable owners, and the next checkpoint."]
+    ]
+  },
+  {
+    id: "complaint-escalation",
+    name: "Handling an Escalated Customer Complaint",
+    role: "Customer Experience Specialist",
+    aiRole: "Dissatisfied Customer",
+    score: null,
+    points: null,
+    attempts: 0,
+    duration: "0m",
+    activity: "Not attempted yet",
+    description: "A customer is frustrated after receiving inconsistent information from several support channels. Listen carefully, clarify the issue, and propose a practical resolution while rebuilding trust.",
+    criteria: [
+      ["Clarify the customer's main concern", 10, false],
+      ["Respond with empathy and professionalism", 10, false],
+      ["Propose a clear resolution and next steps", 10, false]
+    ],
+    history: [],
+    feedback: [],
+    breakdown: []
+  }
+];
+
+const state = {
+  tab: "knowledge",
+  level: "overview",
+  selectedCourse: null,
+  selectedCase: null,
+  viewMode: "completion"
+};
+
+const appView = document.querySelector("#appView");
+const breadcrumb = document.querySelector("#breadcrumb");
+
+function svgIcon(name) {
+  return `<svg viewBox="0 0 24 24" aria-hidden="true">${icons[name] || ""}</svg>`;
+}
+
+function hydrateIcons() {
+  document.querySelectorAll("[data-icon]").forEach((node) => {
+    node.innerHTML = svgIcon(node.dataset.icon);
+  });
+}
+
+function progress(value) {
+  return `<div class="progress-wrap"><div class="progress"><span style="--value:${value}%; --bar-color:${completionColor(value)}"></span></div><b>${value}%</b></div>`;
+}
+
+function completionColor(value) {
+  if (value < 50) return "#EF4444";
+  if (value <= 75) return "#F5B83D";
+  return "#5EC26A";
+}
+
+function average(values) {
+  return Math.round(values.reduce((total, value) => total + value, 0) / values.length);
+}
+
+function subStrandScore(topics) {
+  return average(topics.map(([, value]) => value));
+}
+
+function renderBreadcrumb() {
+  if (state.tab === "skills") {
+    breadcrumb.innerHTML = "<strong>Skills Analytics</strong>";
+    return;
+  }
+
+  if (state.tab === "cbl") {
+    if (state.selectedCase) {
+      breadcrumb.innerHTML = `<button data-cbl-action="overview">Content-Based Learning</button><span>/</span><strong>${state.selectedCase.name}</strong>`;
+    } else {
+      breadcrumb.innerHTML = "<strong>Content-Based Learning</strong>";
+    }
+    return;
+  }
+
+  if (state.level === "overview") {
+    breadcrumb.innerHTML = "<strong>PALS Courses</strong>";
+    return;
+  }
+
+  breadcrumb.innerHTML = `<button data-action="overview">PALS Courses</button><span>/</span><strong>${state.selectedCourse.name}</strong>`;
+}
+
+function renderOverview() {
+  const isScoring = state.viewMode === "scoring";
+  appView.innerHTML = `
+    <section>
+      <article class="panel course-overview-panel">
+        <div class="overview-head">
+          <h2>${isScoring ? "Scoring by PALS Course" : "Completion by PALS Course"}</h2>
+          <div class="view-mode-toggle">
+            <button class="${!isScoring ? "active" : ""}" data-mode="completion">Completion</button>
+            <button class="${isScoring ? "active" : ""}" data-mode="scoring">Scoring</button>
+          </div>
+        </div>
+        <div class="course-tile-grid">
+          ${courses.map((course) => {
+            const metric = isScoring ? course.avgScore : course.progress;
+            return `
+              <button class="course-tile" type="button" data-course="${course.id}">
+                <div class="course-tile-ring">
+                  <div class="ring" style="--value:${metric}; --ring-color:${completionColor(metric)}"><b>${metric}%</b></div>
+                  <span>${isScoring ? "Avg. Score" : "Completion Progress"}</span>
+                </div>
+                <div class="course-tile-copy">
+                  <strong>${course.name}</strong>
+                  <span>${course.activity}</span>
+                </div>
+                <div class="course-tile-footer">
+                  <span>View details</span>
+                </div>
+              </button>
+            `;
+          }).join("")}
+        </div>
+      </article>
+    </section>
+  `;
+}
+
+function radarPoints(items, radius, center, valueKey = "progress") {
+  return items.map((item, index) => {
+    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / items.length;
+    const r = radius * (item[valueKey] / 100);
+    return `${center + Math.cos(angle) * r},${center + Math.sin(angle) * r}`;
+  }).join(" ");
+}
+
+function renderRadar(items) {
+  const center = 200;
+  const radius = 138;
+  const rings = [25, 50, 75, 100].map((value) => {
+    const ringItems = items.map((item) => ({ ...item, progress: value }));
+    return `<polygon class="grid" points="${radarPoints(ringItems, radius, center)}"></polygon>`;
+  }).join("");
+  const axes = items.map((_, index) => {
+    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / items.length;
+    return `<line x1="${center}" y1="${center}" x2="${center + Math.cos(angle) * radius}" y2="${center + Math.sin(angle) * radius}"></line>`;
+  }).join("");
+  const labels = items.map((item, index) => {
+    const angle = -Math.PI / 2 + (Math.PI * 2 * index) / items.length;
+    const x = center + Math.cos(angle) * (radius + 34);
+    const y = center + Math.sin(angle) * (radius + 30);
+    const anchor = Math.abs(Math.cos(angle)) < 0.2 ? "middle" : Math.cos(angle) > 0 ? "start" : "end";
+    return `<text x="${x}" y="${y}" text-anchor="${anchor}">${item.label || item.name}</text>`;
+  }).join("");
+  return `<svg class="radar" viewBox="0 0 400 400">${rings}${axes}<polygon class="value" points="${radarPoints(items, radius, center)}"></polygon>${labels}</svg>`;
+}
+
+function strandAvgScore(strand) {
+  const allScores = strand.sub
+    .flatMap(([, topics]) => topics.map(([,, score]) => score))
+    .filter((s) => s !== null);
+  return allScores.length > 0 ? Math.round(allScores.reduce((a, b) => a + b, 0) / allScores.length) : 0;
+}
+
+function scoringStats() {
+  const allTopics = strands.flatMap((s) => s.sub.flatMap(([, topics]) => topics));
+  const attempted = allTopics.filter(([,, score]) => score !== null);
+  const passedTopics = attempted.filter(([,, score]) => score >= PASS_SCORE);
+  const failedTopics = attempted.filter(([,, score]) => score < PASS_SCORE);
+  const avgPassed = passedTopics.length > 0
+    ? Math.round(passedTopics.reduce((sum, [,, score]) => sum + score, 0) / passedTopics.length)
+    : 0;
+  return {
+    total: allTopics.length,
+    passed: passedTopics.length,
+    failed: failedTopics.length,
+    notAttempted: allTopics.length - attempted.length,
+    avgScore: avgPassed,
+  };
+}
+
+function renderScoringDonut({ avgScore }) {
+  const color = scoringBubbleColor(avgScore);
+  return `
+    <div class="ring scoring-ring" style="--value:${avgScore}; --ring-color:${color}">
+      <b>${avgScore}%</b>
+    </div>
+    <span class="scoring-ring-label" data-tooltip="Average of scores from topics the learner has passed (≥70%). Each score reflects their most recent attempt.">Average Score</span>
+  `;
+}
+
+function scoringBubbleColor(avg) {
+  if (!avg) return "#c4c4c4";
+  if (avg >= 80) return "#0CAD60";
+  if (avg >= 50) return "#f59e0b";
+  return "#E73636";
+}
+
+function renderScoringTable() {
+  return `
+    <table class="scoring-table">
+      <thead>
+        <tr>
+          <th class="sct-col-topic">Topic</th>
+          <th class="sct-col-num">Score <span class="info-icon" data-tooltip="Each score reflects the learner's most recent attempt."><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span></th>
+          <th class="sct-col-num">Attempt</th>
+          <th class="sct-col-status">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${strands.map((strand) => {
+          const topics = strand.sub.flatMap(([, t]) => t);
+          const avg = strandAvgScore(strand);
+          const passedCount = topics.filter(([,, s]) => s !== null && s >= PASS_SCORE).length;
+          return `
+            <tr class="sct-strand-row">
+              <td colspan="4">
+                <button class="sct-strand-toggle collapsed" data-strand-toggle="${strand.name}">
+                  <span class="sct-bubble" style="background:${scoringBubbleColor(avg)}">${avg ? `${avg}%` : "—"}</span>
+                  <strong class="sct-strand-name">${strand.name}</strong>
+                  <span class="sct-strand-count">${passedCount}/${topics.length} passed</span>
+                  <span class="sct-chevron"></span>
+                </button>
+              </td>
+            </tr>
+            ${topics.map(([name,, score, attempt]) => {
+              const ns = score === null;
+              const pass = !ns && score >= PASS_SCORE;
+              const cls = ns ? "sct-ns" : pass ? "sct-pass" : "sct-fail";
+              return `
+                <tr class="sct-topic-row" data-strand-row="${strand.name}" style="display:none">
+                  <td class="sct-topic-name">${name}</td>
+                  <td class="${cls} sct-col-num">${ns ? "—" : `${score}%`}</td>
+                  <td class="sct-muted sct-col-num">${ns ? "—" : `Attempt ${attempt}`}</td>
+                  <td class="${cls} sct-col-status">${ns ? "Not started" : pass ? "Passed" : "Not yet"}</td>
+                </tr>
+              `;
+            }).join("")}
+          `;
+        }).join("")}
+      </tbody>
+    </table>
+  `;
+}
+
+function renderCompletionView() {
+  return `
+    <h2>Sub-strands and Topics</h2>
+    <div class="breakdown">
+      ${strands.map((strand) => `
+        <details class="strand-card">
+          <summary class="strand-head">
+            <div><strong>${strand.name}</strong><small>${strand.sub.length} sub-strands</small></div>
+            ${progress(strand.progress)}
+            <span class="chevron">${svgIcon("chevronDown")}</span>
+          </summary>
+          <div class="topic-list">
+            ${strand.sub.map(([subName, topics]) => `
+              <details class="substrand-card">
+                <summary class="substrand-head"><strong>${subName}</strong>${progress(subStrandScore(topics))}<span class="chevron">${svgIcon("chevronDown")}</span></summary>
+                <div class="topic-rows">
+                  ${topics.map(([topic, value]) => `<div class="topic-row"><span>${topic}</span><div class="progress"><span style="--value:${value}%; --bar-color:${completionColor(value)}"></span></div><b>${value}%</b></div>`).join("")}
+                </div>
+              </details>
+            `).join("")}
+          </div>
+        </details>
+      `).join("")}
+    </div>
+  `;
+}
+
+const PASS_SCORE = 70;
+
+function renderScoringView() {
+  return `
+    <h2>Review Test Scores</h2>
+    <p class="scoring-note">Minimum passing score: ${PASS_SCORE}% per topic.</p>
+    <div class="breakdown">
+      ${strands.map((strand) => {
+        const avg = strandAvgScore(strand);
+        return `
+          <details class="strand-card" open>
+            <summary class="strand-head">
+              <div><strong>${strand.name}</strong><small>Avg. ${avg}%</small></div>
+              ${progress(avg)}
+              <span class="chevron">${svgIcon("chevronDown")}</span>
+            </summary>
+            <div class="topic-list">
+              ${strand.sub.map(([subName, topics]) => `
+                <div class="substrand-scoring">
+                  <span class="substrand-scoring-label">${subName}</span>
+                  <div class="scoring-topic-rows">
+                    ${topics.map(([name,, score]) => {
+                      const passed = score >= PASS_SCORE;
+                      return `
+                        <div class="scoring-topic-row">
+                          <span>${name}</span>
+                          <div class="progress"><span style="--value:${score}%; --bar-color:${completionColor(score)}"></span></div>
+                          <b>${score}%</b>
+                          <span class="score-badge ${passed ? "passed" : "not-passed"}">${passed ? "Passed" : "Not yet"}</span>
+                        </div>
+                      `;
+                    }).join("")}
+                  </div>
+                </div>
+              `).join("")}
+            </div>
+          </details>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function renderCourseDetail() {
+  const stats = scoringStats();
+  appView.innerHTML = `
+    <section class="panel">
+      <div class="detail-head">
+        <div>
+          <h2>${state.selectedCourse.name}</h2>
+          <p>Knowledge progress and review test scores by strand, sub-strand, and topic.</p>
+        </div>
+        <button class="back-button" type="button" data-action="overview"><i data-icon="arrow"></i> Back to PALS courses</button>
+      </div>
+      <div class="detail-grid">
+        <section class="sticky-radar">
+          <h2>Strands</h2>
+          <div class="radar-wrap">${renderRadar(strands)}</div>
+        </section>
+        <section class="taxonomy-section">
+          ${renderCompletionView()}
+        </section>
+      </div>
+      <hr class="detail-divider">
+      <div class="detail-scoring-section">
+        <h2>Review Test Scores</h2>
+        <div class="scoring-layout">
+          <div class="scoring-chart-panel">
+            ${renderScoringDonut(stats)}
+            <div class="scoring-legend">
+              <p class="scoring-legend-title">Out of ${stats.total} review topics</p>
+              <div class="legend-item legend-green">
+                <div class="legend-count">${stats.passed}</div>
+                <div class="legend-info"><strong>Passed</strong><span>Scored 70% or above</span></div>
+              </div>
+              <div class="legend-item legend-amber">
+                <div class="legend-count">${stats.failed}</div>
+                <div class="legend-info"><strong>Not yet</strong><span>Attempted, below 70%</span></div>
+              </div>
+              <div class="legend-item legend-gray">
+                <div class="legend-count">${stats.notAttempted}</div>
+                <div class="legend-info"><strong>Not started</strong><span>Review test not taken</span></div>
+              </div>
+            </div>
+          </div>
+          <div class="scoring-list-panel">
+            ${renderScoringTable()}
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+  hydrateIcons();
+}
+
+function renderSkills() {
+  appView.innerHTML = `
+    <section class="panel">
+      <div class="skills-head">
+        <div>
+          <h2>Skills Analytics</h2>
+          <p>Skill tags are derived from practice and review test questions answered in PALS courses.</p>
+        </div>
+        <div class="skills-summary"><strong>${skills.length}</strong><span>skills answered</span></div>
+      </div>
+      <div class="skills-grid">
+        <div class="radar-wrap">${renderRadar(skills)}</div>
+        <div class="skill-list">
+          ${skills.map((skill) => `
+            <div class="skill-row">
+              <div><strong>${skill.name}</strong><span>${skill.questions} tagged questions</span></div>
+              ${progress(skill.progress)}
+            </div>
+          `).join("")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderCBL() {
+  const attemptedCases = cblChallenges.filter((challenge) => challenge.attempts > 0);
+  const highestScores = attemptedCases.map((challenge) => Math.max(...challenge.history.map(([, , score]) => score)));
+  const averageHighestScore = average(highestScores);
+  const totalAttempts = cblChallenges.reduce((total, challenge) => total + challenge.attempts, 0);
+  return `
+    <section class="cbl-page">
+      <div class="cbl-summary">
+        <article class="cbl-stat"><span>Cases practised</span><strong>${attemptedCases.length}</strong></article>
+        <article class="cbl-stat"><span>Total attempts</span><strong>${totalAttempts}</strong></article>
+        <article class="cbl-stat"><span>Average highest score</span><strong>${averageHighestScore}%</strong></article>
+        <article class="cbl-stat"><span>Practice time</span><strong>1h 26m</strong></article>
+      </div>
+      <section class="panel cbl-panel">
+        <div class="cbl-panel-head">
+          <div>
+            <h2>Practice & Roleplay Cases</h2>
+            <p>Track your highest score and review feedback from each case.</p>
+          </div>
+          <span>${cblChallenges.length} available cases</span>
+        </div>
+        <div class="cbl-tile-grid">
+          ${cblChallenges.map((challenge) => {
+            const highestScore = challenge.attempts ? Math.max(...challenge.history.map(([, , score]) => score)) : null;
+            return `
+            <article class="cbl-tile">
+              <div class="cbl-tile-ring">
+                ${challenge.attempts ? `<div class="ring" style="--value:${highestScore}; --ring-color:${completionColor(highestScore)}"><b>${highestScore}%</b></div>` : `<div class="ring empty-ring"><b>--</b></div>`}
+              </div>
+              <span class="cbl-score-caption">${challenge.attempts ? "Highest score" : "No score yet"}</span>
+              <div class="cbl-title">
+                <strong>${challenge.name}</strong>
+                <span>Role: ${challenge.role}</span>
+              </div>
+              <div class="cbl-tile-meta"><span>${challenge.attempts ? challenge.activity : "Not attempted yet"}</span><strong>${challenge.attempts} total attempts</strong></div>
+              <div class="cbl-action">
+                ${challenge.history[0]?.[3] ? `<span class="mode-pill">${challenge.history[0][3] === "Live" ? svgIcon("mic") : svgIcon("message")} Last attempt: ${challenge.history[0][3]}</span>` : ""}
+                <button type="button" ${challenge.attempts ? `data-case="${challenge.id}"` : "data-practice-again"}>${challenge.attempts ? "View details" : "Start practice"}</button>
+              </div>
+            </article>
+          `}).join("")}
+        </div>
+      </section>
+      ${renderPracticeModal("Start a new case-based learning practice session.")}
+    </section>
+  `;
+}
+
+function renderPracticeModal(description) {
+  return `
+    <dialog class="practice-modal" id="practiceModal">
+      <form method="dialog">
+        <div class="practice-modal-head">
+          <div>
+            <h3>Choose practice mode</h3>
+            <p>${description}</p>
+          </div>
+          <button class="modal-close" type="submit" aria-label="Close">x</button>
+        </div>
+        <div class="practice-mode-grid">
+          <button class="practice-mode-card" type="submit" value="turn-based">
+            <strong>${svgIcon("message")} Turn-based</strong>
+            <span>Exchange messages one turn at a time. Great when you want to think through each response.</span>
+          </button>
+          <button class="practice-mode-card" type="submit" value="live">
+            <strong>${svgIcon("mic")} Live</strong>
+            <span>Speak naturally in real time. The AI listens and replies as you talk, like a phone call.</span>
+          </button>
+        </div>
+      </form>
+    </dialog>
+  `;
+}
+
+function renderCBLDetail() {
+  const item = state.selectedCase;
+  const latestMode = item.history[0]?.[3];
+  const itemHighestScore = Math.max(...item.history.map(([, , score]) => score));
+  const historyAscending = [...item.history].reverse();
+  return `
+    <section class="panel cbl-detail">
+      <div class="detail-head">
+        <div>
+          <h2>${item.name}</h2>
+          <p>Your role: ${item.role} - AI role: ${item.aiRole}</p>
+        </div>
+        <button class="back-button" type="button" data-cbl-action="overview">${svgIcon("arrow")} Back to CBL analytics</button>
+      </div>
+      <div class="cbl-detail-summary">
+        <article><span>Highest score</span><strong>${itemHighestScore}%</strong></article>
+        <article><span>Latest attempt marks</span><strong>${item.points || Math.round(item.score / 10) + "/10"}</strong></article>
+        <article><span>Total attempts</span><strong>${item.attempts}</strong></article>
+        <article><span>Total practice time</span><strong>${item.duration}</strong></article>
+        <article><span>Last attempt mode</span><strong class="mode-label">${latestMode === "Live" ? svgIcon("mic") : svgIcon("message")} ${latestMode}</strong></article>
+      </div>
+      <details class="case-context">
+        <summary>
+          <span>Case scenario and roles</span>
+          ${svgIcon("chevronDown")}
+        </summary>
+        <div class="case-context-body">
+          <p>${item.description}</p>
+          <div class="role-grid">
+            <article><span>Your Role</span><strong>${item.role}</strong></article>
+            <article><span>AI Role</span><strong>${item.aiRole}</strong></article>
+          </div>
+          <h3>Success Criteria</h3>
+          <div class="criteria-list">
+            ${item.criteria.map(([criterion, points, demonstrated], index) => `
+              <article class="criteria-row ${demonstrated ? "demonstrated" : ""}">
+                <span class="criteria-number">${index + 1}</span>
+                <div>
+                  <strong>${criterion}</strong>
+                  <div class="criteria-meta">
+                    <span>${points} points</span>
+                    <b>${demonstrated ? "Demonstrated" : "Not demonstrated"}</b>
+                  </div>
+                </div>
+              </article>
+            `).join("")}
+          </div>
+        </div>
+      </details>
+      <section class="feedback-summary">
+        <div>
+          <h3>Summary Feedback</h3>
+          <span class="feedback-period">Based on your latest attempt</span>
+          <p>${item.feedbackSummary}</p>
+        </div>
+        <div class="feedback-summary-grid">
+          <article>
+            <span>What went well</span>
+            <strong>${item.strengths}</strong>
+          </article>
+          <article>
+            <span>Focus next</span>
+            <strong>${item.nextFocus}</strong>
+          </article>
+        </div>
+      </section>
+      <div class="cbl-detail-grid">
+        <section>
+          <h3>Detailed Feedback</h3>
+          <p class="section-note">Category scores and feedback from your latest attempt.</p>
+          <div class="criteria-breakdown detail-column-feedback">
+            ${item.breakdown.map(([name, score, total, feedback, observed, nextStep]) => `
+              <article class="breakdown-card">
+                <div class="breakdown-card-head">
+                  <div>
+                    <strong>${name}</strong>
+                    <span>${Math.round((score / total) * 100)}% category score</span>
+                  </div>
+                  <b>${score}/${total}</b>
+                </div>
+                <div class="breakdown-feedback">
+                  <span>Feedback</span>
+                  <p>${feedback}</p>
+                </div>
+                <div class="breakdown-insights">
+                  <div>
+                    <span>What you demonstrated</span>
+                    <p>${observed}</p>
+                  </div>
+                  <div>
+                    <span>Try in your next attempt</span>
+                    <p>${nextStep}</p>
+                  </div>
+                </div>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+        <section>
+          <h3>Attempt Score Trend</h3>
+          <div class="trend-chart">
+            <div class="trend-chart-inner">
+              ${historyAscending.map(([attempt,, score]) => `
+                <div class="trend-column">
+                  <b>${score}%</b>
+                  <span style="--trend-value:${score}%; --trend-color:${completionColor(score)}"></span>
+                  <small>${attempt.replace("Attempt ", "#")}</small>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+          <h3>Attempt History</h3>
+          <div class="attempt-list compact">
+            ${item.history.map(([attempt, date, score, mode]) => `
+              <article class="attempt-row">
+                <div>
+                  <strong>${attempt}</strong>
+                  <span>${date}</span>
+                  <small class="attempt-mode">${mode === "Live" ? svgIcon("mic") : svgIcon("message")} ${mode}</small>
+                </div>
+                <div class="attempt-row-action">
+                  <b>${score}%</b>
+                  <button type="button">View record</button>
+                </div>
+              </article>
+            `).join("")}
+          </div>
+        </section>
+      </div>
+      ${renderPracticeModal(`Start a new attempt for ${item.name}.`)}
+    </section>
+  `;
+}
+
+function render() {
+  document.querySelectorAll("[data-tab]").forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.tab === state.tab);
+  });
+  renderBreadcrumb();
+
+  if (state.tab === "skills") {
+    renderSkills();
+    return;
+  }
+
+  if (state.tab === "cbl") {
+    if (state.selectedCase) {
+      appView.innerHTML = renderCBLDetail();
+    } else {
+      appView.innerHTML = renderCBL();
+    }
+    return;
+  }
+
+  if (state.level === "detail") {
+    renderCourseDetail();
+  } else {
+    renderOverview();
+  }
+}
+
+document.addEventListener("click", (event) => {
+  const tab = event.target.closest("[data-tab]");
+  if (tab) {
+    state.tab = tab.dataset.tab;
+    state.level = "overview";
+    state.selectedCourse = null;
+    state.selectedCase = null;
+    render();
+    return;
+  }
+
+  const strandToggle = event.target.closest("[data-strand-toggle]");
+  if (strandToggle) {
+    const name = strandToggle.dataset.strandToggle;
+    const rows = [...document.querySelectorAll(`[data-strand-row="${name}"]`)];
+    const expanded = rows[0] && rows[0].style.display !== "none";
+    strandToggle.classList.toggle("collapsed", expanded);
+    rows.forEach((r) => { r.style.display = expanded ? "none" : ""; });
+    return;
+  }
+
+  const modeBtn = event.target.closest("[data-mode]");
+  if (modeBtn) {
+    state.viewMode = modeBtn.dataset.mode;
+    render();
+    return;
+  }
+
+  const course = event.target.closest("[data-course]");
+  if (course) {
+    state.selectedCourse = courses.find((item) => item.id === course.dataset.course);
+    state.level = "detail";
+    render();
+    return;
+  }
+
+  const action = event.target.closest("[data-action]");
+  if (action) {
+    state.level = "overview";
+    state.selectedCourse = null;
+    render();
+  }
+
+  const caseButton = event.target.closest("[data-case]");
+  if (caseButton) {
+    state.selectedCase = cblChallenges.find((item) => item.id === caseButton.dataset.case);
+    render();
+    return;
+  }
+
+  const cblAction = event.target.closest("[data-cbl-action]");
+  if (cblAction) {
+    state.selectedCase = null;
+    render();
+  }
+
+  const practiceAgain = event.target.closest("[data-practice-again]");
+  if (practiceAgain) {
+    document.querySelector("#practiceModal")?.showModal();
+  }
+});
+
+hydrateIcons();
+render();
+    </script>
+  </body>
+</html>

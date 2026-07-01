@@ -42,18 +42,27 @@
 /* Entity list v2 — header row */
 .entity-list-head-v2 {
   display: grid;
-  grid-template-columns: 44px minmax(180px, 1fr) minmax(160px, 240px) 80px 120px auto;
+  grid-template-columns: 44px minmax(180px, 1fr) minmax(160px, 240px) 80px auto;
   align-items: center;
   gap: 18px;
-  padding: 0 18px;
+  padding: 0 18px 10px;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 4px;
 }
 
 .entity-list-head-v2 span:first-child {
   grid-column: 1 / 3;
 }
+
+/* Align header labels with card content */
+.entity-list-head-v2 span:nth-child(2) { text-align: left; }
+.entity-list-head-v2 span:nth-child(3) { text-align: center; }
+.entity-list-head-v2 span:last-child   { text-align: center; }
 
 /* Entity card v2 */
 .entity-card-v2 {
@@ -63,7 +72,7 @@
   border-radius: 18px;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
   display: grid;
-  grid-template-columns: 44px minmax(180px, 1fr) minmax(160px, 240px) 80px 120px auto;
+  grid-template-columns: 44px minmax(180px, 1fr) minmax(160px, 240px) 80px auto;
   align-items: center;
   gap: 18px;
   padding: 14px 18px;
@@ -80,7 +89,7 @@
 
 .entity-score-cell strong {
   font-family: "Space Grotesk", sans-serif;
-  font-size: 16px;
+  font-size: 13px;
   font-weight: 700;
 }
 
@@ -180,12 +189,12 @@
 /* Topic org-stats table (right side of expand) */
 .pals-score-topics {
   padding: 16px 22px;
-  overflow-x: auto;
+  overflow: visible;
 }
 
 .pals-score-topics-head {
   display: grid;
-  grid-template-columns: 1fr 72px 86px 160px;
+  grid-template-columns: minmax(60px, .35fr) 88px 96px minmax(130px, .65fr);
   gap: 16px;
   padding-bottom: 10px;
   border-bottom: 1px solid var(--line);
@@ -198,7 +207,7 @@
 
 .pals-score-topic-row {
   display: grid;
-  grid-template-columns: 1fr 72px 86px 160px;
+  grid-template-columns: minmax(60px, .35fr) 88px 96px minmax(130px, .65fr);
   gap: 16px;
   align-items: center;
   padding: 10px 0;
@@ -209,6 +218,10 @@
 
 .pals-score-topic-row:last-child {
   border-bottom: 0;
+}
+
+.pals-score-topic-row span:last-child {
+  text-align: left;
 }
 
 .topic-stat {
@@ -299,12 +312,9 @@
 
 /* Entity card v2 responsive */
 @media (max-width: 1260px) {
-  .entity-card-v2 {
-    grid-template-columns: 44px minmax(160px, 1fr) minmax(140px, 200px) 70px 110px auto;
-  }
-
+  .entity-card-v2,
   .entity-list-head-v2 {
-    grid-template-columns: 44px minmax(160px, 1fr) minmax(140px, 200px) 70px 110px auto;
+    grid-template-columns: 44px minmax(160px, 1fr) minmax(140px, 200px) 70px auto;
   }
 }
 
@@ -324,7 +334,6 @@
 
   .entity-card-v2 .progress-wrap,
   .entity-card-v2 .entity-score-cell,
-  .entity-card-v2 .entity-status-badge,
   .entity-card-v2 .view-button {
     grid-column: 1 / -1;
   }
@@ -348,16 +357,6 @@
   .pals-score-summary-text {
     text-align: left;
   }
-
-  .pals-score-topics-head,
-  .pals-score-topic-row {
-    grid-template-columns: 1fr 72px 86px;
-  }
-
-  .pals-score-topics-head span:last-child,
-  .pals-score-topic-row span:last-child {
-    display: none;
-  }
 }
 
 @media (max-width: 680px) {
@@ -370,4 +369,319 @@
   .pals-score-topic-row span:nth-child(2) {
     display: none;
   }
+}
+
+/* Empty ring (no score data) */
+.ring-empty {
+  background: conic-gradient(#edf0f3 100%);
+}
+
+.ring-empty b {
+  color: var(--muted);
+}
+
+/* Label row with info tooltip trigger */
+.pals-score-label-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.pals-score-label-row strong {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Topic table header cells that contain an info button */
+.topic-head-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Info button + tooltip */
+.calc-info-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  color: #9ca3af;
+  line-height: 1;
+}
+
+.calc-info-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.calc-info-btn:hover { color: var(--blue); }
+
+.calc-tooltip {
+  display: none;
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 270px;
+  background: #fff;
+  color: #374151;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 12px;
+  line-height: 1.55;
+  z-index: 20;
+  pointer-events: none;
+  text-align: left;
+  font-weight: 400;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .12);
+}
+
+.calc-tooltip p {
+  margin: 0 0 8px;
+}
+
+.calc-tooltip p:last-child {
+  margin-bottom: 0;
+}
+
+.calc-tooltip b {
+  color: #0f172a;
+}
+
+.calc-formula {
+  background: #f1f5f9;
+  border-radius: 6px;
+  padding: 7px 10px;
+  margin: 5px 0 10px;
+  font-family: "Courier New", monospace;
+  font-size: 11px;
+  color: #2563eb;
+  word-break: break-word;
+}
+
+/* Arrow pointing down — border layer (::before) + fill layer (::after) */
+.calc-tooltip::before {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 7px solid transparent;
+  border-top-color: #e2e8f0;
+}
+
+.calc-tooltip::after {
+  content: "";
+  position: absolute;
+  top: calc(100% + 1px);
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: #fff;
+}
+
+/* Right-anchored tooltip variant (for last column — avoids right overflow) */
+.calc-tooltip.calc-tooltip-end {
+  left: auto;
+  right: -8px;
+  transform: none;
+}
+
+.calc-tooltip.calc-tooltip-end::before,
+.calc-tooltip.calc-tooltip-end::after {
+  left: auto;
+  right: 12px;
+  transform: none;
+}
+
+.calc-info-btn:hover .calc-tooltip,
+.calc-info-btn:focus-within .calc-tooltip {
+  display: block;
+}
+
+/* View Report — entity metric strip */
+.entity-report-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin-bottom: 24px;
+}
+
+.report-metric {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.04);
+}
+
+.report-metric-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #eef0f4;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  color: var(--blue);
+}
+
+.report-metric-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.report-metric strong {
+  display: block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.report-metric span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+/* Font consistency: progress bar % value matches entity-score-cell */
+.progress-wrap b {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+/* Entity type badge next to entity name in course-header h2 */
+.entity-type-tag {
+  display: inline-block;
+  vertical-align: middle;
+  font-family: Inter, sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--blue);
+  background: var(--blue-soft);
+  border-radius: 6px;
+  padding: 2px 8px;
+  margin-left: 8px;
+  position: relative;
+  top: -2px;
+}
+
+/* Section title between metric strip and course grid */
+.report-courses-title {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+/* Avg. score row inside View Report course card */
+.course-score-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 0;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  margin: 2px 0;
+}
+
+.course-score-row span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.course-score-row strong {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+@media (max-width: 980px) {
+  .entity-report-summary { grid-template-columns: 1fr; }
+
+  .pals-score-topics-head,
+  .pals-score-topic-row {
+    grid-template-columns: minmax(60px, .35fr) 88px 96px;
+  }
+
+  .pals-score-topics-head span:last-child,
+  .pals-score-topic-row span:last-child {
+    display: none;
+  }
+}
+
+/* ============================================================
+   Animations
+   ============================================================ */
+
+/* Progress bar: grow from left */
+.progress span {
+  animation: bar-grow 0.65s ease-out both;
+  transform-origin: left center;
+}
+
+@keyframes bar-grow {
+  from { transform: scaleX(0); }
+}
+
+/* Progress bar number: fade in slightly after bar starts */
+.progress-wrap b {
+  animation: fade-in 0.4s 0.3s ease-out both;
+}
+
+/* Ring donut: animate conic-gradient via @property */
+@property --ring-val {
+  syntax: '<number>';
+  initial-value: 0;
+  inherits: false;
+}
+
+.ring:not(.ring-empty) {
+  background: conic-gradient(
+    var(--ring-color, var(--blue)) calc(var(--ring-val) * 1%),
+    #edf0f3 0
+  );
+  animation: ring-grow 0.8s ease-out both;
+}
+
+@keyframes ring-grow {
+  from { --ring-val: 0; }
+  to   { --ring-val: var(--value); }
+}
+
+/* Ring number: fade in after ring starts drawing */
+.ring b {
+  animation: fade-in 0.4s 0.5s ease-out both;
+}
+
+/* Radar polygon: scale from center */
+.radar .value {
+  transform-box: fill-box;
+  transform-origin: center center;
+  animation: radar-appear 0.7s ease-out both;
+}
+
+@keyframes radar-appear {
+  from {
+    transform: scale(0.05);
+    opacity: 0;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
 }
