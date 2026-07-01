@@ -1875,6 +1875,207 @@ svg {
   text-align: center;
 }
 
+/* Scoring expanded row */
+.pals-score-expand-row td {
+  padding: 0 !important;
+  border-bottom: 1px solid var(--line);
+}
+
+.pals-score-expand {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 0;
+  background: #f8fafc;
+}
+
+.pals-score-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 24px 20px;
+  border-right: 1px solid var(--line);
+}
+
+.pals-score-summary .ring {
+  --size: 104px;
+}
+
+.pals-score-summary .ring b {
+  font-size: 18px;
+}
+
+.pals-score-summary-text {
+  text-align: center;
+}
+
+.pals-score-summary-text strong {
+  display: block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pals-score-summary-text span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.pals-score-topics {
+  padding: 16px 24px;
+}
+
+.pals-score-topics-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pals-score-topic-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 20px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f2f5;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pals-score-topic-row:last-child {
+  border-bottom: 0;
+}
+
+.attempt-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.badge-pass {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.badge-fail {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+.badge-pending {
+  background: #f1f5f9;
+  color: #94a3b8;
+}
+
+/* PALS head right side — count badge + future controls */
+.pals-head-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+/* Completion / Score view toggle in proposal-head */
+.proposal-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.pals-view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.pals-view-toggle > span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Expand/collapse button in table rows */
+.course-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.expand-btn {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f8fafc;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.expand-btn:hover {
+  background: var(--blue-soft);
+  border-color: #c4dfe9;
+  color: var(--blue);
+}
+
+.expand-btn svg {
+  width: 11px;
+  height: 11px;
+  transform: rotate(180deg);
+  transition: transform 0.18s ease;
+}
+
+.expand-btn.expanded svg {
+  transform: rotate(0deg);
+}
+
+.expand-spacer {
+  display: inline-block;
+  width: 22px;
+  flex-shrink: 0;
+}
+
+/* Topic sub-rows inside the PALS table */
+.topic-sub-row td {
+  background: #f8fafc;
+  border-bottom-color: #eef1f4;
+  color: var(--muted);
+  font-size: 12px;
+  height: 48px;
+  padding: 8px 20px;
+}
+
+.topic-sub-name {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.topic-indent {
+  display: inline-block;
+  width: 30px;
+  flex-shrink: 0;
+}
+
 @media (max-width: 980px) {
   .pals-spider-layout {
     grid-template-columns: 1fr;
@@ -1898,9 +2099,14 @@ svg {
   }
 
   .pals-progress-head,
-  .pals-progress-toolbar {
+  .pals-progress-toolbar,
+  .proposal-head-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .pals-view-toggle {
+    justify-content: space-between;
   }
 
   .pals-progress-toolbar span {

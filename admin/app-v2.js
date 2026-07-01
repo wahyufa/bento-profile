@@ -26,7 +26,8 @@ const icons = {
   arrow: '<path d="m15 18-6-6 6-6"></path>',
   trend: '<path d="m3 17 6-6 4 4 8-8"></path><path d="M14 7h7v7"></path>',
   mic: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><path d="M12 19v3"></path>',
-  message: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"></path>'
+  message: '<path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4Z"></path>',
+  warning: '<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path>'
 };
 
 const courseRows = [
@@ -48,127 +49,120 @@ const palsRows = [
   ["Digital Collaboration", 6, 14, 8, 73, 76]
 ];
 
-// attempts: total attempts on the review test; passed: which attempt # they passed (null = not passed yet)
-// score: avg score on the review test (0 if not attempted; <70 if attempted but not passed; >=70 if passed)
-// Passing threshold is 70%. avgScore in palsRows is org-wide weighted average (slightly different from topic avg)
-const palsTopics = {
+// Org-level topic stats: how many learners passed, avg score, avg attempts across the org
+// avgAttempts >= 2.5 = signal that this topic needs review (difficulty spike)
+const palsTopicsOrg = {
   "Leadership Management": [
-    { name: "Strategic Leadership Principles", completion: 32, score: 78, attempts: 3, passed: 3 },
-    { name: "Team Dynamics & Motivation", completion: 20, score: 54, attempts: 1, passed: null },
-    { name: "Communication for Leaders", completion: 0, score: 0, attempts: 0, passed: null }
+    { name: "Strategic Leadership Principles", total: 4, passed: 1, avgScore: 71, avgAttempts: 2.4 },
+    { name: "Team Dynamics & Motivation",       total: 4, passed: 0, avgScore: 54, avgAttempts: 1.0 },
+    { name: "Communication for Leaders",        total: 4, passed: 0, avgScore: null, avgAttempts: 0 }
   ],
-  // avg of attempted topics: (78+54)/2 = 66 → org-wide 62 (some learners haven't reached this course yet)
   "Advanced HR Management": [
-    { name: "HR Strategy & Planning", completion: 0, score: 0, attempts: 0, passed: null },
-    { name: "Talent Acquisition Frameworks", completion: 0, score: 0, attempts: 0, passed: null },
-    { name: "Performance Management", completion: 0, score: 0, attempts: 0, passed: null }
+    { name: "HR Strategy & Planning",           total: 4, passed: 0, avgScore: null, avgAttempts: 0 },
+    { name: "Talent Acquisition Frameworks",    total: 4, passed: 0, avgScore: null, avgAttempts: 0 },
+    { name: "Performance Management",           total: 4, passed: 0, avgScore: null, avgAttempts: 0 }
   ],
   "Accountancy Specialist": [
-    { name: "Financial Statements Analysis", completion: 28, score: 61, attempts: 2, passed: 2 },
-    { name: "Tax Compliance Basics", completion: 0, score: 0, attempts: 0, passed: null }
+    { name: "Financial Statements Analysis",    total: 1, passed: 1, avgScore: 61, avgAttempts: 2.0 },
+    { name: "Tax Compliance Basics",            total: 1, passed: 0, avgScore: null, avgAttempts: 0 }
   ],
   "Human Resource Specialist": [
-    { name: "Recruitment & Selection", completion: 72, score: 76, attempts: 1, passed: 1 },
-    { name: "Employee Relations", completion: 64, score: 72, attempts: 2, passed: 2 },
-    { name: "Learning & Development", completion: 0, score: 0, attempts: 0, passed: null }
+    { name: "Recruitment & Selection",          total: 1, passed: 1, avgScore: 76, avgAttempts: 1.0 },
+    { name: "Employee Relations",               total: 1, passed: 1, avgScore: 72, avgAttempts: 2.0 },
+    { name: "Learning & Development",           total: 1, passed: 0, avgScore: null, avgAttempts: 0 }
   ],
-  // avg of attempted: (76+72)/2 = 74 → org-wide 71
   "Customer Service PALS Course": [
-    { name: "Service Excellence Fundamentals", completion: 94, score: 88, attempts: 1, passed: 1 },
-    { name: "Handling Difficult Customers", completion: 90, score: 62, attempts: 3, passed: 3 },
-    // 3 attempts: first two failed (score <70), passed on 3rd with 62 avg across all 3 attempts
-    { name: "Service Recovery Strategies", completion: 88, score: 83, attempts: 2, passed: 2 }
+    { name: "Service Excellence Fundamentals",  total: 18, passed: 15, avgScore: 88, avgAttempts: 1.2 },
+    { name: "Handling Difficult Customers",     total: 18, passed: 11, avgScore: 73, avgAttempts: 2.8 },
+    { name: "Service Recovery Strategies",      total: 18, passed: 10, avgScore: 79, avgAttempts: 1.5 }
   ],
-  // avg of attempted: (88+62+83)/3 = 77.7 → org-wide 84 (high performers dominate)
   "Sales Fundamentals": [
-    { name: "Prospecting & Lead Generation", completion: 62, score: 71, attempts: 2, passed: 2 },
-    { name: "Sales Pitch & Presentation", completion: 55, score: 63, attempts: 1, passed: 1 },
-    { name: "Closing Techniques", completion: 0, score: 0, attempts: 0, passed: null }
+    { name: "Prospecting & Lead Generation",    total: 12, passed: 9,  avgScore: 71, avgAttempts: 1.8 },
+    { name: "Sales Pitch & Presentation",       total: 12, passed: 7,  avgScore: 63, avgAttempts: 2.2 },
+    { name: "Closing Techniques",               total: 12, passed: 0,  avgScore: null, avgAttempts: 0 }
   ],
   "Finance for Non-Finance": [
-    { name: "Reading Financial Reports", completion: 45, score: 48, attempts: 3, passed: 3 },
-    // 3 attempts to finally pass — shows difficulty of this topic
-    { name: "Budgeting Basics", completion: 0, score: 0, attempts: 0, passed: null },
-    { name: "Cost-Benefit Analysis", completion: 0, score: 0, attempts: 0, passed: null }
+    { name: "Reading Financial Reports",        total: 9,  passed: 4,  avgScore: 55, avgAttempts: 3.1 },
+    { name: "Budgeting Basics",                 total: 9,  passed: 0,  avgScore: null, avgAttempts: 0 },
+    { name: "Cost-Benefit Analysis",            total: 9,  passed: 0,  avgScore: null, avgAttempts: 0 }
   ],
   "Digital Collaboration": [
-    { name: "Remote Work Tools & Practices", completion: 78, score: 81, attempts: 1, passed: 1 },
-    { name: "Virtual Meeting Facilitation", completion: 70, score: 74, attempts: 2, passed: 2 },
-    { name: "Digital Communication Etiquette", completion: 0, score: 0, attempts: 0, passed: null }
+    { name: "Remote Work Tools & Practices",    total: 14, passed: 11, avgScore: 81, avgAttempts: 1.1 },
+    { name: "Virtual Meeting Facilitation",     total: 14, passed: 9,  avgScore: 74, avgAttempts: 1.9 },
+    { name: "Digital Communication Etiquette",  total: 14, passed: 0,  avgScore: null, avgAttempts: 0 }
   ]
-  // avg of attempted: (81+74)/2 = 77.5 → org-wide 76
 };
 
 const groups = [
-  { id: "sales", name: "Sales Enablement", members: 32, completion: 72, score: 68 },
-  { id: "service", name: "Customer Service", members: 28, completion: 64, score: 71 },
-  { id: "marketing", name: "Marketing Team", members: 19, completion: 58, score: 55 },
-  { id: "operations", name: "Operations", members: 41, completion: 46, score: 49 }
+  { id: "sales",      name: "Sales Enablement",  members: 32, completion: 72, score: 68 },
+  { id: "service",    name: "Customer Service",   members: 28, completion: 64, score: 71 },
+  { id: "marketing",  name: "Marketing Team",     members: 19, completion: 58, score: 55 },
+  { id: "operations", name: "Operations",         members: 41, completion: 46, score: 49 }
 ];
 
 const learners = [
-  { id: "datolow", name: "datolow_student", courses: 4, completion: 18, score: 22 },
-  { id: "rock01", name: "rockwills_student01", courses: 5, completion: 88, score: 82 },
-  { id: "rock02", name: "rockwills_student02", courses: 5, completion: 87, score: 79 },
-  { id: "rock03", name: "rockwills_student03", courses: 3, completion: 89, score: 84 },
-  { id: "amira", name: "amira_student", courses: 6, completion: 74, score: 70 },
-  { id: "ben", name: "benjamin_student", courses: 4, completion: 52, score: 58 },
-  { id: "cynthia", name: "cynthia_student", courses: 5, completion: 67, score: 63 },
-  { id: "darren", name: "darren_student", courses: 2, completion: 33, score: 38 },
-  { id: "elena", name: "elena_student", courses: 7, completion: 91, score: 86 },
-  { id: "faris", name: "faris_student", courses: 3, completion: 45, score: 51 },
-  { id: "grace", name: "grace_student", courses: 5, completion: 79, score: 74 },
-  { id: "han", name: "han_student", courses: 4, completion: 61, score: 57 }
+  { id: "datolow", name: "datolow_student",      courses: 4, completion: 18, score: 22 },
+  { id: "rock01",  name: "rockwills_student01",  courses: 5, completion: 88, score: 82 },
+  { id: "rock02",  name: "rockwills_student02",  courses: 5, completion: 87, score: 79 },
+  { id: "rock03",  name: "rockwills_student03",  courses: 3, completion: 89, score: 84 },
+  { id: "amira",   name: "amira_student",        courses: 6, completion: 74, score: 70 },
+  { id: "ben",     name: "benjamin_student",     courses: 4, completion: 52, score: 58 },
+  { id: "cynthia", name: "cynthia_student",      courses: 5, completion: 67, score: 63 },
+  { id: "darren",  name: "darren_student",       courses: 2, completion: 33, score: 38 },
+  { id: "elena",   name: "elena_student",        courses: 7, completion: 91, score: 86 },
+  { id: "faris",   name: "faris_student",        courses: 3, completion: 45, score: 51 },
+  { id: "grace",   name: "grace_student",        courses: 5, completion: 79, score: 74 },
+  { id: "han",     name: "han_student",          courses: 4, completion: 61, score: 57 }
 ];
 
 const proposalCourses = [
-  { id: "communications", name: "Communications", progress: 68, enrolments: 42 },
-  { id: "ai-literacy", name: "AI Literacy", progress: 54, enrolments: 35 },
-  { id: "finance", name: "Finance", progress: 47, enrolments: 29 },
-  { id: "leadership", name: "Leadership Essentials", progress: 61, enrolments: 31 }
+  { id: "communications", name: "Communications",     progress: 68, enrolments: 42 },
+  { id: "ai-literacy",    name: "AI Literacy",        progress: 54, enrolments: 35 },
+  { id: "finance",        name: "Finance",            progress: 47, enrolments: 29 },
+  { id: "leadership",     name: "Leadership Essentials", progress: 61, enrolments: 31 }
 ];
 
 const strands = [
-  { name: "Foundations", progress: 82, sub: [["Concept recall", [["Define core terms", 92], ["Identify examples", 78]]], ["Learning orientation", [["Set learning goal", 83], ["Use course resources", 71]]]] },
-  { name: "Application", progress: 66, sub: [["Scenario practice", [["Select approach", 70], ["Apply steps", 62]]], ["Workplace transfer", [["Adapt to role", 59], ["Choose tools", 73]]]] },
-  { name: "Analysis", progress: 51, sub: [["Pattern recognition", [["Compare options", 57], ["Spot gaps", 49]]], ["Decision quality", [["Prioritise criteria", 52], ["Justify recommendation", 46]]]] },
-  { name: "Collaboration", progress: 74, sub: [["Peer exchange", [["Give feedback", 77], ["Respond constructively", 69]]], ["Team routines", [["Share progress", 80], ["Resolve blockers", 71]]]] },
-  { name: "Reflection", progress: 58, sub: [["Self review", [["Assess confidence", 64], ["Name next step", 60]]], ["Improvement planning", [["Use feedback", 55], ["Track progress", 51]]]] },
-  { name: "Mastery", progress: 43, sub: [["Independent performance", [["Complete challenge", 45], ["Explain tradeoffs", 41]]], ["Retention", [["Review checkpoint", 47], ["Maintain accuracy", 39]]]] }
+  { name: "Foundations",   progress: 82, sub: [["Concept recall",      [["Define core terms", 92],        ["Identify examples", 78]]],   ["Learning orientation",  [["Set learning goal", 83],      ["Use course resources", 71]]]] },
+  { name: "Application",   progress: 66, sub: [["Scenario practice",   [["Select approach", 70],          ["Apply steps", 62]]],          ["Workplace transfer",    [["Adapt to role", 59],          ["Choose tools", 73]]]] },
+  { name: "Analysis",      progress: 51, sub: [["Pattern recognition", [["Compare options", 57],          ["Spot gaps", 49]]],            ["Decision quality",      [["Prioritise criteria", 52],    ["Justify recommendation", 46]]]] },
+  { name: "Collaboration", progress: 74, sub: [["Peer exchange",       [["Give feedback", 77],            ["Respond constructively", 69]]],["Team routines",         [["Share progress", 80],         ["Resolve blockers", 71]]]] },
+  { name: "Reflection",    progress: 58, sub: [["Self review",         [["Assess confidence", 64],        ["Name next step", 60]]],       ["Improvement planning",  [["Use feedback", 55],           ["Track progress", 51]]]] },
+  { name: "Mastery",       progress: 43, sub: [["Independent performance",[["Complete challenge", 45],    ["Explain tradeoffs", 41]]],    ["Retention",             [["Review checkpoint", 47],      ["Maintain accuracy", 39]]]] }
 ];
 
 const skillTags = [
-  { name: "Sales Communication", progress: 74, questions: 12 },
+  { name: "Sales Communication",            progress: 74, questions: 12 },
   { name: "Customer Relationship Management", label: "Customer Relation", progress: 81, questions: 15 },
-  { name: "Negotiation", progress: 62, questions: 9 },
-  { name: "Business Presentation", label: "Business Present.", progress: 69, questions: 11 },
-  { name: "Service Excellence", progress: 77, questions: 14 },
-  { name: "Problem Solving", progress: 58, questions: 8 },
-  { name: "Data Interpretation", label: "Data Interpretation", progress: 66, questions: 10 },
-  { name: "Digital Collaboration", label: "Digital Collab.", progress: 71, questions: 7 }
+  { name: "Negotiation",                    progress: 62, questions: 9 },
+  { name: "Business Presentation",          label: "Business Present.", progress: 69, questions: 11 },
+  { name: "Service Excellence",             progress: 77, questions: 14 },
+  { name: "Problem Solving",                progress: 58, questions: 8 },
+  { name: "Data Interpretation",            progress: 66, questions: 10 },
+  { name: "Digital Collaboration",          label: "Digital Collab.", progress: 71, questions: 7 }
 ];
 
 const cblEntities = {
   group: [
-    { id: "sales", name: "Sales Enablement", learners: 32, practised: 24, attempts: 67, score: 78, time: "6h 42m" },
-    { id: "service", name: "Customer Service", learners: 28, practised: 21, attempts: 52, score: 72, time: "5h 18m" },
-    { id: "marketing", name: "Marketing Team", learners: 19, practised: 11, attempts: 24, score: 61, time: "2h 46m" },
-    { id: "operations", name: "Operations", learners: 41, practised: 17, attempts: 36, score: 54, time: "4h 11m" }
+    { id: "sales",     name: "Sales Enablement", learners: 32, practised: 24, attempts: 67, score: 78, time: "6h 42m" },
+    { id: "service",   name: "Customer Service",  learners: 28, practised: 21, attempts: 52, score: 72, time: "5h 18m" },
+    { id: "marketing", name: "Marketing Team",    learners: 19, practised: 11, attempts: 24, score: 61, time: "2h 46m" },
+    { id: "operations",name: "Operations",        learners: 41, practised: 17, attempts: 36, score: 54, time: "4h 11m" }
   ],
   individual: [
-    { id: "rock01", name: "rockwills_student01", learners: 1, practised: 4, attempts: 12, score: 80, time: "1h 26m" },
-    { id: "amira", name: "amira_student", learners: 1, practised: 3, attempts: 7, score: 74, time: "54m" },
-    { id: "elena", name: "elena_student", learners: 1, practised: 4, attempts: 9, score: 69, time: "1h 08m" },
-    { id: "ben", name: "benjamin_student", learners: 1, practised: 2, attempts: 4, score: 58, time: "37m" },
-    { id: "darren", name: "darren_student", learners: 1, practised: 1, attempts: 2, score: 42, time: "19m" },
-    { id: "datolow", name: "datolow_student", learners: 1, practised: 0, attempts: 0, score: null, time: "0m" }
+    { id: "rock01",  name: "rockwills_student01", learners: 1, practised: 4, attempts: 12, score: 80, time: "1h 26m" },
+    { id: "amira",   name: "amira_student",       learners: 1, practised: 3, attempts: 7,  score: 74, time: "54m" },
+    { id: "elena",   name: "elena_student",       learners: 1, practised: 4, attempts: 9,  score: 69, time: "1h 08m" },
+    { id: "ben",     name: "benjamin_student",    learners: 1, practised: 2, attempts: 4,  score: 58, time: "37m" },
+    { id: "darren",  name: "darren_student",      learners: 1, practised: 1, attempts: 2,  score: 42, time: "19m" },
+    { id: "datolow", name: "datolow_student",     learners: 1, practised: 0, attempts: 0,  score: null, time: "0m" }
   ]
 };
 
 const cblCases = [
-  { name: "Banking Client Review Session", role: "Financial Services Specialist", attempted: 18, attempts: 42, score: 76, live: 26, turn: 16 },
-  { name: "Responding to a Renewal Risk", role: "Customer Success Manager", attempted: 15, attempts: 31, score: 68, live: 12, turn: 19 },
-  { name: "Managing a Project Delay", role: "Project Lead", attempted: 12, attempts: 22, score: 57, live: 14, turn: 8 },
+  { name: "Banking Client Review Session",         role: "Financial Services Specialist", attempted: 18, attempts: 42, score: 76, live: 26, turn: 16 },
+  { name: "Responding to a Renewal Risk",          role: "Customer Success Manager",      attempted: 15, attempts: 31, score: 68, live: 12, turn: 19 },
+  { name: "Managing a Project Delay",              role: "Project Lead",                  attempted: 12, attempts: 22, score: 57, live: 14, turn: 8 },
   { name: "Handling an Escalated Customer Complaint", role: "Customer Experience Specialist", attempted: 7, attempts: 11, score: 48, live: 4, turn: 7 }
 ];
 
@@ -178,7 +172,6 @@ const state = {
   proposalLevel: "overview",
   dateRange: "all",
   entityFilter: "all",
-  palsViewMode: "completion",
   expandedPalsRows: new Set(),
   selectedEntity: null,
   selectedCourse: null,
@@ -230,6 +223,13 @@ function rangeAdjustedScore(value) {
   return Math.max(0, Math.min(100, value + (offsets[state.dateRange] || 0)));
 }
 
+// completion-based status for entity cards
+function entityStatus(completion) {
+  if (completion >= 70) return { label: "On Track",    cls: "status-good" };
+  if (completion >= 30) return { label: "In Progress", cls: "status-mid"  };
+  return                       { label: "At Risk",     cls: "status-risk"  };
+}
+
 function renderTopTabs() {
   document.querySelectorAll("[data-main-tab]").forEach((tab) => {
     tab.classList.toggle("active", tab.dataset.mainTab === state.mainTab);
@@ -263,9 +263,7 @@ function renderCourseMastery() {
 }
 
 function renderPalsExisting() {
-  const isScoring = state.palsViewMode === "scoring";
-
-  const palsSpiderItems = palsRows.map(([name,,,, completion, avgScore]) => ({
+  const palsSpiderItems = palsRows.map(([name,,,, completion]) => ({
     name,
     label: name
       .replace("Leadership Management", "Leadership")
@@ -275,93 +273,93 @@ function renderPalsExisting() {
       .replace("Customer Service PALS Course", "Customer Service")
       .replace("Finance for Non-Finance", "Finance")
       .replace("Digital Collaboration", "Digital Collab."),
-    progress: isScoring ? avgScore : completion
+    progress: completion
   }));
 
   return `
     <section class="panel data-panel pals-spider-card">
       <div class="pals-progress-head">
         <div>
-          <h2>${isScoring ? "Avg. Score by PALS Course" : "Completion Rate by PALS Course"}</h2>
-          <p>${isScoring ? "Compare average review test scores across published PALS courses." : "Compare course completion across published PALS courses."}</p>
+          <h2>Completion Rate by PALS Course</h2>
+          <p>Compare course completion across published PALS courses.</p>
         </div>
-        <div class="pals-head-right">
-          <div class="pals-progress-count"><strong>${palsRows.length}</strong><span>courses</span></div>
-        </div>
+        <div class="pals-progress-count"><strong>${palsRows.length}</strong><span>courses</span></div>
       </div>
       <div class="pals-spider-layout">
         <div class="radar-wrap pals-spider-wrap">${renderRadarFor(palsSpiderItems)}</div>
         <div class="pals-spider-legend">
-          ${palsRows.map(([name, kp, assigned, completed, completion, avgScore]) => `
+          ${palsRows.map(([name, kp, assigned, completed, completion]) => `
             <div class="pals-spider-row">
               <div>
                 <strong>${name}</strong>
                 <span>${kp} KP · ${assigned} assigned · ${completed} completed</span>
               </div>
-              ${progress(isScoring ? avgScore : completion)}
+              ${progress(completion)}
             </div>
           `).join("")}
         </div>
       </div>
     </section>
+
     <section class="panel data-panel">
       <h2><span class="title-icon">${svgIcon("cap")}</span>Published PALS Courses</h2>
-      <table>
-        <thead><tr><th>Course</th><th>Knowledge Points</th><th>Assigned Learners</th><th>Completed</th><th>${isScoring ? "Avg. Score" : "Completion Rate"}</th></tr></thead>
+      <table class="pals-dual-table">
+        <thead>
+          <tr>
+            <th>Course</th>
+            <th>Knowledge Points</th>
+            <th>Assigned Learners</th>
+            <th>Completed</th>
+            <th>Completion Rate</th>
+            <th>Avg. Score</th>
+          </tr>
+        </thead>
         <tbody>
           ${palsRows.map(([name, kp, assigned, completed, rate, avgScore]) => {
             const isExpanded = state.expandedPalsRows.has(name);
-            const topics = palsTopics[name] || [];
-            const value = isScoring ? avgScore : rate;
+            const topics = palsTopicsOrg[name] || [];
+            const passedTopics = topics.filter((t) => t.passed > 0).length;
 
-            let expandContent = "";
-            if (isExpanded) {
-              if (isScoring) {
-                const passedCount = topics.filter((t) => t.passed !== null).length;
-                const scoreColor = completionColor(avgScore);
-                expandContent = `
-                  <tr class="pals-score-expand-row">
-                    <td colspan="5">
-                      <div class="pals-score-expand">
-                        <div class="pals-score-summary">
-                          <div class="ring" style="--value:${avgScore}; --ring-color:${scoreColor}"><b>${avgScore}%</b></div>
-                          <div class="pals-score-summary-text">
-                            <strong>Avg. Score</strong>
-                            <span>${passedCount} of ${topics.length} topics passed</span>
-                          </div>
-                        </div>
-                        <div class="pals-score-topics">
-                          <div class="pals-score-topics-head"><span>Topic</span><span>Result</span></div>
-                          ${topics.map((topic) => {
-                            let cls, label;
-                            if (topic.attempts === 0) {
-                              cls = "badge-pending"; label = "Not attempted yet";
-                            } else if (topic.passed === null) {
-                              cls = "badge-fail"; label = `${topic.attempts} attempt${topic.attempts > 1 ? "s" : ""} · Not passed`;
-                            } else {
-                              cls = "badge-pass"; label = topic.passed === 1 ? "Passed on 1st attempt" : `Passed on attempt ${topic.passed}`;
-                            }
-                            return `
-                              <div class="pals-score-topic-row">
-                                <span>${topic.name}</span>
-                                <span class="attempt-badge ${cls}">${label}</span>
-                              </div>
-                            `;
-                          }).join("")}
-                        </div>
+            const expandedRow = isExpanded ? `
+              <tr class="pals-score-expand-row">
+                <td colspan="6">
+                  <div class="pals-score-expand">
+                    <div class="pals-score-summary">
+                      <div class="ring" style="--value:${avgScore}; --ring-color:${completionColor(avgScore)}; --size:120px"><b>${avgScore}%</b></div>
+                      <div class="pals-score-summary-text">
+                        <strong>Avg. Score</strong>
+                        <span>${passedTopics} of ${topics.length} topics passed</span>
                       </div>
-                    </td>
-                  </tr>
-                `;
-              } else {
-                expandContent = topics.map((topic) => `
-                  <tr class="topic-sub-row">
-                    <td><div class="topic-sub-name"><span class="topic-indent"></span>${topic.name}</div></td>
-                    <td>—</td><td>—</td><td>—</td><td>${progress(topic.completion)}</td>
-                  </tr>
-                `).join("");
-              }
-            }
+                    </div>
+                    <div class="pals-score-topics">
+                      <div class="pals-score-topics-head">
+                        <span>Topic</span>
+                        <span>Passed</span>
+                        <span>Avg Score</span>
+                        <span>Avg Attempts</span>
+                      </div>
+                      ${topics.map((topic) => {
+                        const isNotStarted = topic.avgAttempts === 0;
+                        const isHard = topic.avgAttempts >= 2.5;
+                        const passedLabel = isNotStarted ? "—" : `${topic.passed}/${topic.total}`;
+                        const scoreLabel  = isNotStarted ? "—" : `${topic.avgScore ?? "—"}%`;
+                        const attemptsLabel = isNotStarted
+                          ? '<span class="topic-not-started">Not started</span>'
+                          : `${topic.avgAttempts.toFixed(1)}×${isHard ? ` <span class="topic-hard-flag">${svgIcon("warning")} High difficulty</span>` : ""}`;
+                        return `
+                          <div class="pals-score-topic-row">
+                            <span>${topic.name}</span>
+                            <span class="topic-stat ${isNotStarted ? "stat-muted" : ""}">${passedLabel}</span>
+                            <span class="topic-stat ${isNotStarted ? "stat-muted" : ""}">${scoreLabel}</span>
+                            <span class="topic-stat">${attemptsLabel}</span>
+                          </div>
+                        `;
+                      }).join("")}
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ` : "";
 
             return `
               <tr>
@@ -371,9 +369,13 @@ function renderPalsExisting() {
                     ${name}
                   </div>
                 </td>
-                <td>${kp}</td><td>${assigned}</td><td>${completed}</td><td>${progress(value)}</td>
+                <td>${kp}</td>
+                <td>${assigned}</td>
+                <td>${completed}</td>
+                <td>${progress(rate)}</td>
+                <td>${avgScore > 0 ? progress(avgScore) : '<span class="stat-muted">—</span>'}</td>
               </tr>
-              ${expandContent}
+              ${expandedRow}
             `;
           }).join("")}
         </tbody>
@@ -389,7 +391,6 @@ function adjustedCourse(course, index) {
 }
 
 function renderAdminOverview() {
-  const isScoring = state.palsViewMode === "scoring";
   const source = state.adminView === "group" ? groups : learners;
   const items = source
     .filter((item) => state.entityFilter === "all" || item.id === state.entityFilter)
@@ -400,28 +401,17 @@ function renderAdminOverview() {
     }));
   const meta = state.adminView === "group" ? "learners" : "enrolled courses";
   const entityLabel = state.adminView === "group" ? "Groups" : "Learners";
-  const valueLabel = isScoring ? "Avg. Score" : "Completion Rate";
-  const getValue = (item) => isScoring ? item.score : item.completion;
 
   return `
     <section class="panel proposal-panel">
       <div class="proposal-head">
         <div>
-          <h2>Admin PALS Taxonomy</h2>
-          <p>View ${isScoring ? "scoring" : "completion"} by group or individual, then drill into PALS course taxonomy.</p>
+          <h2>PALS Taxonomy</h2>
+          <p>Completion and scoring breakdown by ${state.adminView === "group" ? "group" : "individual learner"}.</p>
         </div>
-        <div class="proposal-head-actions">
-          <div class="pals-view-toggle">
-            <span>View by</span>
-            <div class="tabs compact-tabs">
-              <button class="tab ${!isScoring ? "active" : ""}" data-pals-view="completion">Completion</button>
-              <button class="tab ${isScoring ? "active" : ""}" data-pals-view="scoring">Score</button>
-            </div>
-          </div>
-          <div class="tabs compact-tabs">
-            <button class="tab ${state.adminView === "group" ? "active" : ""}" data-admin-view="group">${svgIcon("users")}Group</button>
-            <button class="tab ${state.adminView === "individual" ? "active" : ""}" data-admin-view="individual">${svgIcon("user")}Individual</button>
-          </div>
+        <div class="tabs compact-tabs">
+          <button class="tab ${state.adminView === "group" ? "active" : ""}" data-admin-view="group">${svgIcon("users")}Group</button>
+          <button class="tab ${state.adminView === "individual" ? "active" : ""}" data-admin-view="individual">${svgIcon("user")}Individual</button>
         </div>
       </div>
       <div class="overview-layout">
@@ -441,21 +431,41 @@ function renderAdminOverview() {
               ${source.map((item) => `<option value="${item.id}" ${state.entityFilter === item.id ? "selected" : ""}>${item.name}</option>`).join("")}
             </select>
           </label>
+
+          <div class="filter-legend">
+            <p>Status</p>
+            <div class="legend-item"><span class="legend-dot status-good"></span>On Track ≥ 70%</div>
+            <div class="legend-item"><span class="legend-dot status-mid"></span>In Progress 30–69%</div>
+            <div class="legend-item"><span class="legend-dot status-risk"></span>At Risk &lt; 30%</div>
+          </div>
         </aside>
+
         <section class="entity-list">
-          <div class="entity-list-head">
+          <div class="entity-list-head-v2">
             <span>${state.adminView === "group" ? "Group" : "Learner"}</span>
-            <span>${valueLabel}</span>
+            <span>Completion</span>
+            <span>Avg. Score</span>
+            <span>Status</span>
             <span>Report</span>
           </div>
-          ${items.length ? items.map((item) => `
-            <article class="entity-card">
-              <div class="entity-avatar">${state.adminView === "group" ? svgIcon("users") : item.name.slice(0, 1).toUpperCase()}</div>
-              <div class="entity-main"><strong>${item.name}</strong><span>${state.adminView === "group" ? item.members : item.courses} ${meta}</span></div>
-              ${progress(getValue(item))}
-              <button class="view-button" data-entity="${item.id}">View Report</button>
-            </article>
-          `).join("") : `<div class="empty-list">No ${entityLabel.toLowerCase()} match the selected filters.</div>`}
+          ${items.length ? items.map((item) => {
+            const s = entityStatus(item.completion);
+            return `
+              <article class="entity-card-v2">
+                <div class="entity-avatar">${state.adminView === "group" ? svgIcon("users") : item.name.slice(0, 1).toUpperCase()}</div>
+                <div class="entity-main">
+                  <strong>${item.name}</strong>
+                  <span>${state.adminView === "group" ? item.members : item.courses} ${meta}</span>
+                </div>
+                ${progress(item.completion)}
+                <div class="entity-score-cell">
+                  <strong>${item.score > 0 ? item.score + "%" : "—"}</strong>
+                </div>
+                <span class="entity-status-badge ${s.cls}">${s.label}</span>
+                <button class="view-button" data-entity="${item.id}">View Report</button>
+              </article>
+            `;
+          }).join("") : `<div class="empty-list">No ${entityLabel.toLowerCase()} match the selected filters.</div>`}
         </section>
       </div>
     </section>
@@ -584,7 +594,7 @@ function renderAdminCBLOverview() {
       <div class="cbl-admin-head">
         <div>
           <h2>CBL Analytics</h2>
-          <p>Review case-based learning practice and roleplay performance across your organization. Scores are averages from all attempts.</p>
+          <p>Review case-based learning practice and roleplay performance across your organization.</p>
         </div>
       </div>
       <section class="cbl-admin-summary">
@@ -596,9 +606,7 @@ function renderAdminCBLOverview() {
     </section>
     <section class="panel cbl-admin-panel">
       <div class="cbl-admin-list-head">
-        <div>
-          <h2><span class="title-icon">${svgIcon("trophy")}</span>Practice and Roleplay Cases</h2>
-        </div>
+        <div><h2><span class="title-icon">${svgIcon("trophy")}</span>Practice and Roleplay Cases</h2></div>
       </div>
       <div class="cbl-admin-tile-grid">
         ${cblCases.map((item, index) => `
@@ -620,9 +628,7 @@ function renderAdminCBLModal() {
   if (!item) return "";
   const selectedGroup = state.selectedCblGroup;
   const groupBreakdown = cblEntities.group.map((group, index) => ({
-    id: group.id,
-    name: group.name,
-    learners: group.learners,
+    id: group.id, name: group.name, learners: group.learners,
     attempts: Math.max(1, Math.round(item.attempts * [.35, .28, .2, .17][index])),
     score: Math.max(22, Math.min(96, item.score + [7, 2, -5, -10][index]))
   }));
@@ -693,12 +699,12 @@ function renderPlaceholder(title) {
 function render() {
   renderTopTabs();
   breadcrumb.innerHTML = "";
-  if (state.mainTab === "courses") appView.innerHTML = renderCourseMastery();
-  if (state.mainTab === "pals") appView.innerHTML = renderPalsTab();
-  if (state.mainTab === "skills") appView.innerHTML = renderSkillAnalytics();
-  if (state.mainTab === "cbl") appView.innerHTML = renderAdminCBL();
+  if (state.mainTab === "courses")     appView.innerHTML = renderCourseMastery();
+  if (state.mainTab === "pals")        appView.innerHTML = renderPalsTab();
+  if (state.mainTab === "skills")      appView.innerHTML = renderSkillAnalytics();
+  if (state.mainTab === "cbl")         appView.innerHTML = renderAdminCBL();
   if (state.mainTab === "assessments") appView.innerHTML = renderPlaceholder("Assessments");
-  if (state.mainTab === "trends") appView.innerHTML = renderPlaceholder("Trends");
+  if (state.mainTab === "trends")      appView.innerHTML = renderPlaceholder("Trends");
 }
 
 document.addEventListener("click", (event) => {
@@ -727,13 +733,6 @@ document.addEventListener("click", (event) => {
     return;
   }
 
-  const palsView = event.target.closest("[data-pals-view]");
-  if (palsView) {
-    state.palsViewMode = palsView.dataset.palsView;
-    render();
-    return;
-  }
-
   const expandPals = event.target.closest("[data-expand-pals]");
   if (expandPals) {
     const courseName = expandPals.dataset.expandPals;
@@ -757,10 +756,9 @@ document.addEventListener("click", (event) => {
 
   const cblGroup = event.target.closest("[data-cbl-group]");
   if (cblGroup) {
-    state.selectedCblGroup = cblEntities.group.find((group) => group.id === cblGroup.dataset.cblGroup);
-    const groupIndex = cblEntities.group.findIndex((group) => group.id === cblGroup.dataset.cblGroup);
+    const groupIndex = cblEntities.group.findIndex((g) => g.id === cblGroup.dataset.cblGroup);
     state.selectedCblGroup = {
-      ...state.selectedCblGroup,
+      ...cblEntities.group[groupIndex],
       attempts: Math.max(1, Math.round(state.selectedCblCase.attempts * [.35, .28, .2, .17][groupIndex])),
       score: Math.max(22, Math.min(96, state.selectedCblCase.score + [7, 2, -5, -10][groupIndex]))
     };
@@ -808,7 +806,6 @@ document.addEventListener("click", (event) => {
 document.addEventListener("change", (event) => {
   const filter = event.target.closest("[data-filter]");
   if (!filter) return;
-
   state[filter.dataset.filter] = filter.value;
   state.proposalLevel = "overview";
   state.selectedEntity = null;

@@ -1,0 +1,373 @@
+/* ============================================================
+   styles-v2.css — incremental overrides on top of styles.css
+   New: entity-card-v2, status badges, pals-dual-table, topic stats
+   ============================================================ */
+
+/* Filter legend (inside filter-panel sidebar) */
+.filter-legend {
+  margin-top: 24px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+
+.filter-legend p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #344054;
+  font-size: 12px;
+  padding: 4px 0;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.legend-dot.status-good  { background: #22c55e; }
+.legend-dot.status-mid   { background: #f59e0b; }
+.legend-dot.status-risk  { background: #ef4444; }
+
+/* Entity list v2 — header row */
+.entity-list-head-v2 {
+  display: grid;
+  grid-template-columns: 44px minmax(180px, 1fr) minmax(160px, 240px) 80px 120px auto;
+  align-items: center;
+  gap: 18px;
+  padding: 0 18px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.entity-list-head-v2 span:first-child {
+  grid-column: 1 / 3;
+}
+
+/* Entity card v2 */
+.entity-card-v2 {
+  min-height: 72px;
+  background: white;
+  border: 1px solid #eef1f4;
+  border-radius: 18px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  display: grid;
+  grid-template-columns: 44px minmax(180px, 1fr) minmax(160px, 240px) 80px 120px auto;
+  align-items: center;
+  gap: 18px;
+  padding: 14px 18px;
+  transition: border-color 0.15s ease;
+}
+
+.entity-card-v2:hover {
+  border-color: #bfe4f0;
+}
+
+.entity-score-cell {
+  text-align: center;
+}
+
+.entity-score-cell strong {
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* Status badge */
+.entity-status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.entity-status-badge.status-good {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.entity-status-badge.status-mid {
+  background: #fef9c3;
+  color: #92400e;
+}
+
+.entity-status-badge.status-risk {
+  background: #fef2f2;
+  color: #dc2626;
+}
+
+/* PALS Dual-metric table (completion + avg score columns) */
+.pals-dual-table {
+  table-layout: fixed;
+}
+
+.pals-dual-table th:first-child,
+.pals-dual-table td:first-child {
+  text-align: left;
+  width: 35%;
+}
+
+.pals-dual-table th:not(:first-child),
+.pals-dual-table td:not(:first-child) {
+  width: calc(65% / 5);
+  text-align: center;
+}
+
+/* Expand row in pals-dual-table */
+.pals-score-expand-row td {
+  padding: 0 !important;
+  border-bottom: 1px solid var(--line);
+}
+
+.pals-score-expand {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 0;
+  background: #f8fafc;
+}
+
+.pals-score-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  padding: 28px 20px;
+  border-right: 1px solid var(--line);
+}
+
+.pals-score-summary .ring {
+  --size: 120px;
+}
+
+.pals-score-summary .ring b {
+  font-size: 20px;
+}
+
+.pals-score-summary-text {
+  text-align: center;
+}
+
+.pals-score-summary-text strong {
+  display: block;
+  font-family: "Space Grotesk", sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pals-score-summary-text span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+/* Topic org-stats table (right side of expand) */
+.pals-score-topics {
+  padding: 16px 22px;
+  overflow-x: auto;
+}
+
+.pals-score-topics-head {
+  display: grid;
+  grid-template-columns: 1fr 72px 86px 160px;
+  gap: 16px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pals-score-topic-row {
+  display: grid;
+  grid-template-columns: 1fr 72px 86px 160px;
+  gap: 16px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f2f5;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.pals-score-topic-row:last-child {
+  border-bottom: 0;
+}
+
+.topic-stat {
+  text-align: center;
+  font-size: 13px;
+}
+
+.stat-muted {
+  color: #9ca3af;
+}
+
+/* "Not started" label in attempts cell */
+.topic-not-started {
+  display: inline-block;
+  color: #9ca3af;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* High difficulty flag: warning icon + "High difficulty" */
+.topic-hard-flag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 999px;
+  color: #c2410c;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px 2px 4px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.topic-hard-flag svg {
+  width: 11px;
+  height: 11px;
+  color: #ea580c;
+}
+
+/* Expand button inside pals-dual-table */
+.course-name-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.expand-btn {
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #f8fafc;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  color: var(--muted);
+  padding: 0;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.expand-btn:hover {
+  background: var(--blue-soft);
+  border-color: #c4dfe9;
+  color: var(--blue);
+}
+
+.expand-btn svg {
+  width: 11px;
+  height: 11px;
+  transform: rotate(180deg);
+  transition: transform 0.18s ease;
+}
+
+.expand-btn.expanded svg {
+  transform: rotate(0deg);
+}
+
+.expand-spacer {
+  display: inline-block;
+  width: 22px;
+  flex-shrink: 0;
+}
+
+/* Entity card v2 responsive */
+@media (max-width: 1260px) {
+  .entity-card-v2 {
+    grid-template-columns: 44px minmax(160px, 1fr) minmax(140px, 200px) 70px 110px auto;
+  }
+
+  .entity-list-head-v2 {
+    grid-template-columns: 44px minmax(160px, 1fr) minmax(140px, 200px) 70px 110px auto;
+  }
+}
+
+@media (max-width: 980px) {
+  .entity-card-v2 {
+    grid-template-columns: 44px 1fr;
+    row-gap: 10px;
+  }
+
+  .entity-list-head-v2 {
+    display: none;
+  }
+
+  .entity-card-v2 .entity-main {
+    grid-column: 2;
+  }
+
+  .entity-card-v2 .progress-wrap,
+  .entity-card-v2 .entity-score-cell,
+  .entity-card-v2 .entity-status-badge,
+  .entity-card-v2 .view-button {
+    grid-column: 1 / -1;
+  }
+
+  .entity-score-cell {
+    text-align: left;
+  }
+
+  .pals-score-expand {
+    grid-template-columns: 1fr;
+  }
+
+  .pals-score-summary {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+    flex-direction: row;
+    gap: 20px;
+    justify-content: flex-start;
+  }
+
+  .pals-score-summary-text {
+    text-align: left;
+  }
+
+  .pals-score-topics-head,
+  .pals-score-topic-row {
+    grid-template-columns: 1fr 72px 86px;
+  }
+
+  .pals-score-topics-head span:last-child,
+  .pals-score-topic-row span:last-child {
+    display: none;
+  }
+}
+
+@media (max-width: 680px) {
+  .pals-score-topics-head,
+  .pals-score-topic-row {
+    grid-template-columns: 1fr 86px;
+  }
+
+  .pals-score-topics-head span:nth-child(2),
+  .pals-score-topic-row span:nth-child(2) {
+    display: none;
+  }
+}
