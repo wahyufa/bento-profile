@@ -182,11 +182,12 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
 .wc.done { background: var(--teal); }
 
 /* Wizard panel right */
-.wiz-panel { flex: 1; overflow-y: auto; padding: 24px; background: var(--bg); }
-.wiz-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
-.wiz-card-head { padding: 20px 24px 16px; border-bottom: 1px solid var(--border); }
+.wiz-panel { flex: 1; overflow: hidden; padding: 24px; background: var(--bg); display: flex; flex-direction: column; }
+.wiz-card { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); display: flex; flex-direction: column; flex: 1; }
+.wiz-card-head { flex: 1; }
 .wiz-card-title { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
 .wiz-card-sub { font-size: 13px; color: var(--text-sec); margin-top: 5px; line-height: 1.5; }
+.wiz-content-area { flex: 1; overflow-y: auto; }
 
 /* Running state */
 .running-box { padding: 40px 32px; text-align: center; }
@@ -203,7 +204,8 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
 
 /* Wizard actions footer */
 .wiz-actions { padding: 16px 24px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: #FAFBFC; }
-.wiz-actions-top { padding: 14px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 10px; background: #FAFBFC; position: sticky; top: 0; z-index: 5; }
+.wiz-actions-top { display: flex; gap: 10px; flex-shrink: 0; }
+.wiz-sticky-header { display: flex; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border); background: var(--white); }
 
 /* ── GENERATION LANGUAGE ── */
 .lang-body { padding: 24px; }
@@ -584,17 +586,19 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
         <!-- RIGHT PANEL -->
         <div class="wiz-panel">
           <div class="wiz-card">
+            <div class="wiz-sticky-header">
             <div class="wiz-card-head">
               <div class="wiz-card-title" id="panelTitle">Generation Language</div>
               <div class="wiz-card-sub" id="panelSub">Choose the language for generating knowledge points</div>
             </div>
-
             <!-- ── SHARED STICKY ACTION BAR ── -->
             <div class="wiz-actions-top" id="wizActionsTop">
               <button class="btn btn-white" id="wizBackBtn">Back</button>
-              <button class="btn btn-teal" id="wizNextBtn" onclick="startExtract()">Next: Extract Knowledge Points →</button>
+              <button class="btn btn-teal" id="wizNextBtn" onclick="startExtract()">Next: Extract Knowledge Points</button>
+            </div>
             </div>
 
+            <div class="wiz-content-area">
             <!-- ── STEP 2: LANGUAGE ── -->
             <div id="st-lang">
               <div class="lang-body">
@@ -1026,6 +1030,7 @@ select.fi { appearance: none; cursor: pointer; background-image: url("data:image
               </div>
             </div>
 
+            </div><!-- /wiz-content-area -->
           </div><!-- /wiz-card -->
         </div><!-- /wiz-panel -->
       </div><!-- /wizard-layout -->
@@ -1162,7 +1167,7 @@ function startFlow() {
   showState('st-lang');
   setPanelHead('Generation Language','Choose the language for generating knowledge points');
   setStep(2,'active'); setStepHint(2,'Select language');
-  setWizActions('Next: Extract Knowledge Points →', startExtract);
+  setWizActions('Next: Extract Knowledge Points', startExtract);
   // widget
   maybeShowWidget();
   bwRow('bwr2','active','');
@@ -1214,7 +1219,7 @@ function triggerReview1() {
 
 function showReviewSkills() {
   setPanelHead('Extract Knowledge Points','');
-  setWizActions('Next: Generate Questions →', doApproveSkills);
+  setWizActions('Next: Generate Questions', doApproveSkills);
   showState('st-review-skills');
 }
 
@@ -1256,7 +1261,7 @@ function triggerReview2() {
   document.getElementById('nQ').textContent = '422';
   if(document.getElementById('page-wizard').classList.contains('active')) {
     setPanelHead('Generate & Review Questions','');
-    setWizActions('Next: Generate Learning Content →', doApproveQ);
+    setWizActions('Next: Generate Learning Content', doApproveQ);
     showState('st-review-q');
   }
   if(wMin) { wMin=false; document.getElementById('bwBody').classList.remove('hidden'); document.getElementById('bwMin').textContent='—'; }
@@ -1301,7 +1306,7 @@ function triggerReview3() {
   document.getElementById('nS').textContent = '51';
   if(document.getElementById('page-wizard').classList.contains('active')) {
     setPanelHead('Generate & Review Learning Content','');
-    setWizActions('Next: Translate →', doApproveLC);
+    setWizActions('Next: Translate', doApproveLC);
     showState('st-review-lc');
   }
   if(wMin) { wMin=false; document.getElementById('bwBody').classList.remove('hidden'); document.getElementById('bwMin').textContent='—'; }
@@ -1318,7 +1323,7 @@ function doApproveLC() {
   document.getElementById('kbDot').style.display = 'none';
   document.getElementById('nBadge').innerHTML = '<span class="badge badge-blue">⟳ Processing</span>';
   setPanelHead('Translate Content (Optional)','');
-  setWizActions('Skip & Continue →', doSkipTranslate);
+  setWizActions('Skip & Continue', doSkipTranslate);
   showState('st-translate');
 }
 
@@ -1331,7 +1336,7 @@ function toggleTargetLang(el) {
     btn.onclick = doTranslateAndContinue;
   } else {
     wrap.style.display = 'none';
-    btn.textContent = 'Skip & Continue →';
+    btn.textContent = 'Skip & Continue';
     btn.onclick = doSkipTranslate;
   }
 }
@@ -1448,16 +1453,16 @@ function handleWidgetClick() {
   if(headMap[appState]) setPanelHead(headMap[appState],'');
   // also sync the sticky top action bar to match this step
   const actionsMap = {
-    lang: ['Next: Extract Knowledge Points →', startExtract],
+    lang: ['Next: Extract Knowledge Points', startExtract],
     extracting: null,
-    'review-skills': ['Next: Generate Questions →', doApproveSkills],
+    'review-skills': ['Next: Generate Questions', doApproveSkills],
     'gen-q': null,
-    'review-q': ['Next: Generate Learning Content →', doApproveQ],
+    'review-q': ['Next: Generate Learning Content', doApproveQ],
     'gen-lc': null,
-    'review-lc': ['Next: Translate →', doApproveLC],
+    'review-lc': ['Next: Translate', doApproveLC],
     translate: [
       document.getElementById('translateToggle') && document.getElementById('translateToggle').checked
-        ? 'Translate & Continue' : 'Skip & Continue →',
+        ? 'Translate & Continue' : 'Skip & Continue',
       document.getElementById('translateToggle') && document.getElementById('translateToggle').checked
         ? doTranslateAndContinue : doSkipTranslate
     ],
