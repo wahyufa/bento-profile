@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS — v0.4 Dashboard Layout Options (A · Sidebar / B · Today Feed)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#0D719A;--primary-dark:#0B5F82;--heading:#16324A;--text:#1E2733;
+    --gray:#5C6B7C;--faint:#8A97A6;--bg:#F7F8FA;--card:#FFFFFF;--border:#DFE3E8;
+    --chip:#F0F3F7;--ink:#40566E;--green:#2E8F6E;--red:#C0392B;--radius:12px;
+  }
+  *{box-sizing:border-box;margin:0;}
+  body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:15px;}
+  button{font-family:'Montserrat',sans-serif;cursor:pointer;}
+  .li{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .li.sm{width:16px;height:16px;}
+  .btn{border:none;border-radius:8px;font-weight:600;font-size:14px;padding:11px 22px;}
+  .btn.primary{background:var(--primary);color:#fff;}
+  .btn.primary:hover{background:var(--primary-dark);}
+  .btn.outline{background:#fff;color:var(--primary);border:1px solid var(--primary);}
+  .btn.sm{font-size:13px;padding:8px 16px;}
+  .btn.xs{font-size:12px;padding:6px 12px;}
+  .icchip{width:40px;height:40px;border-radius:9px;background:var(--chip);color:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .icchip.green{background:#EAF4F0;color:var(--green);}
+  .tile{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:0 1px 2px rgba(22,50,74,.04);}
+  .tile-h{font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .tile-h .li{width:15px;height:15px;}
+  .chip-due{font-size:10px;font-weight:700;color:var(--primary);background:#EAF2F6;border-radius:5px;padding:2px 7px;letter-spacing:.03em;}
+  .chip-done{font-size:10px;font-weight:700;color:var(--green);background:#EAF4F0;border-radius:5px;padding:2px 7px;letter-spacing:.03em;}
+  .prio{font-size:10px;font-weight:700;letter-spacing:.07em;padding:4px 10px;border-radius:6px;border:1px solid;color:var(--primary);border-color:#BDD9E5;}
+
+  /* switcher ribbon */
+  .proto{background:#152232;padding:9px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:sticky;top:0;z-index:50;}
+  .proto .lbl{font-size:10px;color:#7f96ad;text-transform:uppercase;letter-spacing:.08em;font-weight:700;}
+  .proto button{border:1px solid rgba(255,255,255,.25);background:transparent;color:#c8d6e2;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;}
+  .proto button.active{background:#fff;color:#152232;border-color:#fff;}
+  .proto a{color:#c8d6e2;font-size:12px;font-weight:600;text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:6px 14px;border-radius:8px;margin-left:auto;}
+  .proto .cap{font-size:11px;color:#7f96ad;font-weight:500;}
+
+  .layout{display:none;}
+  .layout.active{display:block;}
+
+  /* ============ OPTION A · SIDEBAR ============ */
+  .A-shell{display:flex;min-height:calc(100vh - 44px);}
+  .A-rail{width:236px;background:#fff;border-right:1px solid var(--border);padding:22px 14px;display:flex;flex-direction:column;gap:4px;flex-shrink:0;position:sticky;top:44px;height:calc(100vh - 44px);}
+  .A-logo{display:flex;align-items:center;gap:9px;padding:0 10px 20px;}
+  .A-logo .w{font-weight:700;font-size:19px;color:#111;line-height:1;}
+  .A-logo .w small{display:block;font-size:8px;font-weight:600;color:#555;margin-top:1px;}
+  .A-nav{display:flex;flex-direction:column;gap:2px;}
+  .A-nav a{display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:8px;font-size:13.5px;color:var(--gray);text-decoration:none;font-weight:500;}
+  .A-nav a .li{width:17px;height:17px;}
+  .A-nav a.active{background:#EAF2F6;color:var(--primary);font-weight:600;}
+  .A-nav a:hover{background:var(--chip);}
+  .A-user{margin-top:auto;display:flex;align-items:center;gap:10px;padding:12px;border-top:1px solid var(--border);}
+  .A-user .av{width:32px;height:32px;border-radius:50%;background:var(--heading);color:#fff;font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  .A-user .n{font-size:12.5px;font-weight:600;color:var(--heading);}
+  .A-user .r{font-size:10.5px;color:var(--faint);}
+  .A-main{flex:1;min-width:0;}
+  .A-top{background:#fff;border-bottom:1px solid var(--border);padding:12px 28px;display:flex;align-items:center;justify-content:space-between;gap:16px;}
+  .A-search{flex:1;max-width:420px;display:flex;align-items:center;gap:9px;background:var(--chip);border-radius:8px;padding:9px 14px;color:var(--faint);font-size:13px;}
+  .A-acts{display:flex;align-items:center;gap:14px;color:var(--ink);}
+  .A-body{max-width:1060px;padding:28px;}
+  .A-greet{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:20px;flex-wrap:wrap;}
+  .A-greet h2{font-size:21px;font-weight:700;color:var(--heading);letter-spacing:-.01em;}
+  .A-greet .sub{font-size:13px;color:var(--gray);margin-top:6px;}
+  .A-greet .date{font-size:12px;color:var(--faint);}
+  .A-rec{display:flex;gap:18px;align-items:center;border-left:3px solid var(--primary);margin-bottom:16px;}
+  .A-rec h3{font-size:16.5px;font-weight:700;color:var(--heading);margin-bottom:5px;letter-spacing:-.01em;}
+  .A-rec p{font-size:13.5px;color:var(--gray);line-height:1.6;}
+  .A-rec .meta{display:flex;gap:16px;margin-top:9px;font-size:12px;color:var(--faint);font-weight:500;flex-wrap:wrap;}
+  .A-rec .cta{display:flex;flex-direction:column;gap:9px;align-items:flex-end;flex-shrink:0;}
+  .A-cols{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:16px;}
+  @media(max-width:980px){.A-cols{grid-template-columns:1fr;}}
+  .A-course .bar{height:5px;background:#E8ECF0;border-radius:9999px;overflow:hidden;margin:12px 0 8px;}
+  .A-course .bar i{display:block;height:100%;width:31%;background:var(--primary);}
+  .A-course h4{font-size:14px;font-weight:600;color:var(--heading);line-height:1.4;}
+  .A-course p{font-size:12px;color:var(--faint);margin-top:3px;}
+  .brow{display:flex;align-items:center;gap:11px;padding:9px 0;}
+  .brow + .brow{border-top:1px solid var(--border);}
+  .brow .icchip{width:34px;height:34px;border-radius:8px;}
+  .brow h4{font-size:12.5px;font-weight:600;color:var(--heading);display:flex;gap:7px;align-items:center;flex-wrap:wrap;}
+  .brow p{font-size:11px;color:var(--faint);margin-top:2px;}
+  .brow .bt{flex:1;min-width:0;}
+  .prow{display:flex;align-items:center;gap:12px;padding:8px 0;}
+  .prow + .prow{border-top:1px solid var(--border);}
+  .prow .icchip{width:34px;height:34px;border-radius:8px;}
+  .prow .pn{font-size:15.5px;font-weight:700;color:var(--heading);line-height:1.15;}
+  .prow .pl{font-size:11px;color:var(--faint);font-weight:500;margin-top:1px;}
+  .A-skill{display:flex;align-items:center;gap:16px;}
+  .A-skill h3{font-size:14px;font-weight:700;color:var(--heading);margin-bottom:3px;}
+  .A-skill p{font-size:12.5px;color:var(--gray);line-height:1.5;}
+
+  /* ============ OPTION B · TODAY FEED ============ */
+  .B-top{background:#fff;border-bottom:1px solid var(--border);}
+  .B-top-in{max-width:1180px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 24px;height:58px;}
+  .B-nav{display:flex;gap:26px;}
+  .B-nav a{text-decoration:none;font-size:14.5px;color:var(--gray);font-weight:400;}
+  .B-nav a.active{color:var(--primary);font-weight:600;}
+  .B-stats{background:#fff;border-bottom:1px solid var(--border);}
+  .B-stats-in{max-width:1180px;margin:0 auto;padding:14px 24px;display:flex;gap:34px;flex-wrap:wrap;}
+  .B-stat{display:flex;align-items:center;gap:10px;}
+  .B-stat .li{width:17px;height:17px;color:var(--ink);}
+  .B-stat b{font-size:14.5px;font-weight:700;color:var(--heading);}
+  .B-stat span{font-size:11.5px;color:var(--faint);font-weight:500;}
+  .B-wrap{max-width:720px;margin:0 auto;padding:30px 24px 60px;}
+  .B-greet h2{font-size:21px;font-weight:700;color:var(--heading);letter-spacing:-.01em;}
+  .B-greet .sub{font-size:13px;color:var(--gray);margin:7px 0 22px;}
+  .B-sec{font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin:26px 0 10px;display:flex;align-items:center;}
+  .B-sec span{margin-left:auto;font-size:11px;font-weight:600;color:var(--faint);text-transform:none;letter-spacing:0;}
+  .B-item{background:#fff;border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;display:flex;gap:14px;align-items:center;margin-bottom:10px;box-shadow:0 1px 2px rgba(22,50,74,.04);}
+  .B-item.hero{border-left:3px solid var(--primary);}
+  .B-item .bt{flex:1;min-width:0;}
+  .B-item h4{font-size:14px;font-weight:600;color:var(--heading);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .B-item p{font-size:12.5px;color:var(--gray);margin-top:3px;line-height:1.55;}
+  .B-item .tmeta{font-size:11.5px;color:var(--faint);font-weight:500;margin-top:5px;display:flex;gap:14px;}
+  .B-item.done{opacity:.6;}
+  .B-item.done h4{text-decoration:line-through;text-decoration-color:var(--faint);}
+  .B-explore{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+  @media(max-width:640px){.B-explore{grid-template-columns:1fr;}}
+  .B-x{background:#fff;border:1px solid var(--border);border-radius:10px;padding:13px 15px;display:flex;align-items:center;gap:11px;text-decoration:none;}
+  .B-x:hover{border-color:var(--primary);}
+  .B-x .icchip{width:32px;height:32px;border-radius:7px;}
+  .B-x h4{font-size:12.5px;font-weight:600;color:var(--heading);}
+  .B-x p{font-size:10.5px;color:var(--faint);margin-top:1px;}
+</style>
+</head>
+<body>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.9" y1="4.9" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.1" y2="19.1"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.9" y1="19.1" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.1" y2="4.9"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></symbol>
+  <symbol id="i-check-c" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><polyline points="8.5 13 7 22 12 19.5 17 22 15.5 13"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c1.5 3.5 5.5 5.5 5.5 10a5.5 5.5 0 0 1-11 0c0-2.2 1-3.9 2.2-5.6.5 1.1 1.3 1.8 1.3 1.8S10.5 5 12 2z"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 9.5 12 3l9 6.5V21a1 1 0 0 1-1 1h-5v-7h-6v7H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></symbol>
+</svg>
+
+<div class="proto">
+  <span class="lbl">Dashboard layout options</span>
+  <button class="active" onclick="layout('a',this)">Option A · Sidebar</button>
+  <button onclick="layout('b',this)">Option B · Today feed</button>
+  <span class="cap" id="cap">Persistent left navigation — familiar enterprise-LMS pattern, frees the top bar and scales well as features grow.</span>
+  <a href="ATLAS_Prototype_v0.4_Professional_Dashboard.html" target="_blank">Compare: Bento (v0.4) ↗</a>
+</div>
+
+<!-- ============ OPTION A · SIDEBAR ============ -->
+<div class="layout active" id="lay-a">
+  <div class="A-shell">
+    <aside class="A-rail">
+      <div class="A-logo">
+        <svg width="34" height="30" viewBox="0 0 44 38" fill="none">
+          <rect x="2" y="4" width="27" height="27" rx="5" stroke="#1E9AB0" stroke-width="3"/>
+          <path d="M29 8 L40 5 L40 26 L29 30" stroke="#F0821E" stroke-width="3" fill="none" stroke-linejoin="round"/>
+          <path d="M9 19 L14 14 L18 18 L24 11" stroke="#F0821E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <path d="M9 24 H22" stroke="#1E9AB0" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+        <div class="w">ATLAS<small>By HeyHi</small></div>
+      </div>
+      <nav class="A-nav">
+        <a href="#" class="active"><svg class="li"><use href="#i-home"/></svg>Dashboard</a>
+        <a href="#"><svg class="li"><use href="#i-book"/></svg>Courses</a>
+        <a href="#"><svg class="li"><use href="#i-clip"/></svg>Assessments</a>
+        <a href="#"><svg class="li"><use href="#i-msg"/></svg>CBL</a>
+        <a href="#"><svg class="li"><use href="#i-trend"/></svg>Performance</a>
+        <a href="#"><svg class="li"><use href="#i-compass"/></svg>PALS</a>
+        <a href="#"><svg class="li"><use href="#i-zap"/></svg>Bites</a>
+        <a href="#"><svg class="li"><use href="#i-award"/></svg>Achievements</a>
+      </nav>
+      <div class="A-user">
+        <div class="av">ZC</div>
+        <div><div class="n">Zhi Chuen</div><div class="r">Compliance · Level 7</div></div>
+      </div>
+    </aside>
+
+    <div class="A-main">
+      <div class="A-top">
+        <div class="A-search"><svg class="li sm"><use href="#i-search"/></svg>Search courses, skills, or ask the assistant</div>
+        <div class="A-acts">
+          <svg class="li"><use href="#i-bell"/></svg>
+          <div class="A-user" style="border:none;padding:0;margin:0;"><div class="av" style="width:30px;height:30px;">ZC</div></div>
+        </div>
+      </div>
+
+      <div class="A-body">
+        <div class="A-greet">
+          <div>
+            <h2>Good morning, Zhi Chuen</h2>
+            <div class="sub">One review is waiting for you today.</div>
+          </div>
+          <div class="date">Friday, 3 July 2026</div>
+        </div>
+
+        <!-- recommendation banner -->
+        <div class="tile A-rec">
+          <div class="icchip"><svg class="li"><use href="#i-target"/></svg></div>
+          <div style="flex:1;">
+            <h3>Chapter Review — Customer Due Diligence</h3>
+            <p>You missed three questions on this skill in your last practice test. A short simplified review with a knowledge check takes about five minutes.</p>
+            <div class="meta"><span>5 min</span><span>2 pages · 3-question check</span><span>Source: Practice Test 2</span></div>
+          </div>
+          <div class="cta">
+            <span class="prio">SUGGESTED</span>
+            <button class="btn primary sm" onclick="toV3('review')">Start review</button>
+          </div>
+        </div>
+
+        <div class="A-cols">
+          <div class="tile A-course">
+            <div class="tile-h"><svg class="li"><use href="#i-play"/></svg>Continue learning</div>
+            <h4>Introduction to AML/CFT and Its Importance</h4>
+            <p>Fundamentals of AML/CFT · Session 4 of 13</p>
+            <div class="bar"><i></i></div>
+            <p style="margin-bottom:12px;">31% complete</p>
+            <button class="btn outline sm" style="width:100%;">Resume course</button>
+          </div>
+
+          <div class="tile">
+            <div class="tile-h"><svg class="li"><use href="#i-zap"/></svg>Bites — spaced practice</div>
+            <div class="brow">
+              <div class="icchip"><svg class="li sm"><use href="#i-sun"/></svg></div>
+              <div class="bt"><h4>Daily <span class="chip-done">2 OF 3</span></h4><p>3 short questions</p></div>
+              <button class="btn primary xs" onclick="toV3('bites')">Start</button>
+            </div>
+            <div class="brow">
+              <div class="icchip"><svg class="li sm"><use href="#i-clock"/></svg></div>
+              <div class="bt"><h4>Scheduled <span class="chip-due">DUE</span></h4><p>Customer Due Diligence</p></div>
+              <button class="btn primary xs" onclick="toV3('bites')">Start</button>
+            </div>
+            <div class="brow">
+              <div class="icchip"><svg class="li sm"><use href="#i-cal"/></svg></div>
+              <div class="bt"><h4>Weekly</h4><p>10–15 questions · Sunday</p></div>
+              <button class="btn outline xs" onclick="toV3('bites')">Start</button>
+            </div>
+          </div>
+
+          <div class="tile">
+            <div class="tile-h"><svg class="li"><use href="#i-trend"/></svg>Your progress</div>
+            <div class="prow"><div class="icchip"><svg class="li sm"><use href="#i-flame"/></svg></div><div><div class="pn">12 days</div><div class="pl">Current streak</div></div></div>
+            <div class="prow"><div class="icchip"><svg class="li sm"><use href="#i-zap"/></svg></div><div><div class="pn">2,480 XP</div><div class="pl">Level 7 · 320 to next</div></div></div>
+            <div class="prow"><div class="icchip"><svg class="li sm"><use href="#i-award"/></svg></div><div><div class="pn">7 badges</div><div class="pl">2 in progress</div></div></div>
+          </div>
+        </div>
+
+        <div class="tile A-skill">
+          <div class="icchip"><svg class="li"><use href="#i-search"/></svg></div>
+          <div style="flex:1;">
+            <h3>Skill Check</h3>
+            <p>A short quiz across your topics — we'll identify gaps and prepare targeted reviews where needed.</p>
+          </div>
+          <button class="btn outline sm" onclick="toV3('bites')">Start</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ OPTION B · TODAY FEED ============ -->
+<div class="layout" id="lay-b">
+  <div class="B-top">
+    <div class="B-top-in">
+      <div class="A-logo" style="padding:0;">
+        <svg width="34" height="30" viewBox="0 0 44 38" fill="none">
+          <rect x="2" y="4" width="27" height="27" rx="5" stroke="#1E9AB0" stroke-width="3"/>
+          <path d="M29 8 L40 5 L40 26 L29 30" stroke="#F0821E" stroke-width="3" fill="none" stroke-linejoin="round"/>
+          <path d="M9 19 L14 14 L18 18 L24 11" stroke="#F0821E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+          <path d="M9 24 H22" stroke="#1E9AB0" stroke-width="2.4" stroke-linecap="round"/>
+        </svg>
+        <div class="w" style="font-weight:700;font-size:19px;color:#111;line-height:1;">ATLAS<small style="display:block;font-size:8px;font-weight:600;color:#555;">By HeyHi</small></div>
+      </div>
+      <nav class="B-nav">
+        <a href="#" class="active">Dashboard</a><a href="#">Courses</a><a href="#">Assessments</a><a href="#">CBL</a><a href="#">Performance</a><a href="#">PALS</a>
+      </nav>
+      <div style="display:flex;align-items:center;gap:14px;color:var(--ink);">
+        <svg class="li"><use href="#i-bell"/></svg>
+        <div class="A-user" style="border:none;padding:0;"><div class="av" style="width:30px;height:30px;">ZC</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- metric strip -->
+  <div class="B-stats">
+    <div class="B-stats-in">
+      <div class="B-stat"><svg class="li"><use href="#i-flame"/></svg><div><b>12 days</b> <span>streak</span></div></div>
+      <div class="B-stat"><svg class="li"><use href="#i-zap"/></svg><div><b>2,480</b> <span>XP · Level 7</span></div></div>
+      <div class="B-stat"><svg class="li"><use href="#i-check-c"/></svg><div><b>2 of 4</b> <span>today's plan done</span></div></div>
+      <div class="B-stat"><svg class="li"><use href="#i-award"/></svg><div><b>7</b> <span>badges</span></div></div>
+    </div>
+  </div>
+
+  <div class="B-wrap">
+    <div class="B-greet">
+      <h2>Good morning, Zhi Chuen</h2>
+      <div class="sub">Here is your plan for today — about 15 minutes in total.</div>
+    </div>
+
+    <div class="B-sec">Up next <span>Prioritised for you</span></div>
+
+    <div class="B-item hero">
+      <div class="icchip"><svg class="li"><use href="#i-target"/></svg></div>
+      <div class="bt">
+        <h4>Chapter Review — Customer Due Diligence <span class="prio">SUGGESTED</span></h4>
+        <p>Three missed questions on your last practice test. Simplified review with a knowledge check.</p>
+        <div class="tmeta"><span>5 min</span><span>Source: Practice Test 2</span></div>
+      </div>
+      <button class="btn primary sm" onclick="toV3('review')">Start</button>
+    </div>
+
+    <div class="B-item">
+      <div class="icchip"><svg class="li"><use href="#i-clock"/></svg></div>
+      <div class="bt">
+        <h4>Scheduled Bite — Customer Due Diligence <span class="chip-due">DUE TODAY</span></h4>
+        <p>Five questions to keep this topic in memory. Correct answers extend the next review to 16 days.</p>
+        <div class="tmeta"><span>3 min</span></div>
+      </div>
+      <button class="btn primary sm" onclick="toV3('bites')">Start</button>
+    </div>
+
+    <div class="B-item">
+      <div class="icchip"><svg class="li"><use href="#i-play"/></svg></div>
+      <div class="bt">
+        <h4>Continue — Introduction to AML/CFT</h4>
+        <p>Session 4 of 13 · Fundamentals of AML/CFT</p>
+        <div class="tmeta"><span>≈ 6 min remaining in this session</span></div>
+      </div>
+      <button class="btn outline sm">Resume</button>
+    </div>
+
+    <div class="B-sec">Completed today</div>
+
+    <div class="B-item done">
+      <div class="icchip green"><svg class="li"><use href="#i-check"/></svg></div>
+      <div class="bt">
+        <h4>Daily Bite 1 &amp; 2</h4>
+        <p>6 of 6 correct · +30 XP · streak extended to 12 days</p>
+      </div>
+    </div>
+
+    <div class="B-sec">Explore</div>
+    <div class="B-explore">
+      <a class="B-x" href="#"><div class="icchip"><svg class="li sm"><use href="#i-book"/></svg></div><div><h4>Courses</h4><p>4 enrolled</p></div></a>
+      <a class="B-x" href="#"><div class="icchip"><svg class="li sm"><use href="#i-clip"/></svg></div><div><h4>Assessments</h4><p>1 upcoming</p></div></a>
+      <a class="B-x" href="#"><div class="icchip"><svg class="li sm"><use href="#i-msg"/></svg></div><div><h4>CBL</h4><p>Scenario practice</p></div></a>
+      <a class="B-x" href="#"><div class="icchip"><svg class="li sm"><use href="#i-compass"/></svg></div><div><h4>PALS</h4><p>Your journey</p></div></a>
+      <a class="B-x" href="#"><div class="icchip"><svg class="li sm"><use href="#i-search"/></svg></div><div><h4>Skill Check</h4><p>Find your gaps</p></div></a>
+      <a class="B-x" href="#"><div class="icchip"><svg class="li sm"><use href="#i-award"/></svg></div><div><h4>Achievements</h4><p>Badges &amp; ranks</p></div></a>
+    </div>
+  </div>
+</div>
+
+<script>
+const V3='ATLAS_REC_Recommendation_Prototype_v0.3.html';
+function toV3(s){window.open(V3+'?screen='+s);}
+const caps={
+  a:'Persistent left navigation — familiar enterprise-LMS pattern, frees the top bar and scales well as features grow.',
+  b:'A prioritised daily plan in one column — strongest for habit-building: the system decides what matters today.'
+};
+function layout(k,btn){
+  document.getElementById('lay-a').classList.toggle('active',k==='a');
+  document.getElementById('lay-b').classList.toggle('active',k==='b');
+  document.getElementById('cap').textContent=caps[k];
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+</script>
+</body>
+</html>

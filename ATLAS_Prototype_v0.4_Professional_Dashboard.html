@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS — v0.4 Professional Restyle (Dashboard)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  /* ============ v0.4 professional tokens ============ */
+  :root{
+    --primary:#0D719A;
+    --primary-dark:#0B5F82;
+    --heading:#16324A;
+    --text:#1E2733;
+    --gray:#5C6B7C;
+    --faint:#8A97A6;
+    --bg:#F7F8FA;
+    --card:#FFFFFF;
+    --border:#DFE3E8;
+    --chip:#F0F3F7;
+    --ink:#40566E;          /* icon stroke */
+    --green:#2E8F6E;
+    --red:#C0392B;
+    --amber:#B07E10;
+    --purple:#5E5A8F;
+    --radius:12px;
+  }
+  *{box-sizing:border-box;margin:0;}
+  body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:15px;}
+  button{font-family:'Montserrat',sans-serif;cursor:pointer;}
+  .li{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+  .li.sm{width:16px;height:16px;}
+
+  .btn{border:none;border-radius:8px;font-weight:600;font-size:14px;padding:11px 22px;}
+  .btn.primary{background:var(--primary);color:#fff;}
+  .btn.primary:hover{background:var(--primary-dark);}
+  .btn.outline{background:#fff;color:var(--primary);border:1px solid var(--primary);}
+  .btn.sm{font-size:13px;padding:8px 16px;}
+  .btn.xs{font-size:12px;padding:6px 12px;}
+  .btn.ghost{background:transparent;color:var(--gray);border:none;font-weight:600;font-size:13px;}
+
+  /* ============ header ============ */
+  .topbar{background:#fff;border-bottom:1px solid var(--border);position:sticky;top:0;z-index:40;}
+  .topbar-in{max-width:1280px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:10px 24px;height:60px;}
+  .logo{display:flex;align-items:center;gap:9px;}
+  .logo-mark{width:38px;height:32px;}
+  .logo-word{font-weight:700;font-size:21px;letter-spacing:.02em;color:#111;line-height:1;}
+  .logo-word small{display:block;font-size:8.5px;font-weight:600;color:#555;margin-top:1px;}
+  .nav{display:flex;gap:28px;}
+  .nav a{text-decoration:none;font-size:15px;color:var(--gray);font-weight:400;position:relative;padding-bottom:6px;}
+  .nav a.active{color:var(--primary);font-weight:600;}
+  .nav a.active::after{content:'';position:absolute;left:0;right:0;bottom:-15px;height:3px;background:var(--primary);border-radius:2px;}
+  .top-right{display:flex;align-items:center;gap:14px;}
+  .bell{position:relative;background:none;border:none;color:var(--ink);padding:2px;}
+  .bell .dot{position:absolute;top:-5px;right:-6px;background:var(--red);color:#fff;font-size:9.5px;font-weight:700;border-radius:9999px;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px;}
+  .help-pill{display:flex;align-items:center;gap:7px;background:var(--primary);color:#fff;border:none;border-radius:8px;padding:8px 15px;font-size:13px;font-weight:600;}
+  .avatar{width:32px;height:32px;border-radius:50%;background:var(--heading);color:#fff;font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+
+  /* notif dropdown */
+  .notif{display:none;position:absolute;top:64px;right:calc((100% - 1280px)/2 + 90px);width:360px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 12px 34px rgba(22,50,74,.14);z-index:60;overflow:hidden;}
+  @media(max-width:1320px){.notif{right:90px;}}
+  .notif.open{display:block;}
+  .notif-h{padding:15px 20px 12px;font-size:15px;font-weight:700;color:var(--heading);border-bottom:1px solid var(--border);}
+  .notif-item{display:flex;gap:12px;padding:14px 20px;font-size:13px;border-bottom:1px solid var(--border);cursor:pointer;color:var(--text);}
+  .notif-item.unread{background:#F2F7FA;}
+  .notif-item b{font-weight:600;}
+  .notif-item .time{display:block;font-size:11.5px;color:var(--faint);margin-top:4px;}
+  .notif-f{display:flex;justify-content:flex-end;padding:12px 20px;}
+
+  /* prototype ribbon */
+  .proto{background:#152232;padding:9px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;position:sticky;top:60px;z-index:39;}
+  .proto .lbl{font-size:10px;color:#7f96ad;text-transform:uppercase;letter-spacing:.08em;font-weight:700;}
+  .proto a{color:#c8d6e2;font-size:12px;font-weight:600;text-decoration:none;border:1px solid rgba(255,255,255,.25);padding:6px 14px;border-radius:8px;}
+  .proto span.here{background:#fff;color:#152232;font-size:12px;font-weight:700;padding:6px 14px;border-radius:8px;}
+
+  .sim{display:inline-flex;gap:6px;align-items:center;flex-wrap:wrap;background:#EEF1F4;border:1px dashed #C9D1DA;border-radius:8px;padding:6px 10px;}
+  .sim .lbl{font-size:10px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.06em;}
+  .sim button{border:1px solid var(--border);background:#fff;color:var(--gray);padding:4px 11px;border-radius:7px;font-size:11.5px;font-weight:600;}
+  .sim button.active{background:var(--heading);color:#fff;border-color:var(--heading);}
+
+  /* ============ dashboard ============ */
+  .dashtop{max-width:1240px;margin:0 auto;padding:30px 24px 18px;display:flex;align-items:flex-end;justify-content:space-between;gap:24px;flex-wrap:wrap;}
+  .dashtop h2{font-size:21px;font-weight:700;color:var(--heading);letter-spacing:-.01em;}
+  .dashtop .sub{font-size:13px;color:var(--gray);margin-top:6px;}
+  .dashtop .date{font-size:12px;color:var(--faint);font-weight:500;}
+  .simrow{max-width:1240px;margin:0 auto;padding:0 24px 16px;display:flex;gap:10px;flex-wrap:wrap;}
+
+  .bento{max-width:1240px;margin:0 auto;padding:0 24px 48px;display:grid;gap:14px;
+    grid-template-columns:repeat(4,1fr);
+    grid-template-areas:
+      "rec   rec   prog  hub"
+      "rec   rec   bites hub"
+      "skill skill bites hub";
+  }
+  @media(max-width:1080px){.bento{grid-template-columns:1fr 1fr;grid-template-areas:"rec rec" "prog bites" "skill skill" "hub hub";}}
+  @media(max-width:680px){.bento{grid-template-columns:1fr;grid-template-areas:"rec" "prog" "bites" "skill" "hub";}}
+  .tile{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;box-shadow:0 1px 2px rgba(22,50,74,.04);}
+  .tile-h{font-size:11px;font-weight:700;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+  .tile-h .li{width:15px;height:15px;color:var(--faint);}
+  .tile-h a{margin-left:auto;font-size:11px;font-weight:600;color:var(--primary);text-decoration:none;text-transform:none;letter-spacing:0;}
+
+  /* rec hero */
+  .b-rec{grid-area:rec;display:flex;flex-direction:column;border-top:3px solid var(--primary);}
+  .rec-body{flex:1;display:flex;flex-direction:column;}
+  .rec-top{display:flex;gap:16px;align-items:flex-start;}
+  .icchip{width:44px;height:44px;border-radius:10px;background:var(--chip);color:var(--ink);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .icchip.red{background:#F9EDEB;color:var(--red);}
+  .icchip.purple{background:#EFEEF6;color:var(--purple);}
+  .icchip.green{background:#EAF4F0;color:var(--green);}
+  .rec-top h3{font-size:17px;font-weight:700;color:var(--heading);margin-bottom:6px;line-height:1.35;letter-spacing:-.01em;}
+  .rec-top .desc{font-size:13.5px;color:var(--gray);line-height:1.6;}
+  .skilltag{display:inline-block;background:var(--chip);color:var(--ink);font-size:11.5px;font-weight:600;padding:4px 11px;border-radius:6px;margin:10px 6px 0 0;}
+  .rec-meta{display:flex;gap:16px;margin-top:12px;font-size:12px;color:var(--faint);flex-wrap:wrap;align-items:center;font-weight:500;}
+  .rec-actions{display:flex;gap:10px;align-items:center;margin-top:18px;}
+  .prio{font-size:10px;font-weight:700;letter-spacing:.07em;padding:4px 10px;border-radius:6px;border:1px solid;}
+  .prio.sug{color:var(--primary);border-color:#BDD9E5;}
+  .prio.high{color:var(--red);border-color:#E5C4BF;}
+  .prio.asg{color:var(--purple);border-color:#CFCDE2;}
+  .rec-mini{display:flex;gap:12px;align-items:center;border-top:1px solid var(--border);padding-top:14px;margin-top:14px;}
+  .rec-mini h4{font-size:13.5px;font-weight:600;color:var(--heading);}
+  .rec-mini p{font-size:12px;color:var(--faint);margin-top:2px;}
+  .capinfo{display:flex;gap:10px;align-items:center;background:var(--chip);border-radius:8px;padding:10px 14px;font-size:12.5px;color:var(--gray);margin-bottom:14px;}
+  .rec-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:18px 0;}
+
+  /* progress */
+  .b-prog{grid-area:prog;}
+  .prow{display:flex;align-items:center;gap:13px;padding:9px 0;}
+  .prow + .prow{border-top:1px solid var(--border);}
+  .prow .icchip{width:36px;height:36px;border-radius:8px;}
+  .prow .pn{font-size:17px;font-weight:700;color:var(--heading);line-height:1.15;letter-spacing:-.01em;}
+  .prow .pl{font-size:11.5px;color:var(--faint);font-weight:500;margin-top:2px;}
+  .prow .sbar{height:4px;background:#E8ECF0;border-radius:9999px;margin-top:7px;overflow:hidden;width:110px;}
+  .prow .sbar i{display:block;height:100%;background:var(--primary);border-radius:9999px;}
+
+  /* bites */
+  .b-bites{grid-area:bites;display:flex;flex-direction:column;}
+  .brow{display:flex;align-items:center;gap:12px;padding:11px 0;}
+  .brow + .brow{border-top:1px solid var(--border);}
+  .brow .icchip{width:36px;height:36px;border-radius:8px;}
+  .brow .bt{flex:1;min-width:0;}
+  .brow h4{font-size:13px;font-weight:600;color:var(--heading);display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+  .brow p{font-size:11.5px;color:var(--faint);margin-top:2px;}
+  .chip-done{font-size:10px;font-weight:700;color:var(--green);background:#EAF4F0;border-radius:5px;padding:2px 7px;letter-spacing:.03em;}
+  .chip-due{font-size:10px;font-weight:700;color:var(--primary);background:#EAF2F6;border-radius:5px;padding:2px 7px;letter-spacing:.03em;}
+  .chip-over{font-size:10px;font-weight:700;color:var(--red);background:#F9EDEB;border-radius:5px;padding:2px 7px;letter-spacing:.03em;}
+  .sched-more{font-size:11px;color:var(--primary);font-weight:600;margin-top:4px;}
+
+  /* skill check */
+  .b-skill{grid-area:skill;display:flex;align-items:center;gap:16px;}
+  .b-skill h3{font-size:14.5px;font-weight:700;color:var(--heading);margin-bottom:3px;}
+  .b-skill p{font-size:13px;color:var(--gray);line-height:1.55;}
+
+  /* hub */
+  .b-hub{grid-area:hub;display:flex;flex-direction:column;}
+  .hrow{display:flex;align-items:center;gap:12px;padding:11px 6px;border-radius:8px;text-decoration:none;}
+  .hrow:hover{background:#F3F6F9;}
+  .hrow + .hrow{border-top:1px solid var(--border);}
+  .hrow .icchip{width:34px;height:34px;border-radius:8px;}
+  .hrow .ht{flex:1;}
+  .hrow h4{font-size:13px;font-weight:600;color:var(--heading);}
+  .hrow p{font-size:11px;color:var(--faint);margin-top:1px;}
+  .hrow .go{color:var(--faint);}
+
+  /* onboarding steps */
+  .ob-steps{margin:16px 0 4px;display:flex;flex-direction:column;gap:8px;}
+  .ob-step{display:flex;gap:12px;align-items:flex-start;font-size:13px;color:var(--gray);line-height:1.55;background:var(--chip);border-radius:8px;padding:12px 14px;}
+  .ob-step b{color:var(--heading);font-weight:600;}
+  .ob-n{width:22px;height:22px;border-radius:50%;background:var(--heading);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+
+  /* assistant */
+  .fab{position:fixed;right:28px;bottom:28px;width:54px;height:54px;border-radius:50%;background:var(--heading);color:#fff;border:none;box-shadow:0 6px 20px rgba(22,50,74,.3);z-index:70;display:flex;align-items:center;justify-content:center;}
+  .fab:hover{background:#0F2436;}
+  .fab-hint{position:fixed;right:94px;bottom:38px;background:#fff;border:1px solid var(--border);border-radius:8px;padding:9px 14px;font-size:12px;font-weight:600;color:var(--heading);box-shadow:0 4px 16px rgba(22,50,74,.10);z-index:70;}
+  body.chatopen .fab-hint{display:none;}
+  .chat{position:fixed;top:0;right:0;bottom:0;width:400px;max-width:100vw;background:#fff;box-shadow:-10px 0 34px rgba(22,50,74,.14);z-index:90;display:flex;flex-direction:column;transform:translateX(105%);transition:transform .28s ease;}
+  body.chatopen .chat{transform:none;}
+  .chat-h{background:var(--heading);color:#fff;padding:16px 20px;display:flex;align-items:center;gap:12px;}
+  .chat-h .ca{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .chat-h h3{font-size:14px;font-weight:700;}
+  .chat-h p{font-size:11px;opacity:.7;margin-top:2px;}
+  .chat-h .cx{margin-left:auto;background:none;border:none;color:#fff;font-size:16px;opacity:.8;}
+  .chat-m{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px;background:var(--bg);}
+  .msg{max-width:84%;padding:11px 15px;border-radius:10px;font-size:13px;line-height:1.6;}
+  .msg.ai{background:#fff;border:1px solid var(--border);color:var(--text);align-self:flex-start;}
+  .msg.user{background:var(--primary);color:#fff;align-self:flex-end;}
+  .msg.ai b{color:var(--heading);font-weight:600;}
+  .msg .act{display:inline-block;margin-top:10px;background:var(--primary);color:#fff;border:none;border-radius:7px;padding:8px 15px;font-size:12px;font-weight:600;cursor:pointer;}
+  .typing{display:flex;gap:5px;padding:14px 16px;background:#fff;border:1px solid var(--border);border-radius:10px;align-self:flex-start;}
+  .typing i{width:6px;height:6px;border-radius:50%;background:#9AA7B5;animation:blink 1.2s infinite;}
+  .typing i:nth-child(2){animation-delay:.2s;}
+  .typing i:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,80%,100%{opacity:.25;}40%{opacity:1;}}
+  .chat-sug{padding:0 20px 12px;display:flex;flex-direction:column;gap:8px;background:var(--bg);}
+  .sug{background:#fff;border:1px solid var(--border);border-radius:8px;padding:10px 15px;font-size:12.5px;font-weight:500;color:var(--gray);text-align:left;}
+  .sug:hover{border-color:var(--primary);color:var(--primary);}
+  .chat-in{display:flex;gap:8px;padding:14px 16px;border-top:1px solid var(--border);background:#fff;}
+  .chat-in input{flex:1;border:1px solid var(--border);background:#fff;border-radius:8px;padding:11px 14px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--text);outline:none;}
+  .chat-in input:focus{border-color:var(--primary);}
+  .chat-in button{width:44px;border:none;border-radius:8px;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;}
+
+  /* modal */
+  .overlay{display:none;position:fixed;inset:0;background:rgba(16,28,40,.5);z-index:80;align-items:center;justify-content:center;}
+  .overlay.open{display:flex;}
+  .modal{background:#fff;border-radius:12px;max-width:440px;width:calc(100% - 48px);padding:30px 32px;text-align:center;position:relative;}
+  .modal .mx{position:absolute;top:14px;right:16px;background:none;border:none;font-size:15px;color:var(--faint);}
+  .modal h3{font-size:19px;font-weight:700;color:var(--heading);padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:16px;}
+  .modal p{font-size:13.5px;color:var(--gray);line-height:1.6;margin-bottom:18px;}
+  .opt{display:block;width:100%;background:#fff;border:1px solid var(--border);border-radius:8px;padding:13px 16px;font-size:13.5px;font-weight:600;color:var(--heading);margin-bottom:8px;}
+  .opt:hover{border-color:var(--primary);}
+</style>
+</head>
+<body>
+
+<!-- icon set (lucide-style, stroke) -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+  <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+  <symbol id="i-trend" viewBox="0 0 24 24"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></symbol>
+  <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.9" y1="4.9" x2="6.3" y2="6.3"/><line x1="17.7" y1="17.7" x2="19.1" y2="19.1"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/><line x1="4.9" y1="19.1" x2="6.3" y2="17.7"/><line x1="17.7" y1="6.3" x2="19.1" y2="4.9"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-clip" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><path d="m9 14 2 2 4-4"/></symbol>
+  <symbol id="i-check-c" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+  <symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></symbol>
+  <symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><polyline points="8.5 13 7 22 12 19.5 17 22 15.5 13"/></symbol>
+  <symbol id="i-flame" viewBox="0 0 24 24"><path d="M12 2c1.5 3.5 5.5 5.5 5.5 10a5.5 5.5 0 0 1-11 0c0-2.2 1-3.9 2.2-5.6.5 1.1 1.3 1.8 1.3 1.8S10.5 5 12 2z"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-bot" viewBox="0 0 24 24"><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M12 8V4"/><circle cx="12" cy="3" r="1"/><line x1="9" y1="13" x2="9" y2="15"/><line x1="15" y1="13" x2="15" y2="15"/></symbol>
+</svg>
+
+<div class="topbar">
+  <div class="topbar-in">
+    <div class="logo">
+      <svg class="logo-mark" viewBox="0 0 44 38" fill="none">
+        <rect x="2" y="4" width="27" height="27" rx="5" stroke="#1E9AB0" stroke-width="3"/>
+        <path d="M29 8 L40 5 L40 26 L29 30" stroke="#F0821E" stroke-width="3" fill="none" stroke-linejoin="round"/>
+        <path d="M9 19 L14 14 L18 18 L24 11" stroke="#F0821E" stroke-width="2.4" fill="none" stroke-linecap="round"/>
+        <path d="M9 24 H22" stroke="#1E9AB0" stroke-width="2.4" stroke-linecap="round"/>
+      </svg>
+      <div class="logo-word">ATLAS<small>By HeyHi</small></div>
+    </div>
+    <nav class="nav">
+      <a href="#" class="active">Dashboard</a><a href="#">Courses</a><a href="#">Assessments</a><a href="#">CBL</a><a href="#">Performance</a><a href="#">PALS</a>
+    </nav>
+    <div class="top-right">
+      <button class="bell" onclick="toggleNotif()"><svg class="li"><use href="#i-bell"/></svg><span class="dot" id="ncount">2</span></button>
+      <button class="help-pill"><svg class="li sm"><use href="#i-help"/></svg>Help</button>
+      <div class="avatar">ZC</div>
+    </div>
+  </div>
+</div>
+
+<div class="notif" id="notif">
+  <div class="notif-h">Notifications</div>
+  <div class="notif-item unread" id="nrec" onclick="openReview()">
+    <svg class="li" style="color:var(--primary);"><use href="#i-target"/></svg>
+    <div><b>Chapter Review recommended</b> — Customer Due Diligence<span class="time">Jul 2, 2026 · 09:40 — remains until completed</span></div>
+  </div>
+  <div class="notif-item unread">
+    <svg class="li" style="color:var(--ink);"><use href="#i-book"/></svg>
+    <div><b>Treasury 101</b> has been assigned<span class="time">Jun 10, 2026 · 10:17</span></div>
+  </div>
+  <div class="notif-f"><button class="btn primary sm" onclick="window.open('ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=notif')">View all</button></div>
+</div>
+
+<div class="proto">
+  <span class="lbl">v0.4 Professional restyle</span>
+  <span class="here">Dashboard</span>
+  <a href="ATLAS_REC_Recommendation_Prototype_v0.3.html" target="_blank">Other screens — open v0.3 ↗</a>
+</div>
+
+<div class="dashtop">
+  <div>
+    <h2>Good morning, Zhi Chuen</h2>
+    <div class="sub">Pick up where you left off — one review is waiting for you.</div>
+  </div>
+  <div class="date">Friday, 3 July 2026</div>
+</div>
+
+<div class="simrow">
+  <div class="sim">
+    <span class="lbl">Simulate:</span>
+    <button class="active" onclick="dashState('single',this)">1 recommendation</button>
+    <button onclick="dashState('multi',this)">Multiple</button>
+    <button onclick="dashState('manual',this)">Manual</button>
+    <button onclick="dashState('capped',this)">Capped</button>
+    <button onclick="dashState('empty',this)">Empty</button>
+    <button onclick="dashState('new',this)">New learner</button>
+  </div>
+  <div class="sim">
+    <span class="lbl">Bites:</span>
+    <button class="active" onclick="bitesState('one',this)">1 due</button>
+    <button onclick="bitesState('stack',this)">3 due</button>
+    <button onclick="bitesState('over',this)">Overdue</button>
+  </div>
+</div>
+
+<div class="bento">
+
+  <!-- REC hero -->
+  <div class="tile b-rec">
+    <div class="tile-h"><svg class="li"><use href="#i-target"/></svg>Recommended for you</div>
+
+    <div class="rec-body" id="d-single">
+      <div class="rec-top">
+        <div class="icchip"><svg class="li"><use href="#i-target"/></svg></div>
+        <div>
+          <h3>Chapter Review — Customer Due Diligence</h3>
+          <div class="desc">You missed three questions on this skill in your last practice test. A short simplified review with a knowledge check takes about five minutes.</div>
+          <div><span class="skilltag">Customer Due Diligence</span><span class="skilltag">Red Flag Indicators</span></div>
+          <div class="rec-meta"><span>5 min</span><span>2 pages · 3-question check</span><span>Source: Practice Test 2</span></div>
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+      <div class="rec-actions">
+        <button class="btn primary sm" onclick="openReview()">Start review</button>
+        <button class="btn ghost" onclick="snooze()">Remind me later</button>
+        <span style="flex:1;"></span>
+        <span class="prio sug">SUGGESTED</span>
+      </div>
+    </div>
+
+    <div class="rec-body" id="d-multi" style="display:none;">
+      <div class="rec-top">
+        <div class="icchip red"><svg class="li"><use href="#i-clip"/></svg></div>
+        <div>
+          <h3>Chapter Review — AML/CFT Fundamentals</h3>
+          <div class="desc">Assessment score of 54% is below the 70% passing threshold. This review is prioritised first.</div>
+          <div><span class="skilltag">AML Regulation Basics</span><span class="skilltag">Reporting Obligations</span></div>
+          <div class="rec-meta"><span>8 min</span><span>Source: Failed assessment</span></div>
+        </div>
+      </div>
+      <div class="rec-actions">
+        <button class="btn primary sm" onclick="openReview()">Start review</button>
+        <span style="flex:1;"></span>
+        <span class="prio high">PRIORITY 1</span>
+      </div>
+      <div class="rec-mini">
+        <div class="icchip" style="width:34px;height:34px;"><svg class="li sm"><use href="#i-target"/></svg></div>
+        <div style="flex:1;">
+          <h4>Next: Customer Due Diligence</h4>
+          <p>Three missed questions on Practice Test 2 · 5 min</p>
+        </div>
+        <button class="btn outline xs" onclick="openReview()">Start</button>
+      </div>
+    </div>
+
+    <div class="rec-body" id="d-manual" style="display:none;">
+      <div class="rec-top">
+        <div class="icchip purple"><svg class="li"><use href="#i-user"/></svg></div>
+        <div>
+          <h3>Assigned by your manager — Transaction Monitoring</h3>
+          <div class="desc">Sarah (L&amp;D Manager) reviewed your analytics and assigned this review to close a skill gap ahead of your next assessment.</div>
+          <div><span class="skilltag">Transaction Monitoring</span></div>
+          <div class="rec-meta"><span>6 min</span><span>Source: Manual assignment</span></div>
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+      <div class="rec-actions">
+        <button class="btn primary sm" onclick="openReview()">Start review</button>
+        <span style="flex:1;"></span>
+        <span class="prio asg">ASSIGNED</span>
+      </div>
+    </div>
+
+    <div class="rec-body" id="d-capped" style="display:none;">
+      <div class="capinfo"><svg class="li sm" style="color:var(--faint);"><use href="#i-clock"/></svg><span><b style="color:var(--heading);">One more review is queued</b> — it will surface tomorrow to keep the workload manageable.</span></div>
+      <div class="rec-top">
+        <div class="icchip"><svg class="li"><use href="#i-target"/></svg></div>
+        <div>
+          <h3>Chapter Review — Customer Due Diligence</h3>
+          <div class="desc">Today's recommended review.</div>
+          <div><span class="skilltag">Customer Due Diligence</span></div>
+          <div class="rec-meta"><span>5 min</span></div>
+        </div>
+      </div>
+      <div style="flex:1;"></div>
+      <div class="rec-actions">
+        <button class="btn primary sm" onclick="openReview()">Start review</button>
+        <span style="flex:1;"></span>
+        <span class="prio sug">SUGGESTED</span>
+      </div>
+    </div>
+
+    <div class="rec-body" id="d-empty" style="display:none;">
+      <div class="rec-empty">
+        <div class="icchip green" style="width:52px;height:52px;margin-bottom:14px;"><svg class="li"><use href="#i-check"/></svg></div>
+        <h3 style="font-size:15.5px;font-weight:700;color:var(--heading);margin-bottom:6px;">You're all caught up</h3>
+        <p style="font-size:13px;color:var(--gray);max-width:360px;line-height:1.6;">No reviews are recommended right now. We'll flag the next chapter worth revisiting as you progress.</p>
+        <button class="btn outline sm" style="margin-top:16px;" onclick="openT17()">Request a review on a topic</button>
+      </div>
+    </div>
+
+    <div class="rec-body" id="d-new" style="display:none;">
+      <div class="rec-top">
+        <div class="icchip"><svg class="li"><use href="#i-compass"/></svg></div>
+        <div>
+          <h3>Welcome to ATLAS</h3>
+          <div class="desc">Your personalised learning journey starts here. As you learn, this space will surface reviews tailored to exactly what you need to strengthen.</div>
+        </div>
+      </div>
+      <div class="ob-steps">
+        <div class="ob-step"><span class="ob-n">1</span><div><b>Take a short Skill Check</b> — 5–10 questions so we can map what you already know</div></div>
+        <div class="ob-step"><span class="ob-n">2</span><div><b>Start your first course</b> — Treasury 101 has been assigned to you</div></div>
+        <div class="ob-step"><span class="ob-n">3</span><div><b>Complete the Psychometric Assessment</b> — it personalises how we support you</div></div>
+      </div>
+      <div class="rec-actions">
+        <button class="btn primary sm">Take Skill Check</button>
+        <button class="btn ghost">Browse courses</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- progress -->
+  <div class="tile b-prog">
+    <div class="tile-h"><svg class="li"><use href="#i-trend"/></svg>Your progress <a href="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=gami" target="_blank">View all</a></div>
+    <div id="prog-normal">
+      <div class="prow"><div class="icchip"><svg class="li"><use href="#i-flame"/></svg></div><div><div class="pn">12 days</div><div class="pl">Current streak · longest 21</div></div></div>
+      <div class="prow"><div class="icchip"><svg class="li"><use href="#i-zap"/></svg></div><div><div class="pn">2,480 XP</div><div class="pl">+25 from your last review</div></div></div>
+      <div class="prow"><div class="icchip"><svg class="li"><use href="#i-award"/></svg></div><div><div class="pn">Level 7</div><div class="pl">320 XP to Level 8</div><div class="sbar"><i style="width:64%;"></i></div></div></div>
+    </div>
+    <div id="prog-new" style="display:none;">
+      <div class="prow"><div class="icchip"><svg class="li"><use href="#i-flame"/></svg></div><div><div class="pn">0 days</div><div class="pl">Complete any activity today to start a streak</div></div></div>
+      <div class="prow"><div class="icchip"><svg class="li"><use href="#i-zap"/></svg></div><div><div class="pn">0 XP</div><div class="pl">Earned from courses, checks and reviews</div></div></div>
+      <div class="prow"><div class="icchip"><svg class="li"><use href="#i-award"/></svg></div><div><div class="pn">First milestone</div><div class="pl">Complete your first course</div><div class="sbar"><i style="width:0%;"></i></div></div></div>
+    </div>
+  </div>
+
+  <!-- bites -->
+  <div class="tile b-bites">
+    <div class="tile-h"><svg class="li"><use href="#i-zap"/></svg>Bites — spaced practice</div>
+    <div id="bites-normal">
+      <div class="brow">
+        <div class="icchip"><svg class="li"><use href="#i-sun"/></svg></div>
+        <div class="bt"><h4>Daily <span class="chip-done">2 OF 3 DONE</span></h4><p>3 short questions · resets daily</p></div>
+        <button class="btn primary xs" onclick="toV3('bites')">Start</button>
+      </div>
+      <div class="brow">
+        <div class="icchip"><svg class="li"><use href="#i-cal"/></svg></div>
+        <div class="bt"><h4>Weekly</h4><p>10–15 questions · resets Sunday</p></div>
+        <button class="btn outline xs" onclick="toV3('bites')">Start</button>
+      </div>
+      <div class="brow" id="schedrow">
+        <div class="icchip"><svg class="li"><use href="#i-clock"/></svg></div>
+        <div class="bt"><h4>Scheduled <span class="chip-due">DUE TODAY</span></h4><p>Customer Due Diligence · 5 questions</p></div>
+        <button class="btn primary xs" onclick="toV3('bites')">Start</button>
+      </div>
+    </div>
+    <div id="bites-new" style="display:none;">
+      <div style="text-align:center;padding:24px 8px;">
+        <div class="icchip" style="margin:0 auto 12px;"><svg class="li"><use href="#i-clock"/></svg></div>
+        <h4 style="font-size:13.5px;font-weight:600;color:var(--heading);margin-bottom:8px;">Unlocks after your first topic</h4>
+        <p style="font-size:12px;color:var(--faint);line-height:1.6;">Short retention checks will appear here, scheduled from the day after you complete your first topic.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- skill check -->
+  <div class="tile b-skill">
+    <div class="icchip"><svg class="li"><use href="#i-search"/></svg></div>
+    <div style="flex:1;">
+      <h3>Skill Check</h3>
+      <p>A short quiz across your topics — we'll identify gaps and prepare targeted reviews where needed.</p>
+    </div>
+    <button class="btn outline sm" onclick="toV3('bites')">Start</button>
+  </div>
+
+  <!-- hub -->
+  <div class="tile b-hub">
+    <div class="tile-h"><svg class="li"><use href="#i-grid"/></svg>Learning Hub</div>
+    <a class="hrow" href="#"><div class="icchip"><svg class="li"><use href="#i-book"/></svg></div><div class="ht"><h4>Courses</h4><p>Continue your enrolled courses</p></div><svg class="li sm go"><use href="#i-right"/></svg></a>
+    <a class="hrow" href="#"><div class="icchip"><svg class="li"><use href="#i-clip"/></svg></div><div class="ht"><h4>Assessments</h4><p>Evaluate your skills</p></div><svg class="li sm go"><use href="#i-right"/></svg></a>
+    <a class="hrow" href="#"><div class="icchip"><svg class="li"><use href="#i-check-c"/></svg></div><div class="ht"><h4>Evaluate My Skills</h4><p>Track your mastery</p></div><svg class="li sm go"><use href="#i-right"/></svg></a>
+    <a class="hrow" href="#"><div class="icchip"><svg class="li"><use href="#i-compass"/></svg></div><div class="ht"><h4>PALS</h4><p>Your personalised journey</p></div><svg class="li sm go"><use href="#i-right"/></svg></a>
+    <a class="hrow" href="#"><div class="icchip"><svg class="li"><use href="#i-activity"/></svg></div><div class="ht"><h4>Psychometric</h4><p>Understand your learning style</p></div><svg class="li sm go"><use href="#i-right"/></svg></a>
+    <a class="hrow" href="#"><div class="icchip"><svg class="li"><use href="#i-msg"/></svg></div><div class="ht"><h4>CBL</h4><p>Scenario-based practice</p></div><svg class="li sm go"><use href="#i-right"/></svg></a>
+  </div>
+</div>
+
+<!-- T17 modal -->
+<div class="overlay" id="t17modal">
+  <div class="modal">
+    <button class="mx" onclick="closeT17()">✕</button>
+    <h3>Request a Chapter Review</h3>
+    <p>Choose a topic to revisit — we'll prepare a simplified review with a short knowledge check.</p>
+    <button class="opt" onclick="selfRequest('Customer Due Diligence')">Customer Due Diligence</button>
+    <button class="opt" onclick="selfRequest('Red Flag Indicators')">Red Flag Indicators</button>
+    <button class="opt" onclick="selfRequest('Reporting Obligations')">Reporting Obligations</button>
+  </div>
+</div>
+
+<!-- assistant -->
+<div class="fab-hint" id="fabhint">Ask ATLAS Assistant</div>
+<button class="fab" onclick="toggleChat()" title="ATLAS Assistant"><svg class="li" style="width:22px;height:22px;"><use href="#i-msg"/></svg></button>
+
+<div class="chat" id="chat">
+  <div class="chat-h">
+    <div class="ca"><svg class="li"><use href="#i-bot"/></svg></div>
+    <div>
+      <h3>ATLAS Assistant</h3>
+      <p>Connected to your courses and company knowledge</p>
+    </div>
+    <button class="cx" onclick="toggleChat()">✕</button>
+  </div>
+  <div class="chat-m" id="chatm">
+    <div class="msg ai">Hello Zhi Chuen. I have access to your courses and company knowledge — how can I help today?</div>
+  </div>
+  <div class="chat-sug" id="chatsug">
+    <button class="sug" onclick="ask('What courses should I take next?')">What courses should I take next?</button>
+    <button class="sug" onclick="ask('Summarize my learning progress')">Summarize my learning progress</button>
+    <button class="sug" onclick="ask(&quot;Explain a concept I'm struggling with&quot;)">Explain a concept I'm struggling with</button>
+  </div>
+  <div class="chat-in">
+    <input id="chatinput" placeholder="Ask about your courses, skills, or learning" onkeydown="if(event.key==='Enter')sendChat()">
+    <button onclick="sendChat()"><svg class="li sm"><use href="#i-send"/></svg></button>
+  </div>
+</div>
+
+<script>
+const V3='ATLAS_REC_Recommendation_Prototype_v0.3.html';
+function toV3(s){window.open(V3+'?screen='+s);}
+function openReview(){window.open(V3+'?screen=review');}
+function toggleNotif(){document.getElementById('notif').classList.toggle('open');}
+function toggleChat(){
+  document.body.classList.toggle('chatopen');
+  document.getElementById('fabhint').style.display='none';
+  if(document.body.classList.contains('chatopen'))document.getElementById('chatinput').focus();
+}
+
+/* dashboard states */
+const states=['single','multi','manual','capped','empty','new'];
+function dashState(st,btn){
+  states.forEach(s=>document.getElementById('d-'+s).style.display=(s===st?'flex':'none'));
+  const isNew=st==='new';
+  document.getElementById('prog-normal').style.display=isNew?'none':'block';
+  document.getElementById('prog-new').style.display=isNew?'block':'none';
+  document.getElementById('bites-normal').style.display=isNew?'none':'block';
+  document.getElementById('bites-new').style.display=isNew?'block':'none';
+  if(btn){btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');}
+}
+function snooze(){
+  document.getElementById('d-single').innerHTML='<div class="rec-empty"><div class="icchip" style="width:52px;height:52px;margin-bottom:14px;"><svg class="li"><use href="#i-clock"/></svg></div><h3 style="font-size:15.5px;font-weight:700;color:var(--heading);margin-bottom:6px;">Snoozed for this session</h3><p style="font-size:13px;color:var(--gray);max-width:360px;line-height:1.6;">The recommendation returns on your next visit and remains in notifications until completed.</p></div>';
+}
+/* T17 */
+function openT17(){document.getElementById('t17modal').classList.add('open');}
+function closeT17(){document.getElementById('t17modal').classList.remove('open');}
+function selfRequest(topic){
+  closeT17();
+  dashState('single');
+  document.querySelectorAll('.simrow .sim:first-child button').forEach((b,i)=>b.classList.toggle('active',i===0));
+  document.querySelector('#d-single h3').textContent='Chapter Review — '+topic;
+  document.querySelector('#d-single .desc').textContent='You asked to revisit this topic. A simplified review with a knowledge check is ready — about five minutes.';
+  document.querySelector('#d-single .rec-meta').innerHTML='<span>5 min</span><span>Source: Self-requested</span>';
+}
+/* scheduled bites states */
+const IC='<div class="icchip"><svg class="li"><use href="#i-clock"/></svg></div>';
+const ICR='<div class="icchip red"><svg class="li"><use href="#i-clock"/></svg></div>';
+const schedHTML={
+  one:IC+'<div class="bt"><h4>Scheduled <span class="chip-due">DUE TODAY</span></h4><p>Customer Due Diligence · 5 questions</p></div><button class="btn primary xs" onclick="toV3(\'bites\')">Start</button>',
+  stack:IC+'<div class="bt"><h4>Scheduled <span class="chip-due">3 TOPICS DUE</span></h4><p>Customer Due Diligence · Red Flag Indicators · KYC Monitoring</p><div class="sched-more">About 12 minutes in total — cleared one at a time</div></div><button class="btn primary xs" onclick="toV3(\'bites\')">Start queue</button>',
+  over:ICR+'<div class="bt"><h4>Scheduled <span class="chip-over">OVERDUE · 4 DAYS</span></h4><p>Customer Due Diligence returned to Box 0 while you were away. Five short questions will rebuild it — no penalty.</p></div><button class="btn primary xs" onclick="toV3(\'bites\')">Start</button>'
+};
+function bitesState(st,btn){
+  document.getElementById('schedrow').innerHTML=schedHTML[st];
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+/* assistant (mock) */
+const cannedAnswers=[
+ [/course.*next|next.*course/i,
+  `Based on your progress, continue with <b>Introduction to AML/CFT and Its Importance</b> — you're 4 of 13 sessions in.<br><br>One note: a <b>Chapter Review on Customer Due Diligence</b> is waiting. It takes about five minutes and strengthens concepts the next lessons build on.<br><button class="act" onclick="openReview()">Start Chapter Review</button>`],
+ [/progress|summar/i,
+  `Here is your current snapshot.<br><br>Current streak: <b>12 days</b> (longest 21)<br>Total XP: <b>2,480</b> · Level 7 — 320 XP to Level 8<br>AML/CFT course: <b>1 of 15</b> knowledge points learned<br>Last practice test: <b>60%</b> — four missed questions, mostly on <b>Customer Due Diligence</b><br><br>A short review is ready to close that gap.`],
+ [/struggl|explain|concept|cdd|due diligence/i,
+  `Certainly. Your recent test suggests <b>Customer Due Diligence</b> is the concept to focus on.<br><br>In one line: CDD means knowing exactly who you are doing business with — verify identity, assess risk, and monitor transactions on an ongoing basis.<br><br>Would you like the full simplified walkthrough with a short knowledge check?<br><button class="act" onclick="openReview()">Open Chapter Review</button>`],
+ [/bite/i,
+  `You have <b>one Daily Bite</b> remaining today (2 of 3 complete), and a <b>Scheduled Bite</b> on Customer Due Diligence is due. Both take under three minutes and count toward your 12-day streak.`]
+];
+const defaultAnswer=`I've searched your course material — this topic is covered in <b>Fundamentals of AML/CFT, Section 2</b>. Would you like a simplified explanation, or a link to the exact lesson?`;
+const buddyRe=/cdd|due diligence|struggl|explain|concept|red flag/i;
+let buddyCount=0,buddyNudged=false;
+function ask(t){document.getElementById('chatinput').value=t;sendChat();}
+function sendChat(){
+  const inp=document.getElementById('chatinput');
+  const t=inp.value.trim();
+  if(!t)return;
+  inp.value='';
+  document.getElementById('chatsug').style.display='none';
+  const m=document.getElementById('chatm');
+  const u=document.createElement('div');u.className='msg user';u.textContent=t;m.appendChild(u);
+  const ty=document.createElement('div');ty.className='typing';ty.innerHTML='<i></i><i></i><i></i>';m.appendChild(ty);
+  m.scrollTop=m.scrollHeight;
+  const hit=cannedAnswers.find(([re])=>re.test(t));
+  if(buddyRe.test(t))buddyCount++;
+  setTimeout(()=>{
+    ty.remove();
+    const a=document.createElement('div');a.className='msg ai';
+    a.innerHTML=hit?hit[1]:defaultAnswer;
+    m.appendChild(a);
+    m.scrollTop=m.scrollHeight;
+    if(buddyCount>=2&&!buddyNudged){
+      buddyNudged=true;
+      setTimeout(()=>{
+        const n=document.createElement('div');n.className='msg ai';
+        n.innerHTML='This topic keeps coming up, which usually means it deserves a proper revisit. Shall I prepare a <b>simplified Chapter Review</b>?<br><button class="act" onclick="openReview()">Yes, prepare it</button>';
+        m.appendChild(n);
+        m.scrollTop=m.scrollHeight;
+      },900);
+    }
+  },1100);
+}
+</script>
+</body>
+</html>
