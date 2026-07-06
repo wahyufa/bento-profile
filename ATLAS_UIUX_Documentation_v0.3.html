@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS UI/UX Prototype Documentation — v0.3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --primary:#0D719A;--heading:#1B3F62;--text:#171A26;--gray:#6A7181;
+    --bg:#F6F7F9;--border:#E1E4EA;--green:#3EC8A2;--red:#E73636;--orange:#FFAD33;
+    --navy:#1E3A5F;--slide:#EDF2F8;
+  }
+  *{box-sizing:border-box;margin:0;}
+  body{font-family:'Montserrat',sans-serif;background:var(--bg);color:var(--text);font-size:15px;line-height:1.65;}
+  .page{max-width:980px;margin:0 auto;padding:0 28px 80px;}
+
+  /* cover */
+  .cover{background:var(--navy);color:#fff;padding:54px 28px 46px;}
+  .cover-in{max-width:980px;margin:0 auto;}
+  .cover .kicker{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;opacity:.7;margin-bottom:14px;}
+  .cover h1{font-size:30px;font-weight:800;line-height:1.3;max-width:720px;}
+  .cover .meta{display:flex;gap:26px;flex-wrap:wrap;margin-top:22px;font-size:12.5px;opacity:.85;}
+  .cover .meta b{display:block;font-size:13.5px;opacity:1;}
+
+  h2{font-size:22px;font-weight:800;color:var(--heading);margin:52px 0 6px;}
+  h2 .no{color:var(--orange);margin-right:8px;}
+  h3{font-size:16px;font-weight:700;color:var(--heading);margin:28px 0 8px;}
+  p{margin:10px 0;color:#3A4453;}
+  p.lead{font-size:15.5px;color:var(--gray);}
+  a{color:var(--primary);font-weight:600;text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  code{background:#EDF0F4;border-radius:5px;padding:1px 7px;font-size:12.5px;color:var(--heading);}
+  ul{margin:10px 0 10px 4px;padding-left:20px;color:#3A4453;}
+  li{margin:6px 0;}
+
+  .card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:22px 26px;margin:16px 0;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;margin:14px 0;background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--border);}
+  th{background:#EDF2F8;color:var(--heading);text-align:left;padding:10px 14px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+  td{padding:10px 14px;border-top:1px solid var(--border);vertical-align:top;color:#3A4453;}
+  tr:nth-child(even) td{background:#FAFBFC;}
+  .ok{color:#1E9E77;font-weight:700;}
+  .eng{color:#8A6D1F;font-weight:700;}
+  .swatch{display:inline-block;width:13px;height:13px;border-radius:4px;vertical-align:-2px;margin-right:7px;border:1px solid rgba(0,0,0,.12);}
+  .pill{display:inline-block;background:#EAF0FB;color:#3B6FD1;font-size:10.5px;font-weight:800;padding:3px 11px;border-radius:9999px;letter-spacing:.03em;margin-right:6px;}
+  .pill.g{background:#E7F7EE;color:#2FA86A;}
+  .pill.o{background:#FFF1D8;color:#B07E10;}
+
+  /* live preview frames */
+  .preview{position:relative;border:1px solid var(--border);border-radius:14px;overflow:hidden;background:#fff;margin:16px 0 8px;height:420px;}
+  .preview iframe{width:1440px;height:1050px;border:0;transform:scale(0.648);transform-origin:0 0;pointer-events:none;}
+  .preview .open{position:absolute;right:14px;bottom:14px;background:var(--navy);color:#fff;font-size:12px;font-weight:700;padding:9px 18px;border-radius:9999px;box-shadow:0 6px 18px rgba(0,0,0,.25);}
+  .cap{font-size:12px;color:var(--gray);margin:6px 2px 0;}
+
+  .toc{display:grid;grid-template-columns:1fr 1fr;gap:6px 30px;font-size:13.5px;}
+  @media(max-width:700px){.toc{grid-template-columns:1fr;}.preview iframe{transform:scale(0.45);}.preview{height:300px;}}
+  .toc a{padding:4px 0;display:block;}
+  .callout{background:#FFF7E8;border-left:4px solid var(--orange);border-radius:8px;padding:12px 18px;font-size:13px;color:#6B5316;margin:14px 0;}
+  .divider{border:none;border-top:2px solid var(--border);margin:60px 0 8px;}
+  .parttag{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--orange);}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cover-in">
+    <div class="kicker">ATLAS by HeyHi · UI/UX Design Documentation</div>
+    <h1>Recommendation System, Bites &amp; Spaced Repetition, Engagement Nudges, Gamification — Interactive Prototype v0.3</h1>
+    <div class="meta">
+      <div><b>Author</b>Wahyu — UI/UX</div>
+      <div><b>Date</b>3 July 2026</div>
+      <div><b>Covers</b>REC-03 · SPC-07 · SPC-08 · ENG-04</div>
+      <div><b>Source spec</b>ATLAS Feature Documentation v0.1 (June 2026)</div>
+      <div><b>Prototype</b><a href="ATLAS_REC_Recommendation_Prototype_v0.3.html" style="color:#9BD1E8;">ATLAS_REC_Recommendation_Prototype_v0.3.html</a></div>
+    </div>
+  </div>
+</div>
+
+<div class="page">
+
+  <h2><span class="no">§</span>Contents</h2>
+  <div class="card toc">
+    <div>
+      <a href="#s1">1 · Purpose &amp; how to use this document</a>
+      <a href="#s2">2 · Design language</a>
+      <a href="#s3">3 · Screen-by-screen walkthrough</a>
+      <a href="#s4">4 · How the four features connect</a>
+      <a href="#s5">5 · Open questions for review</a>
+    </div>
+    <div>
+      <a href="#s6">A · Component inventory (dev spec)</a>
+      <a href="#s7">B · Interaction &amp; state rules</a>
+      <a href="#s8">C · Requirement traceability matrix</a>
+    </div>
+  </div>
+
+  <h2 id="s1"><span class="no">1</span>Purpose &amp; how to use this document</h2>
+  <p class="lead">This document accompanies the interactive HTML prototype for the four intelligent-learning features planned for ATLAS. Part 1–5 explain the design for reviewers; appendices A–C specify behaviour for the IT team implementing on 3–14 July.</p>
+  <p>Every screen below is embedded <b>live from the prototype file</b> — previews always match the latest prototype. Keep both files in the same folder. Click <b>Open interactive ↗</b> on any preview to explore that screen full-size; the dark ribbon at the top of the prototype switches between screens, and the small grey "Simulate" controls are prototype-only tools for demoing states (they are not product UI).</p>
+  <div class="callout">Visual fidelity note: all colours, typography and components were measured directly from the live product at <b>demo.atlaslearn.ai</b> (2 Jul 2026), so the new features look native to the existing app.</div>
+
+  <h2 id="s2"><span class="no">2</span>Design language</h2>
+  <p>Tokens extracted from the production app and reused throughout:</p>
+  <table>
+    <tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+    <tr><td>Font</td><td>Montserrat 400–800</td><td>Everything (headings 700–800)</td></tr>
+    <tr><td>Primary action</td><td><span class="swatch" style="background:#0D719A"></span><code>#0D719A</code></td><td>Solid buttons, links, active nav, progress fill</td></tr>
+    <tr><td>Shell bars</td><td><span class="swatch" style="background:#33436B"></span><code>#33436B</code> / <span class="swatch" style="background:#1E3A5F"></span><code>#1E3A5F</code></td><td>Test player / lesson player top bars</td></tr>
+    <tr><td>Correct / wrong</td><td><span class="swatch" style="background:#3EC8A2"></span><code>#3EC8A2</code> / <span class="swatch" style="background:#E73636"></span><code>#E73636</code></td><td>Quiz answer states &amp; feedback text</td></tr>
+    <tr><td>Accent</td><td><span class="swatch" style="background:#FFAD33"></span><code>#FFAD33</code></td><td>Notification badge, active-nav underline, streaks</td></tr>
+    <tr><td>Surfaces</td><td><span class="swatch" style="background:#F6F7F9"></span><code>#F6F7F9</code> bg · white cards · <code>#E1E4EA</code> borders</td><td>Cards radius 16px; quiz options radius 8px; pill buttons</td></tr>
+  </table>
+
+  <h2 id="s3"><span class="no">3</span>Screen-by-screen walkthrough</h2>
+
+  <h3>3.1 Dashboard — bento layout <span class="pill">REC-03</span><span class="pill">SPC-07</span><span class="pill">SPC-08</span></h3>
+  <p>The dashboard is reorganised as a bento grid so nothing important sits below the fold: the <b>Recommendation card</b> is the hero tile (2×2), with <b>progress</b> (streak/XP/level), <b>Bites entry points</b> (Daily · Weekly · Scheduled), <b>Skill Check</b>, and the <b>Learning Hub</b> (existing six modules) arranged around it. The recommendation card has six states — single, multiple (ranked by severity, duplicates collapsed), manual assignment (T16, purple), frequency-capped (excess queued), empty (with a self-request entry, T17), and a first-visit onboarding state for brand-new learners. The floating 💬 button opens the <b>ATLAS Assistant</b> — the existing three starter questions are kept so new users learn how to use it; the assistant can also hand off into a Chapter Review.</p>
+  <div class="preview"><iframe loading="lazy" src="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=dash&amp;embed=1"></iframe><a class="open" href="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=dash" target="_blank">Open interactive ↗</a></div>
+  <p class="cap">Live preview — default state (one recommendation). Use the Simulate controls in the interactive version to switch states.</p>
+
+  <h3>3.2 Post-test trigger <span class="pill">REC-03</span></h3>
+  <p>After a practice test, missed questions are grouped by skill tag. Three wrong answers sharing "Customer Due Diligence" fire trigger <b>T2</b>; on Continue, a modal offers the Chapter Review at the moment of highest intent. Declining never blocks progress — the offer moves to the dashboard card and the 🔔 notification, where it persists until completed (spec 1.3). A post-assessment <b>check-in nudge</b> also appears here (spec 3.4 touchpoint).</p>
+  <div class="preview"><iframe loading="lazy" src="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=posttest&amp;embed=1"></iframe><a class="open" href="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=posttest" target="_blank">Open interactive ↗</a></div>
+
+  <h3>3.3 Chapter Review flow <span class="pill">REC-03</span><span class="pill">ENG-04</span></h3>
+  <p>A four-step full-screen flow using the lesson-player shell: <b>Overview</b> (what triggered it, what it covers, time estimate) → <b>Simplified content</b> (2 pages from the Simplified-preset pipeline, with "Why you missed Qx" callouts tied to the learner's own mistakes) → <b>Mini quiz</b> (3 questions, identical behaviour to the live practice test) → <b>Result</b>. Passing awards XP and clears the card + notification automatically; failing fires <b>T15</b>: retry, re-read, or exit with the recommendation kept. A check-in nudge appears once during content, and another after completion — answering "Not really" escalates to a fresh review (escalation over repetition, spec 3.4).</p>
+  <div class="preview"><iframe loading="lazy" src="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=review&amp;embed=1"></iframe><a class="open" href="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=review" target="_blank">Open interactive ↗</a></div>
+
+  <h3>3.4 Lesson session + engagement nudges <span class="pill">ENG-04</span><span class="pill">SPC-08</span></h3>
+  <p>The three nudge types from spec 3.4 render as one shared bottom-right card component — non-intrusive, dismissible, never blocking the slide: <b>Check-in</b> ("too hard or manageable?" — choosing Simplify regenerates the slide as a simplified preset), <b>Rest &amp; Pause</b> (10-second countdown, auto-dismisses), and <b>Pause &amp; Think</b> (workplace reflection prompt). The ⚡ <b>Bonus Bite</b> pop-up demonstrates SPC-08 interleaving: one quick question from a previously learned topic, mid-course.</p>
+  <div class="preview"><iframe loading="lazy" src="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=lesson&amp;embed=1"></iframe><a class="open" href="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=lesson" target="_blank">Open interactive ↗</a></div>
+
+  <h3>3.5 Bites — Daily · Weekly · Skill Check <span class="pill">SPC-05/06/08</span></h3>
+  <p>One quiz shell serves three flows. <b>Daily</b> (3 questions) ends with the <b>Leitner ladder</b>: a correct topic promotes one box (7 → 16 days), a miss demotes to Box 0 (review tomorrow) — making the invisible scheduling algorithm legible to learners. <b>Weekly</b> (10–15 questions; 5 in this demo) and <b>Skill Check</b> (random cross-topic) end with a "Sent to your recommendations" panel instead — wrong answers feed the Recommendation System (SPC-04) and can open a Chapter Review directly. Results always show XP (+5 per correct answer), the streak, and badge progress; a perfect Bite lights up <b>Sharpshooter — NEW!</b>.</p>
+  <div class="preview"><iframe loading="lazy" src="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=bites&amp;embed=1"></iframe><a class="open" href="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=bites" target="_blank">Open interactive ↗</a></div>
+
+  <h3>3.6 Gamification hub <span class="pill">SPC-07</span></h3>
+  <p>A single page for the reward layer: <b>streak milestones</b> (3 / 7 / 14 / 30 / 100 days with the learner's position marked), the <b>full badge catalogue</b> from spec 3.4.1 grouped as Getting Started, Progression (Bronze/Silver/Gold tiers with progress, e.g. Reviewer 6/15), Mastery, and Breadth &amp; Consistency, and the <b>leaderboard</b> with Organisation / Department / Group tabs. Reached from the "View all →" link on the dashboard progress tile.</p>
+  <div class="preview"><iframe loading="lazy" src="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=gami&amp;embed=1"></iframe><a class="open" href="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=gami" target="_blank">Open interactive ↗</a></div>
+
+  <h3>3.7 Admin console <span class="pill">T16</span><span class="pill">Spec 3.3</span></h3>
+  <p>Two admin surfaces referenced by the spec: <b>Learner Analytics</b> — assessment results with per-skill gap chips; "Assign review" opens a confirmation and the assignment lands on the learner's dashboard as a T16 recommendation. <b>Gamification Settings</b> — the full opt-out matrix from spec 3.3: per-activity toggles for completion / pass (70%) / perfect score across PALS Course, CBL, Assessments, Bites and Chapter Review.</p>
+  <div class="preview"><iframe loading="lazy" src="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=admin&amp;embed=1"></iframe><a class="open" href="ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=admin" target="_blank">Open interactive ↗</a></div>
+
+  <h2 id="s4"><span class="no">4</span>How the four features connect</h2>
+  <div class="card">
+    <p style="margin:0;"><b>Every path leads to the Chapter Review, and every activity feeds the reward layer:</b></p>
+    <ul>
+      <li><b>Tests → Recommendation:</b> missed skill-tagged questions (T2/T3) create the dashboard card and post-test offer.</li>
+      <li><b>Bites → Recommendation:</b> wrong Weekly-Bite and Skill-Check answers queue reviews (SPC-04); Daily Bites drive the Leitner schedule.</li>
+      <li><b>Nudges → Recommendation:</b> check-ins offer simplification in place, and escalate to a review when struggle persists; the assistant (Learning Buddy) offers a review when a topic is asked repeatedly.</li>
+      <li><b>Everything → Gamification:</b> completing reviews and Bites earns XP, extends the streak, and advances badges — surfaced on the dashboard, the Bites results, and the hub.</li>
+      <li><b>Completion closes the loop:</b> finishing a review clears its card and notification; the concept is re-checked on the next assessment (the primary success metric, spec 1.2).</li>
+    </ul>
+  </div>
+
+  <h2 id="s5"><span class="no">5</span>Open questions for review</h2>
+  <ul>
+    <li>Should <b>manual (T16) assignments</b> be snoozable like automatic recommendations, or always pinned? (Currently: pinned, no "Later".)</li>
+    <li>The <b>"Why you missed Qx"</b> callouts in review content need confirmation that the pipeline can map feedback to specific missed questions (REC-02/04 dependency).</li>
+    <li>Exact <b>frequency caps</b> for recommendations and nudges are engine-level TBDs — the UI shows the capped/queued behaviour but the numbers need tuning with Daffa.</li>
+    <li>Weekly Bites in the demo uses 5 questions; production should draw 10–15 per spec 2.3.</li>
+    <li>Leaderboard scope: spec lists Organisation / Department / Group — confirm data availability for all three levels at launch.</li>
+  </ul>
+
+  <hr class="divider">
+  <div class="parttag">Appendix — Developer Specification</div>
+
+  <h2 id="s6"><span class="no">A</span>Component inventory</h2>
+  <table>
+    <tr><th>Component</th><th>Where used</th><th>Key contents</th><th>Variants / states</th></tr>
+    <tr><td><b>Recommendation card</b></td><td>Dashboard hero tile</td><td>Icon, title, reason copy, skill tags, meta (time · length · trigger source), CTA, priority pill</td><td>single · multiple-ranked · manual (T16) · capped · empty · onboarding · snoozed</td></tr>
+    <tr><td><b>Recommendation notification</b></td><td>🔔 dropdown</td><td>Title, concept, timestamp</td><td>No dismiss affordance; auto-clears on completion (spec 1.3)</td></tr>
+    <tr><td><b>Nudge card</b></td><td>Lesson, post-test, review (during + after), any future surface</td><td>Icon chip, title, body, action row, ✕</td><td>check-in · rest-pause (timer) · pause-think · post-review; one shared component, content injected per trigger</td></tr>
+    <tr><td><b>Quiz module</b></td><td>Chapter Review, Bites, Skill Check, Bonus Bite</td><td>Question panel (#E6EEF5 header, "n Mark" pill), 2×2 option grid, feedback line + explanation, Prev/Next</td><td>Option: default / hover / correct (green fill) / wrong (red fill, correct revealed)</td></tr>
+    <tr><td><b>Leitner ladder</b></td><td>Daily/Scheduled Bite result</td><td>Boxes 0–5 with intervals 1/3/7/16/35/90 days</td><td>promote (green target box) · demote (red Box 0)</td></tr>
+    <tr><td><b>Recommendation-feed panel</b></td><td>Weekly Bite &amp; Skill Check results</td><td>"Sent to your recommendations" + detected topic + optional CTA</td><td>gap found (with/without CTA) · no gaps</td></tr>
+    <tr><td><b>Gamification strip / hub</b></td><td>Dashboard tile · Hub page</td><td>Streak, XP, level (+bar); hub adds milestones, badge catalogue, leaderboard</td><td>normal · new-learner (zeroed, action-oriented copy)</td></tr>
+    <tr><td><b>ATLAS Assistant drawer</b></td><td>Global FAB (hidden in full-screen flows)</td><td>Header, message list, 3 starter chips, input</td><td>typing indicator · contextual answers · proactive review offer (repeat-topic trigger)</td></tr>
+    <tr><td><b>Admin table + toggles</b></td><td>Admin console</td><td>Learner rows (score, gap chips, assign action); switch groups per activity</td><td>assign → confirm modal → "✓ Review assigned"</td></tr>
+  </table>
+
+  <h2 id="s7"><span class="no">B</span>Interaction &amp; state rules</h2>
+  <table>
+    <tr><th>Rule</th><th>Behaviour (as prototyped)</th><th>Spec ref</th></tr>
+    <tr><td>Persistence</td><td>Recommendation card + notification remain until the review is <b>completed</b>; "Later" collapses for the session only; no permanent dismiss</td><td>1.2, 1.3</td></tr>
+    <tr><td>Priority &amp; dedup</td><td>Failed assessment (T3) ranks above missed practice questions (T2); multiple triggers on one concept collapse to one card</td><td>1.4.2</td></tr>
+    <tr><td>Frequency cap</td><td>Excess recommendations queue silently with a "1 more queued — tomorrow" banner; exact caps TBD (engine-level)</td><td>1.4.2</td></tr>
+    <tr><td>Review pass/fail</td><td>Pass = 2 of 3 in demo (70% admin-configurable in production). Fail fires T15: retry / re-read / exit-keep; repeated fails escalate to instructor visibility</td><td>1.3, T15</td></tr>
+    <tr><td>Nudge caps</td><td>Auto check-ins fire once per session per surface (≈4–6&nbsp;s after entry, only at natural pauses); manual close always available</td><td>3.4</td></tr>
+    <tr><td>Nudge → REC handoff</td><td>"Too hard" (post-test) opens the review offer; "Simplify" regenerates content; persistent struggle escalates to a fresh queued review rather than repeating the same nudge</td><td>3.4, ENG-06</td></tr>
+    <tr><td>Leitner scheduling</td><td>Correct = promote one box (longer interval); wrong = demote to Box 0 (1 day)</td><td>2.2</td></tr>
+    <tr><td>XP &amp; streaks</td><td>+5 XP per correct Bite answer; acting on a recommendation earns XP; daily streak resets UTC&nbsp;00:00, weekly Sunday UTC&nbsp;00:00</td><td>2.3, 3.2</td></tr>
+    <tr><td>Full-screen shells</td><td>Test/lesson/review/Bites flows hide the app header (takeover pattern, as in the live product); dashboard/hub/admin keep it</td><td>—</td></tr>
+    <tr><td>Deep links</td><td><code>?screen=dash|posttest|review|lesson|bites|gami|admin</code>; add <code>&amp;embed=1</code> to hide prototype chrome (used by this document)</td><td>—</td></tr>
+  </table>
+
+  <h2 id="s8"><span class="no">C</span>Requirement traceability matrix</h2>
+  <table>
+    <tr><th>Spec item</th><th>Where in prototype</th><th>Status</th></tr>
+    <tr><td>1.3 Algorithm: test → trigger → AI content → review (modules + mini quiz)</td><td>Screens 2 → 3</td><td class="ok">Prototyped</td></tr>
+    <tr><td>1.3 Stays on notification/dashboard until completed</td><td>🔔 dropdown + dashboard card; auto-clear on completion</td><td class="ok">Prototyped</td></tr>
+    <tr><td>Triggers T2, T3 (P0 threshold-based)</td><td>Post-test flow; "Multiple" state ranking</td><td class="ok">Prototyped</td></tr>
+    <tr><td>T15 fail → re-trigger/escalate</td><td>Review fail screen</td><td class="ok">Prototyped</td></tr>
+    <tr><td>T16 manual admin assign</td><td>Admin console → learner dashboard card</td><td class="ok">Prototyped</td></tr>
+    <tr><td>T17 learner self-request (P2)</td><td>"Request a review" in empty state</td><td class="ok">Prototyped</td></tr>
+    <tr><td>1.4.2 dedup · caps · priority</td><td>Dashboard card states</td><td class="ok">UI prototyped; engine logic = backend</td></tr>
+    <tr><td>1.5 Dashboard 5–10 question quiz → gaps → review</td><td>Skill Check flow</td><td class="ok">Prototyped</td></tr>
+    <tr><td>2.1–2.2 Scheduled Bites on timer expiry; Leitner boxes 0–5</td><td>Dashboard "DUE TODAY" + Daily Bite result ladder</td><td class="ok">Prototyped</td></tr>
+    <tr><td>2.3 Daily / Weekly Bites; XP; streaks; leaderboard</td><td>Bites flows, results, Gamification hub</td><td class="ok">Prototyped (Weekly demo = 5 q)</td></tr>
+    <tr><td>SPC-04 wrong answers → Recommendation System</td><td>Weekly/Skill-Check result feed panel</td><td class="ok">Prototyped</td></tr>
+    <tr><td>SPC-08 Bonus Bites mid-course</td><td>Lesson screen pop-up</td><td class="ok">Prototyped</td></tr>
+    <tr><td>3.4 Check-in — all five touchpoints</td><td>Lesson · post-assessment · during review · post review · (post-CBL = same component, no CBL screen in prototype)</td><td class="ok">Prototyped</td></tr>
+    <tr><td>3.4 Rest &amp; Pause / Pause &amp; Think (lesson + review)</td><td>Both surfaces, shared component</td><td class="ok">Prototyped</td></tr>
+    <tr><td>3.3 Learning-Buddy repeat-topic trigger (P1)</td><td>Assistant proactive offer after 2nd ask</td><td class="ok">Prototyped</td></tr>
+    <tr><td>Gamification 3.2/3.4.1: badges, tiers, milestones, levels</td><td>Gamification hub</td><td class="ok">Prototyped</td></tr>
+    <tr><td>3.3 Admin opt-out per activity</td><td>Admin console → settings tab</td><td class="ok">Prototyped</td></tr>
+    <tr><td>ENG-02/03 personality profile &amp; tone engine</td><td>—</td><td class="eng">Backend/engine — no UI</td></tr>
+    <tr><td>ENG-07/09 A/B testing &amp; analytics tracking</td><td>—</td><td class="eng">Backend/engine — no UI</td></tr>
+    <tr><td>SPC-09 question-bank rotation</td><td>—</td><td class="eng">Backend/engine — no UI</td></tr>
+  </table>
+
+  <p style="margin-top:40px;font-size:12px;color:var(--gray);">ATLAS by HeyHi · UI/UX Prototype Documentation v0.3 · Wahyu · 3 July 2026 — companion to <a href="ATLAS_REC_Recommendation_Prototype_v0.3.html">the interactive prototype</a>.</p>
+</div>
+
+</body>
+</html>
