@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS — Recommendation System Prototype (REC-03: Recommendation Card + Chapter Review Flow)</title>
+<style>
+  :root{
+    --navy:#1c3a57;
+    --navy-light:#2c4f73;
+    --navy-deep:#152c42;
+    --teal:#178a9e;
+    --teal-dark:#11697a;
+    --teal-bg:#e6f7f5;
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --border:#e6eaf0;
+    --text:#1b2733;
+    --gray:#6b7785;
+    --gold:#f0a93b;
+    --orange:#e8773a;
+    --orange-bg:#fdf0e8;
+    --green:#2fa86a;
+    --green-bg:#e7f7ee;
+    --red:#d64545;
+    --red-bg:#fdeaea;
+    --pending-bg:#fff4e5;
+    --pending-text:#b8731c;
+    --indigo:#3b6fd1; --indigo-bg:#eaf0fb;
+    --purple:#7c5cd1; --purple-bg:#f1ecfb;
+    --radius:16px;
+    --shadow:0 2px 12px rgba(28,58,87,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  .app-shell{max-width:880px;margin:0 auto;background:var(--card);min-height:100vh;box-shadow:0 0 30px rgba(0,0,0,0.06);position:relative;}
+
+  /* ===== App header (recreated from existing product) ===== */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);position:relative;z-index:30;background:#fff;}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;color:var(--text);}
+  .logo .sub{display:block;font-size:9.5px;font-weight:500;color:var(--gray);margin-top:-2px;}
+  .logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--orange),var(--teal));display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;}
+  .topbar-right{display:flex;align-items:center;gap:14px;}
+  .icon-btn{position:relative;color:var(--navy);font-size:16px;cursor:pointer;}
+  .icon-btn .dot{position:absolute;top:-5px;right:-7px;background:var(--orange);color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;}
+  .help-pill{background:var(--teal-dark);color:#fff;border:none;padding:7px 16px;border-radius:999px;font-size:12.5px;font-weight:700;cursor:pointer;}
+
+  /* ===== Notification dropdown (REC persistence surface) ===== */
+  .notif-panel{display:none;position:absolute;top:52px;right:16px;width:330px;background:#fff;border:1px solid var(--border);border-radius:14px;box-shadow:0 8px 30px rgba(28,58,87,0.18);z-index:50;overflow:hidden;}
+  .notif-panel.open{display:block;}
+  .notif-head{padding:12px 16px;font-size:13px;font-weight:800;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+  .notif-head .mark{font-size:11px;color:var(--teal-dark);font-weight:600;cursor:pointer;}
+  .notif-item{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;font-size:12.5px;cursor:pointer;}
+  .notif-item:hover{background:var(--bg);}
+  .notif-item .ni-ico{width:30px;height:30px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .notif-item .ni-title{font-weight:700;margin-bottom:2px;}
+  .notif-item .ni-sub{color:var(--gray);font-size:11.5px;line-height:1.45;}
+  .notif-item .ni-time{color:var(--gray);font-size:10.5px;margin-top:4px;}
+  .notif-item.rec{background:var(--teal-bg);}
+  .notif-item.rec .ni-ico{background:var(--teal-dark);color:#fff;}
+  .notif-foot{padding:10px 16px;font-size:11px;color:var(--gray);text-align:center;}
+
+  /* ===== Prototype switcher ribbon (overlay, not part of real app) ===== */
+  .proto-nav{display:flex;gap:6px;padding:10px 16px;background:var(--navy-deep);flex-wrap:wrap;align-items:center;position:relative;z-index:20;}
+  .proto-nav .proto-label{font-size:10px;color:#8fb3c2;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-right:6px;}
+  .proto-nav button{border:1px solid rgba(255,255,255,0.25);background:transparent;color:#cfe0ea;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;}
+  .proto-nav button.active{background:#fff;color:var(--navy-deep);border-color:#fff;}
+
+  .screen{display:none;}
+  .screen.active{display:block;}
+  .section-pad{padding:20px 24px 40px;}
+  .h2{font-size:15px;font-weight:800;margin:22px 0 10px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px 20px;margin-bottom:14px;}
+
+  .pill-btn{background:var(--navy);color:#fff;border:none;padding:11px 22px;border-radius:999px;font-size:13px;font-weight:700;cursor:pointer;}
+  .pill-btn.small{padding:8px 16px;font-size:12px;}
+  .pill-btn.teal{background:var(--teal-dark);}
+  .pill-btn.outline{background:#fff;color:var(--navy);border:1.5px solid var(--navy);}
+  .pill-btn.ghost{background:transparent;color:var(--gray);border:none;font-weight:600;}
+  .pill-btn:disabled{opacity:.45;cursor:not-allowed;}
+
+  .new-badge{background:var(--orange);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:999px;vertical-align:middle;letter-spacing:.04em;}
+  .skill-tag{display:inline-block;background:var(--indigo-bg);color:var(--indigo);font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;margin-right:6px;margin-top:4px;}
+  .spec-note{background:var(--pending-bg);border:1px dashed var(--gold);border-radius:10px;padding:10px 14px;font-size:11.5px;color:var(--pending-text);line-height:1.5;margin-top:10px;}
+  .spec-note b{color:inherit;}
+
+  /* prototype-only state simulator */
+  .state-sim{display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:var(--bg);border-radius:10px;padding:8px 12px;margin-bottom:16px;}
+  .state-sim .lbl{font-size:10.5px;font-weight:800;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;}
+  .state-sim button{border:1px solid var(--border);background:#fff;color:var(--gray);padding:6px 12px;border-radius:999px;font-size:11.5px;font-weight:600;cursor:pointer;}
+  .state-sim button.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+  /* ===== REC Card ===== */
+  .rec-card{display:flex;gap:14px;align-items:flex-start;border-left:5px solid var(--teal-dark);}
+  .rec-card .icon{width:44px;height:44px;border-radius:12px;background:var(--teal-bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+  .rec-card h3{margin:0 0 4px;font-size:14.5px;}
+  .rec-card p{margin:0;font-size:12.5px;color:var(--gray);line-height:1.5;}
+  .rec-card .meta-row{display:flex;gap:12px;margin-top:8px;font-size:11px;color:var(--gray);flex-wrap:wrap;}
+  .rec-card .meta-row span{display:flex;align-items:center;gap:4px;}
+  .rec-card .actions{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0;}
+  .rec-card.severity-high{border-left-color:var(--red);}
+  .rec-card.severity-high .icon{background:var(--red-bg);}
+  .rec-card.severity-manual{border-left-color:var(--purple);}
+  .rec-card.severity-manual .icon{background:var(--purple-bg);}
+  .sev-pill{font-size:9.5px;font-weight:800;padding:2px 8px;border-radius:999px;letter-spacing:.03em;}
+  .sev-pill.high{background:var(--red-bg);color:var(--red);}
+  .sev-pill.med{background:var(--pending-bg);color:var(--pending-text);}
+  .sev-pill.manual{background:var(--purple-bg);color:var(--purple);}
+  .trigger-src{font-size:10.5px;color:var(--gray);background:var(--bg);padding:2px 8px;border-radius:6px;font-weight:600;}
+
+  .rec-empty{display:flex;gap:14px;align-items:center;border-left:5px solid var(--green);}
+  .rec-empty .icon{width:44px;height:44px;border-radius:12px;background:var(--green-bg);color:var(--green);display:flex;align-items:center;justify-content:center;font-size:20px;}
+
+  .cap-banner{display:flex;gap:10px;align-items:center;background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:10px 16px;font-size:12px;color:var(--gray);margin-bottom:14px;}
+
+  /* dashboard modules (existing product, unchanged) */
+  .ai-bar{display:flex;align-items:center;justify-content:space-between;border:1.5px solid var(--border);border-radius:14px;padding:13px 18px;font-size:13px;color:var(--gray);margin-bottom:12px;}
+  .ai-send{color:var(--teal-dark);font-size:15px;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;}
+  .chip{border:1px solid var(--border);border-radius:999px;padding:7px 14px;font-size:11.5px;color:var(--gray);}
+  .module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-top:16px;}
+  .module-card{border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+  .module-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:10px;}
+  .module-card h4{margin:0 0 4px;font-size:14px;}
+  .module-card p{margin:0 0 10px;font-size:12px;color:var(--gray);line-height:1.45;}
+  .module-card a{font-size:12px;font-weight:700;color:var(--teal-dark);text-decoration:none;}
+
+  /* ===== Post-test results ===== */
+  .result-hero{background:linear-gradient(135deg,var(--navy),var(--navy-light));border-radius:var(--radius);color:#fff;padding:24px;display:flex;align-items:center;gap:20px;margin-bottom:16px;}
+  .score-ring{width:76px;height:76px;border-radius:50%;background:conic-gradient(var(--orange) 0 216deg,rgba(255,255,255,.18) 216deg 360deg);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .score-ring .inner{width:58px;height:58px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;}
+  .result-hero h2{margin:0 0 4px;font-size:17px;}
+  .result-hero p{margin:0;font-size:12.5px;opacity:.85;}
+  .q-row{display:flex;gap:12px;align-items:flex-start;padding:12px 0;border-bottom:1px solid var(--border);font-size:12.5px;}
+  .q-row:last-child{border-bottom:none;}
+  .q-mark{width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;}
+  .q-mark.ok{background:var(--green-bg);color:var(--green);}
+  .q-mark.bad{background:var(--red-bg);color:var(--red);}
+  .q-row .q-skill{font-size:10.5px;color:var(--indigo);font-weight:700;}
+
+  /* ===== Chapter Review flow ===== */
+  .cr-shell-bar{display:flex;align-items:center;gap:14px;background:var(--navy-deep);color:#fff;padding:14px 24px;font-size:14px;font-weight:700;}
+  .cr-shell-bar .close{cursor:pointer;opacity:.7;}
+  .cr-body{padding:24px;max-width:640px;margin:0 auto;}
+  .cr-stepper{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--gray);margin-bottom:22px;flex-wrap:wrap;}
+  .cr-dot{width:22px;height:22px;border-radius:50%;background:var(--border);color:var(--gray);display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;flex-shrink:0;}
+  .cr-dot.done{background:var(--green);color:#fff;}
+  .cr-dot.now{background:var(--navy);color:#fff;}
+  .cr-sep{width:26px;height:2px;background:var(--border);border-radius:2px;}
+  .cr-step{display:none;}
+  .cr-step.active{display:block;animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+  .tag-pill{display:inline-block;background:var(--indigo-bg);color:var(--indigo);font-size:11px;font-weight:800;padding:4px 12px;border-radius:999px;}
+
+  .cr-intro-box{background:var(--teal-bg);border-radius:14px;padding:18px 20px;margin:14px 0;}
+  .cr-intro-box .row{display:flex;gap:10px;font-size:12.5px;margin-bottom:8px;align-items:flex-start;}
+  .cr-intro-box .row:last-child{margin-bottom:0;}
+
+  .content-page{background:var(--bg);border-radius:14px;padding:22px;min-height:180px;font-size:13.5px;line-height:1.7;}
+  .content-page h4{margin:0 0 10px;font-size:15px;}
+  .content-page ul{padding-left:18px;margin:8px 0;}
+  .content-page .callout{background:#fff;border-left:4px solid var(--teal-dark);border-radius:8px;padding:10px 14px;margin-top:12px;font-size:12.5px;}
+  .content-nav{display:flex;justify-content:space-between;align-items:center;margin-top:14px;}
+  .content-dots{display:flex;gap:5px;}
+  .content-dots span{width:8px;height:8px;border-radius:50%;background:var(--border);}
+  .content-dots span.on{background:var(--teal-dark);}
+
+  .quiz-q{font-size:14px;font-weight:700;margin:0 0 12px;}
+  .quiz-option{display:block;width:100%;text-align:left;background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:13px 16px;font-size:13px;margin-bottom:8px;cursor:pointer;font-family:inherit;color:var(--text);}
+  .quiz-option:hover{border-color:var(--navy);}
+  .quiz-option.correct{border-color:var(--green);background:var(--green-bg);}
+  .quiz-option.wrong{border-color:var(--red);background:var(--red-bg);}
+  .quiz-option:disabled{cursor:default;}
+  .quiz-progress{font-size:11.5px;color:var(--gray);font-weight:700;margin-bottom:6px;}
+  .quiz-feedback{font-size:12px;border-radius:10px;padding:10px 14px;margin:6px 0 10px;display:none;}
+  .quiz-feedback.ok{display:block;background:var(--green-bg);color:var(--green);}
+  .quiz-feedback.bad{display:block;background:var(--red-bg);color:var(--red);}
+
+  .xp-strip{display:flex;gap:10px;max-width:320px;margin:0 auto 18px;}
+  .xp-box{flex:1;background:var(--bg);border-radius:12px;padding:12px;text-align:center;}
+  .xp-box .num{font-size:17px;font-weight:800;color:var(--navy);}
+  .xp-box .label{font-size:10.5px;color:var(--gray);margin-top:2px;}
+  .xp-box.gold .num{color:var(--gold);}
+
+  .exit-hint{text-align:center;font-size:11.5px;color:var(--gray);margin-top:16px;}
+
+  /* fail state */
+  .fail-box{background:var(--red-bg);border:1px solid #f2c4c4;border-radius:14px;padding:18px 20px;text-align:left;font-size:12.5px;line-height:1.55;margin:14px 0;}
+
+  /* modal (post-test trigger) */
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(21,44,66,0.5);z-index:80;align-items:center;justify-content:center;}
+  .modal-overlay.open{display:flex;}
+  .modal-box{background:#fff;border-radius:18px;max-width:420px;width:calc(100% - 48px);padding:26px;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.25);}
+  .modal-box .icon-big{font-size:36px;margin-bottom:8px;}
+  .modal-box h3{margin:0 0 8px;font-size:16px;}
+  .modal-box p{font-size:12.5px;color:var(--gray);line-height:1.55;margin:0 0 16px;}
+
+  @media (max-width:560px){
+    .rec-card{flex-wrap:wrap;}
+    .rec-card .actions{flex-direction:row;width:100%;justify-content:flex-end;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="topbar">
+    <div class="logo"><div class="logo-icon">📘</div><div>ATLAS<span class="sub">By HeyHi</span></div></div>
+    <div class="topbar-right">
+      <div class="icon-btn" onclick="toggleNotif()">🔔<span class="dot" id="notif-count">2</span></div>
+      <div class="help-pill">❓ Help</div>
+    </div>
+  </div>
+
+  <!-- Notification panel: recommendation persists here until completed (spec 1.3) -->
+  <div class="notif-panel" id="notif-panel">
+    <div class="notif-head">Notifications <span class="mark">Mark all read</span></div>
+    <div class="notif-item rec" id="notif-rec" onclick="openReviewFromCard('T2')">
+      <div class="ni-ico">🎯</div>
+      <div>
+        <div class="ni-title">Chapter Review recommended</div>
+        <div class="ni-sub">You missed 3 questions on <b>Customer Due Diligence</b>. A short simplified review + mini quiz is ready.</div>
+        <div class="ni-time">2h ago · stays here until completed</div>
+      </div>
+    </div>
+    <div class="notif-item">
+      <div class="ni-ico" style="background:var(--indigo-bg);color:var(--indigo);">📋</div>
+      <div>
+        <div class="ni-title">Assessment result published</div>
+        <div class="ni-sub">AML/CFT Fundamentals — Practice Test 2 has been graded.</div>
+        <div class="ni-time">2h ago</div>
+      </div>
+    </div>
+    <div class="notif-foot">Recommendation notifications cannot be dismissed — they clear automatically when the review is completed (spec 1.3).</div>
+  </div>
+
+  <div class="proto-nav">
+    <span class="proto-label">REC-03 Prototype:</span>
+    <button class="active" data-screen="dash">1 · Recommendation Card (Dashboard)</button>
+    <button data-screen="posttest">2 · Post-Test Trigger</button>
+    <button data-screen="review">3 · Chapter Review Flow</button>
+  </div>
+
+  <!-- ============ SCREEN 1: DASHBOARD + RECOMMENDATION CARD ============ -->
+  <div class="screen active" id="screen-dash">
+    <div class="section-pad">
+      <div class="ai-bar">Ask me anything about your courses, skills, or learning...<span class="ai-send">➤</span></div>
+      <div class="chips">
+        <div class="chip">✦ What courses should I take next?</div>
+        <div class="chip">✦ Summarize my learning progress</div>
+        <div class="chip">✦ Explain a concept I'm struggling with</div>
+      </div>
+
+      <div class="state-sim">
+        <span class="lbl">Simulate state:</span>
+        <button class="active" onclick="setDashState('single',this)">1 recommendation</button>
+        <button onclick="setDashState('multi',this)">Multiple (ranked)</button>
+        <button onclick="setDashState('manual',this)">Manual (T16 admin)</button>
+        <button onclick="setDashState('capped',this)">Frequency-capped</button>
+        <button onclick="setDashState('empty',this)">Empty</button>
+      </div>
+
+      <div class="h2" style="margin-top:0;">Recommended for you <span class="new-badge">REC-03</span></div>
+
+      <!-- STATE: single -->
+      <div id="dash-single">
+        <div class="card rec-card">
+          <div class="icon">🎯</div>
+          <div style="flex:1;">
+            <h3>Chapter Review: Customer Due Diligence</h3>
+            <p>We noticed 3 missed questions sharing this skill tag on your last practice test. A short simplified review with a mini quiz should take about 5 minutes.</p>
+            <div style="margin-top:2px;"><span class="skill-tag">Customer Due Diligence</span><span class="skill-tag">Red Flag Indicators</span></div>
+            <div class="meta-row">
+              <span>⏱ ~5 min</span>
+              <span>📄 2 pages + 3-question quiz</span>
+              <span class="trigger-src" title="Trigger: multiple questions wrong sharing the same skill tag">Trigger T2 · from Practice Test 2</span>
+            </div>
+          </div>
+          <div class="actions">
+            <span class="sev-pill med">Suggested</span>
+            <button class="pill-btn small" onclick="openReviewFromCard('T2')">Start Review</button>
+            <button class="pill-btn ghost small" onclick="snoozeCard(this)">Later</button>
+          </div>
+        </div>
+        <div class="spec-note"><b>Spec 1.2 (non-intrusive):</b> "Later" only collapses the card for this session — it reappears next visit and the notification stays until the review is completed. There is deliberately no permanent dismiss, and it never blocks progression in learning content.</div>
+      </div>
+
+      <!-- STATE: multi (priority ranking, dedup) -->
+      <div id="dash-multi" style="display:none;">
+        <div class="card rec-card severity-high">
+          <div class="icon">🚨</div>
+          <div style="flex:1;">
+            <h3>Chapter Review: AML/CFT Fundamentals</h3>
+            <p>You scored 54% on the full assessment — below the 70% passing threshold. This review is prioritised first.</p>
+            <div style="margin-top:2px;"><span class="skill-tag">AML Regulation Basics</span><span class="skill-tag">Reporting Obligations</span></div>
+            <div class="meta-row"><span>⏱ ~8 min</span><span class="trigger-src">Trigger T3 · failed Assessment</span></div>
+          </div>
+          <div class="actions">
+            <span class="sev-pill high">Priority 1</span>
+            <button class="pill-btn small" onclick="openReviewFromCard('T3')">Start Review</button>
+          </div>
+        </div>
+        <div class="card rec-card">
+          <div class="icon">🎯</div>
+          <div style="flex:1;">
+            <h3>Chapter Review: Customer Due Diligence</h3>
+            <p>3 missed questions sharing this skill tag on Practice Test 2.</p>
+            <div style="margin-top:2px;"><span class="skill-tag">Customer Due Diligence</span></div>
+            <div class="meta-row"><span>⏱ ~5 min</span><span class="trigger-src">Trigger T2 · Practice Test</span></div>
+          </div>
+          <div class="actions">
+            <span class="sev-pill med">Priority 2</span>
+            <button class="pill-btn outline small" onclick="openReviewFromCard('T2')">Start</button>
+          </div>
+        </div>
+        <div class="spec-note"><b>Spec 1.4.2 (priority / ranking + dedup):</b> failed assessment (T3) outranks missed practice questions (T2). T1 and T2 both fired for "Customer Due Diligence" but are collapsed into a single card — triggers never stack duplicates for the same concept.</div>
+      </div>
+
+      <!-- STATE: manual admin assign -->
+      <div id="dash-manual" style="display:none;">
+        <div class="card rec-card severity-manual">
+          <div class="icon">🧑‍🏫</div>
+          <div style="flex:1;">
+            <h3>Assigned by your instructor: Transaction Monitoring</h3>
+            <p>Sarah (L&amp;D Manager) reviewed your analytics and assigned this chapter review to close a skill gap before the next assessment.</p>
+            <div style="margin-top:2px;"><span class="skill-tag">Transaction Monitoring</span></div>
+            <div class="meta-row"><span>⏱ ~6 min</span><span class="trigger-src">Trigger T16 · Manual assignment</span></div>
+          </div>
+          <div class="actions">
+            <span class="sev-pill manual">Assigned</span>
+            <button class="pill-btn small" onclick="openReviewFromCard('T16')">Start Review</button>
+          </div>
+        </div>
+        <div class="spec-note"><b>Spec T16 (P0):</b> manual assignments carry an "Assigned" badge and show who assigned it — visually distinct (purple) from automatic recommendations (teal/red), and no "Later" option since it's instructor-directed. UX open question for Zhi Chuen: should manual assignments be snoozable too?</div>
+      </div>
+
+      <!-- STATE: frequency capped -->
+      <div id="dash-capped" style="display:none;">
+        <div class="cap-banner">⏳ <div><b>1 more review is queued</b> — it will surface tomorrow. We cap recommendations to avoid review fatigue.</div></div>
+        <div class="card rec-card">
+          <div class="icon">🎯</div>
+          <div style="flex:1;">
+            <h3>Chapter Review: Customer Due Diligence</h3>
+            <p>Today's recommended review. One at a time keeps things manageable.</p>
+            <div style="margin-top:2px;"><span class="skill-tag">Customer Due Diligence</span></div>
+            <div class="meta-row"><span>⏱ ~5 min</span><span class="trigger-src">Trigger T2</span></div>
+          </div>
+          <div class="actions">
+            <span class="sev-pill med">Suggested</span>
+            <button class="pill-btn small" onclick="openReviewFromCard('T2')">Start Review</button>
+          </div>
+        </div>
+        <div class="spec-note"><b>Spec 1.4.2 (frequency cap / cooldown):</b> excess recommendations queue silently; the learner sees at most the capped number per day, plus a gentle "queued" banner so the system feels intentional rather than broken. Exact caps TBD with Daffa (engine-level, not per-trigger).</div>
+      </div>
+
+      <!-- STATE: empty -->
+      <div id="dash-empty" style="display:none;">
+        <div class="card rec-empty">
+          <div class="icon">✓</div>
+          <div style="flex:1;">
+            <h3 style="margin:0 0 4px;font-size:14.5px;">You're all caught up</h3>
+            <p style="margin:0;font-size:12.5px;color:var(--gray);">No reviews recommended right now — keep going and we'll flag a chapter if you need to revisit it.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- existing dashboard modules, unchanged -->
+      <div class="h2">Your modules <span style="font-size:10.5px;color:var(--gray);font-weight:600;">(existing — unchanged)</span></div>
+      <div class="module-grid">
+        <div class="module-card"><div class="module-icon" style="background:var(--indigo-bg);color:var(--indigo);">📖</div><h4>Courses</h4><p>Browse and continue your enrolled courses</p><a href="#">Explore →</a></div>
+        <div class="module-card"><div class="module-icon" style="background:#fdeef0;color:#d65a78;">📋</div><h4>Assessments</h4><p>Take assessments to evaluate your skills</p><a href="#">Explore →</a></div>
+        <div class="module-card"><div class="module-icon" style="background:var(--green-bg);color:var(--green);">🎯</div><h4>Evaluate My Skills</h4><p>Test your knowledge and track mastery</p><a href="#">Explore →</a></div>
+        <div class="module-card"><div class="module-icon" style="background:var(--purple-bg);color:var(--purple);">🔗</div><h4>PALS</h4><p>Follow your personalized learning journey</p><a href="#">Explore →</a></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 2: POST-TEST TRIGGER ============ -->
+  <div class="screen" id="screen-posttest">
+    <div class="section-pad">
+      <div class="result-hero">
+        <div class="score-ring"><div class="inner">60%</div></div>
+        <div>
+          <h2>Practice Test 2 — Completed</h2>
+          <p>AML/CFT Fundamentals · 6 of 10 correct · 12 min</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin:0 0 6px;font-size:14px;">Question breakdown</h3>
+        <div class="q-row"><div class="q-mark ok">✓</div><div>Q1 — Which body issues AML/CFT regulation in Singapore? <div class="q-skill">AML Regulation Basics</div></div></div>
+        <div class="q-row"><div class="q-mark ok">✓</div><div>Q2 — Definition of money laundering stages <div class="q-skill">AML Regulation Basics</div></div></div>
+        <div class="q-row"><div class="q-mark bad">✗</div><div>Q3 — When must enhanced due diligence be applied? <div class="q-skill">Customer Due Diligence</div></div></div>
+        <div class="q-row"><div class="q-mark bad">✗</div><div>Q5 — Which document satisfies identity verification? <div class="q-skill">Customer Due Diligence</div></div></div>
+        <div class="q-row"><div class="q-mark bad">✗</div><div>Q8 — Risk profile review frequency for high-risk customers <div class="q-skill">Customer Due Diligence</div></div></div>
+        <div class="q-row"><div class="q-mark bad">✗</div><div>Q9 — Red flags in cross-border transfers <div class="q-skill">Red Flag Indicators</div></div></div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:center;margin:18px 0;">
+        <button class="pill-btn outline small">Review answers</button>
+        <button class="pill-btn small" onclick="openPostTestModal()">Continue</button>
+      </div>
+
+      <div class="spec-note"><b>Flow (spec 1.3 + algorithm diagram):</b> Attempting Questions → Trigger Activated (3 wrong answers share the "Customer Due Diligence" skill tag → T2) → AI regenerates simplified content → Chapter Review offered. Clicking <b>Continue</b> shows the recommendation prompt — the moment of highest intent, right after seeing results. Learner can decline; the card then lands on the dashboard + notifications instead (never lost).</div>
+    </div>
+
+    <!-- post-test recommendation modal -->
+    <div class="modal-overlay" id="posttest-modal">
+      <div class="modal-box">
+        <div class="icon-big">🎯</div>
+        <h3>Want to patch this gap now?</h3>
+        <p>You missed <b>3 questions on Customer Due Diligence</b>. We've prepared a simplified 2-page review with a short quiz — about 5 minutes.</p>
+        <div style="text-align:left;margin:0 0 16px;"><span class="skill-tag">Customer Due Diligence</span><span class="skill-tag">Red Flag Indicators</span></div>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button class="pill-btn outline small" onclick="declinePostTest()">Maybe later</button>
+          <button class="pill-btn small" onclick="closePostTestModal();openReviewFromCard('T2')">Start Chapter Review</button>
+        </div>
+        <p style="margin-top:12px;font-size:10.5px;">"Maybe later" moves this to your dashboard &amp; notifications — it won't block your course progress.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 3: CHAPTER REVIEW FLOW ============ -->
+  <div class="screen" id="screen-review">
+    <div class="cr-shell-bar"><span class="close" onclick="exitReview()">✕</span><span>Chapter Review — Customer Due Diligence</span></div>
+    <div class="cr-body">
+
+      <div class="cr-stepper">
+        <div class="cr-dot now" id="dot1">1</div><span>Overview</span><div class="cr-sep"></div>
+        <div class="cr-dot" id="dot2">2</div><span>Simplified content</span><div class="cr-sep"></div>
+        <div class="cr-dot" id="dot3">3</div><span>Mini quiz</span><div class="cr-sep"></div>
+        <div class="cr-dot" id="dot4">4</div><span>Result</span>
+      </div>
+
+      <!-- STEP 1: overview -->
+      <div class="cr-step active" id="cr-step-1">
+        <span class="tag-pill" id="cr-trigger-label">Recommended from Practice Test 2</span>
+        <h3 style="margin:12px 0 6px;font-size:17px;">Let's revisit Customer Due Diligence</h3>
+        <p style="color:var(--gray);font-size:13px;margin:0;">A quick, simplified pass over the concept you struggled with — then a 3-question quiz to lock it in.</p>
+        <div class="cr-intro-box">
+          <div class="row">📄 <div><b>2 pages</b> of simplified content (AI-generated "Simplified preset" from your lesson material)</div></div>
+          <div class="row">❓ <div><b>3-question mini quiz</b> — pass with 2 of 3 (70% threshold)</div></div>
+          <div class="row">⏱ <div><b>~5 minutes</b> total</div></div>
+          <div class="row">🎯 <div>Covers: <b>Customer Due Diligence</b>, <b>Red Flag Indicators</b> — from Q3, Q5, Q8, Q9 you answered incorrectly</div></div>
+        </div>
+        <button class="pill-btn" onclick="crGo(2)">Begin →</button>
+        <div class="exit-hint">You can exit anytime — your recommendation stays on the dashboard until this review is completed.</div>
+      </div>
+
+      <!-- STEP 2: simplified content, 2 pages -->
+      <div class="cr-step" id="cr-step-2">
+        <span class="tag-pill">Simplified Preset</span>
+
+        <div class="content-page" id="content-page-1" style="margin-top:12px;">
+          <h4>What is Customer Due Diligence (CDD)?</h4>
+          <p>Think of CDD as <b>"know exactly who you're doing business with."</b> Before a bank opens an account, it must verify the customer's identity and understand how risky they are.</p>
+          <ul>
+            <li><b>Verify identity</b> — official documents (passport, NRIC) prove the person is real.</li>
+            <li><b>Assess risk</b> — is this customer likely to be involved in money laundering?</li>
+            <li><b>Keep monitoring</b> — CDD doesn't stop after onboarding; transactions are watched continuously.</li>
+          </ul>
+          <div class="callout">💡 <b>Why you missed Q3:</b> <u>Enhanced</u> due diligence (EDD) kicks in only for <b>high-risk</b> customers — e.g. politically exposed persons — not for every new account.</div>
+        </div>
+
+        <div class="content-page" id="content-page-2" style="display:none;margin-top:12px;">
+          <h4>Spotting Red Flags</h4>
+          <p>A red flag is any signal that a transaction <b>doesn't fit the customer's normal profile</b>.</p>
+          <ul>
+            <li>Transactions <b>just below</b> reporting thresholds (structuring).</li>
+            <li><b>Cross-border transfers</b> to jurisdictions with weak AML controls.</li>
+            <li>Activity that suddenly doesn't match the customer's stated occupation or income.</li>
+          </ul>
+          <div class="callout">💡 <b>Why you missed Q9:</b> the volume of a transfer alone isn't a red flag — it's the <b>mismatch with the customer's profile</b> plus the destination that matters.</div>
+        </div>
+
+        <div class="content-nav">
+          <button class="pill-btn outline small" id="content-prev" onclick="contentNav(-1)" disabled>← Previous</button>
+          <div class="content-dots"><span class="on" id="cdot1"></span><span id="cdot2"></span></div>
+          <button class="pill-btn small" id="content-next" onclick="contentNav(1)">Next →</button>
+        </div>
+        <div class="spec-note" style="margin-top:16px;"><b>REC-04 dependency:</b> this content is generated by the existing Simplified-preset pipeline from the mapped lesson (REC-02: wrong questions → lesson content). The "Why you missed Qx" callouts are a UX proposal — they tie the review directly to the learner's own mistakes. Feasibility to confirm with Daffa.</div>
+      </div>
+
+      <!-- STEP 3: mini quiz -->
+      <div class="cr-step" id="cr-step-3">
+        <span class="tag-pill">Mini Quiz</span>
+        <div id="quiz-container" style="margin-top:12px;"></div>
+      </div>
+
+      <!-- STEP 4a: pass -->
+      <div class="cr-step" id="cr-step-4pass" style="text-align:center;">
+        <div style="font-size:40px;margin:8px 0 4px;">🏅</div>
+        <h3 style="margin:0 0 6px;">Chapter Review complete!</h3>
+        <p style="color:var(--gray);font-size:13px;margin:0 0 16px;" id="pass-score-line">You scored 3/3 on the mini quiz.</p>
+        <div class="xp-strip">
+          <div class="xp-box gold"><div class="num">+25</div><div class="label">XP earned</div></div>
+          <div class="xp-box"><div class="num">6/15</div><div class="label">Reviewer badge (Silver)</div></div>
+        </div>
+        <p style="font-size:12px;color:var(--gray);margin:0 0 16px;">"Customer Due Diligence" will be re-checked on your next assessment — that's how we measure whether this review worked.</p>
+        <button class="pill-btn teal" onclick="finishReview()">Back to Dashboard</button>
+        <div class="spec-note" style="text-align:left;"><b>On completion (spec 1.3 + success metrics 1.2):</b> recommendation card + notification clear automatically; score uplift on the next assessment covering the same concept tag is the primary success metric. XP shown ties into the Gamification reward matrix (acting on a recommendation earns XP).</div>
+      </div>
+
+      <!-- STEP 4b: fail → T15 re-trigger -->
+      <div class="cr-step" id="cr-step-4fail" style="text-align:center;">
+        <div style="font-size:40px;margin:8px 0 4px;">💪</div>
+        <h3 style="margin:0 0 6px;">Almost there</h3>
+        <p style="color:var(--gray);font-size:13px;margin:0 0 4px;" id="fail-score-line">You scored 1/3 — below the 70% pass mark.</p>
+        <div class="fail-box">
+          <b>What happens next (Trigger T15):</b> failing the end-of-review quiz re-triggers the recommendation. You can retake the quiz now, or we'll regenerate a fresh review with different questions and keep it on your dashboard. Repeated fails escalate — your instructor can see this in analytics and may assign targeted help (T16).
+        </div>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button class="pill-btn outline small" onclick="crGo(2)">Re-read content</button>
+          <button class="pill-btn small" onclick="startQuiz();crGo(3)">Retry quiz</button>
+        </div>
+        <div style="margin-top:10px;"><button class="pill-btn ghost small" onclick="finishReviewFail()">Exit — keep on my dashboard</button></div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ---------- screen switching ---------- */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  document.querySelectorAll('.proto-nav button').forEach(b=>b.classList.toggle('active', b.dataset.screen===id));
+  document.getElementById('notif-panel').classList.remove('open');
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.proto-nav button').forEach(btn=>btn.addEventListener('click',()=>showScreen(btn.dataset.screen)));
+
+/* ---------- notifications ---------- */
+function toggleNotif(){ document.getElementById('notif-panel').classList.toggle('open'); }
+
+/* ---------- dashboard states ---------- */
+const dashStates=['single','multi','manual','capped','empty'];
+function setDashState(state,btn){
+  dashStates.forEach(s=>document.getElementById('dash-'+s).style.display = (s===state?'block':'none'));
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function snoozeCard(btn){
+  const card=btn.closest('.card');
+  card.style.transition='opacity .3s, max-height .35s';
+  card.style.opacity='0'; card.style.maxHeight='0'; card.style.overflow='hidden'; card.style.marginBottom='0'; card.style.padding='0 20px';
+  setTimeout(()=>{
+    const note=document.createElement('div');
+    note.className='cap-banner';
+    note.innerHTML='🔕 <div>Snoozed for this session — it will reappear on your next visit, and stays in <b>🔔 notifications</b> until completed.</div>';
+    card.parentElement.insertBefore(note,card);
+  },350);
+}
+
+/* ---------- post-test modal ---------- */
+function openPostTestModal(){ document.getElementById('posttest-modal').classList.add('open'); }
+function closePostTestModal(){ document.getElementById('posttest-modal').classList.remove('open'); }
+function declinePostTest(){
+  closePostTestModal();
+  showScreen('dash');
+}
+
+/* ---------- chapter review flow ---------- */
+const triggerLabels={
+  'T2':'Recommended from Practice Test 2 (missed skill-tag questions)',
+  'T3':'Recommended — Assessment score below 70%',
+  'T16':'Assigned by your instructor'
+};
+function openReviewFromCard(trigger){
+  document.getElementById('cr-trigger-label').textContent = triggerLabels[trigger]||triggerLabels['T2'];
+  resetReview();
+  showScreen('review');
+}
+function crGo(step){
+  document.querySelectorAll('.cr-step').forEach(s=>s.classList.remove('active'));
+  const map={1:'cr-step-1',2:'cr-step-2',3:'cr-step-3','4pass':'cr-step-4pass','4fail':'cr-step-4fail'};
+  document.getElementById(map[step]).classList.add('active');
+  const n = (step==='4pass'||step==='4fail')?4:step;
+  for(let i=1;i<=4;i++){
+    const d=document.getElementById('dot'+i);
+    d.classList.remove('done','now');
+    if(i<n)d.classList.add('done');
+    if(i===n)d.classList.add('now');
+    d.textContent=(i<n)?'✓':i;
+  }
+  if(step===3 && !quizStarted) startQuiz();
+  window.scrollTo(0,0);
+}
+function exitReview(){ showScreen('dash'); }
+function finishReview(){
+  /* completion clears the persistent surfaces (spec 1.3) */
+  const notif=document.getElementById('notif-rec');
+  if(notif) notif.remove();
+  const count=document.getElementById('notif-count');
+  count.textContent='1';
+  setDashStateById('empty');
+  showScreen('dash');
+}
+function finishReviewFail(){ showScreen('dash'); }
+function setDashStateById(state){
+  dashStates.forEach(s=>document.getElementById('dash-'+s).style.display = (s===state?'block':'none'));
+  document.querySelectorAll('#screen-dash .state-sim button').forEach((b,i)=>b.classList.toggle('active', dashStates[i]===state));
+}
+function resetReview(){
+  quizStarted=false;
+  crGo(1);
+  contentPage=1; syncContentNav();
+}
+
+/* content pagination */
+let contentPage=1;
+function contentNav(dir){
+  if(contentPage===2 && dir===1){ crGo(3); return; }
+  contentPage=Math.min(2,Math.max(1,contentPage+dir));
+  syncContentNav();
+}
+function syncContentNav(){
+  document.getElementById('content-page-1').style.display=contentPage===1?'block':'none';
+  document.getElementById('content-page-2').style.display=contentPage===2?'block':'none';
+  document.getElementById('cdot1').className=contentPage===1?'on':'';
+  document.getElementById('cdot2').className=contentPage===2?'on':'';
+  document.getElementById('content-prev').disabled=contentPage===1;
+  document.getElementById('content-next').textContent=contentPage===2?'Start Mini Quiz →':'Next →';
+}
+
+/* ---------- quiz engine ---------- */
+const quizData=[
+  {q:'When must ENHANCED due diligence (EDD) be applied?',
+   opts:['For every new customer, without exception','Only for high-risk customers, such as politically exposed persons','Only when a transaction exceeds $1 million'],
+   correct:1,
+   why:'EDD is reserved for high-risk profiles — standard CDD covers everyone else.'},
+  {q:'Which of these best satisfies identity verification during CDD?',
+   opts:['A business card and verbal confirmation','A government-issued document such as a passport or NRIC','A referral letter from another bank customer'],
+   correct:1,
+   why:'Verification must rely on official, government-issued documents.'},
+  {q:'Which scenario is the strongest red flag?',
+   opts:['A large transfer that matches the customer’s documented business activity','Repeated transfers just below the reporting threshold to a weak-AML jurisdiction','A customer updating their contact details'],
+   correct:1,
+   why:'Structuring below thresholds + a risky destination is a classic laundering pattern; size alone isn’t a flag if it fits the profile.'}
+];
+let quizStarted=false, quizIndex=0, quizScore=0;
+function startQuiz(){
+  quizStarted=true; quizIndex=0; quizScore=0;
+  renderQuizQ();
+}
+function renderQuizQ(){
+  const c=document.getElementById('quiz-container');
+  const d=quizData[quizIndex];
+  c.innerHTML='<div class="quiz-progress">Question '+(quizIndex+1)+' of '+quizData.length+'</div>'+
+    '<p class="quiz-q">'+d.q+'</p>'+
+    d.opts.map((o,i)=>'<button class="quiz-option" onclick="answerQuiz('+i+',this)">'+o+'</button>').join('')+
+    '<div class="quiz-feedback" id="quiz-fb"></div>'+
+    '<button class="pill-btn small" id="quiz-next" style="display:none;" onclick="nextQuizQ()">Continue →</button>';
+}
+function answerQuiz(i,btn){
+  const d=quizData[quizIndex];
+  const opts=document.querySelectorAll('#quiz-container .quiz-option');
+  opts.forEach(o=>o.disabled=true);
+  const fb=document.getElementById('quiz-fb');
+  if(i===d.correct){
+    btn.classList.add('correct'); quizScore++;
+    fb.className='quiz-feedback ok'; fb.innerHTML='✓ Correct — '+d.why;
+  }else{
+    btn.classList.add('wrong');
+    opts[d.correct].classList.add('correct');
+    fb.className='quiz-feedback bad'; fb.innerHTML='✗ Not quite — '+d.why;
+  }
+  document.getElementById('quiz-next').style.display='inline-block';
+}
+function nextQuizQ(){
+  quizIndex++;
+  if(quizIndex<quizData.length){ renderQuizQ(); }
+  else{
+    /* pass rule: 2 of 3 in this prototype (real build: 70% threshold, admin-configurable) */
+    const pass = quizScore >= 2;
+    if(pass){
+      document.getElementById('pass-score-line').textContent='You scored '+quizScore+'/'+quizData.length+' on the mini quiz.';
+      crGo('4pass');
+    }else{
+      document.getElementById('fail-score-line').textContent='You scored '+quizScore+'/'+quizData.length+' — below the 70% pass mark.';
+      crGo('4fail');
+    }
+  }
+}
+</script>
+</body>
+</html>

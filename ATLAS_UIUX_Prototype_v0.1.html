@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ATLAS — UI/UX Prototype (REC-03, SPC-07/08, ENG-04)</title>
+<style>
+  :root{
+    --navy:#1c3a57;
+    --navy-light:#2c4f73;
+    --navy-deep:#152c42;
+    --teal:#178a9e;
+    --teal-dark:#11697a;
+    --teal-bg:#e6f7f5;
+    --bg:#f4f6f9;
+    --card:#ffffff;
+    --border:#e6eaf0;
+    --text:#1b2733;
+    --gray:#6b7785;
+    --gold:#f0a93b;
+    --orange:#e8773a;
+    --green:#2fa86a;
+    --green-bg:#e7f7ee;
+    --pending-bg:#fff4e5;
+    --pending-text:#b8731c;
+    --indigo:#3b6fd1; --indigo-bg:#eaf0fb;
+    --pink:#d65a78; --pink-bg:#fdeef0;
+    --purple:#7c5cd1; --purple-bg:#f1ecfb;
+    --radius:16px;
+    --shadow:0 2px 12px rgba(28,58,87,0.08);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);}
+  .app-shell{max-width:880px;margin:0 auto;background:var(--card);min-height:100vh;box-shadow:0 0 30px rgba(0,0,0,0.06);position:relative;}
+
+  /* ===== Real app header (recreated) ===== */
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);position:relative;z-index:5;background:#fff;}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:19px;color:var(--text);}
+  .logo .sub{display:block;font-size:9.5px;font-weight:500;color:var(--gray);margin-top:-2px;}
+  .logo-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--orange),var(--teal));display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;}
+  .topbar-right{display:flex;align-items:center;gap:14px;}
+  .icon-btn{position:relative;color:var(--navy);font-size:16px;cursor:pointer;}
+  .icon-btn .dot{position:absolute;top:-5px;right:-7px;background:var(--orange);color:#fff;font-size:9px;font-weight:700;border-radius:50%;width:14px;height:14px;display:flex;align-items:center;justify-content:center;}
+  .help-pill{background:var(--teal-dark);color:#fff;border:none;padding:7px 16px;border-radius:999px;font-size:12.5px;font-weight:700;cursor:pointer;}
+  .burger{cursor:pointer;font-size:18px;color:var(--navy);}
+
+  /* prototype switcher ribbon (clearly marked as our overlay, not part of real app) */
+  .proto-nav{display:flex;gap:6px;padding:10px 16px;background:var(--navy-deep);flex-wrap:wrap;align-items:center;}
+  .proto-nav .proto-label{font-size:10px;color:#8fb3c2;text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-right:6px;}
+  .proto-nav button{border:1px solid rgba(255,255,255,0.25);background:transparent;color:#cfe0ea;padding:7px 12px;border-radius:999px;font-size:12px;font-weight:600;cursor:pointer;}
+  .proto-nav button.active{background:#fff;color:var(--navy-deep);border-color:#fff;}
+
+  .screen{display:none;}
+  .screen.active{display:block;}
+
+  /* shared bits */
+  .px{padding:0 24px;}
+  .section-pad{padding:20px 24px 40px;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);}
+  .pill-btn{border-radius:999px;border:1.5px solid var(--navy);background:var(--navy);color:#fff;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;}
+  .pill-btn.outline{background:transparent;color:var(--teal-dark);border-color:var(--teal);}
+  .pill-btn.teal{background:var(--teal);border-color:var(--teal);}
+  .pill-btn.small{padding:6px 13px;font-size:12px;}
+  .pill-btn:disabled{opacity:.45;cursor:not-allowed;}
+  .new-badge{font-size:9px;font-weight:800;background:var(--orange);color:#fff;padding:2px 6px;border-radius:6px;vertical-align:middle;margin-left:6px;letter-spacing:.03em;}
+
+  /* ================= SCREEN 1 — DASHBOARD (recreated) ================= */
+  #screen-dash .section-pad{padding-top:0;}
+  .ai-bar{display:flex;gap:10px;align-items:center;justify-content:space-between;border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin:18px 0 10px;color:var(--gray);font-size:13.5px;}
+  .ai-send{width:30px;height:30px;border-radius:50%;background:var(--teal-bg);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;flex:0 0 auto;}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px;}
+  .chip{font-size:12px;border:1px solid var(--border);border-radius:999px;padding:6px 12px;color:var(--navy-light);}
+
+  .rec-banner{display:flex;align-items:center;gap:14px;border:1.5px solid #ffd9b3;background:var(--pending-bg);margin-bottom:18px;}
+  .rec-banner .icon{width:42px;height:42px;border-radius:10px;background:var(--orange);display:flex;align-items:center;justify-content:center;font-size:19px;color:#fff;flex:0 0 auto;}
+  .rec-banner h3{margin:0 0 3px;font-size:14.5px;}
+  .rec-banner p{margin:0;color:var(--gray);font-size:12.5px;}
+  .skill-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px;}
+  .skill-tag{font-size:10.5px;background:#fff;border:1px solid #ffd9b3;color:var(--orange);padding:3px 9px;border-radius:999px;font-weight:700;}
+
+  .gami-strip{display:flex;gap:10px;margin-bottom:18px;}
+  .gami-box{flex:1;border:1px solid var(--border);border-radius:12px;padding:10px 12px;text-align:center;background:#fafbfc;}
+  .gami-box .num{font-size:17px;font-weight:800;}
+  .gami-box .label{font-size:10px;color:var(--gray);}
+  .gami-box.streak .num{color:var(--orange);}
+  .gami-box.xp .num{color:var(--gold);}
+  .gami-box.bites{cursor:pointer;}
+
+  .module-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+  @media(max-width:560px){.module-grid{grid-template-columns:1fr;}}
+  .module-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:18px;}
+  .module-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px;}
+  .module-card h4{margin:0 0 3px;font-size:14.5px;}
+  .module-card p{margin:0 0 10px;font-size:12px;color:var(--gray);}
+  .module-card a{color:var(--teal-dark);font-size:12.5px;font-weight:700;text-decoration:none;}
+  .module-card.bites{border:1.5px solid var(--teal);background:linear-gradient(135deg,#f3fbfb,#fff);}
+
+  /* ================= SCREEN 2 — PALS (recreated) ================= */
+  .pals-topline{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);font-weight:700;font-size:14px;}
+  .pals-topline .course-pill{border:1px solid var(--border);border-radius:999px;padding:5px 12px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;}
+  .pals-hero{background:linear-gradient(120deg,var(--navy),var(--navy-light));color:#fff;padding:30px 24px;position:relative;overflow:hidden;}
+  .pals-hero h1{margin:0 0 8px;font-size:25px;}
+  .pals-hero p{margin:0;color:#cfe0ea;font-size:13px;max-width:380px;}
+  .pals-hero .deco{position:absolute;right:0;top:0;bottom:0;width:160px;opacity:.15;font-size:90px;display:flex;align-items:center;justify-content:center;}
+
+  .diag-card{margin:18px 24px 0;text-align:center;padding:26px;}
+  .diag-card .target{width:60px;height:60px;border-radius:50%;background:var(--teal-bg);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 10px;}
+
+  .stat-card{margin:18px 24px 0;}
+  .stat-card h3{display:flex;align-items:center;gap:6px;font-size:15px;margin:0 0 10px;}
+  .stat-legend{display:flex;gap:16px;font-size:12.5px;color:var(--gray);margin-bottom:8px;}
+  .stat-legend b{color:var(--text);}
+  .progress-track{height:8px;background:#eef1f5;border-radius:999px;overflow:hidden;}
+  .progress-fill{height:100%;background:var(--teal);border-radius:999px;}
+
+  .bites-section-title{display:flex;align-items:center;gap:8px;margin:24px 24px 10px;font-size:13px;font-weight:800;color:var(--navy);text-transform:uppercase;letter-spacing:.04em;}
+  .bites-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:0 24px;}
+  @media(max-width:560px){.bites-grid{grid-template-columns:1fr;}}
+  .bite-card{border-radius:14px;padding:16px;color:#fff;}
+  .bite-card.daily{background:linear-gradient(135deg,var(--teal-dark),var(--teal));}
+  .bite-card.weekly{background:linear-gradient(135deg,var(--navy-deep),var(--navy));}
+  .bite-card h4{margin:0 0 4px;font-size:14.5px;}
+  .bite-card p{margin:0 0 12px;font-size:11.5px;opacity:.85;}
+  .bite-card .pill-btn{background:#fff;color:var(--navy);border-color:#fff;}
+
+  .path-section{margin:26px 24px 0;}
+  .path-section h3{font-size:18px;color:var(--navy);margin:0 0 4px;}
+  .path-section .sub{font-size:13px;color:var(--gray);margin:0 0 16px;}
+  .path-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:24px;}
+  .path-row{display:flex;align-items:center;}
+  .path-node{width:46px;height:46px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:18px;flex:0 0 auto;color:var(--gray);}
+  .path-node.active{border-color:var(--teal);color:var(--teal);background:var(--teal-bg);}
+  .path-line{flex:1;height:2px;background:var(--border);}
+  .path-title{font-weight:700;font-size:14.5px;margin-bottom:2px;}
+  .path-sub{font-size:12px;color:var(--gray);margin-bottom:8px;}
+
+  /* Bonus bites modal */
+  .modal-overlay{position:absolute;inset:0;background:rgba(20,30,40,.55);display:none;align-items:center;justify-content:center;z-index:50;border-radius:inherit;}
+  .modal-overlay.show{display:flex;}
+  .modal-box{background:#fff;border-radius:18px;padding:26px;max-width:300px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.25);}
+  .modal-box .icon-big{font-size:38px;margin-bottom:8px;}
+  .modal-box p{color:var(--gray);font-size:12.5px;margin:0 0 16px;}
+
+  /* ================= SCREEN 3 — LEARNING SESSION (recreated) ================= */
+  .player-bar{background:var(--navy);color:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;font-size:13.5px;font-weight:700;}
+  .player-bar .close{cursor:pointer;font-size:16px;opacity:.8;}
+  .player-progress-outer{height:6px;background:#eef1f5;}
+  .player-progress-inner{height:100%;width:32%;background:var(--teal);}
+  .player-body{background:#fafbfc;min-height:380px;position:relative;padding:50px 30px;}
+  .player-slide{background:#fff;border-radius:14px;border:1px solid var(--border);max-width:460px;margin:0 auto;padding:30px;text-align:center;font-size:13.5px;line-height:1.7;color:var(--text);}
+  .player-dots{display:flex;justify-content:center;gap:6px;margin-top:18px;}
+  .player-dots span{width:7px;height:7px;border-radius:50%;background:var(--border);}
+  .player-dots span.on{background:var(--navy);}
+  .player-next{position:absolute;right:30px;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);font-size:16px;color:var(--navy);}
+
+  .trigger-strip{display:flex;gap:8px;flex-wrap:wrap;padding:14px 24px;border-top:1px dashed var(--border);background:#fff;}
+  .trigger-strip .lbl{font-size:11px;color:var(--gray);align-self:center;margin-right:4px;}
+
+  .nudge-card{position:absolute;right:24px;bottom:108px;width:250px;background:#fff;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.18);padding:14px;display:none;border:1px solid var(--border);}
+  .nudge-card.show{display:block;}
+  .nudge-head{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .nudge-head .ico{font-size:16px;}
+  .nudge-head .ttl{font-size:12.5px;font-weight:700;flex:1;}
+  .nudge-head .close{cursor:pointer;color:var(--gray);font-size:13px;}
+  .nudge-card p{margin:0 0 10px;font-size:12.5px;color:var(--text);line-height:1.5;text-align:left;}
+  .nudge-actions{display:flex;gap:6px;}
+  .nudge-actions button{flex:1;font-size:11px;padding:6px 8px;}
+  .timer-ring{width:50px;height:50px;border-radius:50%;border:4px solid var(--teal);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--teal-dark);margin:0 auto 8px;}
+
+  /* ================= SCREEN 4 — CHAPTER REVIEW FLOW (recreated as in-app panel) ================= */
+  .cr-shell-bar{background:var(--navy);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700;}
+  .cr-body{padding:24px;}
+  .cr-stepper{display:flex;align-items:center;gap:6px;margin-bottom:16px;font-size:11.5px;color:var(--gray);}
+  .cr-dot{width:8px;height:8px;border-radius:50%;background:#dbe3ea;}
+  .cr-dot.done{background:var(--teal);}
+  .cr-step{display:none;}
+  .cr-step.active{display:block;}
+  .quiz-option{display:block;width:100%;text-align:left;padding:12px 14px;margin-bottom:8px;border:1.5px solid var(--border);border-radius:10px;background:#fff;cursor:pointer;font-size:13.5px;}
+  .quiz-option:hover{border-color:var(--teal);}
+  .quiz-option.correct{border-color:var(--green);background:var(--green-bg);}
+  .quiz-option.wrong{border-color:#d65b5b;background:#fdecec;}
+  .tag-pill{font-size:10.5px;background:var(--teal-bg);color:var(--teal-dark);padding:3px 9px;border-radius:999px;font-weight:700;}
+
+  /* ================= SCREEN 5 — GAMIFICATION HUB ================= */
+  .gh-hero{background:linear-gradient(120deg,var(--navy),var(--navy-light));color:#fff;padding:26px 24px;}
+  .gh-hero h1{margin:0 0 6px;font-size:22px;}
+  .gh-hero p{margin:0;color:#cfe0ea;font-size:13px;}
+  .badge-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+  @media(max-width:560px){.badge-grid{grid-template-columns:repeat(2,1fr);}}
+  .badge-item{text-align:center;padding:12px 4px;border-radius:10px;background:#fafbfc;border:1px solid var(--border);}
+  .badge-item .emoji{font-size:24px;display:block;margin-bottom:4px;}
+  .badge-item.locked{opacity:.35;}
+  .badge-item .name{font-size:10px;font-weight:700;}
+  .badge-item .tier{font-size:8.5px;color:var(--gray);}
+  .lb-row{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);}
+  .lb-row:last-child{border-bottom:none;}
+  .lb-rank{width:20px;font-weight:800;color:var(--gray);font-size:13px;}
+  .lb-avatar{width:30px;height:30px;border-radius:50%;background:var(--teal-bg);color:var(--teal-dark);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center;}
+  .lb-name{flex:1;font-size:13px;font-weight:600;}
+  .lb-name small{display:block;font-weight:400;color:var(--gray);font-size:11px;}
+  .lb-row.me{background:var(--pending-bg);border-radius:8px;padding:9px 8px;}
+
+  .spec-note{font-size:11px;color:var(--gray);background:#f7f9fb;border:1px dashed var(--border);border-radius:8px;padding:8px 10px;margin-top:14px;}
+  .h2{font-size:16px;font-weight:800;color:var(--navy);margin:22px 24px 10px;}
+
+  /* state simulator controls (prototype-only, not part of real app) */
+  .state-sim,.ia-toggle{display:flex;gap:6px;align-items:center;margin:10px 0 14px;flex-wrap:wrap;}
+  .state-sim .lbl,.ia-toggle .lbl{font-size:11px;color:var(--gray);margin-right:2px;}
+  .state-sim button,.ia-toggle button{border:1px solid var(--border);background:#fff;color:var(--gray);font-size:11.5px;padding:5px 10px;border-radius:999px;cursor:pointer;}
+  .state-sim button.active,.ia-toggle button.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+  .rec-banner.empty{background:#f4f6f9;border-color:var(--border);}
+  .gami-box.streak.expired{color:var(--gray);}
+  .gami-box.streak.expired .num{color:#b8731c;}
+
+  #screen-dash.existing-mode .new-only{display:none !important;}
+  .bites-widget-b{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 24px 6px;border:1px solid var(--border);border-radius:12px;padding:10px 14px;background:#fafdfd;}
+  .bw-left{display:flex;align-items:center;gap:10px;}
+  .bw-icon{width:30px;height:30px;border-radius:8px;background:var(--teal-bg);color:var(--teal-dark);display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .bw-title{font-size:13px;font-weight:700;}
+  .bw-sub{font-size:11px;color:var(--gray);}
+
+  /* real lesson page's sticky bottom action bar (recreated for collision check) */
+  .lesson-bottombar{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--border);padding:12px 20px;display:flex;justify-content:space-between;align-items:center;z-index:30;}
+  .badge-grid.locked-all .badge-item{opacity:.35;}
+  .ladder-row{display:flex;gap:6px;margin:0 24px 6px;overflow-x:auto;}
+  .ladder-box{flex:1;min-width:64px;border-radius:10px;padding:9px 4px;text-align:center;background:#fafbfc;border:1px solid var(--border);}
+  .ladder-box .lbl{font-size:9px;color:var(--gray);font-weight:700;}
+  .ladder-box .count{font-size:17px;font-weight:800;color:var(--navy);margin:3px 0 1px;}
+  .ladder-box .interval{font-size:8.5px;color:var(--gray);}
+  .ladder-box.mastered{background:var(--green-bg);border-color:var(--green);}
+  .ladder-box.mastered .count{color:var(--green);}
+  .quiz-box{max-width:340px;text-align:left;width:88%;}
+  .bq-progress{display:flex;gap:4px;margin-bottom:12px;}
+  .bq-progress span{flex:1;height:5px;border-radius:3px;background:#e7ebf0;}
+  .bq-progress span.done{background:var(--teal);}
+  .bq-feedback{font-size:12px;margin-top:10px;padding:9px 10px;border-radius:8px;}
+  .bq-feedback.correct{background:var(--green-bg);color:#1f7a4d;}
+  .bq-feedback.wrong{background:#fdecec;color:#b8341c;}
+  .bq-result-row{display:flex;justify-content:space-between;font-size:11.5px;padding:5px 0;border-bottom:1px solid var(--border);}
+  .bq-result-row:last-child{border-bottom:none;}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <div class="topbar">
+    <div class="logo"><div class="logo-icon">📘</div><div>ATLAS<span class="sub">By HeyHi</span></div></div>
+    <div class="topbar-right">
+      <div class="icon-btn">🔔<span class="dot">1</span></div>
+      <div class="help-pill">❓ Help</div>
+      <div class="burger" onclick="toggleMenu()">☰</div>
+    </div>
+  </div>
+
+  <!-- mock slide-out nav showing new "Bites" IA entry -->
+  <div id="side-menu" style="display:none;position:absolute;top:57px;right:0;width:230px;background:#fff;border:1px solid var(--border);border-radius:0 0 0 14px;box-shadow:var(--shadow);z-index:40;padding:8px 0;">
+    <div style="padding:10px 18px;font-size:13px;color:var(--gray);">Dashboard</div>
+    <div style="padding:10px 18px;font-size:13px;color:var(--gray);">Courses</div>
+    <div style="padding:10px 18px;font-size:13px;color:var(--gray);">Assessments</div>
+    <div style="padding:10px 18px;font-size:13px;color:var(--gray);">CBL</div>
+    <div style="padding:10px 18px;font-size:13px;color:var(--gray);">Performance</div>
+    <div style="padding:10px 18px;font-size:13px;color:var(--gray);">PALS</div>
+    <div style="padding:10px 18px;font-size:13px;font-weight:700;color:var(--navy);background:var(--teal-bg);">⚡ Bites <span class="new-badge">NEW</span></div>
+  </div>
+
+  <div class="proto-nav">
+    <span class="proto-label">Prototype scope:</span>
+    <button class="active" data-screen="dash">1· Dashboard</button>
+    <button data-screen="pals">2· PALS Path + Bites</button>
+    <button data-screen="player">3· Learning Session + Nudges</button>
+    <button data-screen="review">4· Chapter Review</button>
+    <button data-screen="gami">5· Gamification Hub</button>
+    <button data-screen="bites">6· Bites — Full Experience</button>
+  </div>
+
+  <!-- ============ SCREEN 1: DASHBOARD ============ -->
+  <div class="screen active" id="screen-dash">
+    <div class="section-pad">
+      <div class="ai-bar">Ask me anything about your courses, skills, or learning...<span class="ai-send">➤</span></div>
+      <div class="chips">
+        <div class="chip">✦ What courses should I take next?</div>
+        <div class="chip">✦ Summarize my learning progress</div>
+        <div class="chip">✦ Explain a concept I'm struggling with</div>
+      </div>
+
+      <!-- master toggle: existing app as-is, vs with the 4 new ideas layered in -->
+      <div class="state-sim" style="margin-bottom:4px;">
+        <span class="lbl">View:</span>
+        <button onclick="setDashLayer('existing',this)">Existing dashboard (as-is)</button>
+        <button class="active" onclick="setDashLayer('new',this)">With new ideas (REC-03 + Gamification)</button>
+      </div>
+
+      <!-- state simulator for edge cases (prototype-only control), only relevant in "with new ideas" view -->
+      <div class="state-sim new-only">
+        <span class="lbl">Simulate state:</span>
+        <button class="active" onclick="setDashState('normal',this)">Normal</button>
+        <button onclick="setDashState('empty',this)">No recommendation</button>
+        <button onclick="setDashState('expired',this)">Streak expired</button>
+      </div>
+
+      <!-- REC-03: injected into real dashboard -->
+      <div class="card rec-banner new-only" id="rec-banner-normal">
+        <div class="icon">🎯</div>
+        <div style="flex:1;">
+          <h3>Chapter Review recommended <span class="new-badge">REC-03</span></h3>
+          <p>Detected from 3 missed questions on "AML/CFT Fundamentals" practice test.</p>
+          <div class="skill-tags"><span class="skill-tag">Customer Due Diligence</span><span class="skill-tag">Red Flag Indicators</span></div>
+        </div>
+        <button class="pill-btn small" onclick="showScreen('review')">Start Review</button>
+      </div>
+      <!-- empty state: nothing to recommend yet -->
+      <div class="card rec-banner empty new-only" id="rec-banner-empty" style="display:none;">
+        <div class="icon" style="background:#cfd8e0;">✓</div>
+        <div style="flex:1;">
+          <h3 style="color:var(--text);">You're all caught up</h3>
+          <p>No reviews recommended right now — keep going and we'll flag a chapter if you need to revisit it.</p>
+        </div>
+      </div>
+
+      <!-- SPC-07: gamification strip injected into dashboard -->
+      <div class="gami-strip new-only" id="gami-strip-normal">
+        <div class="gami-box streak"><div class="num">🔥 12</div><div class="label">Day streak</div></div>
+        <div class="gami-box xp"><div class="num">2,480</div><div class="label">Total XP</div></div>
+        <div class="gami-box bites" onclick="showScreen('bites')"><div class="num">⚡ 2/3</div><div class="label">Bites today</div></div>
+      </div>
+      <!-- expired-streak state -->
+      <div class="gami-strip new-only" id="gami-strip-expired" style="display:none;">
+        <div class="gami-box streak expired"><div class="num">💔 0</div><div class="label">Streak lost — best was 12</div></div>
+        <div class="gami-box xp"><div class="num">2,480</div><div class="label">Total XP</div></div>
+        <div class="gami-box bites" onclick="showScreen('bites')"><div class="num">⚡ 0/3</div><div class="label">Bites today</div></div>
+      </div>
+
+      <!-- SPC-08: Bites IA alternative comparison -->
+      <div class="ia-toggle new-only">
+        <span class="lbl">Bites placement — IA option:</span>
+        <button class="active" onclick="setBitesIA('nav',this)">A · New nav item</button>
+        <button onclick="setBitesIA('widget',this)">B · Dashboard widget only</button>
+      </div>
+
+      <!-- module-grid: first 6 cards are the real, existing dashboard (unchanged). Bites card is the only new-only addition. -->
+      <div class="module-grid">
+        <div class="module-card"><div class="module-icon" style="background:var(--indigo-bg);color:var(--indigo);">📖</div><h4>Courses</h4><p>Browse and continue your enrolled courses</p><a href="#">Explore →</a></div>
+        <div class="module-card"><div class="module-icon" style="background:var(--pink-bg);color:var(--pink);">📋</div><h4>Assessments</h4><p>Take assessments to evaluate your skills</p><a href="#">Explore →</a></div>
+        <div class="module-card"><div class="module-icon" style="background:var(--green-bg);color:var(--green);">🎯</div><h4>Evaluate My Skills</h4><p>Test your knowledge and track mastery</p><a href="#">Explore →</a></div>
+        <div class="module-card"><div class="module-icon" style="background:var(--purple-bg);color:var(--purple);">🔗</div><h4>PALS</h4><p>Follow your personalized learning journey</p><a href="#" onclick="showScreen('pals')">Explore →</a></div>
+        <div class="module-card"><div class="module-icon" style="background:var(--pending-bg);color:var(--orange);">🧠</div><h4>Psychometric Assessment</h4><p>Discover your learning style with MBTI</p><a href="#">Explore →</a></div>
+        <div class="module-card"><div class="module-icon" style="background:var(--teal-bg);color:var(--teal-dark);">💬</div><h4>CBL</h4><p>Practice real-world scenarios with AI role-play</p><a href="#">Explore →</a></div>
+        <div class="module-card bites new-only" id="bites-card-nav"><div class="module-icon" style="background:var(--teal-bg);color:var(--teal-dark);">⚡</div><h4>Bites <span class="new-badge">NEW · SPC-08</span></h4><p>Daily &amp; Weekly spaced-repetition quizzes</p><a href="#" onclick="showScreen('bites')">Explore →</a></div>
+      </div>
+
+      <!-- Option B: lightweight inline widget instead of a 7th nav card -->
+      <div class="bites-widget-b new-only" id="bites-widget-b" style="display:none;">
+        <div class="bw-left"><div class="bw-icon">⚡</div><div><div class="bw-title">Bites — today's set</div><div class="bw-sub">3 Daily · 12 Weekly remaining</div></div></div>
+        <button class="pill-btn small teal" onclick="showScreen('bites')">Start</button>
+      </div>
+      <div class="spec-note new-only" style="margin:6px 24px 0;">Option B removes the dedicated nav card (one less IA change for IT to build) and surfaces Bites as a slim, low-friction strip instead — closer to how a "quick daily habit" is usually framed in other apps. Trade-off: less discoverable for new users than a full module card.</div>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 2: PALS PATH + BITES ============ -->
+  <div class="screen" id="screen-pals">
+    <div class="pals-topline"><span>Personalised Adaptive Learning System</span><div class="course-pill">📙 AML and CFL Course (10/6)</div></div>
+    <div class="pals-hero">
+      <div class="deco">📐</div>
+      <h1>Start Learning, zhichuenf@gmail.com</h1>
+      <p>Pick up right where you left off and continue building your knowledge with our adaptive system.</p>
+    </div>
+
+    <div class="card diag-card"><div class="target">🎯</div><div style="font-weight:700;">AML and CFL Course (10/6)</div><button class="pill-btn outline small" style="margin-top:10px;">See your diagnostic result</button></div>
+
+    <div class="card stat-card">
+      <h3>📊 Statistic</h3>
+      <div class="stat-legend">Mastered: <b>0</b>&nbsp;&nbsp;Learned: <b>0</b>&nbsp;&nbsp;Remaining: <b>15</b></div>
+      <div class="progress-track"><div class="progress-fill" style="width:3%"></div></div>
+    </div>
+
+    <div class="bites-section-title">⚡ Bites — Spaced Repetition <span class="new-badge">SPC-08</span></div>
+    <div class="bites-grid">
+      <div class="bite-card daily"><h4>☀️ Daily Bites</h4><p>3–5 random questions · refreshes daily</p><button class="pill-btn small" onclick="goToBitesQuiz('daily')">Start (3 questions)</button></div>
+      <div class="bite-card weekly"><h4>🗓️ Weekly Bites</h4><p>10–15 questions · full review</p><button class="pill-btn small" onclick="goToBitesQuiz('weekly')">Start (6 questions)</button></div>
+    </div>
+    <div class="spec-note px" style="margin:14px 24px 0;">These cards are the PALS-side entry point (per the dashboard/PALS placement spec). Starting a Bite jumps to the full Bites experience screen (6).</div>
+
+    <div class="path-section">
+      <h3>Your learning path</h3>
+      <p class="sub">We've designed a learning experience tailored to your skills!</p>
+      <div class="path-card">
+        <div class="path-title">Introduction to AML/CFT and Its Importance</div>
+        <div class="path-sub">Fundamentals of AML/CFT</div>
+        <div class="path-row">
+          <div class="path-node active">📖</div>
+          <div class="path-line"></div>
+          <div class="path-node" id="bonus-node" onclick="showBonusModal()" style="cursor:pointer;" title="Bonus Bites may pop in here">🏆</div>
+          <div class="path-line"></div>
+          <div class="path-node">⭐</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-note px" style="margin:18px 24px;">Spec ref: 2.2–2.4 Leitner ladder (Box 0–5), Bonus Bites interleaving (click the trophy node above to simulate the pop-up mid-path).</div>
+
+    <div class="modal-overlay" id="bonus-modal">
+      <div class="modal-box">
+        <div class="icon-big">⚡</div>
+        <h3 style="margin:0 0 6px;">Bonus Bite!</h3>
+        <p>Take a short break — try 3 quick questions from a topic you've already learned.</p>
+        <div style="display:flex;gap:8px;justify-content:center;">
+          <button class="pill-btn outline small" onclick="closeBonusModal()">Later</button>
+          <button class="pill-btn small" onclick="closeBonusModal();goToBitesQuiz('bonus')">Start now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 3: LEARNING SESSION + NUDGES ============ -->
+  <div class="screen" id="screen-player">
+    <div class="player-bar"><span class="close" onclick="showScreen('pals')">✕</span><span>Why AML/CFT Matters for Banks and Employees</span><span>4/13</span></div>
+    <div class="player-progress-outer"><div class="player-progress-inner"></div></div>
+
+    <div class="trigger-strip">
+      <span class="lbl">Simulate trigger (ENG-04):</span>
+      <button class="pill-btn outline small" onclick="showNudge('checkin')">Check-in</button>
+      <button class="pill-btn outline small" onclick="showNudge('rest')">Rest and Pause</button>
+      <button class="pill-btn outline small" onclick="showNudge('think')">Pause and Think</button>
+    </div>
+
+    <div class="player-body" style="position:relative;padding-bottom:90px;">
+      <!-- recreated floating chat/list icons (confirmed top-right, scroll-with-page, not collision risk) -->
+      <div style="position:absolute;top:10px;right:20px;display:flex;flex-direction:column;gap:8px;">
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;">💬</div>
+        <div style="width:34px;height:34px;border-radius:8px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;">☰</div>
+      </div>
+
+      <div class="player-slide">
+        <p>Financial institutions are required to maintain internal monitoring systems to detect suspicious transactions in real time, as part of their obligation under AML/CFT regulation.</p>
+      </div>
+      <div class="player-dots"><span class="on"></span><span class="on"></span><span class="on"></span><span class="on"></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+      <div class="player-next">→</div>
+
+      <div class="nudge-card" id="nudge-checkin">
+        <div class="nudge-head"><span class="ico">💬</span><span class="ttl">Check-in</span><span class="close" onclick="hideNudge('checkin')">✕</span></div>
+        <p>How do you find this content? Is it too hard or manageable?</p>
+        <div class="nudge-actions"><button class="pill-btn outline small" onclick="hideNudge('checkin')">Manageable</button><button class="pill-btn small" onclick="hideNudge('checkin')">Simplify</button></div>
+      </div>
+      <div class="nudge-card" id="nudge-rest">
+        <div class="timer-ring" id="restTimer">10</div>
+        <p style="text-align:center;">Take some time to rest before we go again.</p>
+      </div>
+      <div class="nudge-card" id="nudge-think">
+        <div class="nudge-head"><span class="ico">🧠</span><span class="ttl">Pause and Think</span><span class="close" onclick="hideNudge('think')">✕</span></div>
+        <p>Think about a recent event where this knowledge would've been useful. How important is it in your workplace?</p>
+        <div class="nudge-actions"><button class="pill-btn small" onclick="hideNudge('think')">Continue</button></div>
+      </div>
+
+      <!-- real lesson page's sticky bottom action bar, recreated to verify no overlap with nudge cards above -->
+      <div class="lesson-bottombar">
+        <button class="pill-btn outline small">← Previous</button>
+        <button class="pill-btn outline small">🌐 Review &amp; Complete</button>
+        <button class="pill-btn small">Next →</button>
+      </div>
+    </div>
+
+    <div class="card" style="margin:16px 24px;">
+      <h3 style="margin:0 0 8px;font-size:14px;">Frequency caps (3.4)</h3>
+      <div style="display:flex;gap:10px;font-size:11.5px;color:var(--gray);flex-wrap:wrap;">
+        <div>Check-in: 1×/session · cooldown 20m · cap 2/day</div>
+        <div>Rest &amp; Pause: 1×/session · cooldown 10m</div>
+        <div>Pause &amp; Think: 1×/session · cooldown 15m · cap 2/day</div>
+      </div>
+    </div>
+    <div class="spec-note" style="margin:0 24px 16px;">Collision check against the real lesson page (confirmed live, 30 Jun): chat/list icons sit top-right and scroll with the page (not fixed), but there IS a sticky bottom action bar (Previous / Review &amp; Complete / Next). Nudge cards were moved up to <code>bottom:108px</code> (was 24px) so they clear that bar instead of overlapping it.</div>
+  </div>
+
+  <!-- ============ SCREEN 4: CHAPTER REVIEW FLOW ============ -->
+  <div class="screen" id="screen-review">
+    <div class="cr-shell-bar"><span class="close" onclick="showScreen('dash')" style="cursor:pointer;">✕</span><span>Chapter Review</span></div>
+    <div class="cr-body">
+      <div class="cr-stepper">
+        <div class="cr-dot done" id="dot1"></div><span>Simplified content</span>
+        <div class="cr-dot" id="dot2"></div><span>Mini quiz</span>
+        <div class="cr-dot" id="dot3"></div><span>Done</span>
+      </div>
+
+      <div class="cr-step active" id="cr-step-1">
+        <span class="tag-pill">Customer Due Diligence</span>
+        <h3 style="margin:10px 0 6px;">Simplified Preset</h3>
+        <p style="color:var(--gray);font-size:13px;margin:0 0 14px;">CDD is the process of verifying a customer's identity to assess money-laundering risk before and during the business relationship.</p>
+        <ul style="font-size:13px;color:var(--text);line-height:1.7;padding-left:18px;margin:0 0 18px;">
+          <li>Verify customer identity (KYC)</li>
+          <li>Assess the customer's risk profile</li>
+          <li>Ongoing transaction monitoring</li>
+        </ul>
+        <button class="pill-btn" onclick="crGo(2)">Continue to Mini Quiz →</button>
+      </div>
+
+      <div class="cr-step" id="cr-step-2">
+        <h3 style="margin:0 0 10px;">Mini Quiz — 1/1</h3>
+        <p style="font-size:13px;color:var(--text);margin:0 0 12px;">What is the main purpose of Customer Due Diligence?</p>
+        <button class="quiz-option" onclick="answerQuiz(this,false)">Speed up account opening</button>
+        <button class="quiz-option" onclick="answerQuiz(this,true)">Assess and mitigate a customer's money-laundering risk</button>
+        <button class="quiz-option" onclick="answerQuiz(this,false)">Increase new customer acquisition</button>
+        <button class="pill-btn" id="cr-next-btn" style="display:none;margin-top:8px;" onclick="crGo(3)">Continue →</button>
+      </div>
+
+      <div class="cr-step" id="cr-step-3" style="text-align:center;">
+        <div style="font-size:38px;margin-bottom:6px;">🏅</div>
+        <h3 style="margin:0 0 6px;">Chapter Review Complete!</h3>
+        <p style="color:var(--gray);font-size:13px;margin:0 0 16px;">This review will count toward the next assessment covering the same concept tag.</p>
+        <div class="gami-strip" style="max-width:280px;margin:0 auto 16px;">
+          <div class="gami-box xp"><div class="num">+25</div><div class="label">XP</div></div>
+          <div class="gami-box"><div class="num">1/5</div><div class="label">Reviewer badge</div></div>
+        </div>
+        <button class="pill-btn teal" onclick="showScreen('dash')">Back to Dashboard</button>
+      </div>
+      <div class="spec-note">Spec ref: 1.3–1.5 Recommendation logic, I1–I3, T1/T2/T3/T15. Stays on dashboard until completed — non-intrusive, doesn't block progression.</div>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 5: GAMIFICATION HUB ============ -->
+  <div class="screen" id="screen-gami">
+    <div class="gh-hero"><h1>Gamification <span class="new-badge">SPC-07</span></h1><p>Streaks, XP, badges and the Bites leaderboard — same reward layer surfaced across PALS, Bites, CBL and Assessments.</p></div>
+    <div class="section-pad">
+      <div class="gami-strip">
+        <div class="gami-box streak"><div class="num">🔥 12</div><div class="label">Daily streak</div></div>
+        <div class="gami-box xp"><div class="num">2,480</div><div class="label">Total XP</div></div>
+        <div class="gami-box"><div class="num">Lv 7</div><div class="label">Learner level</div></div>
+      </div>
+
+      <div class="h2" style="margin-left:0;">Badges</div>
+      <div class="state-sim" style="margin:0 0 10px;">
+        <span class="lbl">Simulate:</span>
+        <button class="active" onclick="setBadgeState(false,this)">Returning learner</button>
+        <button onclick="setBadgeState(true,this)">New learner (0 badges)</button>
+      </div>
+      <div class="card">
+        <div class="badge-grid" id="badge-grid">
+          <div class="badge-item"><span class="emoji">🥉</span><div class="name">First Bite</div><div class="tier">Earned</div></div>
+          <div class="badge-item"><span class="emoji">🔥</span><div class="name">Committed</div><div class="tier">7-day streak</div></div>
+          <div class="badge-item locked"><span class="emoji">🏆</span><div class="name">Unstoppable</div><div class="tier">30-day streak</div></div>
+          <div class="badge-item locked"><span class="emoji">🎯</span><div class="name">Sharpshooter</div><div class="tier">Perfect Bite</div></div>
+        </div>
+        <p id="badge-empty-msg" style="display:none;font-size:12px;color:var(--gray);margin:10px 0 0;text-align:center;">No badges yet — complete your first Daily Bite or Chapter Review to unlock one.</p>
+      </div>
+
+      <div class="h2" style="margin-left:0;">Leaderboard — Bites sub-system</div>
+      <div class="card">
+        <div class="lb-row"><div class="lb-rank">1</div><div class="lb-avatar">DA</div><div class="lb-name">Daffa<small>Lv 9 · 3,120 XP</small></div><div>🥇</div></div>
+        <div class="lb-row me"><div class="lb-rank">2</div><div class="lb-avatar">ZC</div><div class="lb-name">Zhi Chuen (you)<small>Lv 7 · 2,480 XP</small></div><div>🥈</div></div>
+        <div class="lb-row"><div class="lb-rank">3</div><div class="lb-avatar">GL</div><div class="lb-name">Glenn<small>Lv 6 · 2,110 XP</small></div><div>🥉</div></div>
+      </div>
+      <div class="spec-note">Spec ref: 3.2–3.4 Reward Matrix, Badges &amp; Streaks. Admin opt-out (3.3) and per-feature streak toggles not shown in this prototype.</div>
+    </div>
+  </div>
+
+  <!-- ============ SCREEN 6: BITES — FULL EXPERIENCE ============ -->
+  <div class="screen" id="screen-bites">
+    <div class="pals-hero" style="background:linear-gradient(120deg,var(--teal-dark),var(--teal));">
+      <div class="deco">⚡</div>
+      <h1>Bites <span class="new-badge">SPC-08</span></h1>
+      <p>Short spaced-repetition questions that keep what you've already learned fresh, scheduled by a Leitner ladder.</p>
+    </div>
+
+    <div class="gami-strip" style="margin:16px 24px 0;">
+      <div class="gami-box streak"><div class="num" id="bites-streak-num">🔥 12</div><div class="label">Daily streak</div></div>
+      <div class="gami-box xp"><div class="num" id="bites-xp-num">640</div><div class="label">Bites XP (Lv 3)</div></div>
+      <div class="gami-box"><div class="num" id="bites-today-num">0 / 3</div><div class="label">Today's set done</div></div>
+    </div>
+
+    <div class="h2" style="margin:18px 24px 8px;">Your Leitner ladder</div>
+    <div class="ladder-row" id="ladder-row">
+      <div class="ladder-box"><div class="lbl">Box 0</div><div class="count" id="lbox-0">2</div><div class="interval">1 day</div></div>
+      <div class="ladder-box"><div class="lbl">Box 1</div><div class="count" id="lbox-1">3</div><div class="interval">3 days</div></div>
+      <div class="ladder-box"><div class="lbl">Box 2</div><div class="count" id="lbox-2">4</div><div class="interval">7 days</div></div>
+      <div class="ladder-box"><div class="lbl">Box 3</div><div class="count" id="lbox-3">3</div><div class="interval">16 days</div></div>
+      <div class="ladder-box"><div class="lbl">Box 4</div><div class="count" id="lbox-4">2</div><div class="interval">35 days</div></div>
+      <div class="ladder-box mastered"><div class="lbl">Box 5</div><div class="count" id="lbox-5">1</div><div class="interval">90 days</div></div>
+    </div>
+    <div class="spec-note" style="margin:0 24px 16px;">Spec ref: 2.2 Leitner ladder — a correct answer promotes an item one box (longer interval); a miss drops it back to Box 0. Counts above update live as you answer below.</div>
+
+    <div class="bites-section-title">Today's Bites</div>
+    <div class="bites-grid">
+      <div class="bite-card daily"><h4>☀️ Daily Bites</h4><p>3 random questions across topics · refreshes daily 00:00 UTC</p><button class="pill-btn small" onclick="openBitesQuiz('daily')">Start</button></div>
+      <div class="bite-card weekly"><h4>🗓️ Weekly Bites</h4><p>10–15 question full review (6 shown here) · resets Sun 00:00 UTC</p><button class="pill-btn small" onclick="openBitesQuiz('weekly')">Start</button></div>
+    </div>
+
+    <div class="h2" style="margin:20px 24px 8px;">Leaderboard — Bites sub-system</div>
+    <div class="card" style="margin:0 24px;">
+      <div class="lb-row"><div class="lb-rank">1</div><div class="lb-avatar">DA</div><div class="lb-name">Daffa<small>Lv 5 · 820 Bites XP</small></div><div>🥇</div></div>
+      <div class="lb-row me"><div class="lb-rank">2</div><div class="lb-avatar">ZC</div><div class="lb-name">Zhi Chuen (you)<small>Lv 3 · 640 Bites XP</small></div><div>🥈</div></div>
+      <div class="lb-row"><div class="lb-rank">3</div><div class="lb-avatar">GL</div><div class="lb-name">Glenn<small>Lv 3 · 590 Bites XP</small></div><div>🥉</div></div>
+    </div>
+
+    <div class="spec-note" style="margin:14px 24px 24px;">Spec ref: 2.1–2.4 Adaptive Scheduling for Spaced Repetition; 3.4.2 — streak &amp; leaderboard surfaced inside the Bites sub-system itself, not just the Gamification Hub. Dual XP: every correct answer awards +5 XP to your overall learner level <i>and</i> +5 XP to a separate Bites level.</div>
+
+    <!-- Quiz-taking overlay -->
+    <div class="modal-overlay" id="bites-quiz-overlay">
+      <div class="modal-box quiz-box">
+        <div class="bq-progress" id="bq-progress"></div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+          <span id="bq-title" style="font-weight:800;font-size:13px;color:var(--navy);">Daily Bites</span>
+          <span id="bq-counter" style="font-size:10.5px;color:var(--gray);">Question 1 of 3</span>
+        </div>
+        <div id="bq-topic" style="font-size:10px;color:var(--teal-dark);font-weight:700;margin-bottom:10px;"></div>
+        <p id="bq-question" style="font-size:14px;font-weight:600;color:var(--navy);margin:0 0 12px;"></p>
+        <div id="bq-options"></div>
+        <div id="bq-feedback" class="bq-feedback" style="display:none;"></div>
+        <button class="pill-btn small" id="bq-next" style="display:none;margin-top:10px;width:100%;" onclick="nextBitesQuestion()">Next question →</button>
+      </div>
+    </div>
+
+    <!-- Results overlay -->
+    <div class="modal-overlay" id="bites-results">
+      <div class="modal-box quiz-box" style="text-align:center;">
+        <div class="icon-big">⚡</div>
+        <h3 id="bq-results-title" style="margin:0 0 4px;">Daily Bites complete!</h3>
+        <p id="bq-results-score" style="font-weight:700;color:var(--navy);margin:0 0 4px;font-size:13px;"></p>
+        <p id="bq-results-xp" style="margin:0 0 10px;font-size:11.5px;"></p>
+        <div id="bq-results-rows" style="text-align:left;margin-bottom:10px;"></div>
+        <div id="bq-results-badge" style="display:none;background:#fdf3e0;border:1px dashed var(--gold);border-radius:10px;padding:8px;font-size:11.5px;margin-bottom:12px;">🎯 Badge unlocked: <b>Sharpshooter</b> — perfect Bite!</div>
+        <button class="pill-btn small" style="width:100%;" onclick="closeBitesResults()">Done</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.proto-nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('screen-'+id).classList.add('active');
+  const btn=document.querySelector('.proto-nav button[data-screen="'+id+'"]');
+  if(btn) btn.classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+document.querySelectorAll('.proto-nav button').forEach(btn=>btn.addEventListener('click',()=>showScreen(btn.dataset.screen)));
+
+function toggleMenu(){
+  const m=document.getElementById('side-menu');
+  m.style.display = (m.style.display==='none')?'block':'none';
+}
+
+/* Chapter Review flow */
+function crGo(step){
+  document.querySelectorAll('.cr-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById('cr-step-'+step).classList.add('active');
+  for(let i=1;i<=3;i++) document.getElementById('dot'+i).classList.toggle('done', i<=step);
+}
+function answerQuiz(el,correct){
+  document.querySelectorAll('#cr-step-2 .quiz-option').forEach(o=>o.disabled=true);
+  el.classList.add(correct?'correct':'wrong');
+  document.getElementById('cr-next-btn').style.display='inline-block';
+}
+
+/* Bites */
+function showBonusModal(){ document.getElementById('bonus-modal').classList.add('show'); }
+function closeBonusModal(){ document.getElementById('bonus-modal').classList.remove('show'); }
+
+const LADDER_INTERVALS={0:'1 day',1:'3 days',2:'7 days',3:'16 days',4:'35 days',5:'90 days'};
+
+const BITES_QUESTIONS={
+  daily:[
+    {topic:'Customer Due Diligence',box:1,q:'What is the minimum requirement before establishing a business relationship with a new customer?',options:['Customer Due Diligence (CDD)','A signed referral letter','A credit score above 700','Nothing, onboarding can happen freely'],correct:0},
+    {topic:'Suspicious Transactions',box:2,q:'Which of the following is a red flag for a suspicious transaction?',options:['A salary credited monthly','Structuring deposits just under the reporting threshold','Paying a utility bill','A scheduled loan repayment'],correct:1},
+    {topic:'CFT Fundamentals',box:0,q:'CFT stands for Combating the Financing of:',options:['Trade','Terrorism','Technology','Tax evasion'],correct:1}
+  ],
+  weekly:[
+    {topic:'Customer Due Diligence',box:1,q:'Enhanced Due Diligence (EDD) is typically applied to:',options:['Walk-in customers only','High-risk customers, e.g. PEPs','Employees of the bank','Customers under 18'],correct:1},
+    {topic:'Suspicious Transactions',box:0,q:'A Suspicious Transaction Report (STR) should be filed:',options:['Only after police request it','As soon as suspicion arises, regardless of amount','Only for transactions above $1,000,000','Once a year during audit'],correct:1},
+    {topic:'CFT Fundamentals',box:3,q:'Which body sets the global standards for AML/CFT?',options:['FATF','WHO','IMF only','Local police'],correct:0},
+    {topic:'Sanctions Screening',box:1,q:'Sanctions screening should be performed:',options:['Only at onboarding','At onboarding and on an ongoing basis','Only when a regulator asks','Never, it slows onboarding'],correct:1},
+    {topic:'Record Keeping',box:2,q:'How long must AML-related customer records typically be retained after a relationship ends?',options:['No need to retain','At least 5 years (per local regulation)','30 days','Until the customer asks to delete'],correct:1},
+    {topic:'Internal Reporting',box:0,q:'Who is usually responsible for reviewing and escalating internal STRs?',options:['Any colleague nearby','The Money Laundering Reporting Officer (MLRO)','The customer themselves','IT support'],correct:1}
+  ],
+  bonus:[
+    {topic:'Quick Recall',box:2,q:'PEP stands for:',options:['Politically Exposed Person','Personal Expense Plan','Periodic Evaluation Process','Public Employee Profile'],correct:0},
+    {topic:'Quick Recall',box:1,q:'Which is a core pillar of an AML compliance program?',options:['Marketing strategy','Independent audit function','Sales commissions','Office relocation'],correct:1},
+    {topic:'Quick Recall',box:0,q:'"Layering" in money laundering refers to:',options:['Wearing multiple jackets','Obscuring fund origins through complex transactions','Filing paperwork in order','Adding extra signatures to a form'],correct:1}
+  ]
+};
+
+let bq={type:null,idx:0,score:0,results:[]};
+
+function goToBitesQuiz(type){
+  showScreen('bites');
+  setTimeout(()=>openBitesQuiz(type),60);
+}
+
+function openBitesQuiz(type){
+  bq={type:type,idx:0,score:0,results:[]};
+  document.getElementById('bq-title').textContent = type==='daily'?'Daily Bites':type==='weekly'?'Weekly Bites':'Bonus Bite';
+  renderBitesQuestion();
+  document.getElementById('bites-quiz-overlay').classList.add('show');
+}
+
+function renderBitesQuestion(){
+  const list=BITES_QUESTIONS[bq.type];
+  const q=list[bq.idx];
+  let dots='';
+  for(let i=0;i<list.length;i++) dots+='<span class="'+(i<bq.idx?'done':'')+'"></span>';
+  document.getElementById('bq-progress').innerHTML=dots;
+  document.getElementById('bq-counter').textContent='Question '+(bq.idx+1)+' of '+list.length;
+  document.getElementById('bq-topic').textContent='Topic: '+q.topic+' · Box '+q.box+' ('+LADDER_INTERVALS[q.box]+' interval)';
+  document.getElementById('bq-question').textContent=q.q;
+  let opts='';
+  q.options.forEach((o,i)=>{ opts+='<button class="quiz-option" onclick="answerBites('+i+',this)">'+o+'</button>'; });
+  document.getElementById('bq-options').innerHTML=opts;
+  document.getElementById('bq-feedback').style.display='none';
+  document.getElementById('bq-next').style.display='none';
+}
+
+function answerBites(i,el){
+  const list=BITES_QUESTIONS[bq.type];
+  const q=list[bq.idx];
+  document.querySelectorAll('#bq-options .quiz-option').forEach(o=>o.disabled=true);
+  const correct=(i===q.correct);
+  el.classList.add(correct?'correct':'wrong');
+  if(!correct) document.querySelectorAll('#bq-options .quiz-option')[q.correct].classList.add('correct');
+  if(correct) bq.score++;
+  const newBox=correct?Math.min(q.box+1,5):0;
+  bq.results.push({topic:q.topic,correct:correct,fromBox:q.box,toBox:newBox});
+  bumpLadder(q.box,newBox);
+  const fb=document.getElementById('bq-feedback');
+  fb.style.display='block';
+  fb.className='bq-feedback '+(correct?'correct':'wrong');
+  fb.textContent=correct
+    ?('✓ Correct — promoted to Box '+newBox+' ('+LADDER_INTERVALS[newBox]+'). +5 XP to your learner level, +5 XP to your Bites level.')
+    :('✕ Not quite — sent back to Box 0 (1-day interval), so you\'ll see it again soon.');
+  const nextBtn=document.getElementById('bq-next');
+  nextBtn.style.display='inline-block';
+  nextBtn.textContent=(bq.idx+1<list.length)?'Next question →':'See results →';
+}
+
+function bumpLadder(fromBox,toBox){
+  if(bq.type==='bonus') return; // bonus bites don't affect the visible home ladder in this prototype
+  const fromEl=document.getElementById('lbox-'+fromBox);
+  const toEl=document.getElementById('lbox-'+toBox);
+  if(fromEl) fromEl.textContent=Math.max(0,parseInt(fromEl.textContent)-1);
+  if(toEl) toEl.textContent=parseInt(toEl.textContent)+1;
+}
+
+function nextBitesQuestion(){
+  const list=BITES_QUESTIONS[bq.type];
+  bq.idx++;
+  if(bq.idx<list.length) renderBitesQuestion();
+  else finishBitesQuiz();
+}
+
+function finishBitesQuiz(){
+  const list=BITES_QUESTIONS[bq.type];
+  document.getElementById('bites-quiz-overlay').classList.remove('show');
+  const perfect=(bq.score===list.length);
+  const xp=bq.score*5;
+  let rows='';
+  bq.results.forEach(r=>{
+    rows+='<div class="bq-result-row"><span>'+r.topic+'</span><span>'+(r.correct?('Box '+r.fromBox+' → <b style="color:var(--green)">Box '+r.toBox+'</b>'):('Box '+r.fromBox+' → <b style="color:#d65b5b">Box 0</b>'))+'</span></div>';
+  });
+  document.getElementById('bq-results-rows').innerHTML=rows;
+  document.getElementById('bq-results-title').textContent=(bq.type==='daily'?'Daily Bites':bq.type==='weekly'?'Weekly Bites':'Bonus Bite')+' complete!';
+  document.getElementById('bq-results-score').textContent=bq.score+'/'+list.length+' correct';
+  document.getElementById('bq-results-xp').textContent='+'+xp+' XP to your learner level · +'+xp+' XP to your Bites level';
+  document.getElementById('bq-results-badge').style.display=perfect?'block':'none';
+  document.getElementById('bites-results').classList.add('show');
+
+  if(bq.type!=='bonus'){
+    const streakEl=document.getElementById('bites-streak-num');
+    if(streakEl) streakEl.textContent='🔥 '+(parseInt(streakEl.textContent.replace(/\D/g,''))+1);
+    const xpEl=document.getElementById('bites-xp-num');
+    if(xpEl) xpEl.textContent=(parseInt(xpEl.textContent)+xp);
+    const todayEl=document.getElementById('bites-today-num');
+    if(todayEl){
+      const parts=todayEl.textContent.split('/');
+      todayEl.textContent=(parseInt(parts[0])+list.length)+' / '+parts[1].trim();
+    }
+  }
+}
+
+function closeBitesResults(){ document.getElementById('bites-results').classList.remove('show'); }
+
+/* Nudges */
+let restInterval;
+function showNudge(type){
+  ['checkin','rest','think'].forEach(t=>document.getElementById('nudge-'+t).classList.remove('show'));
+  document.getElementById('nudge-'+type).classList.add('show');
+  if(type==='rest'){
+    let n=10;
+    document.getElementById('restTimer').textContent=n;
+    clearInterval(restInterval);
+    restInterval=setInterval(()=>{
+      n--;
+      document.getElementById('restTimer').textContent=n>0?n:'✓';
+      if(n<=0){clearInterval(restInterval);setTimeout(()=>hideNudge('rest'),800);}
+    },1000);
+  }
+}
+function hideNudge(type){
+  document.getElementById('nudge-'+type).classList.remove('show');
+  if(type==='rest') clearInterval(restInterval);
+}
+
+/* Master toggle: existing dashboard vs with new ideas layered in */
+function setDashLayer(mode, btn){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('screen-dash').classList.toggle('existing-mode', mode==='existing');
+}
+
+/* Edge-state simulators */
+function setDashState(state, btn){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('rec-banner-normal').style.display = state==='empty' ? 'none' : 'flex';
+  document.getElementById('rec-banner-empty').style.display = state==='empty' ? 'flex' : 'none';
+  document.getElementById('gami-strip-normal').style.display = state==='expired' ? 'none' : 'flex';
+  document.getElementById('gami-strip-expired').style.display = state==='expired' ? 'flex' : 'none';
+}
+function setBitesIA(mode, btn){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('bites-card-nav').style.display = mode==='nav' ? 'block' : 'none';
+  document.getElementById('bites-widget-b').style.display = mode==='widget' ? 'flex' : 'none';
+}
+function setBadgeState(empty, btn){
+  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('badge-grid').classList.toggle('locked-all', empty);
+  document.getElementById('badge-empty-msg').style.display = empty ? 'block' : 'none';
+}
+</script>
+</body>
+</html>
