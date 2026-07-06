@@ -231,7 +231,9 @@ const state = {
   selectedEntity: null,
   selectedCourse: null,
   selectedCblCase: null,
-  selectedCblGroup: null
+  selectedCblGroup: null,
+  palsExpandTabs: {},
+  testReportTarget: null
 };
 
 const appView   = document.querySelector("#appView");
@@ -253,6 +255,46 @@ function completionColor(value) {
   if (value < 50) return "#E73636";
   if (value <= 75) return "#F5B83D";
   return "#0CAD60";
+}
+
+// ─── Review test helpers ──────────────────────────────────────────────────────
+
+function topicReviewQuestions(topicName) {
+  return [
+    { text: `Which statement best describes the core objective of "${topicName}"?`, correct: 1,
+      choices: ["Minimising team dependencies", "Building systematic understanding and practical application", "Delegating all related responsibilities", "Documenting outcomes only"] },
+    { text: `When applying "${topicName}" concepts in a real situation, you should:`, correct: 2,
+      choices: ["Act quickly without consulting others", "Follow only established processes", "Adapt key principles to the specific context", "Seek approval for every action"] },
+    { text: `The most common barrier to effective "${topicName}" is:`, correct: 0,
+      choices: ["Lack of clear communication and shared understanding", "Having too many experienced team members", "Excessive management support", "Over-documentation of processes"] },
+    { text: `What best demonstrates mastery of "${topicName}"?`, correct: 3,
+      choices: ["Completing all assigned readings", "Attending every training session", "Scoring above average on assessments", "Consistently applying skills with measurable outcomes"] },
+    { text: `Which approach most effectively reinforces learning in "${topicName}"?`, correct: 1,
+      choices: ["One-time training with no follow-up", "Regular practice combined with structured feedback", "Self-directed study only", "Peer discussion without a facilitator"] }
+  ];
+}
+
+function generateAnswers(score, seed) {
+  const correctCount = Math.min(5, Math.round(score / 20));
+  const correctIndices = [1, 2, 0, 3, 1];
+  return correctIndices.map((correctIdx, i) => {
+    if (i < correctCount) return correctIdx;
+    return (correctIdx + 1 + (seed % 2)) % 4;
+  });
+}
+
+function mockLearnerTopicAttempts(learnerId, orgAvgScore) {
+  const seed = learnerId.split("").reduce((s, c) => s + c.charCodeAt(0), 0);
+  const variance = ((seed * 7 + 13) % 29) - 14;
+  const finalScore = Math.max(28, Math.min(98, Math.round((orgAvgScore || 55) + variance)));
+  const passed = finalScore >= 70;
+  const attempts = [];
+  if (!passed && finalScore >= 42) {
+    const firstScore = Math.max(22, finalScore - 16);
+    attempts.push({ score: firstScore, passed: false, answers: generateAnswers(firstScore, seed) });
+  }
+  attempts.push({ score: finalScore, passed, answers: generateAnswers(finalScore, seed + 5) });
+  return attempts;
 }
 
 function progress(value) {
@@ -328,76 +370,206 @@ function renderCourseMastery() {
 
 // ─── Build PALS expand row (shared by renderPalsExisting + targeted DOM update) ─
 
-function buildPalsExpandRow(course) {
+function buildOrgStatsContent(course) {
   const passedTopics = course.topics.filter(t => t.passed > 0).length;
   const tws = course.topics.filter(t => t.avgScore !== null);
   const scoreFormula = tws.length > 0
     ? `(${tws.map(t => t.avgScore).join(' + ')}) ÷ ${tws.length} = <b>${course.avgScore}%</b>`
     : 'No topics attempted yet';
   return `
-    <tr class="pals-score-expand-row">
+    <div class="pals-score-summary">
+      ${course.avgScore !== null
+        ? `<div class="ring" style="--value:${course.avgScore}; --ring-color:${completionColor(course.avgScore)}; --size:120px"><b>${course.avgScore}%</b></div>`
+        : `<div class="ring ring-empty" style="--size:120px"><b>—</b></div>`
+      }
+      <div class="pals-score-summary-text">
+        <div class="pals-score-label-row">
+          <strong>Avg. Score</strong>
+          <button class="calc-info-btn" type="button" aria-label="How is Avg Score calculated?">
+            ${svgIcon("help")}
+            <div class="calc-tooltip">
+              <p><b>Avg. Score</b><br>Mean of topic avg. scores (topics with at least 1 attempt)</p>
+              <div class="calc-formula">${scoreFormula}</div>
+            </div>
+          </button>
+        </div>
+        <span>${passedTopics} of ${course.topics.length} topics passed</span>
+      </div>
+    </div>
+    <div class="pals-score-topics">
+      <div class="pals-score-topics-head">
+        <span>Topic</span>
+        <span>Passed</span>
+        <span class="topic-head-info">Avg Score
+          <button class="calc-info-btn" type="button" aria-label="How is Avg Score calculated?">
+            ${svgIcon("help")}
+            <div class="calc-tooltip">
+              <p><b>Avg. Score</b><br>Mean of topic avg. scores (topics with at least 1 attempt)</p>
+              <div class="calc-formula">${scoreFormula}</div>
+            </div>
+          </button>
+        </span>
+        <span class="topic-head-info">Avg Attempts
+          <button class="calc-info-btn" type="button" aria-label="How is Avg Attempts calculated?">
+            ${svgIcon("help")}
+            <div class="calc-tooltip calc-tooltip-end">
+              <p><b>Avg. Attempts</b> (per topic)<br>Total test attempts ÷ learners who attempted that topic</p>
+              <div class="calc-formula">e.g. 3 learners attempt 2×, 3×, 1× → (2+3+1) ÷ 3 = 2.0×</div>
+            </div>
+          </button>
+        </span>
+      </div>
+      ${course.topics.map(topic => {
+        const notStarted = topic.avgAttempts === 0;
+        const isHard = topic.avgAttempts >= 2.5;
+        const passedLabel   = notStarted ? "—" : `${topic.passed}/${course.assigned}`;
+        const scoreLabel    = notStarted ? "—" : `${topic.avgScore ?? "—"}%`;
+        const attemptsLabel = notStarted
+          ? `<span class="topic-not-started">Not started</span>`
+          : `${topic.avgAttempts.toFixed(1)}×${isHard ? ` <span class="topic-hard-flag">${svgIcon("warning")} High difficulty</span>` : ""}`;
+        return `
+          <div class="pals-score-topic-row">
+            <span>${topic.name}</span>
+            <span class="topic-stat ${notStarted ? "stat-muted" : ""}">${passedLabel}</span>
+            <span class="topic-stat ${notStarted ? "stat-muted" : ""}">${scoreLabel}</span>
+            <span class="topic-stat">${attemptsLabel}</span>
+          </div>
+        `;
+      }).join("")}
+    </div>
+  `;
+}
+
+function buildLearnerScoresContent(course) {
+  const sampleLearners = learners.slice(0, Math.min(8, course.assigned));
+  const headerCells = course.topics
+    .map(t => `<th title="${t.name}">${t.name.length > 22 ? t.name.substring(0, 20) + "…" : t.name}</th>`)
+    .join("");
+  const rows = sampleLearners.map(learner => {
+    const topicResults = course.topics.map(topic => {
+      if (topic.avgAttempts === 0) return null;
+      return mockLearnerTopicAttempts(learner.id, topic.avgScore);
+    });
+    const cells = course.topics.map((topic, i) => {
+      if (!topicResults[i]) return `<td><span class="score-cell not-started">—</span></td>`;
+      const last = topicResults[i][topicResults[i].length - 1];
+      const cls = last.passed ? "passed" : "failed";
+      return `<td><span class="score-cell ${cls}" data-test-report="${learner.id}|${course.name}|${topic.name}" title="View test report">${last.score}% ${last.passed ? "✓" : "✗"}</span></td>`;
+    }).join("");
+    const attempted = topicResults.filter(Boolean);
+    let overallCell;
+    if (attempted.length === 0) {
+      overallCell = `<td><span class="score-cell not-started">—</span></td>`;
+    } else {
+      const avg = Math.round(attempted.reduce((s, r) => s + r[r.length - 1].score, 0) / attempted.length);
+      const cls = avg >= 70 ? "passed" : "failed";
+      overallCell = `<td><span class="score-cell ${cls} score-cell-overall">${avg}%</span></td>`;
+    }
+    return `
+      <tr>
+        <td class="learner-name-cell">
+          <div class="learner-name-row">
+            <span class="learner-avatar-small">${learner.name.charAt(0).toUpperCase()}</span>
+            <span>${learner.name}</span>
+          </div>
+        </td>
+        ${cells}
+        ${overallCell}
+      </tr>
+    `;
+  }).join("");
+  return `
+    <div class="learner-scores-wrap">
+      <table class="learner-scores-table">
+        <thead><tr><th>Learner</th>${headerCells}<th class="overall-col-head">Overall</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <p class="learner-scores-note">Click a topic score to view the learner's detailed test report.</p>
+    </div>
+  `;
+}
+
+function buildTestReportContent({ learnerId, courseName, topicName }) {
+  const learner = learners.find(l => l.id === learnerId);
+  const course  = palsCourses.find(c => c.name === courseName);
+  const topic   = course?.topics.find(t => t.name === topicName);
+  if (!learner || !topic) return "<p style='padding:20px'>Data not found.</p>";
+  const attempts  = mockLearnerTopicAttempts(learnerId, topic.avgScore);
+  const questions = topicReviewQuestions(topicName);
+  const last = attempts[attempts.length - 1];
+  const attemptsHtml = attempts.map((attempt, ai) => {
+    const qRows = questions.map((q, qi) => {
+      const ans = attempt.answers[qi];
+      const ok  = ans === q.correct;
+      return `
+        <div class="test-question ${ok ? "correct" : "wrong"}">
+          <div class="test-q-indicator">${ok ? svgIcon("check-circle") : svgIcon("warning")}</div>
+          <div class="test-q-body">
+            <p class="test-q-text"><b>Q${qi + 1}.</b> ${q.text}</p>
+            <p class="test-q-answer ${ok ? "correct-answer" : "learner-answer"}">
+              <span class="answer-label">${ok ? "Correct:" : "Your answer:"}</span> "${q.choices[ans]}"
+            </p>
+            ${!ok ? `<p class="test-q-answer correct-answer"><span class="answer-label">Correct answer:</span> "${q.choices[q.correct]}"</p>` : ""}
+          </div>
+        </div>`;
+    }).join("");
+    const passTag = attempt.passed
+      ? `<span class="attempt-pass-tag passed">Passed ✓</span>`
+      : `<span class="attempt-pass-tag failed">Failed ✗</span>`;
+    return `
+      <div class="test-attempt">
+        <div class="test-attempt-head">
+          <strong>Attempt ${ai + 1}</strong><span>${attempt.score}%</span>${passTag}
+        </div>
+        <div class="test-questions">${qRows}</div>
+      </div>`;
+  }).join("");
+  return `
+    <div class="test-report-head">
+      <div>
+        <h2>${topicName}</h2>
+        <p>${courseName}<br><strong>${learner.name}</strong></p>
+      </div>
+      <button class="test-report-close" data-action="close-test-report" aria-label="Close">✕</button>
+    </div>
+    <div class="test-report-body">
+      <div class="test-report-stats">
+        <article><span>Attempts</span><strong>${attempts.length}</strong></article>
+        <article><span>Latest Score</span><strong>${last.score}%</strong></article>
+        <article><span>Status</span><strong style="color:${last.passed ? "#0CAD60" : "#E73636"}">${last.passed ? "Passed" : "In Progress"}</strong></article>
+      </div>
+      ${attemptsHtml}
+    </div>
+  `;
+}
+
+function buildCourseTestReportContent(course) {
+  const entity = state.selectedEntity;
+  return `
+    <div class="test-report-head">
+      <div>
+        <h2>${course.name}</h2>
+        <p>${entity ? entity.name + " · " : ""}Learner scores by topic</p>
+      </div>
+      <button class="test-report-close" data-action="close-test-report" aria-label="Close">✕</button>
+    </div>
+    <div class="test-report-body" style="padding:0">
+      ${buildLearnerScoresContent(course)}
+    </div>
+  `;
+}
+
+function buildPalsExpandRow(course) {
+  const activeTab = state.palsExpandTabs[course.name] || "org";
+  return `
+    <tr class="pals-score-expand-row" data-expand-for="${course.name}">
       <td colspan="6">
-        <div class="pals-score-expand">
-          <div class="pals-score-summary">
-            ${course.avgScore !== null
-              ? `<div class="ring" style="--value:${course.avgScore}; --ring-color:${completionColor(course.avgScore)}; --size:120px"><b>${course.avgScore}%</b></div>`
-              : `<div class="ring ring-empty" style="--size:120px"><b>—</b></div>`
-            }
-            <div class="pals-score-summary-text">
-              <div class="pals-score-label-row">
-                <strong>Avg. Score</strong>
-                <button class="calc-info-btn" type="button" aria-label="How is Avg Score calculated?">
-                  ${svgIcon("help")}
-                  <div class="calc-tooltip">
-                    <p><b>Avg. Score</b><br>Mean of topic avg. scores (topics with at least 1 attempt)</p>
-                    <div class="calc-formula">${scoreFormula}</div>
-                  </div>
-                </button>
-              </div>
-              <span>${passedTopics} of ${course.topics.length} topics passed</span>
-            </div>
-          </div>
-          <div class="pals-score-topics">
-            <div class="pals-score-topics-head">
-              <span>Topic</span>
-              <span>Passed</span>
-              <span class="topic-head-info">Avg Score
-                <button class="calc-info-btn" type="button" aria-label="How is Avg Score calculated?">
-                  ${svgIcon("help")}
-                  <div class="calc-tooltip">
-                    <p><b>Avg. Score</b><br>Mean of topic avg. scores (topics with at least 1 attempt)</p>
-                    <div class="calc-formula">${scoreFormula}</div>
-                  </div>
-                </button>
-              </span>
-              <span class="topic-head-info">Avg Attempts
-                <button class="calc-info-btn" type="button" aria-label="How is Avg Attempts calculated?">
-                  ${svgIcon("help")}
-                  <div class="calc-tooltip calc-tooltip-end">
-                    <p><b>Avg. Attempts</b> (per topic)<br>Total test attempts ÷ learners who attempted that topic</p>
-                    <div class="calc-formula">e.g. 3 learners attempt 2×, 3×, 1× → (2+3+1) ÷ 3 = 2.0×</div>
-                  </div>
-                </button>
-              </span>
-            </div>
-            ${course.topics.map(topic => {
-              const notStarted = topic.avgAttempts === 0;
-              const isHard = topic.avgAttempts >= 2.5;
-              const passedLabel   = notStarted ? "—" : `${topic.passed}/${course.assigned}`;
-              const scoreLabel    = notStarted ? "—" : `${topic.avgScore ?? "—"}%`;
-              const attemptsLabel = notStarted
-                ? `<span class="topic-not-started">Not started</span>`
-                : `${topic.avgAttempts.toFixed(1)}×${isHard ? ` <span class="topic-hard-flag">${svgIcon("warning")} High difficulty</span>` : ""}`;
-              return `
-                <div class="pals-score-topic-row">
-                  <span>${topic.name}</span>
-                  <span class="topic-stat ${notStarted ? "stat-muted" : ""}">${passedLabel}</span>
-                  <span class="topic-stat ${notStarted ? "stat-muted" : ""}">${scoreLabel}</span>
-                  <span class="topic-stat">${attemptsLabel}</span>
-                </div>
-              `;
-            }).join("")}
-          </div>
+        <div class="pals-expand-tabs">
+          <button class="pals-expand-tab-btn${activeTab === "org" ? " active" : ""}" data-expand-tab="${course.name}" data-tab="org">Org Stats</button>
+          <button class="pals-expand-tab-btn${activeTab === "learner" ? " active" : ""}" data-expand-tab="${course.name}" data-tab="learner">Learner Scores</button>
+        </div>
+        <div class="pals-score-expand${activeTab === "learner" ? " pals-score-expand--full" : ""}">
+          ${activeTab === "org" ? buildOrgStatsContent(course) : buildLearnerScoresContent(course)}
         </div>
       </td>
     </tr>
@@ -639,6 +811,7 @@ function renderAdminCourses() {
                 <h3>${course.name}</h3>
                 <p>${course.assigned} org-wide assigned · ${course.topics.length} topics</p>
               </div>
+              <button class="test-report-btn" data-open-test-report="${course.name}">View Review Test Report</button>
             </article>
           `;
         }).join("")}
@@ -922,6 +1095,7 @@ document.addEventListener("click", e => {
     const tr = expandPals.closest("tr");
     if (wasExpanded) {
       if (tr.nextElementSibling?.classList.contains("pals-score-expand-row")) tr.nextElementSibling.remove();
+      delete state.palsExpandTabs[name];
       expandPals.classList.remove("expanded");
       expandPals.setAttribute("aria-label", `Expand ${name}`);
     } else {
@@ -929,6 +1103,38 @@ document.addEventListener("click", e => {
       if (course) tr.insertAdjacentHTML("afterend", buildPalsExpandRow(course));
       expandPals.classList.add("expanded");
       expandPals.setAttribute("aria-label", `Collapse ${name}`);
+    }
+    return;
+  }
+
+  const expandTab = e.target.closest("[data-expand-tab]");
+  if (expandTab) {
+    const courseName = expandTab.dataset.expandTab;
+    state.palsExpandTabs[courseName] = expandTab.dataset.tab;
+    const expandRow = appView.querySelector(`tr[data-expand-for="${CSS.escape(courseName)}"]`);
+    if (expandRow) {
+      const course = palsCourses.find(c => c.name === courseName);
+      if (course) expandRow.outerHTML = buildPalsExpandRow(course);
+    }
+    return;
+  }
+
+  const testReportCell = e.target.closest("[data-test-report]");
+  if (testReportCell) {
+    const [learnerId, courseName, topicName] = testReportCell.dataset.testReport.split("|");
+    state.testReportTarget = { learnerId, courseName, topicName };
+    const modal = document.querySelector("#testReportModal");
+    if (modal) { modal.innerHTML = buildTestReportContent(state.testReportTarget); modal.showModal(); }
+    return;
+  }
+
+  const openTestReport = e.target.closest("[data-open-test-report]");
+  if (openTestReport) {
+    const courseName = openTestReport.dataset.openTestReport;
+    const course = palsCourses.find(c => c.name === courseName);
+    if (course) {
+      const modal = document.querySelector("#testReportModal");
+      if (modal) { modal.innerHTML = buildCourseTestReportContent(course); modal.showModal(); }
     }
     return;
   }
@@ -974,6 +1180,10 @@ document.addEventListener("click", e => {
 
   const action = e.target.closest("[data-action]");
   if (action) {
+    if (action.dataset.action === "close-test-report") {
+      document.querySelector("#testReportModal")?.close();
+      return;
+    }
     state.proposalLevel = action.dataset.action === "overview" ? "overview" : "courses";
     if (state.proposalLevel === "overview") { state.selectedEntity = state.selectedCourse = null; }
     renderProposalInPlace();
@@ -991,3 +1201,11 @@ document.addEventListener("change", e => {
 
 hydrateIcons();
 render();
+
+// Test report dialog lives outside re-render cycle
+const testReportModal = document.createElement("dialog");
+testReportModal.id = "testReportModal";
+document.body.appendChild(testReportModal);
+testReportModal.addEventListener("click", e => {
+  if (e.target === testReportModal) testReportModal.close();
+});
