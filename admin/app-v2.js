@@ -130,6 +130,21 @@ const palsCoursesData = [
       { name: "Virtual Meeting Facilitation",     passed: 11, avgScore: 76, avgAttempts: 1.9 },
       { name: "Digital Communication Etiquette",  passed: 10, avgScore: 68, avgAttempts: 2.1 }
     ]
+  },
+  {
+    name: "Professional Skills Accelerator",
+    kp: 12,
+    assigned: 16,
+    topics: [
+      { name: "Strategic Thinking & Problem Solving", passed: 12, avgScore: 78, avgAttempts: 1.4 },
+      { name: "Stakeholder Communication",            passed: 11, avgScore: 72, avgAttempts: 1.8 },
+      { name: "Data-Driven Decision Making",          passed: 10, avgScore: 69, avgAttempts: 2.2 },
+      { name: "Financial Acumen for Managers",        passed: 8,  avgScore: 62, avgAttempts: 2.6 },
+      { name: "Change Leadership & Adaptability",     passed: 7,  avgScore: 58, avgAttempts: 3.0 },
+      { name: "Cross-functional Collaboration",       passed: 6,  avgScore: 74, avgAttempts: 1.6 },
+      { name: "Risk Assessment & Mitigation",         passed: 5,  avgScore: 55, avgAttempts: 2.9 },
+      { name: "Digital Transformation Basics",        passed: 4,  avgScore: 61, avgAttempts: 2.1 }
+    ]
   }
 ];
 
@@ -152,7 +167,8 @@ const REPORT_COURSE_NAMES = [
   "Customer Service PALS Course",
   "Sales Fundamentals",
   "Digital Collaboration",
-  "Leadership Management"
+  "Leadership Management",
+  "Professional Skills Accelerator"
 ];
 
 const groups = [
@@ -443,7 +459,7 @@ function buildOrgStatsContent(course) {
 function buildLearnerScoresContent(course) {
   const sampleLearners = learners.slice(0, Math.min(8, course.assigned));
   const headerCells = course.topics
-    .map(t => `<th title="${t.name}">${t.name.length > 22 ? t.name.substring(0, 20) + "…" : t.name}</th>`)
+    .map(t => `<th class="topic-col-head" title="${t.name}"><div class="th-label">${t.name}</div></th>`)
     .join("");
   const rows = sampleLearners.map(learner => {
     const topicResults = course.topics.map(topic => {
@@ -459,11 +475,11 @@ function buildLearnerScoresContent(course) {
     const attempted = topicResults.filter(Boolean);
     let overallCell;
     if (attempted.length === 0) {
-      overallCell = `<td><span class="score-cell not-started">—</span></td>`;
+      overallCell = `<td class="overall-col"><span class="score-cell not-started">—</span></td>`;
     } else {
       const avg = Math.round(attempted.reduce((s, r) => s + r[r.length - 1].score, 0) / attempted.length);
       const cls = avg >= 70 ? "passed" : "failed";
-      overallCell = `<td><span class="score-cell ${cls} score-cell-overall">${avg}%</span></td>`;
+      overallCell = `<td class="overall-col"><span class="score-cell ${cls} score-cell-overall">${avg}%</span></td>`;
     }
     return `
       <tr>
@@ -473,15 +489,15 @@ function buildLearnerScoresContent(course) {
             <span>${learner.name}</span>
           </div>
         </td>
-        ${cells}
         ${overallCell}
+        ${cells}
       </tr>
     `;
   }).join("");
   return `
     <div class="learner-scores-wrap">
       <table class="learner-scores-table">
-        <thead><tr><th>Learner</th>${headerCells}<th class="overall-col-head">Overall</th></tr></thead>
+        <thead><tr><th>Learner</th><th class="overall-col-head">Overall</th>${headerCells}</tr></thead>
         <tbody>${rows}</tbody>
       </table>
       <p class="learner-scores-note">Click a topic score to view the learner's detailed test report.</p>
@@ -1124,7 +1140,11 @@ document.addEventListener("click", e => {
     const [learnerId, courseName, topicName] = testReportCell.dataset.testReport.split("|");
     state.testReportTarget = { learnerId, courseName, topicName };
     const modal = document.querySelector("#testReportModal");
-    if (modal) { modal.innerHTML = buildTestReportContent(state.testReportTarget); modal.showModal(); }
+    if (modal) {
+      modal.className = "";
+      modal.innerHTML = buildTestReportContent(state.testReportTarget);
+      if (!modal.open) modal.showModal();
+    }
     return;
   }
 
@@ -1134,7 +1154,11 @@ document.addEventListener("click", e => {
     const course = palsCourses.find(c => c.name === courseName);
     if (course) {
       const modal = document.querySelector("#testReportModal");
-      if (modal) { modal.innerHTML = buildCourseTestReportContent(course); modal.showModal(); }
+      if (modal) {
+        modal.className = "test-report-wide";
+        modal.innerHTML = buildCourseTestReportContent(course);
+        if (!modal.open) modal.showModal();
+      }
     }
     return;
   }
