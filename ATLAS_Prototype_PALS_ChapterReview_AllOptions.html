@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATLAS — PALS Chapter Review · All Placement Options (A–E) + ATLAS AI Identifier</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1B3F62;--teal:#0D719A;--teal-d:#0B5F82;--ink:#16324A;
+    --gray:#5F7181;--faint:#93A2AE;--green:#22B07D;
+    --card:#E4EEF8;--hair:#E7EDF0;--tealbg:#E7F1F5;
+  }
+  *{box-sizing:border-box;margin:0;}
+  body{font-family:'Montserrat',sans-serif;background:#EFEFEF;color:var(--ink);font-size:15px;line-height:1.6;padding:0 0 100px;}
+  button{font-family:inherit;cursor:pointer;}
+
+  .proto{background:#111318;padding:9px 24px;display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:36px;}
+  .proto .lbl{font-size:10px;color:#8b929c;text-transform:uppercase;letter-spacing:.08em;font-weight:700;}
+  .proto span.here{background:#fff;color:#111318;font-size:12px;font-weight:700;padding:6px 14px;border-radius:9999px;}
+  .proto button.replay{border:1px solid rgba(255,255,255,.22);background:transparent;color:#c9cdd3;padding:6px 14px;border-radius:9999px;font-size:12px;font-weight:600;}
+  .proto button.pillbtn.active{background:#fff;color:#111318;border-color:#fff;}
+
+  .page{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+  /* AI identifier intro */
+  .aiintro{background:#fff;border-radius:18px;padding:22px 26px;display:flex;gap:18px;align-items:center;margin-bottom:34px;box-shadow:0 1px 3px rgba(22,50,74,.05);flex-wrap:wrap;}
+  .aiintro .big{width:52px;height:52px;flex-shrink:0;}
+  .aiintro h2{font-size:16px;font-weight:700;color:var(--ink);}
+  .aiintro p{font-size:12.5px;color:var(--gray);margin-top:3px;max-width:640px;}
+  .aib{width:18px;height:18px;flex-shrink:0;object-fit:contain;}
+  img.big{width:52px;height:52px;object-fit:contain;}
+  .cr-badge img{width:100%;height:100%;object-fit:contain;}
+  img.ind{object-fit:contain;}
+
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;}
+  @media(max-width:920px){.grid{grid-template-columns:1fr;}}
+  .col h2{font-size:15.5px;font-weight:700;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px;}
+  .col h2 .rec{font-size:9.5px;font-weight:800;letter-spacing:.06em;background:var(--tealbg);color:var(--teal);border-radius:9999px;padding:3px 10px;}
+  .col .why{font-size:12.5px;color:var(--gray);margin-bottom:16px;min-height:78px;}
+  .pathwrap{background:#fff;border-radius:20px;padding:52px 36px 96px;position:relative;}
+
+  /* ===== knowledge point card ===== */
+  .kp{background:var(--card);border-radius:16px;padding:26px 28px 28px;position:relative;}
+  .kp h3{font-size:19px;font-weight:700;color:var(--navy);line-height:1.35;letter-spacing:-.01em;}
+  .kp .unit{font-size:12.5px;color:var(--gray);margin-top:5px;}
+  .nodes{display:flex;align-items:center;margin-top:24px;position:relative;}
+  .nline{width:44px;height:8px;background:#C9DCEF;}
+  .node{width:60px;height:60px;border-radius:50%;display:flex;align-items:center;justify-content:center;position:relative;flex-shrink:0;border:none;background:#EDF2F8;color:#B4C2CF;}
+  .node.done{background:var(--teal);color:#fff;}
+  .node.active{background:#fff;color:var(--teal);border:3px solid var(--teal);cursor:pointer;}
+  .node.active:hover{box-shadow:0 0 0 5px rgba(13,113,154,.15);}
+  .node.spotlit{animation:halo 1.6s ease-in-out infinite;}
+  @keyframes halo{0%,100%{box-shadow:0 0 0 0 rgba(13,113,154,.35);}50%{box-shadow:0 0 0 12px rgba(13,113,154,0);}}
+  .node svg.ic{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+  .tick{position:absolute;top:-3px;right:-3px;width:19px;height:19px;border-radius:6px;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;}
+  .tick svg{width:10px;height:10px;stroke:currentColor;fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;}
+  .ind{position:absolute;top:-7px;right:-7px;width:22px;height:22px;pointer-events:none;filter:drop-shadow(0 2px 4px rgba(22,50,74,.25));}
+
+  /* ===== A · floating chip — default: white pill (option 4) ===== */
+  .cr-chip{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);
+    background:#fff;color:var(--navy);border:none;border-radius:10px;padding:8px 15px 8px 11px;
+    font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 6px 20px rgba(22,50,74,.22);
+    display:flex;align-items:center;gap:8px;animation:chipin .35s cubic-bezier(.34,1.4,.64,1);}
+  .cr-chip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:7px solid transparent;border-top-color:#fff;}
+  .cr-chip:hover{background:#F3F7FA;}
+  .cr-chip:hover::after{border-top-color:#F3F7FA;}
+  .cr-chip .t{font-size:10px;font-weight:600;opacity:.65;}
+  /* alternate: brand navy pill */
+  body.pillnavy .cr-chip{background:var(--navy);color:#fff;box-shadow:0 6px 18px rgba(27,63,98,.4);}
+  body.pillnavy .cr-chip::after{border-top-color:var(--navy);}
+  body.pillnavy .cr-chip:hover{background:#16334F;}
+  body.pillnavy .cr-chip:hover::after{border-top-color:#16334F;}
+  body.pillnavy .cr-chip .t{opacity:.8;}
+  @keyframes chipin{from{opacity:0;transform:translateX(-50%) translateY(8px);}to{opacity:1;transform:translateX(-50%) translateY(0);}}
+  .cr-badge{position:absolute;top:-9px;right:-9px;width:26px;height:26px;border:none;background:none;padding:0;display:none;cursor:pointer;filter:drop-shadow(0 2px 5px rgba(22,50,74,.3));}
+  .cr-badge svg{width:100%;height:100%;}
+
+  /* ===== popovers ===== */
+  .pop{position:absolute;top:calc(100% + 14px);left:50%;transform:translateX(-50%);width:300px;
+    background:#fff;border:1.5px solid var(--teal);border-radius:14px;padding:18px 20px;z-index:30;
+    box-shadow:0 14px 40px rgba(22,50,74,.18);display:none;text-align:left;cursor:default;}
+  .pop.right{left:auto;right:0;transform:none;}
+  .pop.open{display:block;animation:popin .22s ease;}
+  @keyframes popin{from{opacity:0;transform:translateX(-50%) translateY(-6px);}to{opacity:1;}}
+  .pop.right.open{animation:popinR .22s ease;}
+  @keyframes popinR{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
+  .pop h5{font-size:15px;font-weight:700;color:var(--navy);margin-bottom:6px;display:flex;align-items:center;gap:8px;}
+  .pop p{font-size:12.5px;color:var(--gray);line-height:1.6;margin-bottom:12px;}
+  .pop .go{display:block;width:100%;background:var(--teal);color:#fff;border:none;border-radius:9999px;padding:10px 0;font-size:13px;font-weight:700;}
+  .pop .go:hover{background:var(--teal-d);}
+  .pop .alt{display:block;width:100%;background:#fff;color:var(--teal);border:1.5px solid var(--teal);border-radius:9999px;padding:9px 0;font-size:13px;font-weight:700;}
+  .pop .alt:hover{background:var(--tealbg);}
+  .pop .later{display:block;width:100%;background:none;border:none;color:var(--gray);font-size:12px;font-weight:600;margin-top:10px;}
+  .pop .later:hover{color:var(--ink);}
+  .pop .fine{font-size:10.5px;color:var(--faint);text-align:center;margin-top:10px;line-height:1.5;}
+  .recbox{background:var(--tealbg);border-radius:11px;padding:13px 14px;margin-bottom:12px;}
+  .recbox .rb-h{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:700;color:var(--teal);margin-bottom:5px;}
+  .recbox p{font-size:12px;color:#33586B;margin-bottom:10px;}
+  .ordiv{display:flex;align-items:center;gap:10px;font-size:10.5px;font-weight:700;color:var(--faint);margin:12px 0;}
+  .ordiv::before,.ordiv::after{content:'';flex:1;height:1px;background:var(--hair);}
+
+  /* ===== C · banner ===== */
+  .kp-banner{margin-top:18px;background:#fff;border:1.5px solid var(--teal);border-radius:12px;padding:13px 15px;display:flex;align-items:center;gap:12px;box-shadow:0 4px 14px rgba(13,113,154,.12);}
+  .kp-banner .aib{width:30px;height:30px;}
+  .kp-banner .bt{flex:1;min-width:0;}
+  .kp-banner h6{font-size:13px;font-weight:700;color:var(--navy);display:flex;align-items:center;gap:7px;}
+  .kp-banner p{font-size:11.5px;color:var(--gray);margin-top:2px;line-height:1.5;}
+  .kp-banner .bgo{background:var(--teal);color:#fff;border:none;border-radius:9999px;padding:9px 16px;font-size:12px;font-weight:700;white-space:nowrap;}
+  .kp-banner .bgo:hover{background:var(--teal-d);}
+  .kp-banner .bx{background:none;border:none;color:var(--faint);font-size:13px;padding:4px;}
+  .kp-banner .bx:hover{color:var(--ink);}
+
+  /* ===== D · corner tag — default: white pill (option 4) ===== */
+  .cr-tag{position:absolute;top:-14px;right:16px;z-index:5;
+    background:#fff;color:var(--navy);border:none;border-radius:9999px;padding:8px 15px 8px 10px;
+    font-size:12.5px;font-weight:700;display:flex;align-items:center;gap:8px;
+    box-shadow:0 6px 20px rgba(22,50,74,.22);}
+  .cr-tag:hover{background:#F3F7FA;}
+  body.pillnavy .cr-tag{background:var(--navy);color:#fff;box-shadow:0 6px 16px rgba(27,63,98,.4);}
+  body.pillnavy .cr-tag:hover{background:#16334F;}
+  .cr-tag .dot{position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:#F0821E;border:2px solid #fff;animation:blink 1.6s ease-in-out infinite;}
+  @keyframes blink{0%,100%{transform:scale(1);}50%{transform:scale(1.25);}}
+
+  /* ===== E · coach mark ===== */
+  .coach{position:absolute;bottom:calc(100% + 14px);left:50%;transform:translateX(-50%);width:255px;
+    background:var(--navy);color:#fff;border-radius:12px;padding:14px 16px;z-index:40;display:none;text-align:left;}
+  .coach.open{display:block;animation:popin .3s ease;}
+  .coach::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:8px solid transparent;border-top-color:var(--navy);}
+  .coach .ch{font-size:10px;font-weight:800;letter-spacing:.08em;color:#8FD0E3;margin-bottom:5px;display:flex;align-items:center;gap:7px;}
+  .coach p{font-size:12px;line-height:1.55;opacity:.95;margin-bottom:10px;}
+  .coach .ok{background:#fff;color:var(--navy);border:none;border-radius:9999px;padding:7px 16px;font-size:11.5px;font-weight:700;}
+
+  .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:13px;font-weight:600;padding:12px 20px;border-radius:12px;display:none;z-index:90;box-shadow:0 10px 30px rgba(22,50,74,.3);}
+</style>
+</head>
+<body>
+
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="aiBubble" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#FFD54A"/><stop offset="1" stop-color="#F0821E"/>
+    </linearGradient>
+    <linearGradient id="aiStar" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#6FA8FF"/><stop offset="1" stop-color="#4A5FD0"/>
+    </linearGradient>
+  </defs>
+  <!-- ATLAS AI identifier — used on every AI-powered feature -->
+  <symbol id="ai-badge" viewBox="0 0 48 48">
+    <path d="M14 12h22a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8h-4l5 8-13-8H14a8 8 0 0 1-8-8V20a8 8 0 0 1 8-8z" fill="url(#aiBubble)"/>
+    <path d="M18 2l3.6 9.4L31 15l-9.4 3.6L18 28l-3.6-9.4L5 15l9.4-3.6z" fill="url(#aiStar)"/>
+    <path d="M31 24l1.7 4.3L37 30l-4.3 1.7L31 36l-1.7-4.3L25 30l4.3-1.7z" fill="#FFFFFF" opacity=".9"/>
+  </symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+  <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 9a6 6 0 0 0 12 0V3H6z"/><path d="M6 5H3v2a4 4 0 0 0 3 3.87"/><path d="M18 5h3v2a4 4 0 0 1-3 3.87"/><path d="M12 15v3"/><path d="M8 21h8"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+</svg>
+
+<div class="proto">
+  <span class="lbl">PALS component</span>
+  <span class="here">Chapter Review — all placement options (A–E)</span>
+  <button class="replay" onclick="playCoach()">↺ Replay first-trigger intro (E)</button>
+  <span class="lbl" style="margin-left:12px;">Pill colour:</span>
+  <button class="replay pillbtn active" onclick="setPill('white',this)">White</button>
+  <button class="replay pillbtn" onclick="setPill('navy',this)">Brand navy</button>
+</div>
+
+<div class="page">
+
+  <!-- ATLAS AI identifier rule -->
+  <div class="aiintro">
+    <img class="big" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">
+    <div>
+      <h2>ATLAS AI identifier</h2>
+      <p>This mark appears on every AI-powered feature — Chapter Reviews, Engagement Nudges, and the ATLAS Assistant — so learners always know when AI is helping. It is applied to all five options below.</p>
+    </div>
+  </div>
+
+  <div class="grid">
+
+  <!-- ================= OPTION A ================= -->
+  <div class="col">
+    <h2>Option A — floating chip above the node <span class="rec">ZHI CHUEN'S DIRECTION</span></h2>
+    <div class="why">The Chapter Review button is offset above the Practice Test node with its own hit area, carrying the ATLAS AI mark. The node itself stays fully clickable. "Maybe later" collapses the chip into a small AI badge on the node's corner.</div>
+    <div class="pathwrap">
+      <div class="kp">
+        <h3>The Stages of Money Laundering</h3>
+        <div class="unit">Fundamentals of AML/CFT</div>
+        <div class="nodes">
+          <div class="node done"><svg class="ic"><use href="#i-book"/></svg><span class="tick"><svg><use href="#i-check"/></svg></span></div>
+          <div class="nline"></div>
+          <div style="position:relative;">
+            <button class="node active" onclick="togglePop('pop-a-test',event)" title="Practice Test">
+              <svg class="ic"><use href="#i-trophy"/></svg>
+            </button>
+            <button class="cr-badge" id="crbadge-a" onclick="expandChipA(event)" title="Chapter Review available"><img src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'"></button>
+            <button class="cr-chip" id="crchip-a" onclick="togglePop('pop-a-cr',event)">
+              <img class="aib" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">Chapter Review <span class="t">· 5 min</span>
+            </button>
+            <div class="pop" id="pop-a-cr" onclick="event.stopPropagation()">
+              <h5><img class="aib" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">Chapter Review</h5>
+              <p>A short, simplified revisit of this topic — built by ATLAS AI from the questions you missed, with a quick quiz at the end. About 5 minutes.</p>
+              <button class="go" onclick="window.open('ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=review')">Start Review</button>
+              <button class="later" onclick="collapseChipA(event)">Maybe later</button>
+              <div class="fine">You can come back anytime — it won't block your progress.</div>
+            </div>
+            <div class="pop" id="pop-a-test" onclick="event.stopPropagation()">
+              <h5>Practice Test</h5>
+              <p>Check your understanding of this topic. Retake it as many times as you like — your best score counts.</p>
+              <button class="go" onclick="toast('Practice test opens as usual — never blocked ✓')">Start Practice Test</button>
+            </div>
+          </div>
+          <div class="nline" style="background:#DDE6EF;"></div>
+          <div class="node"><svg class="ic"><use href="#i-star"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OPTION B ================= -->
+  <div class="col">
+    <h2>Option B — one click target, choice inside</h2>
+    <div class="why">The node is the only clickable element (the AI badge on its corner is a visual indicator only). Clicking opens one popover holding both paths: the AI-recommended Chapter Review, or straight to the Practice Test. No second hit area to discover.</div>
+    <div class="pathwrap">
+      <div class="kp">
+        <h3>The Stages of Money Laundering</h3>
+        <div class="unit">Fundamentals of AML/CFT</div>
+        <div class="nodes">
+          <div class="node done"><svg class="ic"><use href="#i-book"/></svg><span class="tick"><svg><use href="#i-check"/></svg></span></div>
+          <div class="nline"></div>
+          <div style="position:relative;">
+            <button class="node active" onclick="togglePop('pop-b',event)" title="Practice Test">
+              <svg class="ic"><use href="#i-trophy"/></svg>
+              <img class="ind" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">
+            </button>
+            <div class="pop" id="pop-b" onclick="event.stopPropagation()">
+              <h5>Practice Test</h5>
+              <div class="recbox">
+                <div class="rb-h"><img class="aib" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">Recommended first — Chapter Review</div>
+                <p>A 5-minute simplified revisit, built by ATLAS AI from the questions you missed last time. It makes this test much easier to pass.</p>
+                <button class="go" onclick="window.open('ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=review')">Start Chapter Review</button>
+              </div>
+              <div class="ordiv">OR</div>
+              <button class="alt" onclick="toast('Practice test opens — never blocked ✓')">Skip to Practice Test</button>
+              <div class="fine">Both stay available — the review won't block your progress.</div>
+            </div>
+          </div>
+          <div class="nline" style="background:#DDE6EF;"></div>
+          <div class="node"><svg class="ic"><use href="#i-star"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OPTION C ================= -->
+  <div class="col">
+    <h2>Option C — banner inside the card</h2>
+    <div class="why">The review appears as a full-width banner below the nodes — impossible to miss, large hit area, and it never touches the node. Trade-off: it changes the card height, and stacked reviews could crowd the path.</div>
+    <div class="pathwrap">
+      <div class="kp">
+        <h3>The Stages of Money Laundering</h3>
+        <div class="unit">Fundamentals of AML/CFT</div>
+        <div class="nodes">
+          <div class="node done"><svg class="ic"><use href="#i-book"/></svg><span class="tick"><svg><use href="#i-check"/></svg></span></div>
+          <div class="nline"></div>
+          <div style="position:relative;">
+            <button class="node active" onclick="togglePop('pop-c',event)" title="Practice Test">
+              <svg class="ic"><use href="#i-trophy"/></svg>
+            </button>
+            <div class="pop" id="pop-c" onclick="event.stopPropagation()">
+              <h5>Practice Test</h5>
+              <p>Check your understanding of this topic. Retake it as many times as you like — your best score counts.</p>
+              <button class="go" onclick="toast('Practice test opens — never blocked ✓')">Start Practice Test</button>
+            </div>
+          </div>
+          <div class="nline" style="background:#DDE6EF;"></div>
+          <div class="node"><svg class="ic"><use href="#i-star"/></svg></div>
+        </div>
+        <div class="kp-banner" id="banner-c">
+          <img class="aib" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">
+          <div class="bt">
+            <h6>Chapter Review ready</h6>
+            <p>5 min · built by ATLAS AI from the questions you missed — worth doing before the test.</p>
+          </div>
+          <button class="bgo" onclick="window.open('ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=review')">Start</button>
+          <button class="bx" onclick="hideBanner(event)" title="Later">✕</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OPTION D ================= -->
+  <div class="col">
+    <h2>Option D — corner tag (absolute overlay)</h2>
+    <div class="why">The pill overlaps the card's top edge (absolute position) — no height change, highly visible because it breaks the card silhouette, and placed far from the nodes so hit areas never mix. The blinking dot draws first attention.</div>
+    <div class="pathwrap">
+      <div class="kp">
+        <button class="cr-tag" onclick="togglePop('pop-d-cr',event)">
+          <img class="aib" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">Chapter Review<span class="dot"></span>
+        </button>
+        <div class="pop right" id="pop-d-cr" style="top:8px;" onclick="event.stopPropagation()">
+          <h5><img class="aib" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">Chapter Review</h5>
+          <p>A short, simplified revisit of this topic — built by ATLAS AI from the questions you missed, with a quick quiz at the end. About 5 minutes.</p>
+          <button class="go" onclick="window.open('ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=review')">Start Review</button>
+          <div class="fine">You can come back anytime — it won't block your progress.</div>
+        </div>
+        <h3>The Stages of Money Laundering</h3>
+        <div class="unit">Fundamentals of AML/CFT</div>
+        <div class="nodes">
+          <div class="node done"><svg class="ic"><use href="#i-book"/></svg><span class="tick"><svg><use href="#i-check"/></svg></span></div>
+          <div class="nline"></div>
+          <div style="position:relative;">
+            <button class="node active" onclick="togglePop('pop-d-test',event)" title="Practice Test">
+              <svg class="ic"><use href="#i-trophy"/></svg>
+            </button>
+            <div class="pop" id="pop-d-test" onclick="event.stopPropagation()">
+              <h5>Practice Test</h5>
+              <p>Check your understanding of this topic. Retake it as many times as you like — your best score counts.</p>
+              <button class="go" onclick="toast('Practice test opens — never blocked ✓')">Start Practice Test</button>
+            </div>
+          </div>
+          <div class="nline" style="background:#DDE6EF;"></div>
+          <div class="node"><svg class="ic"><use href="#i-star"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OPTION E ================= -->
+  <div class="col">
+    <h2>Option E — Option B + one-time intro</h2>
+    <div class="why">Same structure as B, but awareness is solved with time instead of space: the first time a review is triggered, a coach mark announces it once with a pulsing halo on the node. After "Got it", the corner AI badge is enough. Card height never changes.</div>
+    <div class="pathwrap">
+      <div class="kp">
+        <h3>The Stages of Money Laundering</h3>
+        <div class="unit">Fundamentals of AML/CFT</div>
+        <div class="nodes">
+          <div class="node done"><svg class="ic"><use href="#i-book"/></svg><span class="tick"><svg><use href="#i-check"/></svg></span></div>
+          <div class="nline"></div>
+          <div style="position:relative;">
+            <button class="node active spotlit" id="node-e" onclick="togglePop('pop-e',event)" title="Practice Test">
+              <svg class="ic"><use href="#i-trophy"/></svg>
+              <img class="ind" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">
+            </button>
+            <div class="coach open" id="coach-e" onclick="event.stopPropagation()">
+              <div class="ch"><img class="aib" style="width:15px;height:15px;" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">NEW FOR THIS TOPIC</div>
+              <p>A 5-minute Chapter Review is ready, built from the questions you missed. Find it here whenever you're ready.</p>
+              <button class="ok" onclick="dismissCoach(event)">Got it</button>
+            </div>
+            <div class="pop" id="pop-e" onclick="event.stopPropagation()">
+              <h5>Practice Test</h5>
+              <div class="recbox">
+                <div class="rb-h"><img class="aib" src="atlas-ai.png" alt="ATLAS AI" onerror="this.style.display='none'">Recommended first — Chapter Review</div>
+                <p>A 5-minute simplified revisit, built by ATLAS AI from the questions you missed last time.</p>
+                <button class="go" onclick="window.open('ATLAS_REC_Recommendation_Prototype_v0.3.html?screen=review')">Start Chapter Review</button>
+              </div>
+              <div class="ordiv">OR</div>
+              <button class="alt" onclick="toast('Practice test opens — never blocked ✓')">Skip to Practice Test</button>
+              <div class="fine">Both stay available — the review won't block your progress.</div>
+            </div>
+          </div>
+          <div class="nline" style="background:#DDE6EF;"></div>
+          <div class="node"><svg class="ic"><use href="#i-star"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function togglePop(id,e){
+  e.stopPropagation();
+  dismissCoachSilent();
+  const el=document.getElementById(id);
+  const open=el.classList.contains('open');
+  closePops();
+  if(!open)el.classList.add('open');
+}
+function closePops(){document.querySelectorAll('.pop').forEach(p=>p.classList.remove('open'));}
+document.addEventListener('click',closePops);
+
+/* Option A — collapse / expand */
+function collapseChipA(e){
+  e.stopPropagation();
+  closePops();
+  document.getElementById('crchip-a').style.display='none';
+  document.getElementById('crbadge-a').style.display='block';
+  toast('Saved — find it on the badge, your dashboard, or notifications.');
+}
+function expandChipA(e){
+  e.stopPropagation();
+  document.getElementById('crbadge-a').style.display='none';
+  document.getElementById('crchip-a').style.display='flex';
+}
+/* Option C — dismiss banner */
+function hideBanner(e){
+  e.stopPropagation();
+  document.getElementById('banner-c').style.display='none';
+  toast('Saved for later — it stays on your dashboard and notifications until completed.');
+}
+/* Option E — coach mark */
+function dismissCoach(e){
+  e.stopPropagation();
+  dismissCoachSilent();
+  toast('Noted — the AI badge stays on this topic until the review is done.');
+}
+function dismissCoachSilent(){
+  const c=document.getElementById('coach-e');
+  if(c)c.classList.remove('open');
+  const n=document.getElementById('node-e');
+  if(n)n.classList.remove('spotlit');
+}
+function playCoach(){
+  document.getElementById('coach-e').classList.add('open');
+  document.getElementById('node-e').classList.add('spotlit');
+}
+/* pill colour switcher — default white, alternate brand navy */
+function setPill(k,btn){
+  document.body.classList.toggle('pillnavy',k==='navy');
+  document.querySelectorAll('.pillbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+let toastT=null;
+function toast(t){
+  const el=document.getElementById('toast');
+  el.textContent=t;el.style.display='block';
+  if(toastT)clearTimeout(toastT);
+  toastT=setTimeout(()=>el.style.display='none',2800);
+}
+</script>
+</body>
+</html>
