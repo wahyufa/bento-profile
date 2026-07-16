@@ -20,9 +20,8 @@
     /* five-band competency ramp (low -> high) */
     --b1:#e2626b; /* Novice */
     --b2:#f0a04b; /* Developing */
-    --b3:#f4c95d; /* Competent */
-    --b4:#8fce6a; /* Proficient */
-    --b5:#3fae5a; /* Advanced */
+    --b3:#8fce6a; /* Competent */
+    --b4:#3fae5a; /* Proficient */
     --shadow:0 1px 2px rgba(27,42,74,.04),0 2px 8px rgba(27,42,74,.04);
   }
   *{box-sizing:border-box}
@@ -78,7 +77,7 @@
 
   /* ranked skill rows */
   .rowlist{margin-top:14px;display:flex;flex-direction:column}
-  .srow{border-top:1px solid var(--border);padding:13px 4px 13px;cursor:pointer;transition:background .12s}
+  .srow{border-top:1px solid var(--border);border-left:3px solid transparent;padding:13px 4px 13px 11px;cursor:pointer;transition:background .12s,opacity .12s}
   .srow:first-child{border-top:0}
   .srow:hover{background:#f7f9fb}
   .srow-top{display:flex;align-items:center;gap:12px}
@@ -86,13 +85,32 @@
   .sname{font-weight:650;color:var(--ink);font-size:14px;flex:1;min-width:0}
   .sname .cat{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
   .sval{font-weight:750;color:var(--navy);font-size:15px;width:52px;text-align:right}
+  /* attention tiers */
+  .srow.crit{background:#fdf4f4;border-left-color:var(--b1)}
+  .srow.crit:hover{background:#fceeee}
+  .srow.crit.open{background:#fceeee}
+  .srow.crit .sval{color:#c0343c}
+  .srow.crit .sname{font-weight:750}
+  .srow.watch{border-left-color:var(--b2)}
+  .srow.strong{opacity:.5}
+  .srow.strong:hover,.srow.strong.open{opacity:1}
+  .srow.strong .sname{color:var(--muted);font-weight:600}
+  .srow.strong .sname .cat{color:var(--faint)}
+  .srow.strong .sval{color:var(--muted)}
+  .srow.strong .bar{opacity:.55}
+  .badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:750;padding:2px 8px 2px 7px;border-radius:20px;letter-spacing:.03em;text-transform:uppercase;margin-left:9px;vertical-align:middle;white-space:nowrap}
+  .badge .bdot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:0 0 6px}
+  .badge.attn{background:#fbe0e1;color:#bf2f38}
+  .badge.watch{background:#fdeed7;color:#a9640f}
+  .badge.ok{background:#e7f4ea;color:#2f7b43}
+  .srow.strong .badge.ok{opacity:.8}
   .cover{width:104px;text-align:right;font-size:11.5px;color:var(--muted);font-weight:600}
   .cover.low{color:#c9791f}
   .cover .flag{display:inline-block;margin-left:4px}
   /* stacked band bar */
   .bar{height:12px;border-radius:6px;overflow:hidden;display:flex;background:#eef1f5;margin:9px 0 0 34px}
   .bar span{height:100%;display:block}
-  .seg1{background:var(--b1)} .seg2{background:var(--b2)} .seg3{background:var(--b3)} .seg4{background:var(--b4)} .seg5{background:var(--b5)}
+  .seg1{background:var(--b1)} .seg2{background:var(--b2)} .seg3{background:var(--b3)} .seg4{background:var(--b4)}
   /* expand */
   .detail{margin:12px 0 4px 34px;padding:14px 16px;background:#f7f9fb;border:1px solid var(--border);border-radius:12px;display:none}
   .srow.open .detail{display:block}
@@ -102,7 +120,7 @@
   .comp .pals{background:var(--accent);display:flex;align-items:center;padding-left:9px;white-space:nowrap}
   .comp .cbl{background:#7c5cbf;display:flex;align-items:center;padding-left:9px;white-space:nowrap}
   .comp .cap{background:repeating-linear-gradient(45deg,#dfe4ea,#dfe4ea 5px,#e9edf2 5px,#e9edf2 10px)}
-  .banddist{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:4px}
+  .banddist{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:4px}
   .bd{display:flex;flex-direction:column;gap:5px;align-items:center;text-align:center}
   .bd .dot{width:10px;height:10px;border-radius:3px}
   .bd .bn{font-weight:750;color:var(--navy);font-size:16px}
@@ -145,7 +163,7 @@
   /* learner drill modal */
   .backdrop{position:fixed;inset:0;background:rgba(27,42,74,.42);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;padding:24px;z-index:50}
   .backdrop.show{display:flex}
-  .modal{background:#fff;border-radius:18px;max-width:560px;width:100%;box-shadow:0 24px 60px rgba(27,42,74,.28);overflow:hidden;animation:pop .18s ease}
+  .modal{background:#fff;border-radius:18px;max-width:600px;width:100%;box-shadow:0 24px 60px rgba(27,42,74,.28);overflow:hidden;animation:pop .18s ease;max-height:92vh;overflow-y:auto}
   @keyframes pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
   .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)}
   .modal-head h3{margin:0;font-size:16px;color:var(--navy)}
@@ -155,6 +173,24 @@
   .drill-note{font-size:12px;color:var(--muted);margin:14px 0 0;padding-top:14px;border-top:1px dashed var(--border-strong)}
 
   .hint{font-size:12px;color:var(--faint);margin-top:14px;text-align:center}
+  /* learner PALS/CBL composition */
+  .lc-block{margin-top:18px;padding-top:16px;border-top:1px solid var(--border)}
+  .lc-h{font-size:11.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+  .lc-summary{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+  .lc-summary .track{flex:1;height:26px;border-radius:7px;background:#e9edf2;display:flex;overflow:hidden;font-size:11.5px;font-weight:700;color:#fff}
+  .lc-summary .p{background:var(--accent);display:flex;align-items:center;padding-left:10px;white-space:nowrap}
+  .lc-summary .c{background:#7c5cbf;display:flex;align-items:center;padding-left:10px;white-space:nowrap}
+  .lc-list{margin-top:4px}
+  .lc-row{display:flex;align-items:center;gap:12px;padding:7px 0;border-top:1px solid var(--border)}
+  .lc-row:first-child{border-top:0}
+  .lc-nm{flex:1;font-size:12.5px;font-weight:650;color:var(--ink);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .lc-bar{width:132px;height:15px;border-radius:5px;background:#eef1f5;display:flex;overflow:hidden;flex:0 0 132px}
+  .lc-bar .p{background:var(--accent);height:100%}
+  .lc-bar .c{background:#7c5cbf;height:100%}
+  .lc-tot{width:38px;text-align:right;font-size:12.5px;font-weight:750;color:var(--navy)}
+  .lc-legend{display:flex;gap:16px;margin-top:12px;font-size:11.5px;font-weight:600;color:var(--body)}
+  .lc-legend .lg-i{display:inline-flex;align-items:center;gap:6px}
+  .lc-legend .sw{width:11px;height:11px;border-radius:3px}
   @media(max-width:1080px){
     .kpis{grid-template-columns:repeat(2,1fr)}
     .body-grid{grid-template-columns:1fr}
@@ -210,9 +246,9 @@
       <div class="field">
         <label>Sort by</label>
         <select id="sortSel">
+          <option value="gap" selected>Needs attention first</option>
           <option value="desc">Mastery — high to low</option>
           <option value="asc">Mastery — low to high</option>
-          <option value="gap">Biggest gap (lowest first)</option>
           <option value="cover">Coverage — most learners</option>
         </select>
       </div>
@@ -228,7 +264,7 @@
           <h2>Skills across the organisation</h2>
           <span class="note" id="skillCount"></span>
         </div>
-        <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)">Each bar shows how learners are distributed across the five competency bands. Click a skill to see its PALS / CBL make-up.</p>
+        <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)">Skills needing attention are pulled to the top and flagged red; strong skills are dimmed. Each bar shows how learners spread across the four competency bands — click a skill for its PALS / CBL make-up.</p>
         <div class="rowlist" id="rowlist"></div>
 
         <div class="legend">
@@ -236,7 +272,6 @@
           <span class="lg"><span class="dot seg2"></span>Developing</span>
           <span class="lg"><span class="dot seg3"></span>Competent</span>
           <span class="lg"><span class="dot seg4"></span>Proficient</span>
-          <span class="lg"><span class="dot seg5"></span>Advanced</span>
         </div>
       </div>
 
@@ -276,6 +311,7 @@
       </div>
       <div class="radar-wrap"><div class="radar" id="radarLearner"></div></div>
       <div class="profile-list" id="learnerProfile"></div>
+      <div id="learnerComp"></div>
       <p class="drill-note" id="drillNote"></p>
     </div>
   </div>
@@ -287,8 +323,7 @@ const BANDS = [
   {key:'Novice',cls:'seg1',color:getComputedStyle(document.documentElement).getPropertyValue('--b1')},
   {key:'Developing',cls:'seg2',color:getComputedStyle(document.documentElement).getPropertyValue('--b2')},
   {key:'Competent',cls:'seg3',color:getComputedStyle(document.documentElement).getPropertyValue('--b3')},
-  {key:'Proficient',cls:'seg4',color:getComputedStyle(document.documentElement).getPropertyValue('--b4')},
-  {key:'Advanced',cls:'seg5',color:getComputedStyle(document.documentElement).getPropertyValue('--b5')}
+  {key:'Proficient',cls:'seg4',color:getComputedStyle(document.documentElement).getPropertyValue('--b4')}
 ];
 const GROUPS = ['Finance','Audit','Risk & Compliance','Advisory','Operations'];
 
@@ -298,43 +333,43 @@ const SECTORS = {
     label:'Accountancy',
     categories:['Accountancy','Financial & Transaction Analysis','Risk, Compliance & Governance','Business Management'],
     skills:[
-      {name:'Forensic Accounting',cat:'Accountancy',avg:82,cover:14,dist:[0,1,3,4,6],pals:52,cbl:30,byGroup:{'Finance':88,'Audit':90,'Risk & Compliance':78,'Advisory':71,'Operations':64}},
-      {name:'Financial Reporting',cat:'Accountancy',avg:76,cover:19,dist:[1,2,4,7,5],pals:48,cbl:28,byGroup:{'Finance':84,'Audit':81,'Risk & Compliance':70,'Advisory':68,'Operations':60}},
-      {name:'Management Accounting',cat:'Accountancy',avg:58,cover:16,dist:[2,4,5,3,2],pals:40,cbl:18,byGroup:{'Finance':72,'Audit':55,'Risk & Compliance':52,'Advisory':50,'Operations':44}},
-      {name:'Transaction Monitoring',cat:'Financial & Transaction Analysis',avg:69,cover:12,dist:[1,2,3,4,2],pals:44,cbl:25,byGroup:{'Finance':66,'Audit':74,'Risk & Compliance':80,'Advisory':58,'Operations':55}},
-      {name:'Financial Modelling',cat:'Financial & Transaction Analysis',avg:47,cover:9,dist:[2,3,2,1,1],pals:34,cbl:13,byGroup:{'Finance':60,'Audit':40,'Risk & Compliance':42,'Advisory':52,'Operations':30}},
-      {name:'AML / KYC',cat:'Risk, Compliance & Governance',avg:88,cover:22,dist:[0,1,2,7,12],pals:50,cbl:38,byGroup:{'Finance':82,'Audit':90,'Risk & Compliance':96,'Advisory':80,'Operations':78}},
-      {name:'Regulatory Compliance',cat:'Risk, Compliance & Governance',avg:71,cover:20,dist:[1,3,4,7,5],pals:45,cbl:26,byGroup:{'Finance':68,'Audit':75,'Risk & Compliance':88,'Advisory':62,'Operations':58}},
-      {name:'Audit & Assurance',cat:'Risk, Compliance & Governance',avg:64,cover:15,dist:[2,3,4,4,2],pals:42,cbl:22,byGroup:{'Finance':55,'Audit':86,'Risk & Compliance':66,'Advisory':52,'Operations':48}},
-      {name:'Internal Controls',cat:'Risk, Compliance & Governance',avg:41,cover:6,dist:[2,2,1,1,0],pals:30,cbl:11,byGroup:{'Finance':44,'Audit':52,'Risk & Compliance':46,'Advisory':32,'Operations':28}},
-      {name:'Stakeholder Management',cat:'Business Management',avg:55,cover:17,dist:[2,4,5,4,2],pals:38,cbl:17,byGroup:{'Finance':52,'Audit':50,'Risk & Compliance':54,'Advisory':70,'Operations':48}},
-      {name:'Project Management',cat:'Business Management',avg:49,cover:13,dist:[3,3,4,2,1],pals:35,cbl:14,byGroup:{'Finance':46,'Audit':44,'Risk & Compliance':48,'Advisory':62,'Operations':44}},
-      {name:'Business Communication',cat:'Business Management',avg:38,cover:5,dist:[2,2,1,0,0],pals:28,cbl:10,byGroup:{'Finance':40,'Audit':36,'Risk & Compliance':38,'Advisory':44,'Operations':30}}
+      {name:'Forensic Accounting',cat:'Accountancy',avg:82,cover:14,dist:[0,1,3,10],pals:52,cbl:30,byGroup:{'Finance':88,'Audit':90,'Risk & Compliance':78,'Advisory':71,'Operations':64}},
+      {name:'Financial Reporting',cat:'Accountancy',avg:76,cover:19,dist:[1,2,4,12],pals:48,cbl:28,byGroup:{'Finance':84,'Audit':81,'Risk & Compliance':70,'Advisory':68,'Operations':60}},
+      {name:'Management Accounting',cat:'Accountancy',avg:58,cover:16,dist:[2,4,5,5],pals:40,cbl:18,byGroup:{'Finance':72,'Audit':55,'Risk & Compliance':52,'Advisory':50,'Operations':44}},
+      {name:'Transaction Monitoring',cat:'Financial & Transaction Analysis',avg:69,cover:12,dist:[1,2,3,6],pals:44,cbl:25,byGroup:{'Finance':66,'Audit':74,'Risk & Compliance':80,'Advisory':58,'Operations':55}},
+      {name:'Financial Modelling',cat:'Financial & Transaction Analysis',avg:47,cover:9,dist:[2,3,2,2],pals:34,cbl:13,byGroup:{'Finance':60,'Audit':40,'Risk & Compliance':42,'Advisory':52,'Operations':30}},
+      {name:'AML / KYC',cat:'Risk, Compliance & Governance',avg:88,cover:22,dist:[0,1,2,19],pals:50,cbl:38,byGroup:{'Finance':82,'Audit':90,'Risk & Compliance':96,'Advisory':80,'Operations':78}},
+      {name:'Regulatory Compliance',cat:'Risk, Compliance & Governance',avg:71,cover:20,dist:[1,3,4,12],pals:45,cbl:26,byGroup:{'Finance':68,'Audit':75,'Risk & Compliance':88,'Advisory':62,'Operations':58}},
+      {name:'Audit & Assurance',cat:'Risk, Compliance & Governance',avg:64,cover:15,dist:[2,3,4,6],pals:42,cbl:22,byGroup:{'Finance':55,'Audit':86,'Risk & Compliance':66,'Advisory':52,'Operations':48}},
+      {name:'Internal Controls',cat:'Risk, Compliance & Governance',avg:41,cover:6,dist:[2,2,1,1],pals:30,cbl:11,byGroup:{'Finance':44,'Audit':52,'Risk & Compliance':46,'Advisory':32,'Operations':28}},
+      {name:'Stakeholder Management',cat:'Business Management',avg:55,cover:17,dist:[2,4,5,6],pals:38,cbl:17,byGroup:{'Finance':52,'Audit':50,'Risk & Compliance':54,'Advisory':70,'Operations':48}},
+      {name:'Project Management',cat:'Business Management',avg:49,cover:13,dist:[3,3,4,3],pals:35,cbl:14,byGroup:{'Finance':46,'Audit':44,'Risk & Compliance':48,'Advisory':62,'Operations':44}},
+      {name:'Business Communication',cat:'Business Management',avg:38,cover:5,dist:[2,2,1,0],pals:28,cbl:10,byGroup:{'Finance':40,'Audit':36,'Risk & Compliance':38,'Advisory':44,'Operations':30}}
     ]
   },
   tech:{
     label:'Technology',
     categories:['Data','Security','Engineering'],
     skills:[
-      {name:'Data Analysis',cat:'Data',avg:73,cover:11,dist:[1,1,3,4,2],pals:47,cbl:26,byGroup:{'Finance':70,'Audit':60,'Risk & Compliance':66,'Advisory':80,'Operations':72}},
-      {name:'SQL & Querying',cat:'Data',avg:61,cover:9,dist:[1,2,3,2,1],pals:41,cbl:20,byGroup:{'Finance':58,'Audit':50,'Risk & Compliance':54,'Advisory':70,'Operations':62}},
-      {name:'Cyber Awareness',cat:'Security',avg:84,cover:24,dist:[0,1,3,8,12],pals:50,cbl:34,byGroup:{'Finance':82,'Audit':85,'Risk & Compliance':90,'Advisory':80,'Operations':81}},
-      {name:'Data Privacy (PDPA)',cat:'Security',avg:67,cover:18,dist:[1,3,5,6,3],pals:44,cbl:23,byGroup:{'Finance':64,'Audit':70,'Risk & Compliance':78,'Advisory':60,'Operations':58}},
-      {name:'Cloud Fundamentals',cat:'Engineering',avg:44,cover:7,dist:[2,3,1,1,0],pals:32,cbl:12,byGroup:{'Finance':40,'Audit':36,'Risk & Compliance':42,'Advisory':52,'Operations':46}},
-      {name:'Automation & Scripting',cat:'Engineering',avg:36,cover:4,dist:[2,1,1,0,0],pals:26,cbl:10,byGroup:{'Finance':32,'Audit':30,'Risk & Compliance':34,'Advisory':44,'Operations':38}},
-      {name:'API Concepts',cat:'Engineering',avg:52,cover:8,dist:[1,2,3,1,1],pals:37,cbl:15,byGroup:{'Finance':48,'Audit':44,'Risk & Compliance':50,'Advisory':60,'Operations':54}}
+      {name:'Data Analysis',cat:'Data',avg:73,cover:11,dist:[1,1,3,6],pals:47,cbl:26,byGroup:{'Finance':70,'Audit':60,'Risk & Compliance':66,'Advisory':80,'Operations':72}},
+      {name:'SQL & Querying',cat:'Data',avg:61,cover:9,dist:[1,2,3,3],pals:41,cbl:20,byGroup:{'Finance':58,'Audit':50,'Risk & Compliance':54,'Advisory':70,'Operations':62}},
+      {name:'Cyber Awareness',cat:'Security',avg:84,cover:24,dist:[0,1,3,20],pals:50,cbl:34,byGroup:{'Finance':82,'Audit':85,'Risk & Compliance':90,'Advisory':80,'Operations':81}},
+      {name:'Data Privacy (PDPA)',cat:'Security',avg:67,cover:18,dist:[1,3,5,9],pals:44,cbl:23,byGroup:{'Finance':64,'Audit':70,'Risk & Compliance':78,'Advisory':60,'Operations':58}},
+      {name:'Cloud Fundamentals',cat:'Engineering',avg:44,cover:7,dist:[2,3,1,1],pals:32,cbl:12,byGroup:{'Finance':40,'Audit':36,'Risk & Compliance':42,'Advisory':52,'Operations':46}},
+      {name:'Automation & Scripting',cat:'Engineering',avg:36,cover:4,dist:[2,1,1,0],pals:26,cbl:10,byGroup:{'Finance':32,'Audit':30,'Risk & Compliance':34,'Advisory':44,'Operations':38}},
+      {name:'API Concepts',cat:'Engineering',avg:52,cover:8,dist:[1,2,3,2],pals:37,cbl:15,byGroup:{'Finance':48,'Audit':44,'Risk & Compliance':50,'Advisory':60,'Operations':54}}
     ]
   },
   ops:{
     label:'Operations & Risk',
     categories:['Process','People','Risk'],
     skills:[
-      {name:'Process Improvement',cat:'Process',avg:66,cover:13,dist:[1,2,4,4,2],pals:43,cbl:23,byGroup:{'Finance':62,'Audit':60,'Risk & Compliance':64,'Advisory':70,'Operations':78}},
-      {name:'Vendor Management',cat:'Process',avg:57,cover:10,dist:[1,3,3,2,1],pals:39,cbl:18,byGroup:{'Finance':54,'Audit':50,'Risk & Compliance':60,'Advisory':58,'Operations':66}},
-      {name:'Coaching & Feedback',cat:'People',avg:72,cover:15,dist:[1,2,3,6,3],pals:46,cbl:26,byGroup:{'Finance':68,'Audit':64,'Risk & Compliance':66,'Advisory':82,'Operations':74}},
-      {name:'Conflict Resolution',cat:'People',avg:48,cover:6,dist:[2,2,1,1,0],pals:34,cbl:14,byGroup:{'Finance':44,'Audit':46,'Risk & Compliance':50,'Advisory':56,'Operations':44}},
-      {name:'Operational Risk',cat:'Risk',avg:79,cover:19,dist:[0,2,3,7,7],pals:49,cbl:30,byGroup:{'Finance':74,'Audit':82,'Risk & Compliance':90,'Advisory':70,'Operations':76}},
-      {name:'Business Continuity',cat:'Risk',avg:53,cover:8,dist:[1,2,3,1,1],pals:38,cbl:15,byGroup:{'Finance':50,'Audit':56,'Risk & Compliance':64,'Advisory':46,'Operations':52}}
+      {name:'Process Improvement',cat:'Process',avg:66,cover:13,dist:[1,2,4,6],pals:43,cbl:23,byGroup:{'Finance':62,'Audit':60,'Risk & Compliance':64,'Advisory':70,'Operations':78}},
+      {name:'Vendor Management',cat:'Process',avg:57,cover:10,dist:[1,3,3,3],pals:39,cbl:18,byGroup:{'Finance':54,'Audit':50,'Risk & Compliance':60,'Advisory':58,'Operations':66}},
+      {name:'Coaching & Feedback',cat:'People',avg:72,cover:15,dist:[1,2,3,9],pals:46,cbl:26,byGroup:{'Finance':68,'Audit':64,'Risk & Compliance':66,'Advisory':82,'Operations':74}},
+      {name:'Conflict Resolution',cat:'People',avg:48,cover:6,dist:[2,2,1,1],pals:34,cbl:14,byGroup:{'Finance':44,'Audit':46,'Risk & Compliance':50,'Advisory':56,'Operations':44}},
+      {name:'Operational Risk',cat:'Risk',avg:79,cover:19,dist:[0,2,3,14],pals:49,cbl:30,byGroup:{'Finance':74,'Audit':82,'Risk & Compliance':90,'Advisory':70,'Operations':76}},
+      {name:'Business Continuity',cat:'Risk',avg:53,cover:8,dist:[1,2,3,2],pals:38,cbl:15,byGroup:{'Finance':50,'Audit':56,'Risk & Compliance':64,'Advisory':46,'Operations':52}}
     ]
   }
 };
@@ -342,7 +377,7 @@ const SECTORS = {
 const LEARNERS = ['Learner Chuen','Aisyah Rahman','Wei Jie Tan','Priya Kumar','Daniel Ong','Farah Iskandar','Marcus Lim','Nurul Aini'];
 
 /* ---------- state ---------- */
-let state = {view:'org', sector:'acc', sort:'desc', gapOnly:false, learner:0};
+let state = {view:'org', sector:'acc', sort:'gap', gapOnly:false, learner:0};
 const LOW_COVERAGE = 8; // flag threshold
 
 /* ---------- helpers ---------- */
@@ -367,25 +402,35 @@ function renderRows(){
     return b.avg-a.avg;
   });
 
-  $('#skillCount').textContent = `${skills.length} skill${skills.length!==1?'s':''} · ${sec.label}`;
+  const attnCount = skills.filter(s=>s.avg<50).length;
+  $('#skillCount').innerHTML = `${skills.length} skill${skills.length!==1?'s':''} · ${sec.label}` +
+    (attnCount?` · <b style="color:#bf2f38">${attnCount} need${attnCount!==1?'':'s'} attention</b>`:'');
 
   const list = $('#rowlist');
   list.innerHTML='';
   if(!skills.length){ list.innerHTML='<div style="padding:26px 4px;color:var(--muted)">No skills sit below 60% in this sector. Toggle the filter off to see all skills.</div>'; return; }
 
+  // attention tier: crit (<50) pronounced, watch (50-64), baseline (65-74), strong (>=75) demoted
+  function tierOf(v){ return v<50?'crit':(v<65?'watch':(v>=75?'strong':'')); }
+  const badgeFor = {
+    crit:'<span class="badge attn"><span class="bdot"></span>Needs attention</span>',
+    watch:'<span class="badge watch"><span class="bdot"></span>Watch</span>',
+    strong:'<span class="badge ok"><span class="bdot"></span>On track</span>'
+  };
+
   skills.forEach((s,i)=>{
     const total = s.dist.reduce((a,b)=>a+b,0)||1;
     const segs = s.dist.map((c,bi)=>`<span class="${BANDS[bi].cls}" style="width:${(c/total*100).toFixed(1)}%"></span>`).join('');
     const low = s.cover < LOW_COVERAGE;
-    const capPals = 70, capCbl = 60; // per-source caps discussed
     const bd = s.dist.map((c,bi)=>`<div class="bd"><span class="dot ${BANDS[bi].cls}"></span><span class="bn">${c}</span><span class="bl">${BANDS[bi].key}</span></div>`).join('');
+    const tier = tierOf(s.avg);
 
     const row = document.createElement('div');
-    row.className='srow';
+    row.className='srow'+(tier?' '+tier:'');
     row.innerHTML=`
       <div class="srow-top">
         <span class="rank">${i+1}</span>
-        <span class="sname">${s.name}<span class="cat">${s.cat}</span></span>
+        <span class="sname">${s.name}${tier?badgeFor[tier]:''}<span class="cat">${s.cat}</span></span>
         <span class="cover ${low?'low':''}">${s.cover} learners${low?'<span class="flag" title="Few learners — read with caution">⚠︎</span>':''}</span>
         <span class="sval">${s.avg}%</span>
       </div>
@@ -478,25 +523,61 @@ function renderHeatmap(){
 }
 
 /* ---------- learner drill modal ---------- */
+// deterministic per-learner, per-skill breakdown: avg split into PALS + CBL points
+function learnerSkill(li, s){
+  const seed=(li+1)*(s.name.length+7);
+  const delta=((seed*13)%30)-15;
+  const avg=Math.max(4,Math.min(100,s.avg+delta));
+  const orgShare=s.pals/(s.pals+s.cbl);
+  const shareDelta=(((seed*7)%30)-15)/100;   // ±0.15 per-learner tilt toward PALS or CBL
+  const palsShare=Math.max(0.15,Math.min(0.9,orgShare+shareDelta));
+  const pals=Math.round(avg*palsShare);
+  const cbl=Math.max(0,avg-pals);
+  return {avg,pals,cbl};
+}
 function renderLearnerRadar(){
-  const cats=catAverages(state.sector, s=>{
-    // deterministic pseudo per-learner variation around org avg
-    const seed=(state.learner+1)*(s.name.length+7);
-    const delta=((seed*13)%30)-15;
-    return Math.max(4,Math.min(100,s.avg+delta));
-  });
+  const li=state.learner;
+  const sec=SECTORS[state.sector];
+  const cats=catAverages(state.sector, s=>learnerSkill(li,s).avg);
   drawRadar($('#radarLearner'),cats,'#7c5cbf');
   const pl=$('#learnerProfile'); pl.innerHTML='';
   cats.forEach(c=>{
     pl.insertAdjacentHTML('beforeend',
       `<div class="pl"><span class="nm">${c.cat}</span><span class="mini"><i style="width:${c.avg}%;background:${heatColor(c.avg)}"></i></span><span class="pv">${c.avg}%</span></div>`);
   });
+
+  // PALS vs CBL contribution
+  const rows=sec.skills.map(s=>({name:s.name, ...learnerSkill(li,s)})).sort((a,b)=>b.avg-a.avg);
+  let sumP=0,sumC=0; rows.forEach(r=>{sumP+=r.pals;sumC+=r.cbl;});
+  const tot=(sumP+sumC)||1;
+  const pPct=Math.round(sumP/tot*100), cPct=100-pPct;
+  const listHtml=rows.map(r=>`
+    <div class="lc-row">
+      <span class="lc-nm">${r.name}</span>
+      <span class="lc-bar" title="PALS ${r.pals} pts · CBL ${r.cbl} pts"><span class="p" style="width:${r.pals}%"></span><span class="c" style="width:${r.cbl}%"></span></span>
+      <span class="lc-tot">${r.avg}%</span>
+    </div>`).join('');
+  $('#learnerComp').innerHTML=`
+    <div class="lc-block">
+      <div class="lc-h">Skill mastery — PALS vs CBL contribution</div>
+      <div class="lc-summary">
+        <div class="track">
+          <span class="p" style="width:${pPct}%">${pPct>=18?'PALS '+pPct+'%':''}</span>
+          <span class="c" style="width:${cPct}%">${cPct>=18?'CBL '+cPct+'%':''}</span>
+        </div>
+      </div>
+      <div class="lc-list">${listHtml}</div>
+      <div class="lc-legend">
+        <span class="lg-i"><span class="sw" style="background:var(--accent)"></span>PALS — questions answered correctly</span>
+        <span class="lg-i"><span class="sw" style="background:#7c5cbf"></span>CBL — challenges completed</span>
+      </div>
+    </div>`;
 }
 function openLearner(group, skill){
   $('#mTitle').textContent = group ? `${group} · learner detail` : 'Learner detail';
   const note = skill
-    ? `Opened from <b>${skill} · ${group}</b>. This is the per-learner view — the same radar your current Skills tab shows, now reachable by drilling down from the org overview.`
-    : `The per-learner view — the same radar your current Skills tab shows, reachable by drilling in from the overview.`;
+    ? `Opened from <b>${skill} · ${group}</b>. The radar shows this learner's category profile; the list below breaks each skill into PALS (correct answers) and CBL (completed challenges) contribution.`
+    : `The radar shows this learner's category profile; the list below breaks each skill into PALS (correct answers) and CBL (completed challenges) contribution.`;
   $('#drillNote').innerHTML=note;
   renderLearnerRadar();
   $('#backdrop').classList.add('show');
