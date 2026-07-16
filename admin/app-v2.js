@@ -202,16 +202,38 @@ const strands = [
   { name: "Mastery",       progress: 43, sub: [["Independent performance",[["Complete challenge", 45],    ["Explain tradeoffs", 41]]],    ["Retention",             [["Review checkpoint", 47],      ["Maintain accuracy", 39]]]] }
 ];
 
+// Skill categories + per-skill analytics (avg mastery, learner coverage, competency-band
+// distribution, PALS/CBL score composition, and per-group averages). Powers the Skills tab.
 const skillTags = [
-  { name: "Sales Communication",              progress: 74, questions: 12 },
-  { name: "Customer Relationship Management", label: "Customer Relation", progress: 81, questions: 15 },
-  { name: "Negotiation",                      progress: 62, questions: 9 },
-  { name: "Business Presentation",            label: "Business Present.", progress: 69, questions: 11 },
-  { name: "Service Excellence",               progress: 77, questions: 14 },
-  { name: "Problem Solving",                  progress: 58, questions: 8 },
-  { name: "Data Interpretation",              progress: 66, questions: 10 },
-  { name: "Digital Collaboration",            label: "Digital Collab.",   progress: 71, questions: 7 }
+  { name: "Sales Communication",               cat: "Sales & Service",               avg: 74, cover: 22, dist: [1, 4, 8, 9],  pals: 46, cbl: 28, byGroup: { "Sales Enablement": 84, "Customer Service": 68, "Marketing Team": 66, "Operations": 58 } },
+  { name: "Service Excellence",                 cat: "Sales & Service",               avg: 79, cover: 24, dist: [0, 3, 8, 13], pals: 49, cbl: 30, byGroup: { "Sales Enablement": 72, "Customer Service": 88, "Marketing Team": 70, "Operations": 62 } },
+  { name: "Negotiation",                        cat: "Sales & Service",               avg: 58, cover: 14, dist: [3, 5, 4, 2],  pals: 38, cbl: 20, byGroup: { "Sales Enablement": 68, "Customer Service": 54, "Marketing Team": 56, "Operations": 44 } },
+  { name: "Customer Relationship Management",   cat: "Communication & Collaboration", avg: 81, cover: 26, dist: [0, 3, 8, 15], pals: 50, cbl: 31, byGroup: { "Sales Enablement": 78, "Customer Service": 90, "Marketing Team": 74, "Operations": 66 } },
+  { name: "Business Presentation",              cat: "Communication & Collaboration", avg: 66, cover: 18, dist: [2, 5, 6, 5],  pals: 42, cbl: 24, byGroup: { "Sales Enablement": 62, "Customer Service": 60, "Marketing Team": 78, "Operations": 54 } },
+  { name: "Digital Collaboration",              cat: "Communication & Collaboration", avg: 71, cover: 20, dist: [1, 4, 7, 8],  pals: 44, cbl: 27, byGroup: { "Sales Enablement": 66, "Customer Service": 68, "Marketing Team": 74, "Operations": 72 } },
+  { name: "Problem Solving",                    cat: "Analytical & Digital",          avg: 55, cover: 15, dist: [3, 5, 4, 3],  pals: 37, cbl: 18, byGroup: { "Sales Enablement": 52, "Customer Service": 50, "Marketing Team": 58, "Operations": 60 } },
+  { name: "Data Interpretation",                cat: "Analytical & Digital",          avg: 63, cover: 16, dist: [2, 5, 6, 3],  pals: 41, cbl: 22, byGroup: { "Sales Enablement": 56, "Customer Service": 54, "Marketing Team": 70, "Operations": 66 } },
+  { name: "Digital Tools Fluency",              cat: "Analytical & Digital",          avg: 44, cover: 9,  dist: [4, 3, 1, 1],  pals: 30, cbl: 14, byGroup: { "Sales Enablement": 40, "Customer Service": 38, "Marketing Team": 52, "Operations": 46 } }
 ];
+
+const SKILL_BANDS = [
+  { key: "Novice",     cls: "band-novice" },
+  { key: "Developing", cls: "band-developing" },
+  { key: "Competent",  cls: "band-competent" },
+  { key: "Proficient", cls: "band-proficient" }
+];
+
+const SKILL_GROUP_NAMES = groups.map(g => g.name);
+const SKILL_LOW_COVERAGE = 10;
+const SKILL_TIER_LABEL = { risk: "Needs attention", mid: "Watch", good: "On track" };
+
+// Shortened labels for the radar axes only (the narrow right rail can't fit the
+// full category names without text spilling past the panel edge).
+const SKILL_CATEGORY_SHORT = {
+  "Sales & Service": "Sales & Service",
+  "Communication & Collaboration": "Communication & Collab.",
+  "Analytical & Digital": "Analytical & Digital"
+};
 
 const cblEntities = {
   group: [
@@ -249,7 +271,13 @@ const state = {
   selectedCblCase: null,
   selectedCblGroup: null,
   palsExpandTabs: {},
-  testReportTarget: null
+  testReportTarget: null,
+  skillSort: "gap",
+  skillGapOnly: false,
+  skillView: "org",
+  skillCategory: "all",
+  skillModalLearner: null,
+  skillModalContext: null
 };
 
 const appView   = document.querySelector("#appView");
@@ -271,6 +299,53 @@ function completionColor(value) {
   if (value < 50) return "#E73636";
   if (value <= 75) return "#F5B83D";
   return "#0CAD60";
+}
+
+// ─── Skills analytics helpers ─────────────────────────────────────────────────
+
+// Continuous red -> amber -> green gradient, interpolated between the same
+// three anchor colors used by completionColor() so the heatmap reads consistently.
+function skillHeatColor(v) {
+  let r, g, b;
+  if (v < 50) { const t = v / 50; r = 231 + (245 - 231) * t; g = 54 + (184 - 54) * t; b = 54 + (61 - 54) * t; }
+  else { const t = (v - 50) / 50; r = 245 + (12 - 245) * t; g = 184 + (173 - 184) * t; b = 61 + (96 - 61) * t; }
+  return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+}
+
+function skillHeatTextColor(v) { return (v >= 40 && v < 68) ? "#5a4008" : "#ffffff"; }
+
+function skillTierOf(v) { return v < 50 ? "risk" : (v < 65 ? "mid" : (v >= 75 ? "good" : "")); }
+
+function skillCategoryAverages(filterFn) {
+  const cats = [...new Set(skillTags.map(s => s.cat))];
+  return cats.map(cat => {
+    const items = skillTags.filter(s => s.cat === cat);
+    const vals = items.map(s => (filterFn ? filterFn(s) : s.avg));
+    const avg = vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+    return { name: cat, label: SKILL_CATEGORY_SHORT[cat] || cat, progress: avg };
+  });
+}
+
+function skillGroupAverages() {
+  return groups.map(g => {
+    const vals = skillTags.map(s => s.byGroup[g.name]);
+    const avg = vals.length ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : 0;
+    return { name: g.name, label: g.name, progress: avg };
+  });
+}
+
+// Deterministic per-learner, per-skill mastery: splits the score into PALS
+// (questions answered correctly) and CBL (challenges completed) contribution.
+function learnerSkillMastery(learner, skill) {
+  const seed = learner.id.split("").reduce((s, c) => s + c.charCodeAt(0), 0) + skill.name.length * 7;
+  const delta = ((seed * 13) % 30) - 15;
+  const avg = Math.max(6, Math.min(100, skill.avg + delta));
+  const orgShare = skill.pals / (skill.pals + skill.cbl);
+  const shareDelta = (((seed * 7) % 30) - 15) / 100;
+  const palsShare = Math.max(0.15, Math.min(0.9, orgShare + shareDelta));
+  const pals = Math.round(avg * palsShare);
+  const cbl = Math.max(0, avg - pals);
+  return { avg, pals, cbl };
 }
 
 // ─── Review test helpers ──────────────────────────────────────────────────────
@@ -920,27 +995,213 @@ function renderPalsTab() {
 // ─── Render: Skills tab ───────────────────────────────────────────────────────
 
 function renderSkillAnalytics() {
+  const categories = [...new Set(skillTags.map(s => s.cat))];
+
+  let items = skillTags.slice();
+  if (state.skillCategory !== "all") items = items.filter(s => s.cat === state.skillCategory);
+  if (state.skillGapOnly) items = items.filter(s => s.avg < 60);
+  items.sort((a, b) => {
+    if (state.skillSort === "asc" || state.skillSort === "gap") return a.avg - b.avg;
+    if (state.skillSort === "cover") return b.cover - a.cover;
+    return b.avg - a.avg;
+  });
+
+  const heatRows = skillTags
+    .filter(s => state.skillCategory === "all" || s.cat === state.skillCategory)
+    .slice()
+    .sort((a, b) => b.avg - a.avg);
+
+  const orgAvg = Math.round(skillTags.reduce((s, i) => s + i.avg, 0) / skillTags.length);
+  const attentionCount = skillTags.filter(s => s.avg < 50).length;
+  const maxCover = skillTags.reduce((m, s) => Math.max(m, s.cover), 0);
+  const catCount = categories.length;
+  const railData = state.skillView === "group" ? skillGroupAverages() : skillCategoryAverages();
+  const railTitle = state.skillView === "group" ? "Group profile" : "Category profile";
+  const railSub = state.skillView === "group" ? "Average skill mastery by group." : "Organisation average by skill category.";
+
   return `
+    <section class="metrics" aria-label="Skills summary">
+      <article class="metric-card">
+        <div class="metric-icon">${svgIcon("sparkle")}</div>
+        <div><strong>${skillTags.length}</strong><span>Skills Tracked</span><small>Across ${catCount} categories</small></div>
+      </article>
+      <article class="metric-card">
+        <div class="metric-icon">${svgIcon("warning")}</div>
+        <div><strong>${attentionCount}</strong><span>Needing Attention</span><small>Org. average below 50%</small></div>
+      </article>
+      <article class="metric-card">
+        <div class="metric-icon">${svgIcon("chart")}</div>
+        <div><strong>${orgAvg}%</strong><span>Org. Avg. Mastery</span><small>Mean across tracked skills</small></div>
+      </article>
+      <article class="metric-card">
+        <div class="metric-icon">${svgIcon("users")}</div>
+        <div><strong>${maxCover}</strong><span>Learners Covered</span><small>Most-covered skill's learner count</small></div>
+      </article>
+    </section>
+
     <section class="panel skills-analytics">
       <div class="skills-analytics-head">
         <div>
-          <h2>Skills Analytics</h2>
-          <p>Skill tags are derived from practice and review test questions answered in PALS courses.</p>
+          <h2>Skills across the organisation</h2>
+          <p>Skill mastery is derived from PALS review-test questions and CBL challenge performance, grouped into four competency bands.</p>
         </div>
-        <div class="skill-summary"><strong>${skillTags.length}</strong><span>skills answered</span></div>
+        <div class="skill-summary"><strong>${skillTags.length}</strong><span>skills tracked</span></div>
       </div>
-      <div class="skills-chart-layout">
-        <div class="radar-wrap skill-radar-wrap">${renderRadarFor(skillTags)}</div>
-        <div class="skill-tag-list">
-          ${skillTags.map(skill => `
-            <div class="skill-tag-row">
-              <div><strong>${skill.name}</strong><span>${skill.questions} tagged questions</span></div>
-              ${progress(skill.progress)}
-            </div>
-          `).join("")}
+
+      <div class="skills-toolbar">
+        <div class="field">
+          <span>View</span>
+          <div class="tabs compact-tabs">
+            <button class="tab${state.skillView === "org" ? " active" : ""}" type="button" data-skill-view="org">${svgIcon("grid")}Organisation</button>
+            <button class="tab${state.skillView === "group" ? " active" : ""}" type="button" data-skill-view="group">${svgIcon("users")}By group</button>
+            <button class="tab${state.skillView === "learner" ? " active" : ""}" type="button" data-skill-view="learner">${svgIcon("user")}Learner</button>
+          </div>
+        </div>
+        <label class="field">
+          <span>Category</span>
+          <select data-skill-category>
+            <option value="all" ${state.skillCategory === "all" ? "selected" : ""}>All categories</option>
+            ${categories.map(c => `<option value="${c}" ${state.skillCategory === c ? "selected" : ""}>${c}</option>`).join("")}
+          </select>
+        </label>
+        <label class="field">
+          <span>Sort by</span>
+          <select data-skill-sort>
+            <option value="gap" ${state.skillSort === "gap" ? "selected" : ""}>Needs attention first</option>
+            <option value="desc" ${state.skillSort === "desc" ? "selected" : ""}>Mastery — high to low</option>
+            <option value="asc" ${state.skillSort === "asc" ? "selected" : ""}>Mastery — low to high</option>
+            <option value="cover" ${state.skillSort === "cover" ? "selected" : ""}>Coverage — most learners</option>
+          </select>
+        </label>
+        <label class="skills-toggle${state.skillGapOnly ? " on" : ""}" data-skill-gap-toggle tabindex="0" role="switch" aria-checked="${state.skillGapOnly}">
+          <span class="skills-switch"></span> Only gaps below 60%
+        </label>
+        <div class="grow"></div>
+      </div>
+
+      <div class="skills-split-layout">
+        <div>
+          <div class="skill-list-note">Showing ${items.length} of ${skillTags.length} skills${state.skillCategory !== "all" ? " in " + state.skillCategory : ""}${state.skillGapOnly ? " · gaps only" : ""}</div>
+          <div class="skill-rank-list">
+            ${items.length ? items.map((s, i) => {
+              const total = s.dist.reduce((a, b) => a + b, 0) || 1;
+              const segs = s.dist.map((c, bi) => `<span class="${SKILL_BANDS[bi].cls}" style="width:${(c / total * 100).toFixed(1)}%"></span>`).join("");
+              const tier = skillTierOf(s.avg);
+              const low = s.cover < SKILL_LOW_COVERAGE;
+              const badge = tier ? `<span class="entity-status-badge status-${tier}">${SKILL_TIER_LABEL[tier]}</span>` : "";
+              const bandDetail = s.dist.map((c, bi) => `
+                <div class="skill-detail-band"><span class="dot ${SKILL_BANDS[bi].cls}"></span><b>${c}</b><span>${SKILL_BANDS[bi].key}</span></div>
+              `).join("");
+              return `
+                <article class="skill-rank-row" data-skill-row="${s.name}">
+                  <div class="skill-rank-top">
+                    <span class="skill-rank-num">${i + 1}</span>
+                    <span class="skill-rank-name">${s.name} ${badge}<small>${s.cat}</small></span>
+                    <span class="skill-rank-cover">${s.cover} learners${low ? " ⚠" : ""}</span>
+                    <span class="skill-rank-val">${s.avg}%</span>
+                  </div>
+                  <div class="skill-band-bar">${segs}</div>
+                  <div class="skill-rank-detail">
+                    <div class="skill-detail-comp">
+                      <div class="ring" style="--value:${s.avg};--ring-color:${completionColor(s.avg)}"><b>${s.avg}%</b></div>
+                      <div class="skill-comp-bars">
+                        <div class="skill-comp-line"><span class="dot" style="background:var(--blue)"></span>PALS (questions answered correctly)<b>${s.pals} pts</b></div>
+                        <div class="skill-comp-line"><span class="dot" style="background:var(--purple)"></span>CBL (challenges completed)<b>${s.cbl} pts</b></div>
+                      </div>
+                    </div>
+                    <div class="skill-detail-bands">${bandDetail}</div>
+                  </div>
+                </article>
+              `;
+            }).join("") : `<div class="empty-list">No skills sit below 60% right now. Toggle the filter off to see all skills.</div>`}
+          </div>
+          <div class="skill-band-legend">
+            <span><span class="dot band-novice"></span>Novice</span>
+            <span><span class="dot band-developing"></span>Developing</span>
+            <span><span class="dot band-competent"></span>Competent</span>
+            <span><span class="dot band-proficient"></span>Proficient</span>
+          </div>
+        </div>
+
+        <div>
+          <h2 style="font-size:15px;margin:0 0 4px">${railTitle}</h2>
+          <p style="margin:0 0 4px;color:var(--muted);font-size:12px">${railSub}</p>
+          <div class="radar-wrap pals-spider-wrap">${renderRadarFor(railData)}</div>
+          <div class="pals-spider-legend">
+            ${railData.map(c => `
+              <div class="pals-spider-row"><div><strong>${c.name}</strong></div>${progress(c.progress)}</div>
+            `).join("")}
+          </div>
         </div>
       </div>
     </section>
+
+    <section class="panel skill-heatmap-panel">
+      <div class="skill-heatmap-head">
+        <h2>Where the gaps sit — skill × group</h2>
+        <p>Average mastery per group${state.skillCategory !== "all" ? " for " + state.skillCategory : ""}. Cells covering fewer than ${SKILL_LOW_COVERAGE} learners are dimmed — read with caution. Click a cell to drill into that group's learners.</p>
+      </div>
+      <div class="skill-heatmap-scroll">
+        <table class="skill-heatmap">
+          <thead><tr><th class="corner">Skill</th>${SKILL_GROUP_NAMES.map(g => `<th>${g}</th>`).join("")}</tr></thead>
+          <tbody>
+            ${heatRows.map(s => `
+              <tr>
+                <td class="skill-heatmap-rowlbl">${s.name}</td>
+                ${SKILL_GROUP_NAMES.map(g => {
+                  const v = s.byGroup[g];
+                  const dim = s.cover < SKILL_LOW_COVERAGE ? " dim" : "";
+                  return `<td><div class="skill-heatmap-cell${dim}" style="background:${skillHeatColor(v)};color:${skillHeatTextColor(v)}" data-skill-heat-cell data-skill="${s.name}" data-group="${g}" title="${s.name} · ${g}: ${v}%">${v}</div></td>`;
+                }).join("")}
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    ${renderSkillModal()}
+  `;
+}
+
+function renderSkillModal() {
+  if (!state.skillModalLearner) return "";
+  const learner = learners.find(l => l.id === state.skillModalLearner) || learners[0];
+  const ctx = state.skillModalContext;
+  const catAvgs = skillCategoryAverages(s => learnerSkillMastery(learner, s).avg);
+  const rows = skillTags.map(s => ({ name: s.name, ...learnerSkillMastery(learner, s) })).sort((a, b) => b.avg - a.avg);
+
+  return `
+    <dialog class="skill-modal" id="skillModal">
+      <form method="dialog">
+        <div class="skill-modal-head">
+          <div>
+            <h2>${learner.name}</h2>
+            <p>${ctx ? `Opened from <b>${ctx.skill} · ${ctx.group}</b>. ` : ""}Skill mastery broken down by category and by PALS / CBL contribution.</p>
+          </div>
+          <button class="skill-modal-close" value="close" aria-label="Close">✕</button>
+        </div>
+        <label class="field skill-modal-picker">
+          <span>Learner</span>
+          <select data-skill-modal-learner>
+            ${learners.map(l => `<option value="${l.id}" ${l.id === learner.id ? "selected" : ""}>${l.name}</option>`).join("")}
+          </select>
+        </label>
+        <div class="radar-wrap pals-spider-wrap">${renderRadarFor(catAvgs)}</div>
+        <div class="pals-spider-legend">
+          ${catAvgs.map(c => `<div class="pals-spider-row"><div><strong>${c.name}</strong></div>${progress(c.progress)}</div>`).join("")}
+        </div>
+        <div class="skill-modal-comp-list">
+          ${rows.map(r => `
+            <div class="skill-modal-comp-row">
+              <span class="nm">${r.name}</span>
+              <span class="bar" title="PALS ${r.pals} pts · CBL ${r.cbl} pts"><span class="p" style="width:${r.pals}%"></span><span class="c" style="width:${r.cbl}%"></span></span>
+              <span class="tot">${r.avg}%</span>
+            </div>
+          `).join("")}
+        </div>
+      </form>
+    </dialog>
   `;
 }
 
@@ -1202,6 +1463,39 @@ document.addEventListener("click", e => {
     renderProposalInPlace(); return;
   }
 
+  const skillRow = e.target.closest("[data-skill-row]");
+  if (skillRow) { skillRow.classList.toggle("open"); return; }
+
+  const skillGapToggle = e.target.closest("[data-skill-gap-toggle]");
+  if (skillGapToggle) {
+    state.skillGapOnly = !state.skillGapOnly;
+    render();
+    return;
+  }
+
+  const skillViewBtn = e.target.closest("[data-skill-view]");
+  if (skillViewBtn) {
+    state.skillView = skillViewBtn.dataset.skillView;
+    if (state.skillView === "learner") {
+      state.skillModalLearner = state.skillModalLearner || learners[0].id;
+      state.skillModalContext = null;
+      render();
+      document.querySelector("#skillModal")?.showModal();
+    } else {
+      render();
+    }
+    return;
+  }
+
+  const skillHeatCell = e.target.closest("[data-skill-heat-cell]");
+  if (skillHeatCell) {
+    state.skillModalLearner = learners[0].id;
+    state.skillModalContext = { group: skillHeatCell.dataset.group, skill: skillHeatCell.dataset.skill };
+    render();
+    document.querySelector("#skillModal")?.showModal();
+    return;
+  }
+
   const action = e.target.closest("[data-action]");
   if (action) {
     if (action.dataset.action === "close-test-report") {
@@ -1216,11 +1510,33 @@ document.addEventListener("click", e => {
 
 document.addEventListener("change", e => {
   const filter = e.target.closest("[data-filter]");
-  if (!filter) return;
-  state[filter.dataset.filter] = filter.value;
-  state.proposalLevel = "overview";
-  state.selectedEntity = null;
-  renderProposalInPlace();
+  if (filter) {
+    state[filter.dataset.filter] = filter.value;
+    state.proposalLevel = "overview";
+    state.selectedEntity = null;
+    renderProposalInPlace();
+    return;
+  }
+
+  const skillSort = e.target.closest("[data-skill-sort]");
+  if (skillSort) { state.skillSort = skillSort.value; render(); return; }
+
+  const skillCategorySel = e.target.closest("[data-skill-category]");
+  if (skillCategorySel) { state.skillCategory = skillCategorySel.value; render(); return; }
+
+  const skillModalLearnerSel = e.target.closest("[data-skill-modal-learner]");
+  if (skillModalLearnerSel) {
+    state.skillModalLearner = skillModalLearnerSel.value;
+    render();
+    document.querySelector("#skillModal")?.showModal();
+    return;
+  }
+});
+
+document.addEventListener("keydown", e => {
+  if (e.key !== " " && e.key !== "Enter") return;
+  const toggle = e.target.closest("[data-skill-gap-toggle]");
+  if (toggle) { e.preventDefault(); toggle.click(); }
 });
 
 hydrateIcons();

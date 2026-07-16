@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atlas Admin Analytics v2 — Skills</title>
+    <link rel="stylesheet" href="styles.css?v=20260608-admin-fonts" />
+    <link rel="stylesheet" href="styles-v2.css" />
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="atlas-logo.png" alt="ATLAS by HeyHi" />
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <div class="nav-label">Navigation</div>
+        <a class="nav-item" href="#"><i data-icon="grid"></i><span>Dashboard</span></a>
+        <a class="nav-item" href="#"><i data-icon="users"></i><span>Users</span></a>
+        <a class="nav-item" href="#"><i data-icon="bars"></i><span>Courses</span></a>
+        <a class="nav-item" href="#"><i data-icon="share"></i><span>Content Sharing</span></a>
+        <a class="nav-item" href="#"><i data-icon="briefcase"></i><span>Job Roles</span></a>
+        <a class="nav-item" href="#"><i data-icon="trophy"></i><span>CBL</span></a>
+        <a class="nav-item" href="#"><i data-icon="sliders"></i><span>PALS Course</span></a>
+        <a class="nav-item" href="#"><i data-icon="users"></i><span>Groups</span></a>
+        <a class="nav-item" href="#"><i data-icon="calendar"></i><span>Classes</span></a>
+        <a class="nav-item" href="#"><i data-icon="clipboard"></i><span>Assessments</span></a>
+        <a class="nav-item" href="#"><i data-icon="book"></i><span>Question Bank</span></a>
+        <a class="nav-item" href="#"><i data-icon="database"></i><span>Knowledge Base</span></a>
+        <div class="nav-group active">
+          <a class="nav-item nav-parent" href="#">
+            <i data-icon="chart"></i><span>Analytics</span><i data-icon="chevron"></i>
+          </a>
+          <a class="nav-item nav-sub selected" href="#"><i data-icon="chart"></i><span>Learning Analytics</span></a>
+          <a class="nav-item nav-sub" href="#"><i data-icon="database"></i><span>Data Overview</span></a>
+          <a class="nav-item nav-sub" href="#"><i data-icon="sparkle"></i><span>People Insights</span></a>
+        </div>
+        <a class="nav-item" href="#"><i data-icon="settings"></i><span>Settings</span></a>
+      </nav>
+
+      <div class="profile">
+        <div class="avatar">Z</div>
+        <div class="profile-text">
+          <strong>Zhi Chuen</strong>
+          <span>Org Admin</span>
+        </div>
+        <i data-icon="settings"></i>
+      </div>
+    </aside>
+
+    <main class="app">
+      <header class="topbar">
+        <button class="icon-button" aria-label="Toggle sidebar"><i data-icon="panel"></i></button>
+        <button class="help"><i data-icon="help"></i><span>Help</span></button>
+      </header>
+
+      <section class="content">
+        <div class="page-title">
+          <div>
+            <h1 id="pageTitle">Learning Analytics</h1>
+            <p id="pageSubtitle">Track your organization's learning performance</p>
+          </div>
+        </div>
+
+        <section class="metrics" aria-label="Admin learning summary">
+          <article class="metric-card">
+            <div class="metric-icon"><i data-icon="users"></i></div>
+            <div>
+              <strong>0%</strong>
+              <span>Engagement Rate</span>
+              <small>0 of 24 users active</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon"><i data-icon="clock"></i></div>
+            <div>
+              <strong>30m</strong>
+              <span>Time Spent</span>
+              <small>Total learning time</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon"><i data-icon="check-circle"></i></div>
+            <div>
+              <strong>1%</strong>
+              <span>Avg. KP Mastery</span>
+              <small>Across 13 enrolment(s)</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon"><i data-icon="medal"></i></div>
+            <div>
+              <strong>20%</strong>
+              <span>Avg. Assessment Score</span>
+              <small>Across all assessments</small>
+            </div>
+          </article>
+        </section>
+
+        <section class="workspace plain">
+          <div class="toolbar">
+            <div class="tabs" role="tablist" aria-label="Analytics views">
+              <button class="tab" data-main-tab="courses"><i data-icon="book-open"></i>Courses</button>
+              <button class="tab" data-main-tab="pals"><i data-icon="cap"></i>PALS Courses</button>
+              <button class="tab active" data-main-tab="skills"><i data-icon="sparkle"></i>Skills</button>
+              <button class="tab" data-main-tab="cbl"><i data-icon="trophy"></i>CBL</button>
+              <button class="tab" data-main-tab="assessments"><i data-icon="clipboard"></i>Assessments</button>
+              <button class="tab" data-main-tab="trends"><i data-icon="trend"></i>Trends</button>
+            </div>
+          </div>
+
+          <div id="breadcrumb" class="breadcrumb"></div>
+          <div id="appView"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app-v2.js"></script>
+    <script>
+      // This entry point opens straight into the Skills Analytics tab.
+      // app-v2.js defaults state.mainTab to "pals" and renders once on load;
+      // we just override that default and re-render before paint.
+      state.mainTab = "skills";
+      render();
+    </script>
+  </body>
+</html>
