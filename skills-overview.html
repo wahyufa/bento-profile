@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skills Analytics — Organisation Overview</title>
+<style>
+  :root{
+    --bg:#f4f6f8;
+    --card:#ffffff;
+    --border:#e6e9ee;
+    --border-strong:#d7dce3;
+    --navy:#1b2a4a;
+    --ink:#2b3648;
+    --body:#5a6472;
+    --muted:#8a94a3;
+    --faint:#aab2bf;
+    --accent:#0e7490;
+    --accent-soft:#e3f0f3;
+    /* five-band competency ramp (low -> high) */
+    --b1:#e2626b; /* Novice */
+    --b2:#f0a04b; /* Developing */
+    --b3:#f4c95d; /* Competent */
+    --b4:#8fce6a; /* Proficient */
+    --b5:#3fae5a; /* Advanced */
+    --shadow:0 1px 2px rgba(27,42,74,.04),0 2px 8px rgba(27,42,74,.04);
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1360px;margin:0 auto;padding:28px 32px 80px}
+  h1{font-size:26px;font-weight:750;color:var(--navy);margin:0 0 4px;letter-spacing:-.01em}
+  .sub{color:var(--muted);font-size:14px;margin:0 0 22px}
+
+  /* KPI cards */
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  .kpi{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:18px 20px;display:flex;gap:14px;align-items:flex-start;box-shadow:var(--shadow)}
+  .kpi .ic{width:38px;height:38px;border-radius:10px;background:#f1f4f7;display:flex;align-items:center;justify-content:center;flex:0 0 38px;color:var(--body)}
+  .kpi .big{font-size:26px;font-weight:750;color:var(--navy);line-height:1.1}
+  .kpi .lbl{font-weight:650;color:var(--ink);font-size:13.5px;margin-top:3px}
+  .kpi .meta{color:var(--muted);font-size:12px}
+
+  /* tabs */
+  .tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+  .tab{display:inline-flex;align-items:center;gap:7px;padding:8px 14px;border-radius:9px;background:transparent;border:1px solid transparent;color:var(--body);font-weight:600;font-size:13.5px;cursor:pointer}
+  .tab:hover{background:#eef1f5}
+  .tab.active{background:var(--navy);color:#fff}
+  .tab svg{opacity:.85}
+
+  /* view switch + controls */
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}
+  .toolbar{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:flex-end;padding:18px 22px;border-bottom:1px solid var(--border)}
+  .seg{display:inline-flex;background:#eef1f5;border-radius:10px;padding:3px}
+  .seg button{border:0;background:transparent;padding:7px 14px;border-radius:8px;font-weight:650;font-size:13px;color:var(--body);cursor:pointer}
+  .seg button.active{background:#fff;color:var(--navy);box-shadow:0 1px 2px rgba(27,42,74,.12)}
+  .field{display:flex;flex-direction:column;gap:5px}
+  .field label{font-size:11.5px;font-weight:650;letter-spacing:.03em;text-transform:uppercase;color:var(--muted)}
+  select,.pill-select{appearance:none;background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238a94a3' stroke-width='2.5'><path d='M6 9l6 6 6-6'/></svg>") no-repeat right 11px center;border:1px solid var(--border-strong);border-radius:9px;padding:8px 34px 8px 12px;font-size:13.5px;color:var(--ink);font-weight:600;cursor:pointer;min-width:190px}
+  select:focus,button:focus-visible,.toggle:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .toggle{display:inline-flex;align-items:center;gap:9px;cursor:pointer;user-select:none;font-weight:600;font-size:13.5px;color:var(--ink)}
+  .switch{width:38px;height:22px;border-radius:22px;background:#cdd4dd;position:relative;transition:background .15s;flex:0 0 38px}
+  .switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+  .toggle.on .switch{background:var(--accent)}
+  .toggle.on .switch::after{transform:translateX(16px)}
+  .grow{flex:1}
+
+  /* body split */
+  .body-grid{display:grid;grid-template-columns:1fr 340px;gap:0}
+  .col-main{padding:22px 24px}
+  .col-rail{padding:22px 24px;border-left:1px solid var(--border);background:#fbfcfd;border-radius:0 0 16px 0}
+  .col-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+  .col-head h2{font-size:16px;color:var(--navy);margin:0;font-weight:700}
+  .col-head .note{font-size:12px;color:var(--muted)}
+
+  /* ranked skill rows */
+  .rowlist{margin-top:14px;display:flex;flex-direction:column}
+  .srow{border-top:1px solid var(--border);padding:13px 4px 13px;cursor:pointer;transition:background .12s}
+  .srow:first-child{border-top:0}
+  .srow:hover{background:#f7f9fb}
+  .srow-top{display:flex;align-items:center;gap:12px}
+  .rank{width:22px;text-align:right;color:var(--faint);font-weight:700;font-size:13px;flex:0 0 22px}
+  .sname{font-weight:650;color:var(--ink);font-size:14px;flex:1;min-width:0}
+  .sname .cat{display:block;font-size:11.5px;color:var(--muted);font-weight:600}
+  .sval{font-weight:750;color:var(--navy);font-size:15px;width:52px;text-align:right}
+  .cover{width:104px;text-align:right;font-size:11.5px;color:var(--muted);font-weight:600}
+  .cover.low{color:#c9791f}
+  .cover .flag{display:inline-block;margin-left:4px}
+  /* stacked band bar */
+  .bar{height:12px;border-radius:6px;overflow:hidden;display:flex;background:#eef1f5;margin:9px 0 0 34px}
+  .bar span{height:100%;display:block}
+  .seg1{background:var(--b1)} .seg2{background:var(--b2)} .seg3{background:var(--b3)} .seg4{background:var(--b4)} .seg5{background:var(--b5)}
+  /* expand */
+  .detail{margin:12px 0 4px 34px;padding:14px 16px;background:#f7f9fb;border:1px solid var(--border);border-radius:12px;display:none}
+  .srow.open .detail{display:block}
+  .srow.open{background:#f7f9fb}
+  .comp{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+  .comp .track{flex:1;height:22px;border-radius:6px;background:#e9edf2;display:flex;overflow:hidden;font-size:11px;font-weight:700;color:#fff}
+  .comp .pals{background:var(--accent);display:flex;align-items:center;padding-left:9px;white-space:nowrap}
+  .comp .cbl{background:#7c5cbf;display:flex;align-items:center;padding-left:9px;white-space:nowrap}
+  .comp .cap{background:repeating-linear-gradient(45deg,#dfe4ea,#dfe4ea 5px,#e9edf2 5px,#e9edf2 10px)}
+  .banddist{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:4px}
+  .bd{display:flex;flex-direction:column;gap:5px;align-items:center;text-align:center}
+  .bd .dot{width:10px;height:10px;border-radius:3px}
+  .bd .bn{font-weight:750;color:var(--navy);font-size:16px}
+  .bd .bl{font-size:10.5px;color:var(--muted);font-weight:600;line-height:1.25}
+  .kv{font-size:12px;color:var(--body);margin-top:10px}
+  .kv b{color:var(--ink)}
+
+  /* legend */
+  .legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px;padding-top:14px;border-top:1px dashed var(--border-strong)}
+  .lg{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--body);font-weight:600}
+  .lg .dot{width:11px;height:11px;border-radius:3px}
+
+  /* radar */
+  .radar-wrap{display:flex;flex-direction:column;align-items:center;margin-top:8px}
+  .radar svg{max-width:100%;height:auto}
+  .profile-list{width:100%;margin-top:8px}
+  .pl{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--border)}
+  .pl:first-child{border-top:0}
+  .pl .nm{flex:1;font-size:12.5px;font-weight:650;color:var(--ink)}
+  .pl .mini{width:74px;height:7px;border-radius:5px;background:#eef1f5;overflow:hidden}
+  .pl .mini i{display:block;height:100%;border-radius:5px}
+  .pl .pv{width:38px;text-align:right;font-size:12.5px;font-weight:750;color:var(--navy)}
+
+  /* heatmap */
+  .hm-panel{margin-top:22px}
+  .hm-head{display:flex;align-items:baseline;justify-content:space-between;padding:20px 24px 4px}
+  .hm-head h2{font-size:16px;color:var(--navy);margin:0;font-weight:700}
+  .hm-head p{margin:4px 0 0;font-size:12.5px;color:var(--muted);max-width:640px}
+  .hm-scroll{overflow-x:auto;padding:16px 24px 24px}
+  table.hm{border-collapse:separate;border-spacing:0;width:100%;min-width:640px}
+  table.hm th,table.hm td{padding:0}
+  table.hm thead th{font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.03em;text-align:center;padding:0 6px 10px;vertical-align:bottom}
+  table.hm thead th.corner{text-align:left}
+  .hm .rowlbl{font-size:12.5px;font-weight:650;color:var(--ink);white-space:nowrap;padding:4px 14px 4px 2px;text-align:left}
+  .cell{height:40px;border-radius:8px;margin:3px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12.5px;cursor:pointer;transition:transform .1s,box-shadow .1s;position:relative}
+  .cell:hover{transform:scale(1.04);box-shadow:0 2px 8px rgba(27,42,74,.18);z-index:2}
+  .cell.dim{opacity:.32}
+  .cell .n{position:absolute;top:2px;right:5px;font-size:9px;opacity:.7;font-weight:700}
+
+  /* learner drill modal */
+  .backdrop{position:fixed;inset:0;background:rgba(27,42,74,.42);backdrop-filter:blur(2px);display:none;align-items:center;justify-content:center;padding:24px;z-index:50}
+  .backdrop.show{display:flex}
+  .modal{background:#fff;border-radius:18px;max-width:560px;width:100%;box-shadow:0 24px 60px rgba(27,42,74,.28);overflow:hidden;animation:pop .18s ease}
+  @keyframes pop{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:none;opacity:1}}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border)}
+  .modal-head h3{margin:0;font-size:16px;color:var(--navy)}
+  .modal-head .x{border:0;background:#f1f4f7;width:32px;height:32px;border-radius:9px;cursor:pointer;color:var(--body);font-size:16px}
+  .modal-body{padding:20px 22px 24px}
+  .learner-pick{margin-bottom:16px}
+  .drill-note{font-size:12px;color:var(--muted);margin:14px 0 0;padding-top:14px;border-top:1px dashed var(--border-strong)}
+
+  .hint{font-size:12px;color:var(--faint);margin-top:14px;text-align:center}
+  @media(max-width:1080px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .body-grid{grid-template-columns:1fr}
+    .col-rail{border-left:0;border-top:1px solid var(--border);border-radius:0}
+  }
+  @media(max-width:560px){
+    .wrap{padding:18px 16px 60px}
+    .kpis{grid-template-columns:1fr}
+    .cover{display:none}
+  }
+  @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Learning Analytics</h1>
+  <p class="sub">Track your organisation's learning performance</p>
+
+  <div class="kpis">
+    <div class="kpi"><div class="ic">👥</div><div><div class="big">13%</div><div class="lbl">Engagement Rate</div><div class="meta">4 of 31 users active</div></div></div>
+    <div class="kpi"><div class="ic">🕐</div><div><div class="big">16h</div><div class="lbl">Time Spent</div><div class="meta">Total learning time</div></div></div>
+    <div class="kpi"><div class="ic">✓</div><div><div class="big">74%</div><div class="lbl">Avg. KP Mastery</div><div class="meta">Across 24 enrolment(s)</div></div></div>
+    <div class="kpi"><div class="ic">🏅</div><div><div class="big">61%</div><div class="lbl">Avg. Assessment Score</div><div class="meta">Across all assessments</div></div></div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab">📖 Courses</div>
+    <div class="tab">🎓 PALS Courses</div>
+    <div class="tab active">✨ Skills</div>
+    <div class="tab">🏆 CBL</div>
+    <div class="tab">📋 Assessments</div>
+    <div class="tab">📈 Trends</div>
+  </div>
+
+  <div class="panel">
+    <div class="toolbar">
+      <div class="field">
+        <label>View</label>
+        <div class="seg" id="viewSeg">
+          <button class="active" data-view="org">Organisation</button>
+          <button data-view="group">By group</button>
+          <button data-view="learner">Learner</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Sector</label>
+        <select id="sectorSel">
+          <option value="acc">Accountancy (12)</option>
+          <option value="tech">Technology (7)</option>
+          <option value="ops">Operations &amp; Risk (6)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Sort by</label>
+        <select id="sortSel">
+          <option value="desc">Mastery — high to low</option>
+          <option value="asc">Mastery — low to high</option>
+          <option value="gap">Biggest gap (lowest first)</option>
+          <option value="cover">Coverage — most learners</option>
+        </select>
+      </div>
+      <label class="toggle" id="gapToggle" tabindex="0" role="switch" aria-checked="false">
+        <span class="switch"></span> Only gaps below 60%
+      </label>
+      <div class="grow"></div>
+    </div>
+
+    <div class="body-grid">
+      <div class="col-main">
+        <div class="col-head">
+          <h2>Skills across the organisation</h2>
+          <span class="note" id="skillCount"></span>
+        </div>
+        <p style="margin:2px 0 0;font-size:12.5px;color:var(--muted)">Each bar shows how learners are distributed across the five competency bands. Click a skill to see its PALS / CBL make-up.</p>
+        <div class="rowlist" id="rowlist"></div>
+
+        <div class="legend">
+          <span class="lg"><span class="dot seg1"></span>Novice</span>
+          <span class="lg"><span class="dot seg2"></span>Developing</span>
+          <span class="lg"><span class="dot seg3"></span>Competent</span>
+          <span class="lg"><span class="dot seg4"></span>Proficient</span>
+          <span class="lg"><span class="dot seg5"></span>Advanced</span>
+        </div>
+      </div>
+
+      <div class="col-rail">
+        <div class="col-head"><h2>Sector profile</h2></div>
+        <p style="margin:2px 0 0;font-size:12px;color:var(--muted)">Organisation average by category.</p>
+        <div class="radar-wrap"><div class="radar" id="radar"></div></div>
+        <div class="profile-list" id="profileList"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="panel hm-panel">
+    <div class="hm-head">
+      <div>
+        <h2>Where the gaps sit — skill × group</h2>
+        <p>Average mastery for each group. Cells with few learners are dimmed — read them with caution. Click any cell to drill into that group's learners.</p>
+      </div>
+    </div>
+    <div class="hm-scroll"><table class="hm" id="heatmap"></table></div>
+  </div>
+
+  <p class="hint">Prototype with sample data · HeyHi ATLAS · Skills Analytics org overview</p>
+</div>
+
+<!-- learner drill modal -->
+<div class="backdrop" id="backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="modal-head">
+      <h3 id="mTitle">Learner detail</h3>
+      <button class="x" id="closeModal" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="field learner-pick">
+        <label>Learner</label>
+        <select id="learnerSel" style="min-width:100%"></select>
+      </div>
+      <div class="radar-wrap"><div class="radar" id="radarLearner"></div></div>
+      <div class="profile-list" id="learnerProfile"></div>
+      <p class="drill-note" id="drillNote"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------- sample data ---------- */
+const BANDS = [
+  {key:'Novice',cls:'seg1',color:getComputedStyle(document.documentElement).getPropertyValue('--b1')},
+  {key:'Developing',cls:'seg2',color:getComputedStyle(document.documentElement).getPropertyValue('--b2')},
+  {key:'Competent',cls:'seg3',color:getComputedStyle(document.documentElement).getPropertyValue('--b3')},
+  {key:'Proficient',cls:'seg4',color:getComputedStyle(document.documentElement).getPropertyValue('--b4')},
+  {key:'Advanced',cls:'seg5',color:getComputedStyle(document.documentElement).getPropertyValue('--b5')}
+];
+const GROUPS = ['Finance','Audit','Risk & Compliance','Advisory','Operations'];
+
+// skills: cat = radar category, avg, cover(n learners with data), dist=[5 band counts], pals+cbl = points making up avg (out of 100), byGroup avg map
+const SECTORS = {
+  acc:{
+    label:'Accountancy',
+    categories:['Accountancy','Financial & Transaction Analysis','Risk, Compliance & Governance','Business Management'],
+    skills:[
+      {name:'Forensic Accounting',cat:'Accountancy',avg:82,cover:14,dist:[0,1,3,4,6],pals:52,cbl:30,byGroup:{'Finance':88,'Audit':90,'Risk & Compliance':78,'Advisory':71,'Operations':64}},
+      {name:'Financial Reporting',cat:'Accountancy',avg:76,cover:19,dist:[1,2,4,7,5],pals:48,cbl:28,byGroup:{'Finance':84,'Audit':81,'Risk & Compliance':70,'Advisory':68,'Operations':60}},
+      {name:'Management Accounting',cat:'Accountancy',avg:58,cover:16,dist:[2,4,5,3,2],pals:40,cbl:18,byGroup:{'Finance':72,'Audit':55,'Risk & Compliance':52,'Advisory':50,'Operations':44}},
+      {name:'Transaction Monitoring',cat:'Financial & Transaction Analysis',avg:69,cover:12,dist:[1,2,3,4,2],pals:44,cbl:25,byGroup:{'Finance':66,'Audit':74,'Risk & Compliance':80,'Advisory':58,'Operations':55}},
+      {name:'Financial Modelling',cat:'Financial & Transaction Analysis',avg:47,cover:9,dist:[2,3,2,1,1],pals:34,cbl:13,byGroup:{'Finance':60,'Audit':40,'Risk & Compliance':42,'Advisory':52,'Operations':30}},
+      {name:'AML / KYC',cat:'Risk, Compliance & Governance',avg:88,cover:22,dist:[0,1,2,7,12],pals:50,cbl:38,byGroup:{'Finance':82,'Audit':90,'Risk & Compliance':96,'Advisory':80,'Operations':78}},
+      {name:'Regulatory Compliance',cat:'Risk, Compliance & Governance',avg:71,cover:20,dist:[1,3,4,7,5],pals:45,cbl:26,byGroup:{'Finance':68,'Audit':75,'Risk & Compliance':88,'Advisory':62,'Operations':58}},
+      {name:'Audit & Assurance',cat:'Risk, Compliance & Governance',avg:64,cover:15,dist:[2,3,4,4,2],pals:42,cbl:22,byGroup:{'Finance':55,'Audit':86,'Risk & Compliance':66,'Advisory':52,'Operations':48}},
+      {name:'Internal Controls',cat:'Risk, Compliance & Governance',avg:41,cover:6,dist:[2,2,1,1,0],pals:30,cbl:11,byGroup:{'Finance':44,'Audit':52,'Risk & Compliance':46,'Advisory':32,'Operations':28}},
+      {name:'Stakeholder Management',cat:'Business Management',avg:55,cover:17,dist:[2,4,5,4,2],pals:38,cbl:17,byGroup:{'Finance':52,'Audit':50,'Risk & Compliance':54,'Advisory':70,'Operations':48}},
+      {name:'Project Management',cat:'Business Management',avg:49,cover:13,dist:[3,3,4,2,1],pals:35,cbl:14,byGroup:{'Finance':46,'Audit':44,'Risk & Compliance':48,'Advisory':62,'Operations':44}},
+      {name:'Business Communication',cat:'Business Management',avg:38,cover:5,dist:[2,2,1,0,0],pals:28,cbl:10,byGroup:{'Finance':40,'Audit':36,'Risk & Compliance':38,'Advisory':44,'Operations':30}}
+    ]
+  },
+  tech:{
+    label:'Technology',
+    categories:['Data','Security','Engineering'],
+    skills:[
+      {name:'Data Analysis',cat:'Data',avg:73,cover:11,dist:[1,1,3,4,2],pals:47,cbl:26,byGroup:{'Finance':70,'Audit':60,'Risk & Compliance':66,'Advisory':80,'Operations':72}},
+      {name:'SQL & Querying',cat:'Data',avg:61,cover:9,dist:[1,2,3,2,1],pals:41,cbl:20,byGroup:{'Finance':58,'Audit':50,'Risk & Compliance':54,'Advisory':70,'Operations':62}},
+      {name:'Cyber Awareness',cat:'Security',avg:84,cover:24,dist:[0,1,3,8,12],pals:50,cbl:34,byGroup:{'Finance':82,'Audit':85,'Risk & Compliance':90,'Advisory':80,'Operations':81}},
+      {name:'Data Privacy (PDPA)',cat:'Security',avg:67,cover:18,dist:[1,3,5,6,3],pals:44,cbl:23,byGroup:{'Finance':64,'Audit':70,'Risk & Compliance':78,'Advisory':60,'Operations':58}},
+      {name:'Cloud Fundamentals',cat:'Engineering',avg:44,cover:7,dist:[2,3,1,1,0],pals:32,cbl:12,byGroup:{'Finance':40,'Audit':36,'Risk & Compliance':42,'Advisory':52,'Operations':46}},
+      {name:'Automation & Scripting',cat:'Engineering',avg:36,cover:4,dist:[2,1,1,0,0],pals:26,cbl:10,byGroup:{'Finance':32,'Audit':30,'Risk & Compliance':34,'Advisory':44,'Operations':38}},
+      {name:'API Concepts',cat:'Engineering',avg:52,cover:8,dist:[1,2,3,1,1],pals:37,cbl:15,byGroup:{'Finance':48,'Audit':44,'Risk & Compliance':50,'Advisory':60,'Operations':54}}
+    ]
+  },
+  ops:{
+    label:'Operations & Risk',
+    categories:['Process','People','Risk'],
+    skills:[
+      {name:'Process Improvement',cat:'Process',avg:66,cover:13,dist:[1,2,4,4,2],pals:43,cbl:23,byGroup:{'Finance':62,'Audit':60,'Risk & Compliance':64,'Advisory':70,'Operations':78}},
+      {name:'Vendor Management',cat:'Process',avg:57,cover:10,dist:[1,3,3,2,1],pals:39,cbl:18,byGroup:{'Finance':54,'Audit':50,'Risk & Compliance':60,'Advisory':58,'Operations':66}},
+      {name:'Coaching & Feedback',cat:'People',avg:72,cover:15,dist:[1,2,3,6,3],pals:46,cbl:26,byGroup:{'Finance':68,'Audit':64,'Risk & Compliance':66,'Advisory':82,'Operations':74}},
+      {name:'Conflict Resolution',cat:'People',avg:48,cover:6,dist:[2,2,1,1,0],pals:34,cbl:14,byGroup:{'Finance':44,'Audit':46,'Risk & Compliance':50,'Advisory':56,'Operations':44}},
+      {name:'Operational Risk',cat:'Risk',avg:79,cover:19,dist:[0,2,3,7,7],pals:49,cbl:30,byGroup:{'Finance':74,'Audit':82,'Risk & Compliance':90,'Advisory':70,'Operations':76}},
+      {name:'Business Continuity',cat:'Risk',avg:53,cover:8,dist:[1,2,3,1,1],pals:38,cbl:15,byGroup:{'Finance':50,'Audit':56,'Risk & Compliance':64,'Advisory':46,'Operations':52}}
+    ]
+  }
+};
+
+const LEARNERS = ['Learner Chuen','Aisyah Rahman','Wei Jie Tan','Priya Kumar','Daniel Ong','Farah Iskandar','Marcus Lim','Nurul Aini'];
+
+/* ---------- state ---------- */
+let state = {view:'org', sector:'acc', sort:'desc', gapOnly:false, learner:0};
+const LOW_COVERAGE = 8; // flag threshold
+
+/* ---------- helpers ---------- */
+const $ = s=>document.querySelector(s);
+function heatColor(v){
+  // red(0) -> amber(50) -> green(100)
+  let r,g,b;
+  if(v<50){const t=v/50; r=226+(240-226)*t; g=98+(196-98)*t; b=107+(93-107)*t;}
+  else{const t=(v-50)/50; r=240+(63-240)*t; g=196+(174-196)*t; b=93+(90-93)*t;}
+  return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+}
+function textOn(v){ return (v>=42 && v<70) ? '#4a3c10' : '#fff'; }
+
+/* ---------- ranked skill rows ---------- */
+function renderRows(){
+  const sec = SECTORS[state.sector];
+  let skills = sec.skills.slice();
+  if(state.gapOnly) skills = skills.filter(s=>s.avg<60);
+  skills.sort((a,b)=>{
+    if(state.sort==='asc'||state.sort==='gap') return a.avg-b.avg;
+    if(state.sort==='cover') return b.cover-a.cover;
+    return b.avg-a.avg;
+  });
+
+  $('#skillCount').textContent = `${skills.length} skill${skills.length!==1?'s':''} · ${sec.label}`;
+
+  const list = $('#rowlist');
+  list.innerHTML='';
+  if(!skills.length){ list.innerHTML='<div style="padding:26px 4px;color:var(--muted)">No skills sit below 60% in this sector. Toggle the filter off to see all skills.</div>'; return; }
+
+  skills.forEach((s,i)=>{
+    const total = s.dist.reduce((a,b)=>a+b,0)||1;
+    const segs = s.dist.map((c,bi)=>`<span class="${BANDS[bi].cls}" style="width:${(c/total*100).toFixed(1)}%"></span>`).join('');
+    const low = s.cover < LOW_COVERAGE;
+    const capPals = 70, capCbl = 60; // per-source caps discussed
+    const bd = s.dist.map((c,bi)=>`<div class="bd"><span class="dot ${BANDS[bi].cls}"></span><span class="bn">${c}</span><span class="bl">${BANDS[bi].key}</span></div>`).join('');
+
+    const row = document.createElement('div');
+    row.className='srow';
+    row.innerHTML=`
+      <div class="srow-top">
+        <span class="rank">${i+1}</span>
+        <span class="sname">${s.name}<span class="cat">${s.cat}</span></span>
+        <span class="cover ${low?'low':''}">${s.cover} learners${low?'<span class="flag" title="Few learners — read with caution">⚠︎</span>':''}</span>
+        <span class="sval">${s.avg}%</span>
+      </div>
+      <div class="bar">${segs}</div>
+      <div class="detail">
+        <div style="font-size:11.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin-bottom:8px">Score composition</div>
+        <div class="comp">
+          <div class="track">
+            <span class="pals" style="width:${s.pals}%">${s.pals>10?'PALS '+s.pals:''}</span>
+            <span class="cbl" style="width:${s.cbl}%">${s.cbl>10?'CBL '+s.cbl:''}</span>
+            <span class="cap" style="width:${Math.max(0,100-s.pals-s.cbl)}%"></span>
+          </div>
+        </div>
+        <div class="kv"><b>${s.avg}%</b> combined = <b style="color:var(--accent)">${s.pals} pts PALS</b> (questions answered correctly) + <b style="color:#7c5cbf">${s.cbl} pts CBL</b> (completed challenges). Remaining ${100-s.pals-s.cbl} pts still open.</div>
+        <div style="font-size:11.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--muted);margin:16px 0 8px">Learners per band</div>
+        <div class="banddist">${bd}</div>
+      </div>`;
+    row.addEventListener('click',()=>row.classList.toggle('open'));
+    list.appendChild(row);
+  });
+}
+
+/* ---------- radar (category level) ---------- */
+function catAverages(sector, filterFn){
+  const sec = SECTORS[sector];
+  return sec.categories.map(cat=>{
+    const sk = sec.skills.filter(s=>s.cat===cat);
+    const vals = sk.map(s=>filterFn?filterFn(s):s.avg);
+    const avg = vals.length? Math.round(vals.reduce((a,b)=>a+b,0)/vals.length):0;
+    return {cat, avg};
+  });
+}
+function drawRadar(el, cats, color){
+  const size=250, cx=size/2, cy=size/2+6, R=88, n=cats.length;
+  const ang=i=>(-Math.PI/2)+i*2*Math.PI/n;
+  const pt=(i,r)=>[cx+Math.cos(ang(i))*r, cy+Math.sin(ang(i))*r];
+  let rings='';
+  [25,50,75,100].forEach(lv=>{
+    const p=cats.map((_,i)=>pt(i,R*lv/100).join(',')).join(' ');
+    rings+=`<polygon points="${p}" fill="none" stroke="#e3e8ee" stroke-width="1"/>`;
+  });
+  let spokes='',labels='';
+  cats.forEach((c,i)=>{
+    const [x,y]=pt(i,R);
+    spokes+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#e8ecf1" stroke-width="1"/>`;
+    const [lx,ly]=pt(i,R+18);
+    const anchor = Math.abs(lx-cx)<8?'middle':(lx>cx?'start':'end');
+    const short = c.cat.length>16? c.cat.slice(0,15)+'…':c.cat;
+    labels+=`<text x="${lx}" y="${ly}" font-size="9.5" font-weight="700" fill="#5a6472" text-anchor="${anchor}" dominant-baseline="middle">${short}</text>`;
+  });
+  const poly=cats.map((c,i)=>pt(i,R*c.avg/100).join(',')).join(' ');
+  const dots=cats.map((c,i)=>{const[x,y]=pt(i,R*c.avg/100);return `<circle cx="${x}" cy="${y}" r="3" fill="${color}"/>`}).join('');
+  el.innerHTML=`<svg viewBox="0 0 ${size} ${size+8}" width="${size}" height="${size+8}">
+    ${rings}${spokes}
+    <polygon points="${poly}" fill="${color}33" stroke="${color}" stroke-width="2"/>
+    ${dots}${labels}
+  </svg>`;
+}
+function renderRadar(){
+  const cats=catAverages(state.sector);
+  drawRadar($('#radar'),cats,'#0e7490');
+  const pl=$('#profileList'); pl.innerHTML='';
+  cats.forEach(c=>{
+    pl.insertAdjacentHTML('beforeend',
+      `<div class="pl"><span class="nm">${c.cat}</span><span class="mini"><i style="width:${c.avg}%;background:${heatColor(c.avg)}"></i></span><span class="pv">${c.avg}%</span></div>`);
+  });
+}
+
+/* ---------- heatmap ---------- */
+function renderHeatmap(){
+  const sec=SECTORS[state.sector];
+  let skills=sec.skills.slice().sort((a,b)=>b.avg-a.avg);
+  const t=$('#heatmap');
+  let head='<thead><tr><th class="corner">Skill</th>'+GROUPS.map(g=>`<th>${g}</th>`).join('')+'</tr></thead>';
+  let rows='<tbody>';
+  skills.forEach(s=>{
+    rows+=`<tr><td class="rowlbl">${s.name}</td>`;
+    GROUPS.forEach(g=>{
+      const v=s.byGroup[g];
+      const dim = s.cover<LOW_COVERAGE?'dim':'';
+      rows+=`<td><div class="cell ${dim}" style="background:${heatColor(v)};color:${textOn(v)}" data-skill="${s.name}" data-group="${g}" data-v="${v}" title="${s.name} · ${g}: ${v}%">${v}</div></td>`;
+    });
+    rows+='</tr>';
+  });
+  rows+='</tbody>';
+  t.innerHTML=head+rows;
+  t.querySelectorAll('.cell').forEach(c=>{
+    c.addEventListener('click',()=>openLearner(c.dataset.group, c.dataset.skill));
+  });
+}
+
+/* ---------- learner drill modal ---------- */
+function renderLearnerRadar(){
+  const cats=catAverages(state.sector, s=>{
+    // deterministic pseudo per-learner variation around org avg
+    const seed=(state.learner+1)*(s.name.length+7);
+    const delta=((seed*13)%30)-15;
+    return Math.max(4,Math.min(100,s.avg+delta));
+  });
+  drawRadar($('#radarLearner'),cats,'#7c5cbf');
+  const pl=$('#learnerProfile'); pl.innerHTML='';
+  cats.forEach(c=>{
+    pl.insertAdjacentHTML('beforeend',
+      `<div class="pl"><span class="nm">${c.cat}</span><span class="mini"><i style="width:${c.avg}%;background:${heatColor(c.avg)}"></i></span><span class="pv">${c.avg}%</span></div>`);
+  });
+}
+function openLearner(group, skill){
+  $('#mTitle').textContent = group ? `${group} · learner detail` : 'Learner detail';
+  const note = skill
+    ? `Opened from <b>${skill} · ${group}</b>. This is the per-learner view — the same radar your current Skills tab shows, now reachable by drilling down from the org overview.`
+    : `The per-learner view — the same radar your current Skills tab shows, reachable by drilling in from the overview.`;
+  $('#drillNote').innerHTML=note;
+  renderLearnerRadar();
+  $('#backdrop').classList.add('show');
+}
+function closeModal(){ $('#backdrop').classList.remove('show'); }
+
+/* ---------- wire up ---------- */
+function renderAll(){ renderRows(); renderRadar(); renderHeatmap(); }
+
+$('#viewSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  $('#viewSeg').querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active'); state.view=b.dataset.view;
+  if(state.view==='learner'){ openLearner(null,null); }
+});
+$('#sectorSel').addEventListener('change',e=>{state.sector=e.target.value;renderAll();});
+$('#sortSel').addEventListener('change',e=>{state.sort=e.target.value;renderRows();});
+const gt=$('#gapToggle');
+function toggleGap(){ state.gapOnly=!state.gapOnly; gt.classList.toggle('on',state.gapOnly); gt.setAttribute('aria-checked',state.gapOnly); renderRows(); }
+gt.addEventListener('click',toggleGap);
+gt.addEventListener('keydown',e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();toggleGap();}});
+
+// learner select
+const ls=$('#learnerSel');
+LEARNERS.forEach((l,i)=>ls.insertAdjacentHTML('beforeend',`<option value="${i}">${l}${i===0?' · zhichuen+learner7@heyhi.sg':''}</option>`));
+ls.addEventListener('change',e=>{state.learner=+e.target.value;renderLearnerRadar();});
+
+$('#closeModal').addEventListener('click',closeModal);
+$('#backdrop').addEventListener('click',e=>{if(e.target.id==='backdrop')closeModal();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
+
+renderAll();
+</script>
+</body>
+</html>
