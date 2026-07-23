@@ -1225,84 +1225,63 @@
 
     .preference-card {
       display: grid;
-      gap: 14px;
-      padding: 20px;
+      gap: 10px;
+      padding: 16px;
       border: 1px solid var(--line-soft);
       border-radius: 16px;
       background: #fff;
     }
 
-    .preference-card-title {
+    .preference-card h4 {
       margin: 0;
       color: var(--text);
-      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      font-size: 21px;
+      font-size: 14px;
       font-weight: 700;
     }
 
-    .split-labels {
+    .preference-card p {
+      margin: 4px 0 0;
+      color: #3d4856;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .split-labels,
+    .split-values {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       justify-content: space-between;
       gap: 10px;
-    }
-
-    .split-label-side {
-      display: grid;
-      gap: 2px;
-    }
-
-    .split-label-side:last-child {
-      text-align: right;
-    }
-
-    .split-label-side strong {
-      font-size: 16px;
-      font-weight: 700;
-    }
-
-    .split-label-side span {
-      color: var(--muted);
       font-size: 11px;
       font-weight: 700;
     }
 
-    .split-label-side:first-child strong { color: var(--left-color); }
-    .split-label-side:last-child strong { color: var(--right-color); }
+    .split-labels span:first-child,
+    .split-values span:first-child {
+      color: var(--left-color);
+    }
+
+    .split-labels span:last-child,
+    .split-values span:last-child {
+      color: var(--right-color);
+    }
 
     .split-bar {
       display: flex;
-      height: 30px;
+      height: 28px;
       overflow: hidden;
       border-radius: 999px;
       background: #e8eef4;
     }
 
-    .split-bar span {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-    }
-
     .split-bar span:first-child {
       border-radius: 999px 0 0 999px;
-      background: var(--left-color);
-      color: #fff;
+      background: linear-gradient(90deg, var(--left-start), var(--left-color));
     }
 
     .split-bar span:last-child {
       border-radius: 0 999px 999px 0;
-      background: var(--right-color);
-      color: var(--text);
-    }
-
-    .preference-bullets {
-      margin-top: 2px;
-      padding-top: 14px;
-      padding-left: 18px;
-      border-top: 1px solid var(--line-soft);
+      background: linear-gradient(90deg, var(--right-fill, var(--right-color)), var(--right-end));
     }
 
     .result-code {
@@ -2061,169 +2040,246 @@
 ];
     const preferenceQuestions = [
   {
-    "id": "PP-ENERGY-1",
-    "type": "Introvert",
-    "dimension": "Energy",
-    "text": "I feel recharged when I am given time to think on my own."
-  },
-  {
-    "id": "PP-ENERGY-2",
+    "id": "PP-E-1",
     "type": "Extravert",
     "dimension": "Energy",
-    "text": "When joining a group, I prefer to jump right in and introduce myself to everyone."
+    "text": "I communicate best when I meet people face to face."
   },
   {
-    "id": "PP-ENERGY-3",
+    "id": "PP-E-2",
     "type": "Extravert",
     "dimension": "Energy",
-    "text": "I find myself speaking more than listening."
+    "text": "I lack energy when I am left to work on my own."
   },
   {
-    "id": "PP-ENERGY-4",
+    "id": "PP-E-3",
     "type": "Extravert",
     "dimension": "Energy",
     "text": "I prefer to discuss my ideas with others rather than reflect quietly on them."
   },
   {
-    "id": "PP-ENERGY-5",
+    "id": "PP-E-4",
+    "type": "Extravert",
+    "dimension": "Energy",
+    "text": "I find myself speaking more than listening."
+  },
+  {
+    "id": "PP-E-5",
+    "type": "Extravert",
+    "dimension": "Energy",
+    "text": "When joining a group, I prefer to jump right in and introduce myself to everyone."
+  },
+  {
+    "id": "PP-I-1",
     "type": "Introvert",
     "dimension": "Energy",
     "text": "I feel comfortable by myself."
   },
   {
-    "id": "PP-PERCEPTION-1",
-    "type": "Sensing",
-    "dimension": "Perception",
-    "text": "I am most comfortable when things proceed according to plan."
+    "id": "PP-I-2",
+    "type": "Introvert",
+    "dimension": "Energy",
+    "text": "I feel recharged when I am given time to think on my own."
   },
   {
-    "id": "PP-PERCEPTION-2",
-    "type": "Sensing",
-    "dimension": "Perception",
-    "text": "I am more comfortable relying on established rules and procedures."
+    "id": "PP-I-3",
+    "type": "Introvert",
+    "dimension": "Energy",
+    "text": "I communicate best when I have time to write down my thoughts."
   },
   {
-    "id": "PP-PERCEPTION-3",
+    "id": "PP-I-4",
+    "type": "Introvert",
+    "dimension": "Energy",
+    "text": "Problem-solving is easiest when I have enough time to think out a solution."
+  },
+  {
+    "id": "PP-I-5",
+    "type": "Introvert",
+    "dimension": "Energy",
+    "text": "I tend to think before I act."
+  },
+  {
+    "id": "PP-N-1",
     "type": "Intuitive",
     "dimension": "Perception",
     "text": "I am a 'big picture'-oriented person."
   },
   {
-    "id": "PP-PERCEPTION-4",
-    "type": "Intuitive",
-    "dimension": "Perception",
-    "text": "I am most comfortable when I have room to adapt and adjust to unfolding circumstances."
-  },
-  {
-    "id": "PP-PERCEPTION-5",
+    "id": "PP-N-2",
     "type": "Intuitive",
     "dimension": "Perception",
     "text": "When learning new things, I prefer to deal with relationships and connections between concepts."
   },
   {
-    "id": "PP-PERCEPTION-6",
-    "type": "Intuitive",
-    "dimension": "Perception",
-    "text": "I am most interested in tasks that allow me to link different theoretical outcomes to form a big picture."
-  },
-  {
-    "id": "PP-PERCEPTION-7",
-    "type": "Sensing",
-    "dimension": "Perception",
-    "text": "I am a detail-oriented person."
-  },
-  {
-    "id": "PP-PERCEPTION-8",
+    "id": "PP-N-3",
     "type": "Intuitive",
     "dimension": "Perception",
     "text": "I work best with global aims and targets."
   },
   {
-    "id": "PP-PERCEPTION-9",
+    "id": "PP-N-4",
+    "type": "Intuitive",
+    "dimension": "Perception",
+    "text": "I am most comfortable when I have room to adapt and adjust to unfolding circumstances."
+  },
+  {
+    "id": "PP-N-5",
+    "type": "Intuitive",
+    "dimension": "Perception",
+    "text": "I am most interested in tasks that allow me to link different theoretical outcomes to form a big picture."
+  },
+  {
+    "id": "PP-S-1",
+    "type": "Sensing",
+    "dimension": "Perception",
+    "text": "I am a detail-oriented person."
+  },
+  {
+    "id": "PP-S-2",
     "type": "Sensing",
     "dimension": "Perception",
     "text": "I prefer information that I can verify."
   },
   {
-    "id": "PP-DECISION-1",
+    "id": "PP-S-3",
+    "type": "Sensing",
+    "dimension": "Perception",
+    "text": "I am most comfortable when things proceed according to plan."
+  },
+  {
+    "id": "PP-S-4",
+    "type": "Sensing",
+    "dimension": "Perception",
+    "text": "I am more comfortable relying on established rules and procedures."
+  },
+  {
+    "id": "PP-S-5",
+    "type": "Sensing",
+    "dimension": "Perception",
+    "text": "I am most interested in tasks that have real-world outcomes."
+  },
+  {
+    "id": "PP-T-1",
     "type": "Thinking",
-    "dimension": "Decision-Making",
+    "dimension": "Judgement",
+    "text": "The outcomes of my decisions must be fair to all involved."
+  },
+  {
+    "id": "PP-T-2",
+    "type": "Thinking",
+    "dimension": "Judgement",
     "text": "I often consider the pros and cons of alternative decisions when making a choice."
   },
   {
-    "id": "PP-DECISION-2",
-    "type": "Feeling",
-    "dimension": "Decision-Making",
-    "text": "I tend to let my feelings affect my decisions."
+    "id": "PP-T-3",
+    "type": "Thinking",
+    "dimension": "Judgement",
+    "text": "I am often critical of information I receive."
   },
   {
-    "id": "PP-DECISION-3",
+    "id": "PP-T-4",
     "type": "Thinking",
-    "dimension": "Decision-Making",
+    "dimension": "Judgement",
     "text": "My decisions are guided by my principles."
   },
   {
-    "id": "PP-DECISION-4",
+    "id": "PP-T-5",
+    "type": "Thinking",
+    "dimension": "Judgement",
+    "text": "I would emphasize fairness over harmony."
+  },
+  {
+    "id": "PP-F-1",
     "type": "Feeling",
-    "dimension": "Decision-Making",
+    "dimension": "Judgement",
+    "text": "When making a choice, I often consider the impact of my decision on others involved."
+  },
+  {
+    "id": "PP-F-2",
+    "type": "Feeling",
+    "dimension": "Judgement",
+    "text": "I tend to follow my heart when making a decision."
+  },
+  {
+    "id": "PP-F-3",
+    "type": "Feeling",
+    "dimension": "Judgement",
     "text": "In any decision, what is most important is that everyone involved is satisfied with the outcome."
   },
   {
-    "id": "PP-DECISION-5",
+    "id": "PP-F-4",
     "type": "Feeling",
-    "dimension": "Decision-Making",
+    "dimension": "Judgement",
+    "text": "I tend to let my feelings affect my decisions."
+  },
+  {
+    "id": "PP-F-5",
+    "type": "Feeling",
+    "dimension": "Judgement",
     "text": "I would emphasize harmony over fairness."
   },
   {
-    "id": "PP-LIFESTYLE-1",
+    "id": "PP-J-1",
     "type": "Judging",
     "dimension": "Lifestyle",
     "text": "I am very structured in my work flow."
   },
   {
-    "id": "PP-LIFESTYLE-2",
+    "id": "PP-J-2",
     "type": "Judging",
     "dimension": "Lifestyle",
     "text": "I am a goal-oriented person."
   },
   {
-    "id": "PP-LIFESTYLE-3",
+    "id": "PP-J-3",
+    "type": "Judging",
+    "dimension": "Lifestyle",
+    "text": "All problems should be dealt with as soon as possible."
+  },
+  {
+    "id": "PP-J-4",
+    "type": "Judging",
+    "dimension": "Lifestyle",
+    "text": "I like structured work environments."
+  },
+  {
+    "id": "PP-J-5",
     "type": "Judging",
     "dimension": "Lifestyle",
     "text": "Being able to plan ahead is very important to me."
   },
   {
-    "id": "PP-LIFESTYLE-4",
+    "id": "PP-P-1",
+    "type": "Perceiving",
+    "dimension": "Lifestyle",
+    "text": "I am very flexible in my work flow."
+  },
+  {
+    "id": "PP-P-2",
+    "type": "Perceiving",
+    "dimension": "Lifestyle",
+    "text": "I believe the world should be unpredictable and flexible."
+  },
+  {
+    "id": "PP-P-3",
+    "type": "Perceiving",
+    "dimension": "Lifestyle",
+    "text": "When completing a task, I focus more on the process than the outcome."
+  },
+  {
+    "id": "PP-P-4",
     "type": "Perceiving",
     "dimension": "Lifestyle",
     "text": "I prefer to deal with problems when I am ready."
   },
   {
-    "id": "PP-LIFESTYLE-5",
+    "id": "PP-P-5",
     "type": "Perceiving",
     "dimension": "Lifestyle",
-    "text": "I am very flexible in my work flow."
+    "text": "I prioritise freedom over structure."
   }
 ];
-
-    const preferenceTypeCounts = preferenceQuestions.reduce((acc, q) => {
-      acc[q.type] = (acc[q.type] || 0) + 1;
-      return acc;
-    }, {});
-
-    function preferencePercents(scores) {
-      const percents = {};
-      Object.keys(preferenceTypeCounts).forEach((type) => {
-        const max = preferenceTypeCounts[type] * 6;
-        percents[type] = max ? ((scores[type] || 0) / max) * 100 : 0;
-      });
-      return percents;
-    }
-
-    function formatPercent(value) {
-      const rounded = Math.round(value * 10) / 10;
-      return Number.isInteger(rounded) ? `${rounded}%` : `${rounded.toFixed(1)}%`;
-    }
 
     const state = {
       screen: 'intro',
@@ -2480,12 +2536,12 @@
         .join('');
     }
 
-    function preferenceCode(percents) {
+    function preferenceCode(scores) {
       return pairRules.map(([left, right, leftCode, rightCode, tieCode]) => {
-        const leftPct = percents[left] || 0;
-        const rightPct = percents[right] || 0;
-        if (leftPct === rightPct) return tieCode;
-        return leftPct > rightPct ? leftCode : rightCode;
+        const leftScore = scores[left] || 0;
+        const rightScore = scores[right] || 0;
+        if (leftScore === rightScore) return tieCode;
+        return leftScore > rightScore ? leftCode : rightCode;
       }).join('');
     }
 
@@ -2574,8 +2630,8 @@
       I: { label: 'Introvert', dimension: 'Energy', summary: 'The Introvert type is often characterized as: Persistent, determined, thorough.' },
       S: { label: 'Sensing', dimension: 'Perception', summary: 'The Sensing type is often characterized as: Sturdy, sensible, practical.' },
       N: { label: 'Intuitive', dimension: 'Perception', summary: 'The iNtuitive type is often characterized as: Visionary, innovative, creative.' },
-      T: { label: 'Thinking', dimension: 'Decision-Making', summary: 'The Thinking type is often characterized as: Logical, fair, critical.' },
-      F: { label: 'Feeling', dimension: 'Decision-Making', summary: 'The Feeling type is often characterized as: Warm, friendly, emotion-based.' },
+      T: { label: 'Thinking', dimension: 'Judgement', summary: 'The Thinking type is often characterized as: Logical, fair, critical.' },
+      F: { label: 'Feeling', dimension: 'Judgement', summary: 'The Feeling type is often characterized as: Warm, friendly, emotion-based.' },
       J: { label: 'Judging', dimension: 'Lifestyle', summary: 'The Judging type is often characterized as: Hardworking, efficient, goal-oriented.' },
       P: { label: 'Perceiving', dimension: 'Lifestyle', summary: 'The Perceiving type is often characterized as: Flexible, spontaneous, freely expressive.' }
     };
@@ -2669,110 +2725,72 @@
       }).join('');
     }
 
-    const preferenceDimensionBullets = {
-      Extravert: [
-        'Builds energy through collaboration, discussion, and active engagement with others',
-        'Thinks out loud and often arrives at best ideas through conversation',
-        'Prefers working in team-based, socially dynamic environments',
-        'Communicates most effectively in real-time, face-to-face, or live discussions',
-        'Tends to take initiative and move quickly from ideas to action',
-        'Breadth of interests and connections is a key professional strength',
-        'Works best when given regular opportunities for interaction and group problem-solving'
-      ],
-      Introvert: [
-        'Builds energy by stepping back from situations to reflect before acting',
-        'Thinks deeply and independently, preferring to fully understand something before contributing',
-        'Performs best in focused, low-distraction work environments',
-        'Communicates most effectively through written formats or prepared discussion',
-        'Brings persistence and depth of thinking to complex, long-term tasks',
-        'Works best when given adequate time and space to process before being asked to respond',
-        'Strengths lie in careful analysis, independent execution, and considered decision-making'
-      ],
-      Sensing: [
-        'Focuses on concrete, verifiable information and real-world application',
-        'Learns most effectively through structured, step-by-step instruction and hands-on practice',
-        'Detail-oriented with a strong grasp of facts, procedures, and established methods',
-        'Prefers tasks with clear, practical outcomes and measurable results',
-        'Brings reliability and precision to routine and process-driven work',
-        'Works best with well-defined expectations and proven approaches',
-        'Most comfortable building on existing knowledge rather than speculating on untested ideas'
-      ],
-      Intuitive: [
-        'Focuses on patterns, possibilities, and the connections between ideas',
-        'Learns most effectively through exploration, theory, and conceptual frameworks',
-        'Thinks broadly and is drawn to innovative, future-oriented challenges',
-        'Prefers working with the big picture rather than getting into operational detail',
-        'Brings creativity and original thinking to complex, open-ended problems',
-        'Works best when given room to experiment and pursue new approaches',
-        'Energised by variety, intellectual challenge, and work that involves envisioning what could be'
-      ],
-      Thinking: [
-        'Makes decisions based on objective analysis, logic, and evidence',
-        'Evaluates options systematically by weighing pros and cons against clear criteria',
-        'Brings consistency and fairness to decision-making by applying principles rather than precedent',
-        'Most effective in roles that require critical evaluation and impartial judgement',
-        'Comfortable delivering honest, direct feedback even when it may be unwelcome',
-        'Driven by the need for accuracy and rational justification in conclusions',
-        'Works best in environments that value analytical rigour and evidence-based reasoning'
-      ],
-      Feeling: [
-        'Makes decisions with strong consideration for the impact on people and relationships',
-        'Prioritises team harmony and collective wellbeing when evaluating options',
-        'Brings empathy and interpersonal sensitivity to leadership, facilitation, and collaborative roles',
-        'Most effective in roles involving people development, mediation, and values-driven work',
-        'Motivated by a clear sense of purpose and the human significance of their contribution',
-        'Skilled at reading group dynamics and building consensus',
-        'Works best in environments that value cooperation, trust, and person-centred outcomes'
-      ],
-      Judging: [
-        'Prefers organised, structured approaches to work with clearly defined goals and timelines',
-        'Plans ahead and works systematically toward completion',
-        'Performs best when tasks are well-scoped and expectations are clearly established',
-        'Brings decisiveness and follow-through to project execution',
-        'Finds satisfaction in finalising tasks and closing open loops',
-        'Works best in environments with consistent routines and reliable processes',
-        'Strengths lie in time management, planning, and disciplined delivery'
-      ],
-      Perceiving: [
-        'Prefers flexible, adaptive approaches to work that allow for adjustment as circumstances evolve',
-        'Performs best when given autonomy to determine their own process and pace',
-        'Brings spontaneity and resourcefulness to dynamic, fast-changing environments',
-        'Comfortable managing multiple tasks simultaneously and shifting priorities as needed',
-        'Energised by open-ended challenges that leave room for exploration',
-        'Works best in environments that value adaptability over rigid structure',
-        'Strengths lie in creative problem-solving, responsiveness, and finding new angles on familiar challenges'
-      ]
-    };
-
-    const preferenceDimensionMeta = [
-      { dimension: 'Energy', leftCode: 'E', leftName: 'Extravert', rightCode: 'I', rightName: 'Introvert', tieDefault: 'Introvert', leftColor: '#e6399b', rightColor: '#f8d3ef' },
-      { dimension: 'Perception', leftCode: 'S', leftName: 'Sensing', rightCode: 'N', rightName: 'Intuitive', tieDefault: 'Intuitive', leftColor: '#e2600a', rightColor: '#ffe0c7' },
-      { dimension: 'Decision-Making', leftCode: 'T', leftName: 'Thinking', rightCode: 'F', rightName: 'Feeling', tieDefault: 'Feeling', leftColor: '#1c7fc4', rightColor: '#d9effb' },
-      { dimension: 'Lifestyle', leftCode: 'J', leftName: 'Judging', rightCode: 'P', rightName: 'Perceiving', tieDefault: 'Perceiving', leftColor: '#4f8f2c', rightColor: '#dcefcc' }
-    ];
-
-    function preferenceDimensionRows(percents) {
-      return preferenceDimensionMeta.map((row) => {
-        const leftPct = percents[row.leftName] || 0;
-        const rightPct = percents[row.rightName] || 0;
-        const winnerName = leftPct === rightPct ? row.tieDefault : (leftPct > rightPct ? row.leftName : row.rightName);
-        const bullets = preferenceDimensionBullets[winnerName] || [];
-        const total = leftPct + rightPct;
-        const leftShare = total ? (leftPct / total) * 100 : 50;
-        const rightShare = 100 - leftShare;
+    function preferenceDimensionRows(scores) {
+      const rows = [
+        {
+          dimension: 'Energy',
+          leftCode: 'E',
+          leftName: 'Extravert',
+          rightCode: 'I',
+          rightName: 'Introvert',
+          leftStart: '#f414d7',
+          leftColor: '#f414d7',
+          rightColor: '#f282f0',
+          rightEnd: '#f282f0'
+        },
+        {
+          dimension: 'Perception',
+          leftCode: 'S',
+          leftName: 'Sensing',
+          rightCode: 'N',
+          rightName: 'Intuitive',
+          leftStart: '#ff5b00',
+          leftColor: '#ff5b00',
+          rightColor: '#ff9364',
+          rightEnd: '#ff9364'
+        },
+        {
+          dimension: 'Judgement',
+          leftCode: 'T',
+          leftName: 'Thinking',
+          rightCode: 'F',
+          rightName: 'Feeling',
+          leftStart: '#399be5',
+          leftColor: '#399be5',
+          rightText: '#4a9bc7',
+          rightColor: '#d9effb',
+          rightEnd: '#d9effb'
+        },
+        {
+          dimension: 'Lifestyle',
+          leftCode: 'J',
+          leftName: 'Judging',
+          rightCode: 'P',
+          rightName: 'Perceiving',
+          leftStart: '#69ad3e',
+          leftColor: '#69ad3e',
+          rightText: '#72a957',
+          rightColor: '#d4ecc5',
+          rightEnd: '#d4ecc5'
+        }
+      ];
+      return rows.map((row) => {
+        const { dimension, leftCode, leftName, rightCode, rightName, leftStart, leftColor, rightColor, rightEnd, rightText } = row;
+        const leftScore = scores[leftName] || 0;
+        const rightScore = scores[rightName] || 0;
+        const total = Math.max(1, leftScore + rightScore);
+        const leftPct = Math.round(leftScore / total * 100);
+        const rightPct = 100 - leftPct;
+        const winnerCode = leftPct >= rightPct ? leftCode : rightCode;
+        const winner = preferenceInfo[winnerCode];
         return `
-          <article class="preference-card" style="--left-color:${row.leftColor}; --right-color:${row.rightColor};">
-            <h4 class="preference-card-title">${row.dimension}</h4>
-            <div class="split-labels">
-              <div class="split-label-side"><strong>${row.leftCode}</strong><span>${row.leftName}</span></div>
-              <div class="split-label-side"><strong>${row.rightCode}</strong><span>${row.rightName}</span></div>
-            </div>
-            <div class="split-bar">
-              <span style="width:${leftShare}%">${formatPercent(leftShare)}</span>
-              <span style="width:${rightShare}%">${formatPercent(rightShare)}</span>
-            </div>
-            <ul class="bullet-list preference-bullets">${bullets.map((item) => `<li>${item}</li>`).join('')}</ul>
-          </article>
+          <section class="preference-card" style="--left-start:${leftStart}; --left-color:${leftColor}; --right-color:${rightText || rightColor}; --right-fill:${rightColor}; --right-end:${rightEnd};">
+            <h4>${dimension}: ${winner.label}</h4>
+            <div class="split-labels"><span>${leftName}</span><span>${rightName}</span></div>
+            <div class="split-bar"><span style="width:${leftPct}%"></span><span style="width:${rightPct}%"></span></div>
+            <div class="split-values"><span>${leftPct}%</span><span>${rightPct}%</span></div>
+            <p>${winner.summary}</p>
+          </section>
         `;
       }).join('');
     }
@@ -2813,9 +2831,8 @@
       screenEl.className = 'card';
       const iScores = scoresFor(interestQuestions, 'interest');
       const pScores = scoresFor(preferenceQuestions, 'preference');
-      const pPercents = preferencePercents(pScores);
       const iCode = interestCode(iScores);
-      const pCode = state.summaryType || preferenceCode(pPercents);
+      const pCode = state.summaryType || preferenceCode(pScores);
       try {
         localStorage.setItem('psychometricPreferenceCode', pCode);
       } catch (error) {}
@@ -2882,7 +2899,7 @@
                 </article>
                 <div class="type-summary">${typeLetters(pCode)}</div>
               </div>
-              <div class="preference-grid">${preferenceDimensionRows(pPercents)}</div>
+              <div class="preference-grid">${preferenceDimensionRows(pScores)}</div>
             </section>
 
             <section class="report-page">

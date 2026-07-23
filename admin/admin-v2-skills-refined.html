@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atlas Admin Analytics v2 — Skills (Refined)</title>
+    <link rel="stylesheet" href="styles.css?v=20260608-admin-fonts" />
+    <link rel="stylesheet" href="styles-v2.css" />
+    <style>
+      /* Scoped to this file only. Same data + same features as the full Skills
+         tab in app-v2.js (View / Category / Sort / gap toggle, expandable
+         rows, category & group radar, heatmap, learner drill-down modal) —
+         nothing removed. These rules only refine the visual presentation:
+         a distinct KPI strip (instead of cards that look like the page-level
+         metrics above), a grouped "control bar" for the toolbar instead of a
+         loose row of inputs, small eyebrow labels for scan-ability, and
+         lighter default row/legend styling. */
+
+      .skill-simple-strip {
+        display: flex;
+        align-items: center;
+        background: linear-gradient(135deg, var(--blue-soft) 0%, #eef2fb 100%);
+        border: 1px solid #d7eef6;
+        border-radius: 14px;
+        padding: 16px 26px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 4px 0;
+      }
+      .skill-simple-stat { display: flex; flex-direction: column; gap: 2px; padding: 0 28px; }
+      .skill-simple-stat:first-child { padding-left: 0; }
+      .skill-simple-stat strong { font-family: "Space Grotesk", sans-serif; font-size: 23px; color: var(--blue-dark); line-height: 1; }
+      .skill-simple-stat span { font-size: 12px; color: var(--muted); font-weight: 600; }
+      .skill-simple-stat.warn strong { color: #dc2626; }
+      .skill-simple-divider { width: 1px; align-self: stretch; background: #c9dde6; }
+
+      .eyebrow {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--blue-dark);
+        margin: 0 0 4px;
+      }
+
+      /* Group the toolbar controls into one calm, bordered bar instead of
+         inputs floating directly on the panel background. */
+      .skills-toolbar {
+        background: #f8fafc;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 16px 18px;
+      }
+
+      /* Slightly more breathing room per ranked row + softer badge/legend weight. */
+      .skill-rank-row { padding: 15px 6px; }
+      .skill-rank-name small { font-weight: 500; }
+      .skill-band-legend { font-weight: 500; }
+
+      /* Trim the helper paragraphs down visually (smaller, tighter) so the
+         data reads first and the caption reads second. */
+      .skills-analytics-head p,
+      .skill-heatmap-head p { font-size: 12.5px; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <aside class="sidebar">
+      <div class="brand">
+        <img src="atlas-logo.png" alt="ATLAS by HeyHi" />
+      </div>
+
+      <nav class="nav" aria-label="Primary">
+        <div class="nav-label">Navigation</div>
+        <a class="nav-item" href="#"><i data-icon="grid"></i><span>Dashboard</span></a>
+        <a class="nav-item" href="#"><i data-icon="users"></i><span>Users</span></a>
+        <a class="nav-item" href="#"><i data-icon="bars"></i><span>Courses</span></a>
+        <a class="nav-item" href="#"><i data-icon="share"></i><span>Content Sharing</span></a>
+        <a class="nav-item" href="#"><i data-icon="briefcase"></i><span>Job Roles</span></a>
+        <a class="nav-item" href="#"><i data-icon="trophy"></i><span>CBL</span></a>
+        <a class="nav-item" href="#"><i data-icon="sliders"></i><span>PALS Course</span></a>
+        <a class="nav-item" href="#"><i data-icon="users"></i><span>Groups</span></a>
+        <a class="nav-item" href="#"><i data-icon="calendar"></i><span>Classes</span></a>
+        <a class="nav-item" href="#"><i data-icon="clipboard"></i><span>Assessments</span></a>
+        <a class="nav-item" href="#"><i data-icon="book"></i><span>Question Bank</span></a>
+        <a class="nav-item" href="#"><i data-icon="database"></i><span>Knowledge Base</span></a>
+        <div class="nav-group active">
+          <a class="nav-item nav-parent" href="#">
+            <i data-icon="chart"></i><span>Analytics</span><i data-icon="chevron"></i>
+          </a>
+          <a class="nav-item nav-sub selected" href="#"><i data-icon="chart"></i><span>Learning Analytics</span></a>
+          <a class="nav-item nav-sub" href="#"><i data-icon="database"></i><span>Data Overview</span></a>
+          <a class="nav-item nav-sub" href="#"><i data-icon="sparkle"></i><span>People Insights</span></a>
+        </div>
+        <a class="nav-item" href="#"><i data-icon="settings"></i><span>Settings</span></a>
+      </nav>
+
+      <div class="profile">
+        <div class="avatar">Z</div>
+        <div class="profile-text">
+          <strong>Zhi Chuen</strong>
+          <span>Org Admin</span>
+        </div>
+        <i data-icon="settings"></i>
+      </div>
+    </aside>
+
+    <main class="app">
+      <header class="topbar">
+        <button class="icon-button" aria-label="Toggle sidebar"><i data-icon="panel"></i></button>
+        <button class="help"><i data-icon="help"></i><span>Help</span></button>
+      </header>
+
+      <section class="content">
+        <div class="page-title">
+          <div>
+            <h1 id="pageTitle">Learning Analytics</h1>
+            <p id="pageSubtitle">Track your organization's learning performance</p>
+          </div>
+        </div>
+
+        <section class="metrics" aria-label="Admin learning summary">
+          <article class="metric-card">
+            <div class="metric-icon"><i data-icon="users"></i></div>
+            <div>
+              <strong>71%</strong>
+              <span>Engagement Rate</span>
+              <small>17 of 24 users active</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon"><i data-icon="clock"></i></div>
+            <div>
+              <strong>42h 15m</strong>
+              <span>Time Spent</span>
+              <small>Total learning time</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon"><i data-icon="check-circle"></i></div>
+            <div>
+              <strong>68%</strong>
+              <span>Avg. KP Mastery</span>
+              <small>Across 96 enrolment(s)</small>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon"><i data-icon="medal"></i></div>
+            <div>
+              <strong>74%</strong>
+              <span>Avg. Assessment Score</span>
+              <small>Across all assessments</small>
+            </div>
+          </article>
+        </section>
+
+        <section class="workspace plain">
+          <div class="toolbar">
+            <div class="tabs" role="tablist" aria-label="Analytics views">
+              <button class="tab" data-main-tab="courses"><i data-icon="book-open"></i>Courses</button>
+              <button class="tab" data-main-tab="pals"><i data-icon="cap"></i>PALS Courses</button>
+              <button class="tab active" data-main-tab="skills"><i data-icon="sparkle"></i>Skills</button>
+              <button class="tab" data-main-tab="cbl"><i data-icon="trophy"></i>CBL</button>
+              <button class="tab" data-main-tab="assessments"><i data-icon="clipboard"></i>Assessments</button>
+              <button class="tab" data-main-tab="trends"><i data-icon="trend"></i>Trends</button>
+            </div>
+          </div>
+
+          <div id="breadcrumb" class="breadcrumb"></div>
+          <div id="appView"></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="app-v2.js"></script>
+    <script>
+      // Same Skills tab data and interactions as app-v2.js's renderSkillAnalytics()
+      // (View / Category / Sort / gap toggle, expandable rows with PALS/CBL
+      // composition + band distribution, category/group radar, skill × group
+      // heatmap, learner drill-down modal) — this override only changes the
+      // markup for the KPI strip and adds eyebrow labels / a toolbar wrapper.
+      // All event delegation (data-skill-view, data-skill-category, etc.) is
+      // already wired in app-v2.js and keeps working unchanged since it just
+      // calls render(), which calls this function.
+
+      function renderSkillAnalytics() {
+        const categories = [...new Set(skillTags.map(s => s.cat))];
+
+        let items = skillTags.slice();
+        if (state.skillCategory !== "all") items = items.filter(s => s.cat === state.skillCategory);
+        if (state.skillGapOnly) items = items.filter(s => s.avg < 60);
+        items.sort((a, b) => {
+          if (state.skillSort === "asc" || state.skillSort === "gap") return a.avg - b.avg;
+          if (state.skillSort === "cover") return b.cover - a.cover;
+          return b.avg - a.avg;
+        });
+
+        const heatRows = skillTags
+          .filter(s => state.skillCategory === "all" || s.cat === state.skillCategory)
+          .slice()
+          .sort((a, b) => b.avg - a.avg);
+
+        const orgAvg = Math.round(skillTags.reduce((s, i) => s + i.avg, 0) / skillTags.length);
+        const attentionCount = skillTags.filter(s => s.avg < 50).length;
+        const maxCover = skillTags.reduce((m, s) => Math.max(m, s.cover), 0);
+        const catCount = categories.length;
+        const railData = state.skillView === "group" ? skillGroupAverages() : skillCategoryAverages();
+        const railTitle = state.skillView === "group" ? "Group profile" : "Category profile";
+        const railSub = state.skillView === "group" ? "Average skill mastery by group." : "Organisation average by skill category.";
+
+        return `
+          <section class="skill-simple-strip" aria-label="Skills summary">
+            <div class="skill-simple-stat"><strong>${skillTags.length}</strong><span>Skills tracked</span></div>
+            <div class="skill-simple-divider"></div>
+            <div class="skill-simple-stat${attentionCount ? " warn" : ""}"><strong>${attentionCount}</strong><span>Needing attention</span></div>
+            <div class="skill-simple-divider"></div>
+            <div class="skill-simple-stat"><strong>${orgAvg}%</strong><span>Org. avg. mastery</span></div>
+            <div class="skill-simple-divider"></div>
+            <div class="skill-simple-stat"><strong>${maxCover}</strong><span>Learners covered</span></div>
+          </section>
+
+          <section class="panel skills-analytics">
+            <div class="skills-analytics-head">
+              <div>
+                <span class="eyebrow">Skills Overview</span>
+                <h2>Skills across the organisation</h2>
+                <p>Mastery is derived from PALS review-test questions and CBL challenge performance, grouped into four competency bands.</p>
+              </div>
+              <div class="skill-summary"><strong>${skillTags.length}</strong><span>skills tracked</span></div>
+            </div>
+
+            <div class="skills-toolbar">
+              <div class="field">
+                <span>View</span>
+                <div class="tabs compact-tabs">
+                  <button class="tab${state.skillView === "org" ? " active" : ""}" type="button" data-skill-view="org">${svgIcon("grid")}Organisation</button>
+                  <button class="tab${state.skillView === "group" ? " active" : ""}" type="button" data-skill-view="group">${svgIcon("users")}By group</button>
+                  <button class="tab${state.skillView === "learner" ? " active" : ""}" type="button" data-skill-view="learner">${svgIcon("user")}Learner</button>
+                </div>
+              </div>
+              <label class="field">
+                <span>Category</span>
+                <select data-skill-category>
+                  <option value="all" ${state.skillCategory === "all" ? "selected" : ""}>All categories</option>
+                  ${categories.map(c => `<option value="${c}" ${state.skillCategory === c ? "selected" : ""}>${c}</option>`).join("")}
+                </select>
+              </label>
+              <label class="field">
+                <span>Sort by</span>
+                <select data-skill-sort>
+                  <option value="gap" ${state.skillSort === "gap" ? "selected" : ""}>Needs attention first</option>
+                  <option value="desc" ${state.skillSort === "desc" ? "selected" : ""}>Mastery — high to low</option>
+                  <option value="asc" ${state.skillSort === "asc" ? "selected" : ""}>Mastery — low to high</option>
+                  <option value="cover" ${state.skillSort === "cover" ? "selected" : ""}>Coverage — most learners</option>
+                </select>
+              </label>
+              <label class="skills-toggle${state.skillGapOnly ? " on" : ""}" data-skill-gap-toggle tabindex="0" role="switch" aria-checked="${state.skillGapOnly}">
+                <span class="skills-switch"></span> Only gaps below 60%
+              </label>
+              <div class="grow"></div>
+            </div>
+
+            <div class="skills-split-layout">
+              <div>
+                <div class="skill-list-note">Showing ${items.length} of ${skillTags.length} skills${state.skillCategory !== "all" ? " in " + state.skillCategory : ""}${state.skillGapOnly ? " · gaps only" : ""}</div>
+                <div class="skill-rank-list">
+                  ${items.length ? items.map((s, i) => {
+                    const total = s.dist.reduce((a, b) => a + b, 0) || 1;
+                    const segs = s.dist.map((c, bi) => `<span class="${SKILL_BANDS[bi].cls}" style="width:${(c / total * 100).toFixed(1)}%"></span>`).join("");
+                    const tier = skillTierOf(s.avg);
+                    const low = s.cover < SKILL_LOW_COVERAGE;
+                    const badge = tier ? `<span class="entity-status-badge status-${tier}">${SKILL_TIER_LABEL[tier]}</span>` : "";
+                    const bandDetail = s.dist.map((c, bi) => `
+                      <div class="skill-detail-band"><span class="dot ${SKILL_BANDS[bi].cls}"></span><b>${c}</b><span>${SKILL_BANDS[bi].key}</span></div>
+                    `).join("");
+                    return `
+                      <article class="skill-rank-row" data-skill-row="${s.name}">
+                        <div class="skill-rank-top">
+                          <span class="skill-rank-num">${i + 1}</span>
+                          <span class="skill-rank-name">${s.name} ${badge}<small>${s.cat}</small></span>
+                          <span class="skill-rank-cover">${s.cover} learners${low ? " ⚠" : ""}</span>
+                          <span class="skill-rank-val">${s.avg}%</span>
+                        </div>
+                        <div class="skill-band-bar">${segs}</div>
+                        <div class="skill-rank-detail">
+                          <div class="skill-detail-comp">
+                            <div class="ring" style="--value:${s.avg};--ring-color:${completionColor(s.avg)}"><b>${s.avg}%</b></div>
+                            <div class="skill-comp-bars">
+                              <div class="skill-comp-line"><span class="dot" style="background:var(--blue)"></span>PALS (questions answered correctly)<b>${s.pals} pts</b></div>
+                              <div class="skill-comp-line"><span class="dot" style="background:var(--purple)"></span>CBL (challenges completed)<b>${s.cbl} pts</b></div>
+                            </div>
+                          </div>
+                          <div class="skill-detail-bands">${bandDetail}</div>
+                        </div>
+                      </article>
+                    `;
+                  }).join("") : `<div class="empty-list">No skills sit below 60% right now. Toggle the filter off to see all skills.</div>`}
+                </div>
+                <div class="skill-band-legend">
+                  <span><span class="dot band-novice"></span>Novice</span>
+                  <span><span class="dot band-developing"></span>Developing</span>
+                  <span><span class="dot band-competent"></span>Competent</span>
+                  <span><span class="dot band-proficient"></span>Proficient</span>
+                </div>
+              </div>
+
+              <div>
+                <span class="eyebrow">${railTitle}</span>
+                <p style="margin:0 0 4px;color:var(--muted);font-size:12px">${railSub}</p>
+                <div class="radar-wrap pals-spider-wrap">${renderRadarFor(railData)}</div>
+                <div class="pals-spider-legend">
+                  ${railData.map(c => `
+                    <div class="pals-spider-row"><div><strong>${c.name}</strong></div>${progress(c.progress)}</div>
+                  `).join("")}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel skill-heatmap-panel">
+            <div class="skill-heatmap-head">
+              <span class="eyebrow">Skill × Group Breakdown</span>
+              <h2>Where the gaps sit</h2>
+              <p>Average mastery per group${state.skillCategory !== "all" ? " for " + state.skillCategory : ""}. Cells covering fewer than ${SKILL_LOW_COVERAGE} learners are dimmed — read with caution. Click a cell to drill into that group's learners.</p>
+            </div>
+            <div class="skill-heatmap-scroll">
+              <table class="skill-heatmap">
+                <thead><tr><th class="corner">Skill</th>${SKILL_GROUP_NAMES.map(g => `<th>${g}</th>`).join("")}</tr></thead>
+                <tbody>
+                  ${heatRows.map(s => `
+                    <tr>
+                      <td class="skill-heatmap-rowlbl">${s.name}</td>
+                      ${SKILL_GROUP_NAMES.map(g => {
+                        const v = s.byGroup[g];
+                        const dim = s.cover < SKILL_LOW_COVERAGE ? " dim" : "";
+                        return `<td><div class="skill-heatmap-cell${dim}" style="background:${skillHeatColor(v)};color:${skillHeatTextColor(v)}" data-skill-heat-cell data-skill="${s.name}" data-group="${g}" title="${s.name} · ${g}: ${v}%">${v}</div></td>`;
+                      }).join("")}
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          ${renderSkillModal()}
+        `;
+      }
+
+      state.mainTab = "skills";
+      render();
+    </script>
+  </body>
+</html>

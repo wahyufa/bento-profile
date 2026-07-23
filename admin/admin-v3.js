@@ -1,0 +1,648 @@
+const v3SkillState = {
+  sourceFilter: "all",
+  sort: "low"
+};
+
+const v3CblSummary = {
+  learnersAttempted: 31,
+  totalAttempts: 42,
+  averageHighestScore: 72
+};
+
+const v3CblState = {
+  caseId: null,
+  groupId: null
+};
+
+const v3CblCases = [
+  {
+    id: "handling-angry-parent",
+    score: 60,
+    name: "Handling An Angry Parent",
+    role: "Training & Adult Education Specialist",
+    learners: 11,
+    detailLearners: 3,
+    attempts: 9,
+    live: 0,
+    turnBased: 9,
+    groups: [
+      { id: "heyhi-demo", name: "HeyHi Demo", learners: 8, attempts: 7, score: 33 },
+      { id: "demo-june", name: "Demo June", learners: 1, attempts: 0, score: 0 },
+      {
+        id: "not-in-group",
+        name: "Not in any group",
+        learners: 2,
+        attempts: 2,
+        score: 74,
+        live: 0,
+        turnBased: 2,
+        people: [
+          { name: "Unknown learner", attempts: 1, version: "V1", score: 75 },
+          { name: "Gam Mai", attempts: 1, version: "V1", score: 72 }
+        ]
+      }
+    ]
+  },
+  { id: "motivating-disengaged-student", score: 82, name: "Motivating a Disengaged Student", role: "Online Tutor", learners: 3 },
+  { id: "upset-parent-performance", score: 81, name: "Handling an upset parent due to child's poor performance", role: "Training & Adult Education Specialist", learners: 3 },
+  { id: "banking-review-mandarin", score: 83, name: "Banking Client review session - Understanding Client's mismatched business model (Mandarin)", role: "Financial Services Specialist", learners: 26 },
+  { id: "rapid-pass-through", score: 78, name: "Rapid Pass-through", role: "Financial Services Specialist", learners: 25 },
+  { id: "explaining-learning-gaps", score: 75, name: "Explaining Learning Gaps to Parents", role: "Education Consultant", learners: 4 },
+  { id: "technical-support-escalation", score: 82, name: "Resolving a Technical Support Escalation", role: "Technical Support Lead", learners: 5 },
+  { id: "onboarding-corporate-client", score: 0, name: "Onboarding a New Corporate Client", role: "Business Development Manager", learners: 1 },
+  { id: "pitching-adaptive-learning", score: 67, name: "Pitching Adaptive Learning to Educators", role: "Product Specialist", learners: 2 },
+  { id: "rapid-pass-through-cantonese", score: 72, name: "Rapid Pass-Through (Cantonese)", role: "Financial Services Specialist", learners: 25 },
+  { id: "banking-review-cantonese", score: 56, name: "Banking Client review session - Understanding Client's mismatched business model (Cantonese)", role: "Financial Services Specialist", learners: 25 },
+  { id: "banking-review", score: 0, name: "Banking Client review session - Understanding Client's mismatched business model", role: "Financial Services Specialist", learners: 23 },
+  { id: "rapid-pass-through-mandarin", score: 61, name: "Rapid Pass-Through (Mandarin)", role: "Financial Services Specialist", learners: 26 },
+  { id: "handling-angry-parent-v2", score: 71, name: "Handling an Angry parent v2", role: "Learning Manager", learners: 4 },
+  { id: "banking-review-test", score: 81, name: "Banking Client review session - Test 12/6", role: "Financial Services Specialist", learners: 4 }
+];
+
+function v3Average(values) {
+  const available = values.filter((value) => value != null);
+  return available.length
+    ? Math.round(available.reduce((sum, value) => sum + value, 0) / available.length)
+    : null;
+}
+
+function v3SkillSourceType(skill) {
+  const hasPals = palsSkillScore(skill) != null;
+  const hasCbl = skill.cbl?.score != null;
+  if (hasPals && hasCbl) return "both";
+  if (hasPals) return "pals-only";
+  if (hasCbl) return "cbl-only";
+  return "none";
+}
+
+function v3SectorStats(sector) {
+  const tracked = sector.skills.filter((skill) => skill.mastery != null);
+  const pals = sector.skills.filter((skill) => palsSkillScore(skill) != null);
+  const cbl = sector.skills.filter((skill) => skill.cbl?.score != null);
+  const both = sector.skills.filter((skill) => v3SkillSourceType(skill) === "both");
+  const needsAttention = sector.skills.filter((skill) => skill.mastery == null || skill.mastery < 70);
+
+  return {
+    mastery: v3Average(tracked.map((skill) => skill.mastery)),
+    tracked: tracked.length,
+    pals: pals.length,
+    cbl: cbl.length,
+    both: both.length,
+    needsAttention: needsAttention.length,
+    questions: sector.skills.reduce((sum, skill) => sum + skill.total, 0),
+    scenarios: sector.skills.reduce((sum, skill) => sum + (skill.cbl?.scenarios || 0), 0)
+  };
+}
+
+function v3AllSkillStats() {
+  const skills = skillSectors.flatMap((sector) => sector.skills);
+  const tracked = skills.filter((skill) => skill.mastery != null);
+  const both = skills.filter((skill) => v3SkillSourceType(skill) === "both");
+  const needsAttention = skills.filter((skill) => skill.mastery == null || skill.mastery < 70);
+
+  return {
+    mastery: v3Average(tracked.map((skill) => skill.mastery)),
+    tracked: tracked.length,
+    total: skills.length,
+    coverage: skills.length ? Math.round(tracked.length / skills.length * 100) : 0,
+    both: both.length,
+    needsAttention: needsAttention.length
+  };
+}
+
+function v3SourceFilterLabel(value) {
+  return {
+    all: "All evidence",
+    both: "Both sources",
+    "pals-only": "PALS only",
+    "cbl-only": "CBL only",
+    none: "No evidence"
+  }[value] || "All evidence";
+}
+
+function v3SortSkills(skills) {
+  return [...skills].sort((first, second) => {
+    if (v3SkillState.sort === "high") return (second.mastery ?? -1) - (first.mastery ?? -1);
+    if (v3SkillState.sort === "name") return first.name.localeCompare(second.name);
+    return (first.mastery ?? -1) - (second.mastery ?? -1);
+  });
+}
+
+function v3FilteredSkills(sector) {
+  const filtered = v3SkillState.sourceFilter === "all"
+    ? sector.skills
+    : sector.skills.filter((skill) => v3SkillSourceType(skill) === v3SkillState.sourceFilter);
+  return v3SortSkills(filtered);
+}
+
+function v3SourcePanel(type, skill) {
+  const isPals = type === "pals";
+  const score = isPals ? palsSkillScore(skill) : skill.cbl?.score ?? null;
+  const scenarios = skill.cbl?.scenarios || 0;
+  const meta = isPals
+    ? (skill.total ? `${skill.correct} of ${skill.total} correct` : "No tagged questions yet")
+    : (scenarios ? `${scenarios} scored ${scenarios === 1 ? "scenario" : "scenarios"}` : "No scored scenarios yet");
+
+  return `
+    <article class="skills-v3-source ${isPals ? "is-pals" : "is-cbl"}">
+      <div class="skills-v3-source-head">
+        <span><i></i>${isPals ? "PALS knowledge" : "CBL application"}</span>
+        <strong>${score == null ? "—" : `${score}%`}</strong>
+      </div>
+      <p>${meta}</p>
+    </article>`;
+}
+
+function v3SkillGuidance(skill, sourceType) {
+  if (skill.mastery == null) return "Waiting for tagged learning evidence";
+  if (skill.mastery < 70) return "Review this skill next";
+  if (sourceType === "both") return "Knowledge and application evidence available";
+  return "Add the complementary source to strengthen confidence";
+}
+
+function v3SkillRow(skill, sector) {
+  const sourceType = v3SkillSourceType(skill);
+  const evidenceState = skillEvidenceState(skill);
+  const evidenceCount = skill.total + (skill.cbl?.scenarios || 0);
+  const guidance = v3SkillGuidance(skill, sourceType);
+
+  return `
+    <article class="skills-v3-row" data-v3-skill-name="${skill.name}">
+      <header class="skills-v3-row-head">
+        <div class="skills-v3-row-name">
+          <strong>${skill.name}</strong>
+          <small>${sector.category}</small>
+        </div>
+        <span class="evidence-badge ${evidenceState.className}">${evidenceState.label}</span>
+        <div class="skills-v3-score">
+          <span>Combined mastery</span>
+          <strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong>
+        </div>
+      </header>
+      <div class="skills-v3-overall-track">
+        ${skill.mastery == null
+          ? '<span class="mastery-empty-track" aria-hidden="true"></span>'
+          : progressBar(skill.mastery, toneFor(skill.mastery), `${skill.name} combined mastery`)}
+      </div>
+      <div class="skills-v3-source-grid">
+        ${v3SourcePanel("pals", skill)}
+        ${v3SourcePanel("cbl", skill)}
+      </div>
+      <footer class="skills-v3-row-foot">
+        <span>${guidance} · ${evidenceCount} evidence ${evidenceCount === 1 ? "item" : "items"}</span>
+        <button class="evidence-button" type="button" data-skill-evidence="${sector.id}" data-skill-name="${skill.name}" ${skill.mastery == null ? "disabled" : ""}>View evidence</button>
+      </footer>
+    </article>`;
+}
+
+function v3SectorStrip(selectedSector) {
+  return skillSectors.map((sector) => {
+    const stats = v3SectorStats(sector);
+    const active = sector.id === selectedSector.id;
+    return `
+      <button class="skills-v3-sector ${active ? "is-active" : ""}" type="button" data-v3-sector="${sector.id}" aria-pressed="${active}">
+        <span>${sector.category}</span>
+        <strong>${stats.mastery == null ? "—" : `${stats.mastery}%`}</strong>
+        <small>${stats.tracked}/${sector.skills.length} skills</small>
+      </button>`;
+  }).join("");
+}
+
+function v3SkillsScope(learner) {
+  return `
+    <header class="skills-v3-scope">
+      <div class="skills-v3-scope-copy">
+        <h2>Skills analytics</h2>
+        <p>Start with capability outcomes, then inspect the learning evidence behind each result.</p>
+      </div>
+      <div class="field">
+        <label for="skills-learner">Learner</label>
+        <select id="skills-learner" data-skills-learner>
+          ${skillsLearners.map((item) => `<option value="${item.id}" ${item.id === learner.id ? "selected" : ""}>${item.label}</option>`).join("")}
+        </select>
+      </div>
+    </header>`;
+}
+
+function renderSkillsV3() {
+  const learner = skillsLearners.find((item) => item.id === state.skillsLearner) || skillsLearners[0];
+  const sector = skillSectors.find((item) => item.id === state.skillsSector) || skillSectors[0];
+
+  if (!learner.hasData) {
+    return `
+      <div class="skills-v3">
+        ${v3SkillsScope(learner)}
+        <section class="skills-v3-overview">
+          <div class="empty-state">
+            <div><span class="empty-state-icon" data-icon="sparkle"></span><h3>No skill evidence yet</h3><p>This learner has no PALS answers or scored CBL scenarios mapped to a canonical skill.</p></div>
+          </div>
+        </section>
+      </div>`;
+  }
+
+  const overall = v3AllSkillStats();
+  const sectorStats = v3SectorStats(sector);
+  const visibleSkills = v3FilteredSkills(sector);
+
+  return `
+    <div class="skills-v3">
+      ${v3SkillsScope(learner)}
+
+      <section class="skills-v3-overview" aria-labelledby="skills-v3-overview-title">
+        <div class="skills-v3-overview-head">
+          <div class="skills-v3-overview-heading">
+            <h2 id="skills-v3-overview-title">Skills overview</h2>
+            <p>Bird’s-eye view across every sector before drilling into individual skills.</p>
+          </div>
+        </div>
+
+        <div class="skills-v3-summary">
+          <article class="is-primary">
+            <span class="skills-v3-summary-icon" data-icon="sparkle"></span>
+            <span class="skills-v3-summary-label">Combined mastery</span>
+            <strong>${overall.mastery}%</strong>
+            <small>Average across ${overall.tracked} tracked skills</small>
+          </article>
+          <article>
+            <span class="skills-v3-summary-icon" data-icon="check-circle"></span>
+            <span class="skills-v3-summary-label">Evidence coverage</span>
+            <strong>${overall.coverage}%</strong>
+            <small>${overall.tracked} of ${overall.total} skills have evidence</small>
+          </article>
+          <article>
+            <span class="skills-v3-summary-icon" data-icon="book-open"></span>
+            <span class="skills-v3-summary-label">Dual-source confidence</span>
+            <strong>${overall.both}</strong>
+            <small>Skills supported by both PALS and CBL</small>
+          </article>
+          <article>
+            <span class="skills-v3-summary-icon" data-icon="trend"></span>
+            <span class="skills-v3-summary-label">Needs attention</span>
+            <strong>${overall.needsAttention}</strong>
+            <small>Below 70% or still missing evidence</small>
+          </article>
+        </div>
+
+        <div class="skills-v3-sectors">
+          <div class="skills-v3-section-label"><strong>Across sectors</strong><span>Select a sector to inspect its skill evidence</span></div>
+          <div class="skills-v3-sector-strip">${v3SectorStrip(sector)}</div>
+        </div>
+      </section>
+
+      <section class="skills-v3-detail" aria-labelledby="skills-v3-detail-title">
+        <header class="skills-v3-detail-head">
+          <div class="skills-v3-detail-heading">
+            <p class="skill-category-label">Selected sector</p>
+            <h2 id="skills-v3-detail-title">${sector.category}</h2>
+            <p>${sectorStats.tracked} of ${sector.skills.length} skills tracked · ${sectorStats.questions} PALS questions · ${sectorStats.scenarios} CBL scenarios</p>
+          </div>
+          <div class="skills-v3-controls">
+            <button class="skills-v3-method-trigger" type="button" data-v3-method-info aria-haspopup="dialog"><span data-icon="help"></span>How mastery works</button>
+            <div class="field">
+              <label for="v3-source-filter">Evidence</label>
+              <select id="v3-source-filter" data-v3-source-filter>
+                ${["all", "both", "pals-only", "cbl-only", "none"].map((value) => `<option value="${value}" ${v3SkillState.sourceFilter === value ? "selected" : ""}>${v3SourceFilterLabel(value)}</option>`).join("")}
+              </select>
+            </div>
+            <div class="field">
+              <label for="v3-skill-sort">Sort by</label>
+              <select id="v3-skill-sort" data-v3-skill-sort>
+                <option value="low" ${v3SkillState.sort === "low" ? "selected" : ""}>Mastery: low first</option>
+                <option value="high" ${v3SkillState.sort === "high" ? "selected" : ""}>Mastery: high first</option>
+                <option value="name" ${v3SkillState.sort === "name" ? "selected" : ""}>Skill name</option>
+              </select>
+            </div>
+          </div>
+        </header>
+
+        <div class="skills-v3-detail-body">
+          <aside class="skills-v3-profile" aria-label="Selected sector profile">
+            <p class="skill-category-label">Sector profile</p>
+            ${radarChart(sector.skills.map((skill) => ({ name: skill.name, value: skill.mastery || 0 })), "skills-v3-radar", `${sector.category} skill mastery`)}
+            <div class="skills-v3-profile-summary">
+              <article><span>Sector mastery</span><strong>${sectorStats.mastery == null ? "—" : `${sectorStats.mastery}%`}</strong></article>
+              <article><span>Both sources</span><strong>${sectorStats.both}/${sector.skills.length}</strong></article>
+            </div>
+          </aside>
+          <div class="skills-v3-list">
+            ${visibleSkills.length
+              ? visibleSkills.map((skill) => v3SkillRow(skill, sector)).join("")
+              : `<div class="skills-v3-empty-filter"><strong>No matching skills</strong>Try another evidence filter for this sector.</div>`}
+          </div>
+        </div>
+      </section>
+    </div>`;
+}
+
+function v3CblGroups(item) {
+  if (item.groups) return item.groups;
+  const primaryLearners = Math.max(1, Math.round(item.learners * 0.75));
+  const remainingLearners = Math.max(0, item.learners - primaryLearners);
+  const totalAttempts = item.attempts ?? Math.max(1, Math.round(item.learners * 0.6));
+  const primaryAttempts = Math.max(1, Math.round(totalAttempts * 0.8));
+
+  return [
+    { id: "heyhi-demo", name: "HeyHi Demo", learners: primaryLearners, attempts: primaryAttempts, score: item.score },
+    remainingLearners
+      ? { id: "not-in-group", name: "Not in any group", learners: remainingLearners, attempts: Math.max(0, totalAttempts - primaryAttempts), score: Math.max(0, item.score - 5) }
+      : null
+  ].filter(Boolean);
+}
+
+function v3CblLearners(group) {
+  if (group.people) return group.people;
+  const names = ["Bima 23", "Siti Rahma", "Daniel Wong", "Nadia Putri", "Alex Tan", "Maya Chen"];
+  const scoreOffsets = [4, 1, -2, -5, 2, -1];
+  return Array.from({ length: group.learners }, (_, index) => ({
+    name: names[index] || `Learner ${index + 1}`,
+    attempts: group.attempts ? Math.max(1, Math.round(group.attempts / group.learners)) : 0,
+    version: "V1",
+    score: Math.max(0, Math.min(100, group.score + scoreOffsets[index % scoreOffsets.length]))
+  }));
+}
+
+function v3CountLabel(count, singular) {
+  return `${count} ${singular}${count === 1 ? "" : "s"}`;
+}
+
+function v3CblCaseCard(item) {
+  return `
+    <article class="cbl-v3-case">
+      <div class="cbl-v3-score-ring" style="--cbl-score-angle:${item.score * 3.6}deg" role="img" aria-label="${item.score}% average highest score"><strong>${item.score}%</strong></div>
+      <div class="cbl-v3-case-copy"><h3>${item.name}</h3><p>Role: ${item.role}</p></div>
+      <div class="cbl-v3-case-meta"><span>Average highest score</span><strong>${v3CountLabel(item.learners, "learner")}</strong></div>
+      <button class="view-report-button" type="button" data-v3-cbl-case="${item.id}" aria-label="View details for ${item.name}">View Details</button>
+    </article>`;
+}
+
+function renderCblV3() {
+  return `
+    <div class="stack cbl-v3">
+      <section class="panel">
+        <div class="panel-body">
+          <div class="panel-heading"><div><h2>CBL Analytics</h2><p>Review case-based learning practice and roleplay performance across your organization. Scores are averages from all attempts.</p></div></div>
+          <section class="cbl-summary" aria-label="CBL summary">
+            <article><span>Available cases</span><strong>${v3CblCases.length}</strong></article>
+            <article><span>Learners attempted</span><strong>${v3CblSummary.learnersAttempted}</strong></article>
+            <article><span>Total attempts</span><strong>${v3CblSummary.totalAttempts}</strong></article>
+            <article><span>Average highest score</span><strong>${v3CblSummary.averageHighestScore}%</strong></article>
+          </section>
+        </div>
+      </section>
+      <section class="panel">
+        <div class="panel-body">
+          <div class="panel-heading"><div><h2>Practice and Roleplay Cases</h2><p>Select a case to compare group performance, then drill down to individual learners.</p></div><div class="panel-count"><strong>${v3CblCases.length}</strong><span>cases</span></div></div>
+          <div class="cbl-v3-case-grid">${v3CblCases.map(v3CblCaseCard).join("")}</div>
+        </div>
+      </section>
+    </div>`;
+}
+
+function v3CblLearnerBreakdown(group) {
+  return `
+    <button class="cbl-v3-back" type="button" data-v3-cbl-back><span aria-hidden="true">&larr;</span> Back to groups</button>
+    <div class="panel-heading"><div><h3>Learner Performance</h3><p>Highest score and attempt count for each learner in ${group.name}.</p></div></div>
+    <div class="cbl-v3-learner-list">
+      ${v3CblLearners(group).map((learner) => `
+        <article><div><strong>${learner.name}</strong><span>${v3CountLabel(learner.attempts, "attempt")} &middot; ${learner.version}</span></div><div><span>Highest score</span><strong>${learner.score}%</strong></div></article>`).join("")}
+    </div>`;
+}
+
+function v3CblGroupBreakdown(groups) {
+  return `
+    <div class="panel-heading"><div><h3>Group Performance</h3><p>Compare participation and average highest score across learner groups.</p></div></div>
+    <div class="cbl-v3-group-list">
+      ${groups.map((group) => `
+        <article><div><strong>${group.name}</strong><span>${v3CountLabel(group.learners, "learner")} &middot; ${v3CountLabel(group.attempts, "attempt")}</span></div><div><span>Average highest score</span><strong>${group.score}%</strong></div><button type="button" data-v3-cbl-group="${group.id}" aria-label="View learners in ${group.name}">View learners</button></article>`).join("")}
+    </div>`;
+}
+
+function renderCblDialogV3() {
+  const item = v3CblCases.find((candidate) => candidate.id === v3CblState.caseId);
+  if (!item) return;
+  const groups = v3CblGroups(item);
+  const group = groups.find((candidate) => candidate.id === v3CblState.groupId);
+  const attempts = group ? group.attempts : item.attempts ?? Math.max(1, Math.round(item.learners * 0.6));
+  const learners = group ? group.learners : item.detailLearners ?? item.learners;
+  const score = group ? group.score : item.score;
+  const live = group ? group.live ?? 0 : item.live ?? 0;
+  const turnBased = group ? group.turnBased ?? group.attempts : item.turnBased ?? attempts;
+
+  if (reportDialog.open) reportDialog.close();
+  showReportDialog({
+    title: item.name,
+    subtitle: group
+      ? `${group.name} learner breakdown. Scores represent highest scores.`
+      : `Role: ${item.role}. Scores represent highest scores.`,
+    summaryLabel: "CBL case summary",
+    summary: `
+      <article><span>Average highest score</span><strong>${score}%</strong></article>
+      <article><span>Total attempts</span><strong>${attempts}</strong></article>
+      <article><span>Learners attempted</span><strong>${learners}</strong></article>`,
+    body: `
+      <div class="cbl-v3-mode-chips"><span>${live} Live</span><span>${turnBased} Turn-based</span></div>
+      ${group ? v3CblLearnerBreakdown(group) : v3CblGroupBreakdown(groups)}`
+  });
+}
+
+function openCblCaseV3(caseId) {
+  v3CblState.caseId = caseId;
+  v3CblState.groupId = null;
+  renderCblDialogV3();
+}
+
+function v3FeatureCard({ tab, icon, title, status, statusTone = "", metric, metricLabel, description, priority = false }) {
+  return `
+    <article class="overview-v3-card ${priority ? "is-priority" : ""}">
+      <header class="overview-v3-card-head">
+        <span class="overview-v3-card-title"><span class="overview-v3-card-icon" data-icon="${icon}"></span>${title}</span>
+        <span class="overview-v3-card-status ${statusTone}">${status}</span>
+      </header>
+      <div class="overview-v3-card-metric"><strong>${metric}</strong><span>${metricLabel}</span></div>
+      <p>${description}</p>
+      <button class="overview-v3-link" type="button" data-v3-overview-tab="${tab}">Open ${title}<span data-icon="arrow"></span></button>
+    </article>`;
+}
+
+function renderOverviewV3() {
+  const skills = v3AllSkillStats();
+  const palsCompletion = v3Average(palsCourses.map((course) => course.completion));
+  const palsScore = v3Average(palsCourses.map((course) => course.score));
+  const cblNeedsReview = v3CblCases.filter((item) => item.score === 0).length;
+  const assessmentScore = v3Average(assessments.map((assessment) => assessment.score));
+  const enrollments = courses.reduce((sum, course) => sum + course.enrollments, 0);
+  const completions = courses.reduce((sum, course) => sum + course.completions, 0);
+  const recentCompletions = trendSeries.completions.reduce((sum, value) => sum + value, 0);
+  const recentEnrollments = trendSeries.enrollments.reduce((sum, value) => sum + value, 0);
+
+  const cards = [
+    {
+      tab: "pals", icon: "cap", title: "PALS Courses", status: "Primary", statusTone: "is-good",
+      metric: `${palsCompletion}%`, metricLabel: `average completion · ${palsScore}% average score`,
+      description: `${palsCourses.length} published PALS courses generate knowledge-check evidence for Skills.`, priority: true
+    },
+    {
+      tab: "cbl", icon: "trophy", title: "CBL", status: "Active", statusTone: "is-good",
+      metric: v3CblCases.length, metricLabel: `${v3CblSummary.learnersAttempted} learners Â· ${v3CblSummary.totalAttempts} attempts`,
+      description: `Case-based practice is active with a ${v3CblSummary.averageHighestScore}% average highest score across the catalogue.`, priority: true
+    },
+    {
+      tab: "skills", icon: "sparkle", title: "Skills", status: "Outcome", statusTone: "is-good",
+      metric: `${skills.mastery}%`, metricLabel: `combined mastery · ${skills.coverage}% evidence coverage`,
+      description: "Skills consolidates PALS knowledge and CBL application without hiding the source breakdown.", priority: true
+    },
+    {
+      tab: "assessments", icon: "clipboard", title: "Assessments", status: "Validation",
+      metric: `${assessmentScore}%`, metricLabel: `average score across ${assessments.length} assessments`,
+      description: "Assessments validate broader learning performance and provide a formal checkpoint after practice."
+    },
+    {
+      tab: "courses", icon: "book-open", title: "Courses", status: "Delivery",
+      metric: enrollments, metricLabel: `enrollments · ${completions} course completions`,
+      description: "Courses provide participation context around the learning activities and evidence shown elsewhere."
+    },
+    {
+      tab: "trends", icon: "trend", title: "Trends", status: "Exploratory",
+      metric: recentCompletions, metricLabel: `lesson completions · ${recentEnrollments} enrollments in 30 days`,
+      description: "Trends is reserved for change over time. Its final product questions still need to be defined."
+    }
+  ];
+
+  return `
+    <div class="overview-v3">
+      <section class="overview-v3-section" aria-labelledby="overview-v3-feature-title">
+        <header class="overview-v3-section-head">
+          <div><h2 id="overview-v3-feature-title">Feature pulse</h2><p>Each summary links to the tab that owns the detailed data.</p></div>
+        </header>
+        <div class="overview-v3-grid">${cards.map(v3FeatureCard).join("")}</div>
+      </section>
+
+      <section class="overview-v3-focus-list" aria-label="Analytics focus areas">
+        <h2>Focus next</h2>
+        <article class="overview-v3-focus-item"><i class="overview-v3-focus-dot"></i><div><strong>Review ${cblNeedsReview} CBL cases without a scored outcome</strong><span>The catalogue is active; use case details to distinguish low participation from missing performance evidence.</span></div><button type="button" data-v3-overview-tab="cbl">Open CBL</button></article>
+        <article class="overview-v3-focus-item"><i class="overview-v3-focus-dot"></i><div><strong>Review ${skills.needsAttention} skills needing attention</strong><span>These skills are below 70% mastery or still have no evidence.</span></div><button type="button" data-v3-overview-tab="skills">Open Skills</button></article>
+        <article class="overview-v3-focus-item"><i class="overview-v3-focus-dot"></i><div><strong>Investigate course completion</strong><span>${enrollments} enrollments currently produce ${completions} completed courses.</span></div><button type="button" data-v3-overview-tab="courses">Open Courses</button></article>
+      </section>
+    </div>`;
+}
+
+function openSkillsMethodV3() {
+  showReportDialog({
+    title: "How skill mastery works",
+    subtitle: "Skills analytics",
+    summaryLabel: "Mastery evidence sources",
+    summary: `
+      <article><span>PALS knowledge</span><strong>Knowledge checks</strong></article>
+      <article><span>CBL application</span><strong>Applied performance</strong></article>
+      <article><span>Combined mastery</span><strong>Unified result</strong></article>`,
+    body: `
+      <div class="panel-heading"><div><h3>Evidence composition</h3><p>Source-level results remain visible so administrators can understand what contributes to each skill result.</p></div></div>
+      <div class="skills-v3-method-explainer">
+        <article><span data-icon="book-open"></span><div><strong>PALS knowledge</strong><p>Uses performance from correctly answered PALS questions tagged to the skill.</p></div></article>
+        <article class="is-cbl"><span data-icon="trophy"></span><div><strong>CBL application</strong><p>Uses scored CBL scenarios mapped to the skill through Learning Objectives.</p></div></article>
+        <article><span data-icon="chart"></span><div><strong>Combined mastery</strong><p>Brings the available knowledge and application evidence into one skill result.</p></div></article>
+      </div>
+      <p class="skills-v3-evidence-note"><strong>Source transparency:</strong> PALS and CBL scores remain available independently alongside combined mastery.</p>`
+  });
+}
+
+function openSkillEvidenceV3(sectorId, skillName) {
+  const sector = skillSectors.find((item) => item.id === sectorId);
+  const skill = sector?.skills.find((item) => item.name === skillName);
+  if (!sector || !skill) return;
+
+  const palsScore = palsSkillScore(skill);
+  const cblScore = skill.cbl?.score ?? null;
+  const scenarioCount = skill.cbl?.scenarios || 0;
+  const evidenceState = skillEvidenceState(skill);
+
+  showReportDialog({
+    title: skill.name,
+    subtitle: `${sector.category} · ${evidenceState.label}`,
+    summaryLabel: "Skill evidence summary",
+    summary: `
+      <article><span>Combined mastery</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong></article>
+      <article><span>PALS knowledge</span><strong>${palsScore == null ? "—" : `${palsScore}%`}</strong></article>
+      <article><span>CBL application</span><strong>${cblScore == null ? "—" : `${cblScore}%`}</strong></article>`,
+    body: `
+      <div class="panel-heading"><div><h3>Evidence composition</h3><p>Each source stays visible so an administrator can understand why this mastery result exists.</p></div></div>
+      <div class="skills-v3-evidence-flow">
+        <article><span>PALS knowledge</span><strong>${palsScore == null ? "—" : `${palsScore}%`}</strong><small>${skill.total ? `${skill.correct} of ${skill.total} tagged questions correct` : "No question evidence"}</small></article>
+        <span class="skills-v3-flow-plus">+</span>
+        <article><span>CBL application</span><strong>${cblScore == null ? "—" : `${cblScore}%`}</strong><small>${scenarioCount ? `${scenarioCount} scored ${scenarioCount === 1 ? "scenario" : "scenarios"}` : "No scenario evidence"}</small></article>
+        <span class="skills-v3-flow-plus">→</span>
+        <article><span>Combined mastery</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong><small>Knowledge and application evidence combined</small></article>
+      </div>
+      <p class="skills-v3-evidence-note"><strong>Learning objective mapping:</strong> CBL scenarios contribute evidence when their admin-defined Learning Objectives are mapped to this canonical skill. PALS questions use the same skill taxonomy, preventing duplicate or fragmented skill names.</p>
+      <article class="question-card"><strong>PALS question evidence</strong><p>${skill.total ? `${skill.correct} correct answers from ${skill.total} questions tagged to ${skill.name}.` : "No PALS question evidence has been recorded for this skill yet."}</p></article>
+      <article class="question-card"><strong>CBL scenario evidence</strong><p>${scenarioCount ? `${scenarioCount} scored ${scenarioCount === 1 ? "scenario was" : "scenarios were"} mapped to ${skill.name} through Learning Objectives.` : "No scored CBL scenario evidence has been recorded for this skill yet."}</p></article>`
+  });
+}
+
+tabRenderers.overview = renderOverviewV3;
+tabRenderers.cbl = renderCblV3;
+tabRenderers.skills = renderSkillsV3;
+openSkillEvidence = openSkillEvidenceV3;
+
+document.addEventListener("click", (event) => {
+  const cblCase = event.target.closest("[data-v3-cbl-case]");
+  if (cblCase) {
+    openCblCaseV3(cblCase.dataset.v3CblCase);
+    return;
+  }
+
+  const cblGroup = event.target.closest("[data-v3-cbl-group]");
+  if (cblGroup) {
+    v3CblState.groupId = cblGroup.dataset.v3CblGroup;
+    renderCblDialogV3();
+    return;
+  }
+
+  if (event.target.closest("[data-v3-cbl-back]")) {
+    v3CblState.groupId = null;
+    renderCblDialogV3();
+    return;
+  }
+
+  if (event.target.closest("[data-v3-method-info]")) {
+    openSkillsMethodV3();
+    return;
+  }
+
+  const overviewLink = event.target.closest("[data-v3-overview-tab]");
+  if (overviewLink) {
+    state.tab = overviewLink.dataset.v3OverviewTab;
+    render();
+    document.querySelector(`[data-tab="${state.tab}"]`)?.focus();
+    return;
+  }
+
+  const sectorButton = event.target.closest("[data-v3-sector]");
+  if (!sectorButton) return;
+  state.skillsSector = sectorButton.dataset.v3Sector;
+  v3SkillState.sourceFilter = "all";
+  renderAndFocus(`[data-v3-sector="${state.skillsSector}"]`);
+});
+
+document.addEventListener("change", (event) => {
+  if (event.target.matches("[data-skills-learner]")) {
+    v3SkillState.sourceFilter = "all";
+    v3SkillState.sort = "low";
+    renderAndFocus("[data-skills-learner]");
+    return;
+  }
+
+  if (event.target.matches("[data-v3-source-filter]")) {
+    v3SkillState.sourceFilter = event.target.value;
+    renderAndFocus("[data-v3-source-filter]");
+    return;
+  }
+
+  if (event.target.matches("[data-v3-skill-sort]")) {
+    v3SkillState.sort = event.target.value;
+    renderAndFocus("[data-v3-skill-sort]");
+  }
+});
+
+state.tab = "overview";
+render();

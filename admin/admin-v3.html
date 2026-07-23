@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Interactive local replica of the ATLAS Learning Analytics admin page."
+      content="ATLAS Learning Analytics administration dashboard."
     />
-    <title>ATLAS Learning Analytics — Production Replica</title>
+    <title>ATLAS Learning Analytics</title>
     <link rel="stylesheet" href="admin-v2-skills-replica.css?v=20260722-sample-data" />
     <link rel="stylesheet" href="admin-v2-skills-replica-analytics.css?v=20260722-sample-data" />
+    <link rel="stylesheet" href="admin-v3.css?v=20260722-skills-hierarchy" />
   </head>
   <body>
     <div class="mobile-scrim" data-sidebar-scrim hidden></div>
@@ -96,11 +97,12 @@
         <section class="analytics-workspace" aria-label="Learning analytics detail">
           <div class="analytics-tabs-scroll">
             <div class="analytics-tabs" role="tablist" aria-label="Analytics views">
-              <button class="analytics-tab is-active" type="button" role="tab" id="tab-courses" aria-selected="true" aria-controls="analytics-panel" data-tab="courses"><span data-icon="book-open"></span>Courses</button>
+              <button class="analytics-tab is-active" type="button" role="tab" id="tab-overview" aria-selected="true" aria-controls="analytics-panel" data-tab="overview"><span data-icon="grid"></span>Overview</button>
               <button class="analytics-tab" type="button" role="tab" id="tab-pals" aria-selected="false" aria-controls="analytics-panel" data-tab="pals"><span data-icon="cap"></span>PALS Courses</button>
-              <button class="analytics-tab" type="button" role="tab" id="tab-skills" aria-selected="false" aria-controls="analytics-panel" data-tab="skills"><span data-icon="sparkle"></span>Skills</button>
               <button class="analytics-tab" type="button" role="tab" id="tab-cbl" aria-selected="false" aria-controls="analytics-panel" data-tab="cbl"><span data-icon="trophy"></span>CBL</button>
+              <button class="analytics-tab" type="button" role="tab" id="tab-skills" aria-selected="false" aria-controls="analytics-panel" data-tab="skills"><span data-icon="sparkle"></span>Skills</button>
               <button class="analytics-tab" type="button" role="tab" id="tab-assessments" aria-selected="false" aria-controls="analytics-panel" data-tab="assessments"><span data-icon="clipboard"></span>Assessments</button>
+              <button class="analytics-tab" type="button" role="tab" id="tab-courses" aria-selected="false" aria-controls="analytics-panel" data-tab="courses"><span data-icon="book-open"></span>Courses</button>
               <button class="analytics-tab" type="button" role="tab" id="tab-trends" aria-selected="false" aria-controls="analytics-panel" data-tab="trends"><span data-icon="trend"></span>Trends</button>
             </div>
           </div>
@@ -115,5 +117,6 @@
     </dialog>
 
     <script src="admin-v2-skills-replica.js?v=20260722-sample-data"></script>
+    <script src="admin-v3.js?v=20260722-skills-hierarchy"></script>
   </body>
 </html>
