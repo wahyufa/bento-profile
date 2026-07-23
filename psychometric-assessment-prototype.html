@@ -2882,7 +2882,6 @@
                 </article>
                 <div class="type-summary">${typeLetters(pCode)}</div>
               </div>
-              <div class="preference-grid">${preferenceDimensionRows(pPercents)}</div>
             </section>
 
             <section class="report-page">
@@ -2906,6 +2905,16 @@
                 <article class="profile-panel"><div class="panel-icon">5</div><h3>Possible challenges</h3>${listHtml(preferenceProfile.challenges, 5)}</article>
                 <article class="profile-panel"><div class="panel-icon">6</div><h3>Demotivated by</h3>${listHtml(preferenceProfile.demotivated, 5)}</article>
               </section>
+            </section>
+
+            <section class="report-page">
+              <div class="report-page-header">
+                <div>
+                  <p class="report-page-label">Preference dimensions</p>
+                  <h2 class="report-page-title">How does this relate to your Learning and Work?</h2>
+                </div>
+              </div>
+              <div class="preference-grid">${preferenceDimensionRows(pPercents)}</div>
             </section>
           </div>
 
