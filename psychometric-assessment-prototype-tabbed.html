@@ -1610,73 +1610,48 @@
 
     .hidden { display: none !important; }
 
-    .floating-cta {
-      position: fixed;
-      right: 24px;
-      bottom: 24px;
-      z-index: 40;
+    .preference-tabs-wrap {
+      margin-top: 6px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .preference-tablist {
       display: inline-flex;
-      align-items: center;
-      max-width: min(340px, calc(100vw - 48px));
-      min-height: 52px;
-      padding: 0 22px;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 999px;
+      background: #eef2f6;
+    }
+
+    .preference-tab {
+      min-height: 38px;
+      padding: 0 18px;
       border: 0;
       border-radius: 999px;
-      background: var(--brand);
-      color: #fff;
-      font-size: 14px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
       font-weight: 700;
-      line-height: 1.3;
-      text-align: left;
-      box-shadow: 0 12px 28px rgba(7, 143, 208, .35);
       cursor: pointer;
     }
 
-    .floating-cta:hover { background: var(--brand-dark); }
-
-    .modal-overlay {
-      position: fixed;
-      inset: 0;
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
-      background: rgba(18, 38, 63, .55);
-    }
-
-    .modal-panel {
-      width: min(920px, 100%);
-      max-height: min(86vh, 900px);
-      overflow-y: auto;
-      padding: 26px;
-      border-radius: 20px;
+    .preference-tab.active {
       background: #fff;
+      color: var(--brand-dark);
+      box-shadow: 0 4px 10px rgba(18, 38, 63, .08);
     }
 
-    .modal-header {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
+    .preference-tab-intro {
+      max-width: 640px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
     }
 
-    .modal-header .report-page-title { margin: 0; }
-
-    .modal-close {
-      flex: 0 0 auto;
-      display: inline-grid;
-      width: 36px;
-      height: 36px;
-      place-items: center;
-      border: 0;
-      border-radius: 999px;
-      background: #f2f4f7;
-      color: var(--text);
-      font-size: 20px;
-      line-height: 1;
-      cursor: pointer;
+    .preference-tabpanel {
+      margin-top: 18px;
     }
 
     .modal-close:hover { background: #e7edf3; }
@@ -1730,9 +1705,8 @@
       .report-page { padding: 20px; }
       .report-page-header { flex-direction: column; }
       .report-actions { flex-direction: column; }
-      .floating-cta { right: 16px; left: 16px; bottom: 16px; max-width: none; font-size: 13px; }
-      .modal-panel { padding: 18px; }
-      .modal-header { flex-direction: column; }
+      .preference-tablist { display: flex; width: 100%; }
+      .preference-tab { flex: 1; }
     }
   </style>
 </head>
@@ -2305,7 +2279,7 @@
       page: 0,
       answers: {},
       summaryType: null,
-      dimensionModalOpen: false
+      preferenceView: 'quick'
     };
 
     const perPage = 10;
@@ -2957,29 +2931,36 @@
                 </article>
                 <div class="type-summary">${typeLetters(pCode)}</div>
               </div>
-            </section>
 
-            <section class="report-page">
-              <div class="report-page-header">
-                <div>
-                  <p class="report-page-label">Preference detail</p>
-                  <h2 class="report-page-title">${pCode} Detail</h2>
-                  <p class="report-page-subtitle">This section translates your preference type into practical notes from the latest detailed type description.</p>
+              <div class="preference-tabs-wrap">
+                <div class="preference-tablist" role="tablist" aria-label="Preference Profile views">
+                  <button class="preference-tab ${state.preferenceView === 'quick' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'quick'}" data-preference-tab="quick">Learning &amp; Work Snapshot</button>
+                  <button class="preference-tab ${state.preferenceView === 'detail' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'detail'}" data-preference-tab="detail">Full ${pCode} detail</button>
                 </div>
-                <span class="page-chip">Preference detail</span>
+
+                ${state.preferenceView === 'quick' ? `
+                  <p class="preference-tab-intro">A dimension-by-dimension look at how your ${pCode} result may show up day to day.</p>
+                  <div class="preference-tabpanel">
+                    <div class="preference-grid">${preferenceDimensionRows(pPercents)}</div>
+                  </div>
+                ` : `
+                  <p class="preference-tab-intro">The full ${pCode} write-up, translated into practical notes from the detailed type description.</p>
+                  <div class="preference-tabpanel">
+                    <section class="quick-summary">
+                      <h3>How to read this result</h3>
+                      <p>Your profile describes preferences, not ability. Use it to notice what gives you energy, where you may thrive, and which situations may need extra support.</p>
+                    </section>
+                    <section class="profile-panels">
+                      <article class="profile-panel"><div class="panel-icon">1</div><h3>Often characterised as</h3>${listHtml(preferenceProfile.characterised, 4)}</article>
+                      <article class="profile-panel"><div class="panel-icon">2</div><h3>What may motivate you</h3>${listHtml(preferenceProfile.motivated, 4)}</article>
+                      <article class="profile-panel"><div class="panel-icon">3</div><h3>Work environments you may thrive in</h3>${listHtml(preferenceProfile.environment, 5)}</article>
+                      <article class="profile-panel"><div class="panel-icon">4</div><h3>Strengths</h3>${listHtml(preferenceProfile.strengths, 6)}</article>
+                      <article class="profile-panel"><div class="panel-icon">5</div><h3>Possible challenges</h3>${listHtml(preferenceProfile.challenges, 5)}</article>
+                      <article class="profile-panel"><div class="panel-icon">6</div><h3>Demotivated by</h3>${listHtml(preferenceProfile.demotivated, 5)}</article>
+                    </section>
+                  </div>
+                `}
               </div>
-              <section class="quick-summary">
-                <h3>How to read this result</h3>
-                <p>Your profile describes preferences, not ability. Use it to notice what gives you energy, where you may thrive, and which situations may need extra support.</p>
-              </section>
-              <section class="profile-panels">
-                <article class="profile-panel"><div class="panel-icon">1</div><h3>Often characterised as</h3>${listHtml(preferenceProfile.characterised, 4)}</article>
-                <article class="profile-panel"><div class="panel-icon">2</div><h3>What may motivate you</h3>${listHtml(preferenceProfile.motivated, 4)}</article>
-                <article class="profile-panel"><div class="panel-icon">3</div><h3>Work environments you may thrive in</h3>${listHtml(preferenceProfile.environment, 5)}</article>
-                <article class="profile-panel"><div class="panel-icon">4</div><h3>Strengths</h3>${listHtml(preferenceProfile.strengths, 6)}</article>
-                <article class="profile-panel"><div class="panel-icon">5</div><h3>Possible challenges</h3>${listHtml(preferenceProfile.challenges, 5)}</article>
-                <article class="profile-panel"><div class="panel-icon">6</div><h3>Demotivated by</h3>${listHtml(preferenceProfile.demotivated, 5)}</article>
-              </section>
             </section>
           </div>
 
@@ -2988,20 +2969,6 @@
             <button class="button" type="button" data-back-dashboard="${pCode}">Back to Dashboard</button>
           </div>
         </div>
-
-        <button class="floating-cta" type="button" data-open-dimensions>What does this mean to my learning and work?</button>
-
-        ${state.dimensionModalOpen ? `
-          <div class="modal-overlay" data-dimensions-overlay>
-            <div class="modal-panel" role="dialog" aria-modal="true" aria-label="What does this mean to my learning and work?">
-              <div class="modal-header">
-                <h2 class="report-page-title">What does this mean to my learning and work?</h2>
-                <button class="modal-close" type="button" data-close-dimensions aria-label="Close">&times;</button>
-              </div>
-              <div class="preference-grid">${preferenceDimensionRows(pPercents)}</div>
-            </div>
-          </div>
-        ` : ''}
       `;
     }
 
@@ -3026,10 +2993,8 @@
         return;
       }
       if (event.target.closest('#backToDashboard')) { window.location.href = 'atlas-student-dashboard.html'; return; }
-      if (event.target.closest('[data-open-dimensions]')) { state.dimensionModalOpen = true; render(); return; }
-      if (event.target.closest('[data-close-dimensions]')) { state.dimensionModalOpen = false; render(); return; }
-      const overlayTarget = event.target.closest('[data-dimensions-overlay]');
-      if (overlayTarget && event.target === overlayTarget) { state.dimensionModalOpen = false; render(); return; }
+      const preferenceTab = event.target.closest('[data-preference-tab]');
+      if (preferenceTab) { state.preferenceView = preferenceTab.dataset.preferenceTab; render(); return; }
       const answer = event.target.closest('[data-answer-id]');
       if (answer) { setAnswer(answer.dataset.answerId, Number(answer.dataset.answerValue)); return; }
       if (event.target.closest('[data-start]')) { state.screen = 'questions'; state.assessment = 'interest'; state.page = 0; render(); return; }
@@ -3052,10 +3017,6 @@
       if (event.target.closest('[data-edit-interest]')) { state.screen = 'questions'; state.assessment = 'interest'; state.page = 0; render(); return; }
       if (event.target.closest('[data-submit]')) { state.screen = 'loading'; render(); setTimeout(showReport, 900); return; }
       if (event.target.closest('[data-restart]')) { state.screen = 'intro'; state.assessment = 'interest'; state.page = 0; state.answers = {}; render(); return; }
-    });
-
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && state.dimensionModalOpen) { state.dimensionModalOpen = false; render(); }
     });
 
     showSavedSummaryFromUrl();
