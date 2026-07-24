@@ -3,6 +3,12 @@ const v3SkillState = {
   sort: "low"
 };
 
+const v3SkillEvidenceState = {
+  sectorId: null,
+  skillName: null,
+  showBreakdown: false
+};
+
 const v3CblSummary = {
   learnersAttempted: 31,
   totalAttempts: 42,
@@ -25,6 +31,7 @@ const v3CblCases = [
     attempts: 9,
     live: 0,
     turnBased: 9,
+    skills: ["Learning Facilitation"],
     groups: [
       { id: "heyhi-demo", name: "HeyHi Demo", learners: 8, attempts: 7, score: 33 },
       { id: "demo-june", name: "Demo June", learners: 1, attempts: 0, score: 0 },
@@ -43,21 +50,140 @@ const v3CblCases = [
       }
     ]
   },
-  { id: "motivating-disengaged-student", score: 82, name: "Motivating a Disengaged Student", role: "Online Tutor", learners: 3 },
-  { id: "upset-parent-performance", score: 81, name: "Handling an upset parent due to child's poor performance", role: "Training & Adult Education Specialist", learners: 3 },
-  { id: "banking-review-mandarin", score: 83, name: "Banking Client review session - Understanding Client's mismatched business model (Mandarin)", role: "Financial Services Specialist", learners: 26 },
-  { id: "rapid-pass-through", score: 78, name: "Rapid Pass-through", role: "Financial Services Specialist", learners: 25 },
-  { id: "explaining-learning-gaps", score: 75, name: "Explaining Learning Gaps to Parents", role: "Education Consultant", learners: 4 },
-  { id: "technical-support-escalation", score: 82, name: "Resolving a Technical Support Escalation", role: "Technical Support Lead", learners: 5 },
-  { id: "onboarding-corporate-client", score: 0, name: "Onboarding a New Corporate Client", role: "Business Development Manager", learners: 1 },
-  { id: "pitching-adaptive-learning", score: 67, name: "Pitching Adaptive Learning to Educators", role: "Product Specialist", learners: 2 },
-  { id: "rapid-pass-through-cantonese", score: 72, name: "Rapid Pass-Through (Cantonese)", role: "Financial Services Specialist", learners: 25 },
-  { id: "banking-review-cantonese", score: 56, name: "Banking Client review session - Understanding Client's mismatched business model (Cantonese)", role: "Financial Services Specialist", learners: 25 },
-  { id: "banking-review", score: 0, name: "Banking Client review session - Understanding Client's mismatched business model", role: "Financial Services Specialist", learners: 23 },
-  { id: "rapid-pass-through-mandarin", score: 61, name: "Rapid Pass-Through (Mandarin)", role: "Financial Services Specialist", learners: 26 },
-  { id: "handling-angry-parent-v2", score: 71, name: "Handling an Angry parent v2", role: "Learning Manager", learners: 4 },
-  { id: "banking-review-test", score: 81, name: "Banking Client review session - Test 12/6", role: "Financial Services Specialist", learners: 4 }
+  { id: "motivating-disengaged-student", score: 82, name: "Motivating a Disengaged Student", role: "Online Tutor", learners: 3, skills: ["Learning Facilitation", "Learning Needs Analysis"] },
+  { id: "upset-parent-performance", score: 81, name: "Handling an upset parent due to child's poor performance", role: "Training & Adult Education Specialist", learners: 3, skills: ["Learning Needs Analysis"] },
+  { id: "banking-review-mandarin", score: 83, name: "Banking Client review session - Understanding Client's mismatched business model (Mandarin)", role: "Financial Services Specialist", learners: 26, skills: ["Forensic Accounting", "Risk and Compliance"] },
+  { id: "rapid-pass-through", score: 78, name: "Rapid Pass-through", role: "Financial Services Specialist", learners: 25, skills: ["Strategy Planning"] },
+  { id: "explaining-learning-gaps", score: 75, name: "Explaining Learning Gaps to Parents", role: "Education Consultant", learners: 4, skills: ["Learning Needs Analysis"] },
+  { id: "technical-support-escalation", score: 82, name: "Resolving a Technical Support Escalation", role: "Technical Support Lead", learners: 5, skills: ["Cybersecurity Awareness", "Cloud Operations"] },
+  { id: "onboarding-corporate-client", score: 0, name: "Onboarding a New Corporate Client", role: "Business Development Manager", learners: 1, skills: ["Client Advisory", "Financial Planning and Analysis"] },
+  { id: "pitching-adaptive-learning", score: 67, name: "Pitching Adaptive Learning to Educators", role: "Product Specialist", learners: 2, skills: ["Data Analytics"] },
+  { id: "rapid-pass-through-cantonese", score: 72, name: "Rapid Pass-Through (Cantonese)", role: "Financial Services Specialist", learners: 25, skills: ["Strategy Planning"] },
+  { id: "banking-review-cantonese", score: 56, name: "Banking Client review session - Understanding Client's mismatched business model (Cantonese)", role: "Financial Services Specialist", learners: 25, skills: ["Forensic Accounting", "Risk and Compliance"] },
+  { id: "banking-review", score: 0, name: "Banking Client review session - Understanding Client's mismatched business model", role: "Financial Services Specialist", learners: 23, skills: ["Risk and Compliance", "Client Advisory"] },
+  { id: "rapid-pass-through-mandarin", score: 61, name: "Rapid Pass-Through (Mandarin)", role: "Financial Services Specialist", learners: 26, skills: ["Strategy Planning", "Tax Compliance"] },
+  { id: "handling-angry-parent-v2", score: 71, name: "Handling an Angry parent v2", role: "Learning Manager", learners: 4, skills: ["Learning Facilitation"] },
+  { id: "banking-review-test", score: 81, name: "Banking Client review session - Test 12/6", role: "Financial Services Specialist", learners: 4, skills: ["Client Advisory", "Audit and Assurance"] }
 ];
+
+const PALS_MASTERY_CAP = 70;
+const CBL_MASTERY_CAP = 60;
+const CBL_CASE_SKILL_WEIGHT = 30;
+
+function v3CasesForSkill(skillName) {
+  return v3CblCases.filter((item) => (item.skills || []).includes(skillName));
+}
+
+function v3SkillCblEvidence(skillName) {
+  const cases = v3CasesForSkill(skillName);
+  if (!cases.length) return { score: null, scenarios: 0, points: 0 };
+  const score = Math.round(cases.reduce((sum, item) => sum + item.score, 0) / cases.length);
+  const points = Math.min(
+    CBL_MASTERY_CAP,
+    Math.round(cases.reduce((sum, item) => sum + (item.score / 100) * (CBL_CASE_SKILL_WEIGHT / item.skills.length), 0))
+  );
+  return { score, scenarios: cases.length, points };
+}
+
+function v3SkillPalsPoints(skill) {
+  const score = palsSkillScore(skill);
+  return score == null ? 0 : Math.min(PALS_MASTERY_CAP, Math.round(score * PALS_MASTERY_CAP / 100));
+}
+
+function v3RecomputeSkillMastery() {
+  skillSectors.forEach((sector) => {
+    sector.skills.forEach((skill) => {
+      const cbl = v3SkillCblEvidence(skill.name);
+      const palsScore = palsSkillScore(skill);
+      const palsPoints = v3SkillPalsPoints(skill);
+      const hasEvidence = palsScore != null || cbl.scenarios > 0;
+      skill.cbl = cbl.scenarios > 0 ? { score: cbl.score, scenarios: cbl.scenarios, points: cbl.points } : null;
+      skill.palsPoints = palsPoints;
+      skill.mastery = hasEvidence ? Math.min(100, palsPoints + cbl.points) : null;
+    });
+  });
+}
+
+v3RecomputeSkillMastery();
+
+// Deterministic per-learner evidence: no per-learner PALS/CBL history exists yet,
+// so this seeds plausible correct/total and CBL scores from the learner id and
+// skill name. Same inputs always produce the same output (stable across renders).
+function v3LearnerSkillSeed(learnerId, skillName) {
+  return learnerId.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0) + skillName.length * 7;
+}
+
+function v3LearnerSkillEvidence(learnerId, skillName) {
+  const seed = v3LearnerSkillSeed(learnerId, skillName);
+  const hasPals = seed % 5 !== 0;
+  const hasCbl = Math.floor(seed / 3) % 3 === 0;
+  const total = hasPals ? 10 : 0;
+  const correct = hasPals ? Math.max(1, Math.min(10, Math.round(((seed * 13) % 90) / 10))) : 0;
+  const cblScore = hasCbl ? Math.max(35, Math.min(97, 35 + ((seed * 17) % 60))) : null;
+  const scenarios = hasCbl ? 1 + (seed % 3) : 0;
+  return { correct, total, cbl: hasCbl ? { score: cblScore, scenarios } : null };
+}
+
+// Pools each member's seeded evidence for a skill: PALS correct/total add up
+// (more members answering = more combined evidence), CBL score is the average
+// across contributing members weighted by their scenario count.
+function v3GroupSkillEvidence(memberIds, skillName) {
+  let correct = 0;
+  let total = 0;
+  let cblScoreWeighted = 0;
+  let cblScenarios = 0;
+  memberIds.forEach((learnerId) => {
+    const evidence = v3LearnerSkillEvidence(learnerId, skillName);
+    correct += evidence.correct;
+    total += evidence.total;
+    if (evidence.cbl) {
+      cblScoreWeighted += evidence.cbl.score * evidence.cbl.scenarios;
+      cblScenarios += evidence.cbl.scenarios;
+    }
+  });
+  return {
+    correct,
+    total,
+    cbl: cblScenarios ? { score: Math.round(cblScoreWeighted / cblScenarios), scenarios: cblScenarios } : null
+  };
+}
+
+function v3SkillFromEvidence(skill, evidence) {
+  const palsScore = evidence.total ? Math.round((evidence.correct / evidence.total) * 100) : null;
+  const palsPoints = palsScore == null ? 0 : Math.min(PALS_MASTERY_CAP, Math.round(palsScore * PALS_MASTERY_CAP / 100));
+  const cblPoints = evidence.cbl ? Math.min(CBL_MASTERY_CAP, Math.round((evidence.cbl.score / 100) * CBL_MASTERY_CAP)) : 0;
+  const hasEvidence = palsScore != null || evidence.cbl != null;
+  return {
+    ...skill,
+    correct: evidence.correct,
+    total: evidence.total,
+    cbl: evidence.cbl ? { ...evidence.cbl, points: cblPoints } : null,
+    palsPoints,
+    mastery: hasEvidence ? Math.min(100, palsPoints + cblPoints) : null
+  };
+}
+
+function v3SkillForLearner(skill, learnerId) {
+  return v3SkillFromEvidence(skill, v3LearnerSkillEvidence(learnerId, skill.name));
+}
+
+function v3SkillForGroup(skill, memberIds) {
+  return v3SkillFromEvidence(skill, v3GroupSkillEvidence(memberIds, skill.name));
+}
+
+function v3SectorsForLearner(learnerId) {
+  return skillSectors.map((sector) => ({
+    ...sector,
+    skills: sector.skills.map((skill) => v3SkillForLearner(skill, learnerId))
+  }));
+}
+
+function v3SectorsForGroup(memberIds) {
+  return skillSectors.map((sector) => ({
+    ...sector,
+    skills: sector.skills.map((skill) => v3SkillForGroup(skill, memberIds))
+  }));
+}
 
 function v3Average(values) {
   const available = values.filter((value) => value != null);
@@ -94,8 +220,8 @@ function v3SectorStats(sector) {
   };
 }
 
-function v3AllSkillStats() {
-  const skills = skillSectors.flatMap((sector) => sector.skills);
+function v3AllSkillStats(sectors) {
+  const skills = sectors.flatMap((sector) => sector.skills);
   const tracked = skills.filter((skill) => skill.mastery != null);
   const both = skills.filter((skill) => v3SkillSourceType(skill) === "both");
   const needsAttention = skills.filter((skill) => skill.mastery == null || skill.mastery < 70);
@@ -171,7 +297,7 @@ function v3SkillRow(skill, sector) {
       <header class="skills-v3-row-head">
         <div class="skills-v3-row-name">
           <strong>${skill.name}</strong>
-          <small>${sector.category}</small>
+          <small>${v3SectorName(sector)}</small>
         </div>
         <span class="evidence-badge ${evidenceState.className}">${evidenceState.label}</span>
         <div class="skills-v3-score">
@@ -195,64 +321,200 @@ function v3SkillRow(skill, sector) {
     </article>`;
 }
 
-function v3SectorStrip(selectedSector) {
-  return skillSectors.map((sector) => {
+function v3SectorName(sector) {
+  return sector.label.replace(/\s*\(\d+\)$/, "");
+}
+
+function v3LearnerName(learner) {
+  return learner.label.split(" · ")[0];
+}
+
+function v3ScopeSubtitle(scope) {
+  if (scope.group) {
+    const names = scope.group.memberIds
+      .map((id) => v3LearnerName(skillsLearners.find((item) => item.id === id)))
+      .join(", ");
+    return `Combines evidence from ${v3CountLabel(scope.group.memberIds.length, "student")} in ${scope.group.name}: ${names}.`;
+  }
+  return "Bird’s-eye view across every sector before drilling into individual skills.";
+}
+
+function v3SectorStrip(sectors, selectedSectorId) {
+  return sectors.map((sector) => {
     const stats = v3SectorStats(sector);
-    const active = sector.id === selectedSector.id;
+    const active = sector.id === selectedSectorId;
     return `
       <button class="skills-v3-sector ${active ? "is-active" : ""}" type="button" data-v3-sector="${sector.id}" aria-pressed="${active}">
-        <span>${sector.category}</span>
+        <span>${v3SectorName(sector)}</span>
         <strong>${stats.mastery == null ? "—" : `${stats.mastery}%`}</strong>
-        <small>${stats.tracked}/${sector.skills.length} skills</small>
       </button>`;
   }).join("");
 }
 
-function v3SkillsScope(learner) {
+function v3SkillGroups() {
+  return taxonomyGroups.map((group) => ({
+    id: group.id,
+    name: group.name,
+    memberIds: skillsLearners.filter((item) => item.groupId === group.id && item.hasData).map((item) => item.id)
+  }));
+}
+
+function v3SkillsScope() {
+  const mode = state.skillsMode;
   return `
     <header class="skills-v3-scope">
       <div class="skills-v3-scope-copy">
         <h2>Skills analytics</h2>
         <p>Start with capability outcomes, then inspect the learning evidence behind each result.</p>
       </div>
-      <div class="field">
-        <label for="skills-learner">Learner</label>
-        <select id="skills-learner" data-skills-learner>
-          ${skillsLearners.map((item) => `<option value="${item.id}" ${item.id === learner.id ? "selected" : ""}>${item.label}</option>`).join("")}
-        </select>
+      <div class="skills-v3-scope-controls">
+        <div class="segmented-control" role="group" aria-label="Skills analytics scope">
+          <button class="segmented-button ${mode === "organization" ? "is-active" : ""}" type="button" data-skills-mode="organization" aria-pressed="${mode === "organization"}">Organization</button>
+          <button class="segmented-button ${mode === "group" ? "is-active" : ""}" type="button" data-skills-mode="group" aria-pressed="${mode === "group"}">Group</button>
+          <button class="segmented-button ${mode === "individual" ? "is-active" : ""}" type="button" data-skills-mode="individual" aria-pressed="${mode === "individual"}">Individual</button>
+        </div>
+        ${mode === "group" ? `
+          <div class="field">
+            <label for="skills-group">Group</label>
+            <select id="skills-group" data-skills-group>
+              <option value="" ${!state.skillsGroup ? "selected" : ""}>Select a group</option>
+              ${v3SkillGroups().map((group) => `<option value="${group.id}" ${state.skillsGroup === group.id ? "selected" : ""}>${group.name} (${v3CountLabel(group.memberIds.length, "student")})</option>`).join("")}
+            </select>
+          </div>` : ""}
+        ${mode === "individual" ? `
+          <div class="field">
+            <label for="skills-learner">Learner</label>
+            <select id="skills-learner" data-skills-learner>
+              <option value="" ${!state.skillsLearner ? "selected" : ""}>Select a learner</option>
+              ${skillsLearners.map((item) => `<option value="${item.id}" ${state.skillsLearner === item.id ? "selected" : ""}>${v3LearnerName(item)}</option>`).join("")}
+            </select>
+          </div>` : ""}
       </div>
     </header>`;
 }
 
-function renderSkillsV3() {
-  const learner = skillsLearners.find((item) => item.id === state.skillsLearner) || skillsLearners[0];
-  const sector = skillSectors.find((item) => item.id === state.skillsSector) || skillSectors[0];
+function v3SectorPicker(sectors, selectedSectorId, promptText) {
+  return `
+    <div class="skills-v3-sectors">
+      <div class="skills-v3-section-label"><strong>Across sectors</strong><span>${promptText}</span></div>
+      <div class="skills-v3-sector-strip">${v3SectorStrip(sectors, selectedSectorId)}</div>
+    </div>`;
+}
 
-  if (!learner.hasData) {
+function v3SkillsDetailSection(sector, sectors) {
+  const sectorStats = v3SectorStats(sector);
+  const visibleSkills = v3FilteredSkills(sector);
+
+  return `
+    <section class="skills-v3-detail" aria-labelledby="skills-v3-detail-title">
+      ${v3SectorPicker(sectors, sector.id, "Switch sectors to inspect different skill evidence.")}
+      <header class="skills-v3-detail-head">
+        <div class="skills-v3-detail-heading">
+          <p class="skill-category-label">Selected sector</p>
+          <h2 id="skills-v3-detail-title">${v3SectorName(sector)}</h2>
+          <p>${sector.category} · ${sectorStats.tracked} of ${sector.skills.length} skills tracked · ${sectorStats.questions} PALS questions · ${sectorStats.scenarios} CBL scenarios</p>
+        </div>
+        <div class="skills-v3-controls">
+          <button class="skills-v3-method-trigger" type="button" data-v3-method-info aria-haspopup="dialog"><span data-icon="help"></span>How mastery works</button>
+          <div class="field">
+            <label for="v3-source-filter">Evidence</label>
+            <select id="v3-source-filter" data-v3-source-filter>
+              ${["all", "both", "pals-only", "cbl-only", "none"].map((value) => `<option value="${value}" ${v3SkillState.sourceFilter === value ? "selected" : ""}>${v3SourceFilterLabel(value)}</option>`).join("")}
+            </select>
+          </div>
+          <div class="field">
+            <label for="v3-skill-sort">Sort by</label>
+            <select id="v3-skill-sort" data-v3-skill-sort>
+              <option value="low" ${v3SkillState.sort === "low" ? "selected" : ""}>Mastery: low first</option>
+              <option value="high" ${v3SkillState.sort === "high" ? "selected" : ""}>Mastery: high first</option>
+              <option value="name" ${v3SkillState.sort === "name" ? "selected" : ""}>Skill name</option>
+            </select>
+          </div>
+        </div>
+      </header>
+
+      <div class="skills-v3-detail-body">
+        <aside class="skills-v3-profile" aria-label="Selected sector profile">
+          <p class="skill-category-label">Sector profile</p>
+          ${radarChart(sector.skills.map((skill) => ({ name: skill.name, value: skill.mastery || 0 })), "skills-v3-radar", `${v3SectorName(sector)} skill mastery`)}
+          <div class="skills-v3-profile-summary">
+            <article><span>Sector mastery</span><strong>${sectorStats.mastery == null ? "—" : `${sectorStats.mastery}%`}</strong></article>
+            <article><span>Both sources</span><strong>${sectorStats.both}/${sector.skills.length}</strong></article>
+          </div>
+        </aside>
+        <div class="skills-v3-list">
+          ${visibleSkills.length
+            ? visibleSkills.map((skill) => v3SkillRow(skill, sector)).join("")
+            : `<div class="skills-v3-empty-filter"><strong>No matching skills</strong>Try another evidence filter for this sector.</div>`}
+        </div>
+      </div>
+    </section>`;
+}
+
+function v3ResolveSkillsScope() {
+  if (state.skillsMode === "group") {
+    const group = state.skillsGroup ? v3SkillGroups().find((item) => item.id === state.skillsGroup) : null;
+    if (!group) {
+      return { sectors: null, emptyTitle: "Select a group to begin", emptyBody: "Choose a group above to inspect its combined skill evidence." };
+    }
+    if (!group.memberIds.length) {
+      return { sectors: null, emptyTitle: "No skill evidence yet", emptyBody: "No learners with tracked skill evidence are assigned to this group." };
+    }
+    return { sectors: v3SectorsForGroup(group.memberIds), group };
+  }
+
+  if (state.skillsMode === "individual") {
+    const learner = state.skillsLearner ? skillsLearners.find((item) => item.id === state.skillsLearner) : null;
+    if (!learner) {
+      return { sectors: null, emptyTitle: "Select a learner to begin", emptyBody: "Choose a learner above to inspect their skill-level PALS and CBL evidence." };
+    }
+    if (!learner.hasData) {
+      return { sectors: null, emptyTitle: "No skill evidence yet", emptyBody: "This learner has no PALS answers or scored CBL scenarios mapped to a canonical skill." };
+    }
+    return { sectors: v3SectorsForLearner(learner.id) };
+  }
+
+  return { sectors: skillSectors };
+}
+
+function renderSkillsV3() {
+  const scope = v3ResolveSkillsScope();
+
+  if (!scope.sectors) {
     return `
       <div class="skills-v3">
-        ${v3SkillsScope(learner)}
+        ${v3SkillsScope()}
         <section class="skills-v3-overview">
           <div class="empty-state">
-            <div><span class="empty-state-icon" data-icon="sparkle"></span><h3>No skill evidence yet</h3><p>This learner has no PALS answers or scored CBL scenarios mapped to a canonical skill.</p></div>
+            <div><h3>${scope.emptyTitle}</h3><p>${scope.emptyBody}</p></div>
           </div>
         </section>
       </div>`;
   }
 
-  const overall = v3AllSkillStats();
-  const sectorStats = v3SectorStats(sector);
-  const visibleSkills = v3FilteredSkills(sector);
+  const sectors = scope.sectors;
+  const overall = v3AllSkillStats(sectors);
+  const sector = state.skillsSector ? sectors.find((item) => item.id === state.skillsSector) : null;
+  const detailSection = sector ? v3SkillsDetailSection(sector, sectors) : `
+      <section class="skills-v3-detail skills-v3-detail-empty" aria-label="No sector selected">
+        <div class="empty-state">
+          <div>
+            <h3>Select a sector to begin</h3>
+            <p>Choose a sector below to inspect its skill-level PALS and CBL evidence.</p>
+            <div class="skills-v3-sector-strip">${v3SectorStrip(sectors, null)}</div>
+          </div>
+        </div>
+      </section>`;
 
   return `
     <div class="skills-v3">
-      ${v3SkillsScope(learner)}
+      ${v3SkillsScope()}
 
       <section class="skills-v3-overview" aria-labelledby="skills-v3-overview-title">
         <div class="skills-v3-overview-head">
           <div class="skills-v3-overview-heading">
             <h2 id="skills-v3-overview-title">Skills overview</h2>
-            <p>Bird’s-eye view across every sector before drilling into individual skills.</p>
+            <p>${v3ScopeSubtitle(scope)}</p>
           </div>
         </div>
 
@@ -282,55 +544,9 @@ function renderSkillsV3() {
             <small>Below 70% or still missing evidence</small>
           </article>
         </div>
-
-        <div class="skills-v3-sectors">
-          <div class="skills-v3-section-label"><strong>Across sectors</strong><span>Select a sector to inspect its skill evidence</span></div>
-          <div class="skills-v3-sector-strip">${v3SectorStrip(sector)}</div>
-        </div>
       </section>
 
-      <section class="skills-v3-detail" aria-labelledby="skills-v3-detail-title">
-        <header class="skills-v3-detail-head">
-          <div class="skills-v3-detail-heading">
-            <p class="skill-category-label">Selected sector</p>
-            <h2 id="skills-v3-detail-title">${sector.category}</h2>
-            <p>${sectorStats.tracked} of ${sector.skills.length} skills tracked · ${sectorStats.questions} PALS questions · ${sectorStats.scenarios} CBL scenarios</p>
-          </div>
-          <div class="skills-v3-controls">
-            <button class="skills-v3-method-trigger" type="button" data-v3-method-info aria-haspopup="dialog"><span data-icon="help"></span>How mastery works</button>
-            <div class="field">
-              <label for="v3-source-filter">Evidence</label>
-              <select id="v3-source-filter" data-v3-source-filter>
-                ${["all", "both", "pals-only", "cbl-only", "none"].map((value) => `<option value="${value}" ${v3SkillState.sourceFilter === value ? "selected" : ""}>${v3SourceFilterLabel(value)}</option>`).join("")}
-              </select>
-            </div>
-            <div class="field">
-              <label for="v3-skill-sort">Sort by</label>
-              <select id="v3-skill-sort" data-v3-skill-sort>
-                <option value="low" ${v3SkillState.sort === "low" ? "selected" : ""}>Mastery: low first</option>
-                <option value="high" ${v3SkillState.sort === "high" ? "selected" : ""}>Mastery: high first</option>
-                <option value="name" ${v3SkillState.sort === "name" ? "selected" : ""}>Skill name</option>
-              </select>
-            </div>
-          </div>
-        </header>
-
-        <div class="skills-v3-detail-body">
-          <aside class="skills-v3-profile" aria-label="Selected sector profile">
-            <p class="skill-category-label">Sector profile</p>
-            ${radarChart(sector.skills.map((skill) => ({ name: skill.name, value: skill.mastery || 0 })), "skills-v3-radar", `${sector.category} skill mastery`)}
-            <div class="skills-v3-profile-summary">
-              <article><span>Sector mastery</span><strong>${sectorStats.mastery == null ? "—" : `${sectorStats.mastery}%`}</strong></article>
-              <article><span>Both sources</span><strong>${sectorStats.both}/${sector.skills.length}</strong></article>
-            </div>
-          </aside>
-          <div class="skills-v3-list">
-            ${visibleSkills.length
-              ? visibleSkills.map((skill) => v3SkillRow(skill, sector)).join("")
-              : `<div class="skills-v3-empty-filter"><strong>No matching skills</strong>Try another evidence filter for this sector.</div>`}
-          </div>
-        </div>
-      </section>
+      ${detailSection}
     </div>`;
 }
 
@@ -465,7 +681,7 @@ function v3FeatureCard({ tab, icon, title, status, statusTone = "", metric, metr
 }
 
 function renderOverviewV3() {
-  const skills = v3AllSkillStats();
+  const skills = v3AllSkillStats(skillSectors);
   const palsCompletion = v3Average(palsCourses.map((course) => course.completion));
   const palsScore = v3Average(palsCourses.map((course) => course.score));
   const cblNeedsReview = v3CblCases.filter((item) => item.score === 0).length;
@@ -483,7 +699,7 @@ function renderOverviewV3() {
     },
     {
       tab: "cbl", icon: "trophy", title: "CBL", status: "Active", statusTone: "is-good",
-      metric: v3CblCases.length, metricLabel: `${v3CblSummary.learnersAttempted} learners Â· ${v3CblSummary.totalAttempts} attempts`,
+      metric: v3CblCases.length, metricLabel: `${v3CblSummary.learnersAttempted} learners &middot; ${v3CblSummary.totalAttempts} attempts`,
       description: `Case-based practice is active with a ${v3CblSummary.averageHighestScore}% average highest score across the catalogue.`, priority: true
     },
     {
@@ -538,27 +754,76 @@ function openSkillsMethodV3() {
     body: `
       <div class="panel-heading"><div><h3>Evidence composition</h3><p>Source-level results remain visible so administrators can understand what contributes to each skill result.</p></div></div>
       <div class="skills-v3-method-explainer">
-        <article><span data-icon="book-open"></span><div><strong>PALS knowledge</strong><p>Uses performance from correctly answered PALS questions tagged to the skill.</p></div></article>
-        <article class="is-cbl"><span data-icon="trophy"></span><div><strong>CBL application</strong><p>Uses scored CBL scenarios mapped to the skill through Learning Objectives.</p></div></article>
-        <article><span data-icon="chart"></span><div><strong>Combined mastery</strong><p>Brings the available knowledge and application evidence into one skill result.</p></div></article>
+        <article><span data-icon="book-open"></span><div><strong>PALS knowledge</strong><p>Uses performance from correctly answered PALS questions tagged to the skill. PALS alone can contribute up to ${PALS_MASTERY_CAP} of the 100 mastery points.</p></div></article>
+        <article class="is-cbl"><span data-icon="trophy"></span><div><strong>CBL application</strong><p>Uses scored CBL cases mapped to the skill through Learning Objectives, worth up to ${CBL_MASTERY_CAP} of the 100 mastery points. A case mapped to more than one skill splits its weight evenly across every mapped skill.</p></div></article>
+        <article><span data-icon="chart"></span><div><strong>Combined mastery</strong><p>Adds the PALS and CBL points together, so a skill needs evidence from both sources to reach 100% mastery.</p></div></article>
       </div>
       <p class="skills-v3-evidence-note"><strong>Source transparency:</strong> PALS and CBL scores remain available independently alongside combined mastery.</p>`
   });
 }
 
-function openSkillEvidenceV3(sectorId, skillName) {
+function v3RawSkill(sectorId, skillName) {
   const sector = skillSectors.find((item) => item.id === sectorId);
+  return sector?.skills.find((item) => item.name === skillName);
+}
+
+function v3SkillBreakdownRows(sectorId, skillName, memberIds) {
+  const rawSkill = v3RawSkill(sectorId, skillName);
+  if (!rawSkill) return "";
+  return memberIds.map((learnerId) => {
+    const learner = skillsLearners.find((item) => item.id === learnerId);
+    const memberSkill = v3SkillForLearner(rawSkill, learnerId);
+    const memberPalsScore = palsSkillScore(memberSkill);
+    const memberCblScore = memberSkill.cbl?.score ?? null;
+    return `
+      <article class="skills-v3-breakdown-row">
+        <div class="skills-v3-breakdown-name">${v3LearnerName(learner)}</div>
+        <div><span>PALS</span><strong>${memberPalsScore == null ? "—" : `${memberPalsScore}%`}</strong><small>${memberSkill.total ? `${memberSkill.correct}/${memberSkill.total}` : "No evidence"}</small></div>
+        <div><span>CBL</span><strong>${memberCblScore == null ? "—" : `${memberCblScore}%`}</strong><small>${memberSkill.cbl?.scenarios ? v3CountLabel(memberSkill.cbl.scenarios, "scenario") : "No evidence"}</small></div>
+        <div><span>Combined</span><strong>${memberSkill.mastery == null ? "—" : `${memberSkill.mastery}%`}</strong></div>
+      </article>`;
+  }).join("");
+}
+
+function openSkillEvidenceV3(sectorId, skillName) {
+  v3SkillEvidenceState.sectorId = sectorId;
+  v3SkillEvidenceState.skillName = skillName;
+  v3SkillEvidenceState.showBreakdown = false;
+  renderSkillEvidenceDialogV3();
+}
+
+function renderSkillEvidenceDialogV3() {
+  const { sectorId, skillName } = v3SkillEvidenceState;
+  const scope = v3ResolveSkillsScope();
+  if (!scope.sectors) return;
+  const isOrgWide = state.skillsMode === "organization";
+  const isGroupMode = state.skillsMode === "group";
+  const sector = scope.sectors.find((item) => item.id === sectorId);
   const skill = sector?.skills.find((item) => item.name === skillName);
   if (!sector || !skill) return;
 
   const palsScore = palsSkillScore(skill);
   const cblScore = skill.cbl?.score ?? null;
   const scenarioCount = skill.cbl?.scenarios || 0;
+  const palsPoints = skill.palsPoints || 0;
+  const cblPoints = skill.cbl?.points || 0;
   const evidenceState = skillEvidenceState(skill);
+  const mappedCases = isOrgWide ? v3CasesForSkill(skill.name) : [];
+  const cblMappingNote = scenarioCount
+    ? `${scenarioCount} CBL ${scenarioCount === 1 ? "case" : "cases"} mapped to ${skill.name} through Learning Objectives${mappedCases.length ? ` (${mappedCases.map((item) => item.name).join("; ")})` : ""} contribute ${cblPoints} of the ${CBL_MASTERY_CAP} available CBL points; each case's weight is split evenly across every skill it is mapped to.`
+    : "No CBL cases have been mapped to this skill through Learning Objectives yet.";
+
+  const breakdownSection = isGroupMode ? `
+      <div class="skills-v3-breakdown">
+        <button class="skills-v3-breakdown-toggle" type="button" data-v3-skill-breakdown-toggle aria-expanded="${v3SkillEvidenceState.showBreakdown}">
+          ${v3SkillEvidenceState.showBreakdown ? "Hide" : "View"} student breakdown (${v3CountLabel(scope.group.memberIds.length, "student")})
+        </button>
+        ${v3SkillEvidenceState.showBreakdown ? `<div class="skills-v3-breakdown-list">${v3SkillBreakdownRows(sectorId, skillName, scope.group.memberIds)}</div>` : ""}
+      </div>` : "";
 
   showReportDialog({
     title: skill.name,
-    subtitle: `${sector.category} · ${evidenceState.label}`,
+    subtitle: `${v3SectorName(sector)} · ${evidenceState.label}`,
     summaryLabel: "Skill evidence summary",
     summary: `
       <article><span>Combined mastery</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong></article>
@@ -571,11 +836,12 @@ function openSkillEvidenceV3(sectorId, skillName) {
         <span class="skills-v3-flow-plus">+</span>
         <article><span>CBL application</span><strong>${cblScore == null ? "—" : `${cblScore}%`}</strong><small>${scenarioCount ? `${scenarioCount} scored ${scenarioCount === 1 ? "scenario" : "scenarios"}` : "No scenario evidence"}</small></article>
         <span class="skills-v3-flow-plus">→</span>
-        <article><span>Combined mastery</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong><small>Knowledge and application evidence combined</small></article>
+        <article><span>Combined mastery</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong><small>${skill.mastery == null ? "Knowledge and application evidence combined" : `${palsPoints} PALS pt${palsPoints === 1 ? "" : "s"} + ${cblPoints} CBL pt${cblPoints === 1 ? "" : "s"} (capped at ${PALS_MASTERY_CAP}/${CBL_MASTERY_CAP})`}</small></article>
       </div>
-      <p class="skills-v3-evidence-note"><strong>Learning objective mapping:</strong> CBL scenarios contribute evidence when their admin-defined Learning Objectives are mapped to this canonical skill. PALS questions use the same skill taxonomy, preventing duplicate or fragmented skill names.</p>
+      <p class="skills-v3-evidence-note"><strong>Learning objective mapping:</strong> ${cblMappingNote} PALS questions use the same canonical skill taxonomy, preventing duplicate or fragmented skill names.</p>
       <article class="question-card"><strong>PALS question evidence</strong><p>${skill.total ? `${skill.correct} correct answers from ${skill.total} questions tagged to ${skill.name}.` : "No PALS question evidence has been recorded for this skill yet."}</p></article>
-      <article class="question-card"><strong>CBL scenario evidence</strong><p>${scenarioCount ? `${scenarioCount} scored ${scenarioCount === 1 ? "scenario was" : "scenarios were"} mapped to ${skill.name} through Learning Objectives.` : "No scored CBL scenario evidence has been recorded for this skill yet."}</p></article>`
+      <article class="question-card"><strong>CBL scenario evidence</strong><p>${scenarioCount ? `${scenarioCount} scored ${scenarioCount === 1 ? "scenario was" : "scenarios were"} mapped to ${skill.name} through Learning Objectives.` : "No scored CBL scenario evidence has been recorded for this skill yet."}</p></article>
+      ${breakdownSection}`
   });
 }
 
@@ -609,11 +875,29 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (event.target.closest("[data-v3-skill-breakdown-toggle]")) {
+    v3SkillEvidenceState.showBreakdown = !v3SkillEvidenceState.showBreakdown;
+    renderSkillEvidenceDialogV3();
+    return;
+  }
+
   const overviewLink = event.target.closest("[data-v3-overview-tab]");
   if (overviewLink) {
     state.tab = overviewLink.dataset.v3OverviewTab;
     render();
     document.querySelector(`[data-tab="${state.tab}"]`)?.focus();
+    return;
+  }
+
+  const skillsModeButton = event.target.closest("[data-skills-mode]");
+  if (skillsModeButton) {
+    state.skillsMode = skillsModeButton.dataset.skillsMode;
+    state.skillsGroup = null;
+    state.skillsLearner = null;
+    state.skillsSector = null;
+    v3SkillState.sourceFilter = "all";
+    v3SkillState.sort = "low";
+    renderAndFocus(`[data-skills-mode="${state.skillsMode}"]`);
     return;
   }
 
@@ -626,9 +910,20 @@ document.addEventListener("click", (event) => {
 
 document.addEventListener("change", (event) => {
   if (event.target.matches("[data-skills-learner]")) {
+    state.skillsLearner = event.target.value || null;
+    state.skillsSector = null;
     v3SkillState.sourceFilter = "all";
     v3SkillState.sort = "low";
     renderAndFocus("[data-skills-learner]");
+    return;
+  }
+
+  if (event.target.matches("[data-skills-group]")) {
+    state.skillsGroup = event.target.value || null;
+    state.skillsSector = null;
+    v3SkillState.sourceFilter = "all";
+    v3SkillState.sort = "low";
+    renderAndFocus("[data-skills-group]");
     return;
   }
 

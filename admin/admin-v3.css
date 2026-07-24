@@ -276,13 +276,26 @@
   line-height: 1.5;
 }
 
-.skills-v3-scope .field {
-  width: min(100%, 390px);
-  flex: 0 0 min(42%, 390px);
+.skills-v3-scope-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.skills-v3-scope select {
-  width: 100%;
+.skills-v3-scope-controls .field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.skills-v3-scope-controls .field label {
+  white-space: nowrap;
+}
+
+.skills-v3-scope-controls .field select {
+  width: auto;
+  min-width: 190px;
 }
 
 .skills-v3-overview,
@@ -376,9 +389,19 @@
 }
 
 .skills-v3-sectors {
-  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 13px 13px 0 0;
   background: #fbfcfd;
   padding: 16px 22px 20px;
+}
+
+.skills-v3-detail-empty .empty-state p {
+  margin: 0 auto;
+}
+
+.empty-state .skills-v3-sector-strip {
+  justify-content: center;
+  margin-top: 18px;
 }
 
 .skills-v3-section-label {
@@ -400,22 +423,22 @@
 }
 
 .skills-v3-sector-strip {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(118px, 1fr));
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  overflow-x: auto;
-  padding-bottom: 3px;
 }
 
 .skills-v3-sector {
-  min-width: 118px;
-  min-height: 86px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 36px;
   border: 1px solid #e0e4ea;
-  border-radius: 10px;
+  border-radius: 999px;
   background: #fff;
   color: #515a69;
-  padding: 11px;
-  text-align: left;
+  padding: 8px 14px;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -429,31 +452,16 @@
   box-shadow: inset 0 0 0 1px var(--cyan);
 }
 
-.skills-v3-sector span,
-.skills-v3-sector small {
-  display: block;
-}
-
 .skills-v3-sector span {
-  min-height: 28px;
-  font-size: 12px;
-  font-weight: 650;
-  line-height: 1.35;
+  font-size: 13px;
+  font-weight: 600;
+  color: #273142;
 }
 
 .skills-v3-sector strong {
-  display: inline-block;
-  margin-top: 9px;
-  color: #273142;
+  color: #14738b;
   font-family: "Space Grotesk", Inter, sans-serif;
-  font-size: 16px;
-}
-
-.skills-v3-sector small {
-  float: right;
-  margin-top: 11px;
-  color: #8c95a3;
-  font-size: 12px;
+  font-size: 13px;
 }
 
 .skills-v3-detail-head {
@@ -814,6 +822,69 @@
   color: #335d68;
   font-size: 12px;
   line-height: 1.55;
+}
+
+.skills-v3-breakdown {
+  margin-top: 10px;
+}
+
+.skills-v3-breakdown-toggle {
+  min-height: 34px;
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  background: #fff;
+  color: #384254;
+  cursor: pointer;
+  padding: 0 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.skills-v3-breakdown-toggle:hover {
+  border-color: var(--cyan);
+}
+
+.skills-v3-breakdown-list {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.skills-v3-breakdown-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(3, minmax(0, 0.8fr));
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.skills-v3-breakdown-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #283141;
+}
+
+.skills-v3-breakdown-row span {
+  display: block;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.skills-v3-breakdown-row strong {
+  display: block;
+  color: #283141;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 14px;
+}
+
+.skills-v3-breakdown-row small {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .cbl-v3-case-grid {

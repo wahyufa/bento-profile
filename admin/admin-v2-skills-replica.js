@@ -88,11 +88,11 @@ const palsRangeProfiles = {
 };
 
 const skillsLearners = [
-  { id: "bima-23", label: "Bima Rindarto · bima+23@heyhi.sg", hasData: true },
-  { id: "bima-learner", label: "bima leraner · bimalearner@heyhi.sg", hasData: false },
-  { id: "gam-mai", label: "Gam Mai · maigam08092000@gmail.com", hasData: true },
-  { id: "learner-chuen", label: "Learner Chuen · zhichuen+learner7@heyhi.sg", hasData: true },
-  { id: "learner-vin", label: "Learner Vin · learnerdemo_vin@heyhi.sg", hasData: true }
+  { id: "bima-23", label: "Bima Rindarto · bima+23@heyhi.sg", hasData: true, groupId: "demo-june" },
+  { id: "bima-learner", label: "bima leraner · bimalearner@heyhi.sg", hasData: false, groupId: "heyhi-demo" },
+  { id: "gam-mai", label: "Gam Mai · maigam08092000@gmail.com", hasData: true, groupId: "heyhi-demo" },
+  { id: "learner-chuen", label: "Learner Chuen · zhichuen+learner7@heyhi.sg", hasData: true, groupId: "heyhi-demo" },
+  { id: "learner-vin", label: "Learner Vin · learnerdemo_vin@heyhi.sg", hasData: true, groupId: "heyhi-demo" }
 ];
 
 const skillSectors = [
@@ -184,8 +184,10 @@ const state = {
   palsEntity: "all",
   expandedPals: null,
   palsDetailTab: "org",
-  skillsLearner: "bima-23",
-  skillsSector: "accountancy"
+  skillsMode: "organization",
+  skillsGroup: null,
+  skillsLearner: null,
+  skillsSector: null
 };
 
 const analyticsPanel = document.querySelector("#analytics-panel");
@@ -554,12 +556,20 @@ function renderCbl() {
     </div>`;
 }
 
+function assessmentPassSummary() {
+  const totalCompleted = assessments.reduce((sum, item) => sum + item.completed, 0);
+  const totalPassed = assessments.reduce((sum, item) => sum + (item.pass / 100) * item.completed, 0);
+  const passRate = totalCompleted ? Math.round((totalPassed / totalCompleted) * 100) : 0;
+  return { passRate, failRate: 100 - passRate };
+}
+
 function renderAssessments() {
+  const { passRate, failRate } = assessmentPassSummary();
   return `
     <div class="stack">
       <div class="two-column">
         <section class="panel"><div class="panel-body"><div class="panel-heading"><div><h2>Score vs Pass Rate</h2><p>Average score and pass rate for each assessment.</p></div></div><div class="assessment-chart" role="img" aria-label="Grouped bar chart comparing assessment scores and pass rates">${assessments.map((item) => `<div class="assessment-bar-group" title="${item.name}: score ${item.score}%, pass rate ${item.pass}%"><span class="assessment-bar is-score" style="height:${item.score}%"></span><span class="assessment-bar is-pass" style="height:${item.pass}%"></span><span class="assessment-bar-label">${item.name}</span></div>`).join("")}</div><div class="chart-legend"><span><i class="legend-swatch" style="background:var(--purple)"></i>Avg. Score</span><span><i class="legend-swatch" style="background:var(--teal)"></i>Pass Rate</span></div></div></section>
-        <section class="panel"><div class="panel-body"><div class="panel-heading"><div><h2>Pass / Fail</h2><p>Outcome split across completed attempts.</p></div></div><div class="donut-wrap"><div class="donut" role="img" aria-label="44 percent passed, 56 percent failed"><div class="donut-label" style="inset:61px 0 auto"><strong>44%</strong><span>passed</span></div></div><div class="chart-legend"><span><i class="legend-swatch" style="background:var(--teal)"></i>Passed 44%</span><span><i class="legend-swatch" style="background:var(--red)"></i>Failed 56%</span></div></div></div></section>
+        <section class="panel"><div class="panel-body"><div class="panel-heading"><div><h2>Pass / Fail</h2><p>Outcome split across completed attempts.</p></div></div><div class="donut-wrap"><div class="donut" role="img" aria-label="${passRate} percent passed, ${failRate} percent failed" style="background:conic-gradient(var(--teal) 0 ${passRate}%, var(--red) ${passRate}% 100%)"><div class="donut-label" style="inset:61px 0 auto"><strong>${passRate}%</strong><span>passed</span></div></div><div class="chart-legend"><span><i class="legend-swatch" style="background:var(--teal)"></i>Passed ${passRate}%</span><span><i class="legend-swatch" style="background:var(--red)"></i>Failed ${failRate}%</span></div></div></div></section>
       </div>
       <section class="panel"><div class="table-title"><span data-icon="clipboard"></span><h3>Assessment Performance</h3></div><div class="table-scroll"><table class="data-table"><thead><tr><th>Assessment</th><th>Attempts</th><th>Completed</th><th>Avg. Score</th><th>Pass Rate</th><th>Completion</th></tr></thead><tbody>${assessments.map((item) => `<tr><td>${item.name}</td><td>${item.attempts}</td><td>${item.completed}</td><td>${item.score}%</td><td>${item.pass}%</td><td>${progress(item.completion, "is-teal", `${item.name} completion`)}</td></tr>`).join("")}</tbody></table></div></section>
     </div>`;
@@ -831,7 +841,7 @@ document.addEventListener("change", (event) => {
 
   if (event.target.matches("[data-skills-learner]")) {
     state.skillsLearner = event.target.value;
-    state.skillsSector = "accountancy";
+    state.skillsSector = null;
     renderAndFocus("[data-skills-learner]");
     return;
   }

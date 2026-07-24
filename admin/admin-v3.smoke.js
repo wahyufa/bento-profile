@@ -143,11 +143,27 @@ assert.match(dialogContent.innerHTML, /Group Performance/);
 run('state.tab = "overview"');
 emit("click", "[data-v3-overview-tab]", { v3OverviewTab: "skills" });
 assert.equal(vm.runInContext("state.tab", context), "skills");
+assert.equal(vm.runInContext("state.skillsMode", context), "organization", "defaults to the organization-wide view");
+assert.equal(vm.runInContext("state.skillsSector", context), null, "no sector is auto-selected on first load");
 output = analyticsPanel.innerHTML;
 assert.match(output, /Skills overview/);
 assert.doesNotMatch(output, /skills-v3-path|Organization<\/span><i>|<strong>Accountancy<\/strong>/);
-assert.match(output, /Across sectors/);
 assert.match(output, /Evidence coverage/);
+assert.match(output, /data-skills-mode="organization"/);
+assert.match(output, /data-skills-mode="group"/);
+assert.match(output, /data-skills-mode="individual"/);
+assert.doesNotMatch(output, /data-skills-group|data-skills-learner/, "organization mode has no secondary entity picker");
+assert.match(output, /Select a sector to begin/, "prompts the admin to choose a sector instead of assuming one");
+assert.doesNotMatch(output, /Forensic Accounting/, "no sector detail renders until a sector is selected");
+assert.ok(
+  output.indexOf("Choose a sector below to inspect") < output.indexOf('data-v3-sector="accountancy"'),
+  "sector pills sit directly below the prompt copy, not in a separate section"
+);
+
+emit("click", "[data-v3-sector]", { v3Sector: "accountancy" });
+assert.equal(vm.runInContext("state.skillsSector", context), "accountancy");
+output = analyticsPanel.innerHTML;
+assert.match(output, /Across sectors/, "the selected-sector view keeps a switcher to change sectors");
 assert.match(output, /data-v3-method-info/);
 assert.match(output, /How mastery works/);
 assert.doesNotMatch(output, /Sample scoring model|Illustrative|pending product approval/i);
@@ -188,15 +204,57 @@ emit("change", "[data-v3-source-filter]", {}, "pals-only");
 assert.match(analyticsPanel.innerHTML, /data-v3-skill-name="Claims Processing"/);
 assert.doesNotMatch(analyticsPanel.innerHTML, /data-v3-skill-name="Healthcare Data Protection"/);
 
+// --- Group scope ---
+emit("click", "[data-skills-mode]", { skillsMode: "group" });
+assert.equal(vm.runInContext("state.skillsMode", context), "group");
+assert.equal(vm.runInContext("state.skillsSector", context), null, "switching scope clears the sector pick");
+output = analyticsPanel.innerHTML;
+assert.match(output, /Select a group to begin/);
+assert.match(output, /Demo June/);
+assert.match(output, /HeyHi Demo/);
+
+emit("change", "[data-skills-group]", {}, "heyhi-demo");
+assert.equal(vm.runInContext("state.skillsGroup", context), "heyhi-demo");
+assert.match(analyticsPanel.innerHTML, /Select a sector to begin/, "picking a group still requires an explicit sector pick");
+
+emit("click", "[data-v3-sector]", { v3Sector: "accountancy" });
+output = analyticsPanel.innerHTML;
+assert.match(output, /Forensic Accounting/);
+assert.match(output, /7 of 30 correct/, "group evidence pools every member's PALS answers");
+
+vm.runInContext('openSkillEvidence("accountancy", "Forensic Accounting")', context);
+assert.equal(reportDialog.open, true);
+assert.match(dialogContent.innerHTML, /data-v3-skill-breakdown-toggle/, "group evidence dialog offers a per-student breakdown");
+assert.doesNotMatch(dialogContent.innerHTML, /skills-v3-breakdown-list/, "breakdown starts collapsed");
+
+emit("click", "[data-v3-skill-breakdown-toggle]");
+output = dialogContent.innerHTML;
+assert.match(output, /skills-v3-breakdown-list/, "toggle expands the breakdown");
+assert.match(output, /Gam Mai/);
+assert.match(output, /Learner Chuen/);
+assert.match(output, /Learner Vin/);
+assert.match(output, /2\/10/, "per-student PALS counts sum to the group's pooled total");
+
+emit("click", "[data-v3-skill-breakdown-toggle]");
+assert.doesNotMatch(dialogContent.innerHTML, /skills-v3-breakdown-list/, "toggle collapses the breakdown again");
+reportDialog.close();
+
+// --- Individual scope ---
+emit("click", "[data-skills-mode]", { skillsMode: "individual" });
+assert.equal(vm.runInContext("state.skillsMode", context), "individual");
+assert.match(analyticsPanel.innerHTML, /Select a learner to begin/);
+
 emit("change", "[data-skills-learner]", {}, "bima-learner");
 assert.equal(vm.runInContext("v3SkillState.sourceFilter", context), "all", "changing learner resets stale evidence filters");
 assert.match(analyticsPanel.innerHTML, /No skill evidence yet/);
 
-run('state.skillsLearner = "bima-23"; state.skillsSector = "accountancy"');
+emit("change", "[data-skills-learner]", {}, "bima-23");
+emit("click", "[data-v3-sector]", { v3Sector: "accountancy" });
 vm.runInContext('openSkillEvidence("accountancy", "Forensic Accounting")', context);
 assert.equal(reportDialog.open, true);
 assert.match(dialogContent.innerHTML, /Combined mastery/);
-assert.match(dialogContent.innerHTML, /Learning objective/);
+assert.match(dialogContent.innerHTML, /3 of 10 tagged questions correct/, "evidence dialog reflects the selected learner, not the org aggregate");
+assert.doesNotMatch(dialogContent.innerHTML, /data-v3-skill-breakdown-toggle/, "individual scope has no group to break down");
 assert.doesNotMatch(dialogContent.innerHTML, unapprovedScoringLanguage);
 
 output = run('state.tab = "trends"');
