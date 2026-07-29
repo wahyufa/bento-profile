@@ -1,6 +1,8 @@
 const v3SkillState = {
   sourceFilter: "all",
-  sort: "low"
+  sort: "low",
+  compareExpanded: true,
+  expandedRow: null
 };
 
 const v3SkillEvidenceState = {
@@ -110,7 +112,12 @@ v3RecomputeSkillMastery();
 // so this seeds plausible correct/total and CBL scores from the learner id and
 // skill name. Same inputs always produce the same output (stable across renders).
 function v3LearnerSkillSeed(learnerId, skillName) {
-  return learnerId.split("").reduce((sum, ch) => sum + ch.charCodeAt(0), 0) + skillName.length * 7;
+  const combined = `${learnerId}::${skillName}`;
+  let hash = 0;
+  for (let i = 0; i < combined.length; i++) {
+    hash = (hash * 31 + combined.charCodeAt(i)) >>> 0;
+  }
+  return hash;
 }
 
 function v3LearnerSkillEvidence(learnerId, skillName) {
@@ -261,24 +268,6 @@ function v3FilteredSkills(sector) {
   return v3SortSkills(filtered);
 }
 
-function v3SourcePanel(type, skill) {
-  const isPals = type === "pals";
-  const score = isPals ? palsSkillScore(skill) : skill.cbl?.score ?? null;
-  const scenarios = skill.cbl?.scenarios || 0;
-  const meta = isPals
-    ? (skill.total ? `${skill.correct} of ${skill.total} correct` : "No tagged questions yet")
-    : (scenarios ? `${scenarios} scored ${scenarios === 1 ? "scenario" : "scenarios"}` : "No scored scenarios yet");
-
-  return `
-    <article class="skills-v3-source ${isPals ? "is-pals" : "is-cbl"}">
-      <div class="skills-v3-source-head">
-        <span><i></i>${isPals ? "PALS knowledge" : "CBL application"}</span>
-        <strong>${score == null ? "—" : `${score}%`}</strong>
-      </div>
-      <p>${meta}</p>
-    </article>`;
-}
-
 function v3SkillGuidance(skill, sourceType) {
   if (skill.mastery == null) return "Waiting for tagged learning evidence";
   if (skill.mastery < 70) return "Review this skill next";
@@ -286,38 +275,97 @@ function v3SkillGuidance(skill, sourceType) {
   return "Add the complementary source to strengthen confidence";
 }
 
+const V3_BAND_LEARNERS = ["bima-23", "gam-mai", "learner-chuen", "learner-vin"];
+const V3_BAND_DEFS = [
+  { key: "novice", label: "Novice" },
+  { key: "developing", label: "Developing" },
+  { key: "competent", label: "Competent" },
+  { key: "proficient", label: "Proficient" }
+];
+const V3_LOW_BAND_COVERAGE = 2;
+
+function v3SkillTier(mastery) {
+  if (mastery == null) return "";
+  if (mastery < 50) return "is-attention";
+  if (mastery < 65) return "is-watch";
+  if (mastery >= 75) return "is-track";
+  return "";
+}
+
+const V3_TIER_BADGE = {
+  "is-attention": '<span class="skills-v3-tier-badge is-attention"><i></i>Needs attention</span>',
+  "is-watch": '<span class="skills-v3-tier-badge is-watch"><i></i>Watch</span>',
+  "is-track": '<span class="skills-v3-tier-badge is-track"><i></i>On track</span>'
+};
+
+// Bands are derived from the same seeded sample learners used by the
+// Individual/Group scopes, independent of this skill's org-wide evidence.
+// Only meaningful once the skill has real org-wide evidence (see v3SkillRow).
+function v3SkillBands(sectorId, skillName) {
+  const rawSkill = v3RawSkill(sectorId, skillName);
+  const dist = [0, 0, 0, 0];
+  let cover = 0;
+  if (!rawSkill) return { dist, cover };
+  V3_BAND_LEARNERS.forEach((learnerId) => {
+    const memberSkill = v3SkillForLearner(rawSkill, learnerId);
+    if (memberSkill.mastery == null) return;
+    cover++;
+    if (memberSkill.mastery < 50) dist[0]++;
+    else if (memberSkill.mastery < 70) dist[1]++;
+    else if (memberSkill.mastery < 85) dist[2]++;
+    else dist[3]++;
+  });
+  return { dist, cover };
+}
+
 function v3SkillRow(skill, sector) {
   const sourceType = v3SkillSourceType(skill);
-  const evidenceState = skillEvidenceState(skill);
-  const evidenceCount = skill.total + (skill.cbl?.scenarios || 0);
   const guidance = v3SkillGuidance(skill, sourceType);
+  const evidenceCount = skill.total + (skill.cbl?.scenarios || 0);
+  const tier = v3SkillTier(skill.mastery);
+  const hasEvidence = skill.mastery != null;
+  const { dist, cover } = hasEvidence ? v3SkillBands(sector.id, skill.name) : { dist: [0, 0, 0, 0], cover: 0 };
+  const bandTotal = dist.reduce((sum, count) => sum + count, 0) || 1;
+  const bandBar = dist.map((count, i) => `<span class="skills-v3-band-seg is-${V3_BAND_DEFS[i].key}" style="width:${(count / bandTotal * 100).toFixed(1)}%"></span>`).join("");
+  const bandDetail = dist.map((count, i) => `<div class="skills-v3-band-detail-item"><span class="skills-v3-band-dot is-${V3_BAND_DEFS[i].key}"></span><strong>${count}</strong><span>${V3_BAND_DEFS[i].label}</span></div>`).join("");
+  const lowCoverage = hasEvidence && cover < V3_LOW_BAND_COVERAGE;
+  const palsPoints = skill.palsPoints || 0;
+  const cblPoints = skill.cbl?.points || 0;
+  const openGap = Math.max(0, 100 - palsPoints - cblPoints);
+  const isOpen = v3SkillState.expandedRow === skill.name;
 
   return `
-    <article class="skills-v3-row" data-v3-skill-name="${skill.name}">
-      <header class="skills-v3-row-head">
+    <article class="skills-v3-row ${tier}" data-v3-skill-name="${skill.name}">
+      <div class="skills-v3-row-top">
         <div class="skills-v3-row-name">
-          <strong>${skill.name}</strong>
+          <strong>${skill.name}</strong>${tier ? V3_TIER_BADGE[tier] : ""}
           <small>${v3SectorName(sector)}</small>
         </div>
-        <span class="evidence-badge ${evidenceState.className}">${evidenceState.label}</span>
-        <div class="skills-v3-score">
-          <span>Combined mastery</span>
-          <strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong>
+        <span class="skills-v3-row-coverage ${lowCoverage ? "is-low" : ""}">${hasEvidence ? `${cover} of ${V3_BAND_LEARNERS.length} learners${lowCoverage ? '<span class="skills-v3-row-coverage-flag" title="Few sample learners have data for this skill — read with caution">&#9888;&#65038;</span>' : ""}` : "No evidence yet"}</span>
+        <span class="skills-v3-row-value">${skill.mastery == null ? "—" : `${skill.mastery}%`}</span>
+        <button class="expand-button" type="button" data-v3-skill-toggle="${skill.name}" aria-expanded="${isOpen}" aria-label="${isOpen ? "Collapse" : "Expand"} ${skill.name} details"><span data-icon="chevron"></span></button>
+      </div>
+      <div class="skills-v3-band-bar">${hasEvidence ? bandBar : '<span class="skills-v3-band-bar-empty"></span>'}</div>
+      ${isOpen ? `
+      <div class="skills-v3-row-detail">
+        <div class="skills-v3-detail-label">Score composition</div>
+        <div class="skills-v3-composition">
+          <div class="skills-v3-composition-track">
+            <span class="is-pals" style="width:${palsPoints}%">${palsPoints > 10 ? "PALS " + palsPoints : ""}</span>
+            <span class="is-cbl" style="width:${cblPoints}%">${cblPoints > 10 ? "CBL " + cblPoints : ""}</span>
+            <span class="is-open-gap" style="width:${openGap}%"></span>
+          </div>
         </div>
-      </header>
-      <div class="skills-v3-overall-track">
-        ${skill.mastery == null
-          ? '<span class="mastery-empty-track" aria-hidden="true"></span>'
-          : progressBar(skill.mastery, toneFor(skill.mastery), `${skill.name} combined mastery`)}
-      </div>
-      <div class="skills-v3-source-grid">
-        ${v3SourcePanel("pals", skill)}
-        ${v3SourcePanel("cbl", skill)}
-      </div>
-      <footer class="skills-v3-row-foot">
-        <span>${guidance} · ${evidenceCount} evidence ${evidenceCount === 1 ? "item" : "items"}</span>
-        <button class="evidence-button" type="button" data-skill-evidence="${sector.id}" data-skill-name="${skill.name}" ${skill.mastery == null ? "disabled" : ""}>View evidence</button>
-      </footer>
+        <p class="skills-v3-composition-note"><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong> combined = <strong class="is-pals-text">${palsPoints} pts PALS</strong> (questions answered correctly) + <strong class="is-cbl-text">${cblPoints} pts CBL</strong> (scored scenarios). ${guidance}.</p>
+        ${hasEvidence ? `
+        <div class="skills-v3-detail-label" style="margin-top:14px">Learners per band (sample of ${V3_BAND_LEARNERS.length})</div>
+        <div class="skills-v3-band-detail">${bandDetail}</div>` : `
+        <p class="skills-v3-band-empty-note">No organization-wide evidence yet, so no learner band breakdown is shown for this skill.</p>`}
+        <div class="skills-v3-row-evidence-note">
+          <span>${evidenceCount} evidence ${evidenceCount === 1 ? "item" : "items"} tracked for this skill.</span>
+          <button class="evidence-button" type="button" data-skill-evidence="${sector.id}" data-skill-name="${skill.name}" ${skill.mastery == null ? "disabled" : ""}>View evidence</button>
+        </div>
+      </div>` : ""}
     </article>`;
 }
 
@@ -337,6 +385,47 @@ function v3ScopeSubtitle(scope) {
     return `Combines evidence from ${v3CountLabel(scope.group.memberIds.length, "student")} in ${scope.group.name}: ${names}.`;
   }
   return "Bird’s-eye view across every sector before drilling into individual skills.";
+}
+
+function v3SkillGroupComparisonTable() {
+  const groups = v3SkillGroups().filter((group) => group.memberIds.length);
+  if (groups.length < 2) return "";
+
+  const expanded = v3SkillState.compareExpanded;
+
+  const table = !expanded ? "" : (() => {
+    const rows = skillSectors.flatMap((sector) => sector.skills.map((skill) => ({
+      sector,
+      skill,
+      scores: groups.map((group) => v3SkillForGroup(skill, group.memberIds).mastery)
+    })));
+    const sorted = [...rows].sort((a, b) => (v3Average(a.scores) ?? 999) - (v3Average(b.scores) ?? 999));
+    return `
+      <div class="table-scroll">
+        <table class="data-table">
+          <thead><tr><th>Skill</th>${groups.map((group) => `<th>${group.name}</th>`).join("")}</tr></thead>
+          <tbody>
+            ${sorted.map((row) => `
+              <tr>
+                <td><strong>${row.skill.name}</strong><br><small>${v3SectorName(row.sector)}</small></td>
+                ${row.scores.map((score) => `<td>${score == null ? "—" : `<span class="skills-v3-score-pill ${toneFor(score)}">${score}%</span>`}</td>`).join("")}
+              </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>`;
+  })();
+
+  return `
+    <section class="panel skills-v3-compare" aria-label="Skill mastery by group">
+      <button class="skills-v3-compare-head" type="button" data-v3-compare-toggle aria-expanded="${expanded}">
+        <div>
+          <div class="table-title"><span data-icon="sparkle"></span><h3>Where the gaps sit</h3></div>
+          <p class="skills-v3-compare-note">Combined mastery per group for every skill, sorted with the widest gaps first.</p>
+        </div>
+        <span class="skills-v3-compare-chevron" aria-hidden="true"><span data-icon="chevron"></span></span>
+      </button>
+      ${table}
+    </section>`;
 }
 
 function v3SectorStrip(sectors, selectedSectorId) {
@@ -404,6 +493,7 @@ function v3SectorPicker(sectors, selectedSectorId, promptText) {
 function v3SkillsDetailSection(sector, sectors) {
   const sectorStats = v3SectorStats(sector);
   const visibleSkills = v3FilteredSkills(sector);
+  const attentionCount = sector.skills.filter((skill) => skill.mastery != null && skill.mastery < 50).length;
 
   return `
     <section class="skills-v3-detail" aria-labelledby="skills-v3-detail-title">
@@ -412,7 +502,7 @@ function v3SkillsDetailSection(sector, sectors) {
         <div class="skills-v3-detail-heading">
           <p class="skill-category-label">Selected sector</p>
           <h2 id="skills-v3-detail-title">${v3SectorName(sector)}</h2>
-          <p>${sector.category} · ${sectorStats.tracked} of ${sector.skills.length} skills tracked · ${sectorStats.questions} PALS questions · ${sectorStats.scenarios} CBL scenarios</p>
+          <p>${sectorStats.tracked} of ${sector.skills.length} skills tracked &middot; ${sectorStats.questions} PALS questions &middot; ${sectorStats.scenarios} CBL scenarios</p>
         </div>
         <div class="skills-v3-controls">
           <button class="skills-v3-method-trigger" type="button" data-v3-method-info aria-haspopup="dialog"><span data-icon="help"></span>How mastery works</button>
@@ -425,7 +515,7 @@ function v3SkillsDetailSection(sector, sectors) {
           <div class="field">
             <label for="v3-skill-sort">Sort by</label>
             <select id="v3-skill-sort" data-v3-skill-sort>
-              <option value="low" ${v3SkillState.sort === "low" ? "selected" : ""}>Mastery: low first</option>
+              <option value="low" ${v3SkillState.sort === "low" ? "selected" : ""}>Needs attention first</option>
               <option value="high" ${v3SkillState.sort === "high" ? "selected" : ""}>Mastery: high first</option>
               <option value="name" ${v3SkillState.sort === "name" ? "selected" : ""}>Skill name</option>
             </select>
@@ -436,16 +526,26 @@ function v3SkillsDetailSection(sector, sectors) {
       <div class="skills-v3-detail-body">
         <aside class="skills-v3-profile" aria-label="Selected sector profile">
           <p class="skill-category-label">Sector profile</p>
+          <h3 class="skills-v3-profile-title">${v3SectorName(sector)}</h3>
+          <p class="skills-v3-profile-note">Average mastery by skill within this sector, combining PALS and CBL evidence.</p>
           ${radarChart(sector.skills.map((skill) => ({ name: skill.name, value: skill.mastery || 0 })), "skills-v3-radar", `${v3SectorName(sector)} skill mastery`)}
           <div class="skills-v3-profile-summary">
             <article><span>Sector mastery</span><strong>${sectorStats.mastery == null ? "—" : `${sectorStats.mastery}%`}</strong></article>
             <article><span>Both sources</span><strong>${sectorStats.both}/${sector.skills.length}</strong></article>
           </div>
         </aside>
-        <div class="skills-v3-list">
-          ${visibleSkills.length
-            ? visibleSkills.map((skill) => v3SkillRow(skill, sector)).join("")
-            : `<div class="skills-v3-empty-filter"><strong>No matching skills</strong>Try another evidence filter for this sector.</div>`}
+        <div>
+          <h3 class="skills-v3-list-title">Skills across the organisation</h3>
+          <p class="skills-v3-list-count">${sector.skills.length} skill${sector.skills.length === 1 ? "" : "s"} &middot; ${v3SectorName(sector)}${attentionCount ? ` &middot; <b class="skills-v3-attn-count">${attentionCount} need${attentionCount === 1 ? "s" : ""} attention</b>` : ""}</p>
+          <p class="skills-v3-list-note">Skills needing attention are pulled to the top and flagged red; strong skills are dimmed. Each bar shows how sample learners spread across the four competency bands — expand a skill for its PALS / CBL make-up.</p>
+          <div class="skills-v3-list">
+            ${visibleSkills.length
+              ? visibleSkills.map((skill) => v3SkillRow(skill, sector)).join("")
+              : `<div class="skills-v3-empty-filter"><strong>No matching skills</strong>Try another evidence filter for this sector.</div>`}
+          </div>
+          <div class="skills-v3-band-legend">
+            ${V3_BAND_DEFS.map((band) => `<span><span class="skills-v3-band-dot is-${band.key}"></span>${band.label}</span>`).join("")}
+          </div>
         </div>
       </div>
     </section>`;
@@ -479,6 +579,7 @@ function v3ResolveSkillsScope() {
 
 function renderSkillsV3() {
   const scope = v3ResolveSkillsScope();
+  const comparisonEnabled = state.skillsMode === "group" || state.skillsMode === "organization";
 
   if (!scope.sectors) {
     return `
@@ -547,6 +648,7 @@ function renderSkillsV3() {
       </section>
 
       ${detailSection}
+      ${comparisonEnabled && sector ? v3SkillGroupComparisonTable() : ""}
     </div>`;
 }
 
@@ -684,7 +786,6 @@ function renderOverviewV3() {
   const skills = v3AllSkillStats(skillSectors);
   const palsCompletion = v3Average(palsCourses.map((course) => course.completion));
   const palsScore = v3Average(palsCourses.map((course) => course.score));
-  const cblNeedsReview = v3CblCases.filter((item) => item.score === 0).length;
   const assessmentScore = v3Average(assessments.map((assessment) => assessment.score));
   const enrollments = courses.reduce((sum, course) => sum + course.enrollments, 0);
   const completions = courses.reduce((sum, course) => sum + course.completions, 0);
@@ -731,13 +832,6 @@ function renderOverviewV3() {
           <div><h2 id="overview-v3-feature-title">Feature pulse</h2><p>Each summary links to the tab that owns the detailed data.</p></div>
         </header>
         <div class="overview-v3-grid">${cards.map(v3FeatureCard).join("")}</div>
-      </section>
-
-      <section class="overview-v3-focus-list" aria-label="Analytics focus areas">
-        <h2>Focus next</h2>
-        <article class="overview-v3-focus-item"><i class="overview-v3-focus-dot"></i><div><strong>Review ${cblNeedsReview} CBL cases without a scored outcome</strong><span>The catalogue is active; use case details to distinguish low participation from missing performance evidence.</span></div><button type="button" data-v3-overview-tab="cbl">Open CBL</button></article>
-        <article class="overview-v3-focus-item"><i class="overview-v3-focus-dot"></i><div><strong>Review ${skills.needsAttention} skills needing attention</strong><span>These skills are below 70% mastery or still have no evidence.</span></div><button type="button" data-v3-overview-tab="skills">Open Skills</button></article>
-        <article class="overview-v3-focus-item"><i class="overview-v3-focus-dot"></i><div><strong>Investigate course completion</strong><span>${enrollments} enrollments currently produce ${completions} completed courses.</span></div><button type="button" data-v3-overview-tab="courses">Open Courses</button></article>
       </section>
     </div>`;
 }
@@ -881,6 +975,20 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (event.target.closest("[data-v3-compare-toggle]")) {
+    v3SkillState.compareExpanded = !v3SkillState.compareExpanded;
+    renderAndFocus("[data-v3-compare-toggle]");
+    return;
+  }
+
+  const skillToggle = event.target.closest("[data-v3-skill-toggle]");
+  if (skillToggle) {
+    const name = skillToggle.dataset.v3SkillToggle;
+    v3SkillState.expandedRow = v3SkillState.expandedRow === name ? null : name;
+    renderAndFocus(`[data-v3-skill-toggle="${name}"]`);
+    return;
+  }
+
   const overviewLink = event.target.closest("[data-v3-overview-tab]");
   if (overviewLink) {
     state.tab = overviewLink.dataset.v3OverviewTab;
@@ -905,6 +1013,7 @@ document.addEventListener("click", (event) => {
   if (!sectorButton) return;
   state.skillsSector = sectorButton.dataset.v3Sector;
   v3SkillState.sourceFilter = "all";
+  v3SkillState.expandedRow = null;
   renderAndFocus(`[data-v3-sector="${state.skillsSector}"]`);
 });
 

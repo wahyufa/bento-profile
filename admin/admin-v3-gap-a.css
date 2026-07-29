@@ -1,0 +1,15 @@
+.skills-v3-row.is-attention {
+  border-color: var(--red);
+  border-left-width: 4px;
+  padding-left: 11px;
+}
+
+.skills-v3-attention-tag {
+  display: inline-block;
+  margin-left: 8px;
+  color: var(--red);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}

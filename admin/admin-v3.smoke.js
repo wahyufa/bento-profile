@@ -155,6 +155,7 @@ assert.match(output, /data-skills-mode="individual"/);
 assert.doesNotMatch(output, /data-skills-group|data-skills-learner/, "organization mode has no secondary entity picker");
 assert.match(output, /Select a sector to begin/, "prompts the admin to choose a sector instead of assuming one");
 assert.doesNotMatch(output, /Forensic Accounting/, "no sector detail renders until a sector is selected");
+assert.doesNotMatch(output, /Where the gaps sit/, "comparison table waits for the main content, same as the sector detail");
 assert.ok(
   output.indexOf("Choose a sector below to inspect") < output.indexOf('data-v3-sector="accountancy"'),
   "sector pills sit directly below the prompt copy, not in a separate section"
@@ -169,8 +170,22 @@ assert.match(output, /How mastery works/);
 assert.doesNotMatch(output, /Sample scoring model|Illustrative|pending product approval/i);
 assert.doesNotMatch(output, /class="skills-v3-method"/);
 assert.match(output, /Forensic Accounting/);
-assert.match(output, /8 of 10 correct/);
-assert.match(output, /2 scored scenarios/);
+assert.match(output, /data-v3-skill-toggle="Forensic Accounting"[^>]*aria-expanded="false"/, "skill rows start collapsed");
+assert.doesNotMatch(output, /questions answered correctly/, "composition detail is hidden until a row is expanded");
+
+emit("click", "[data-v3-skill-toggle]", { v3SkillToggle: "Forensic Accounting" });
+output = analyticsPanel.innerHTML;
+assert.match(output, /data-v3-skill-toggle="Forensic Accounting"[^>]*aria-expanded="true"/);
+assert.match(output, /8 pts PALS/);
+assert.match(output, /Learners per band \(sample of 4\)/);
+
+emit("click", "[data-v3-skill-toggle]", { v3SkillToggle: "Forensic Accounting" });
+assert.match(analyticsPanel.innerHTML, /data-v3-skill-toggle="Forensic Accounting"[^>]*aria-expanded="false"/, "toggling again collapses the row");
+
+output = analyticsPanel.innerHTML;
+assert.match(output, /Where the gaps sit/, "the group comparison table is also available in organization mode, once a sector is selected");
+assert.match(output, /data-v3-compare-toggle[^>]*aria-expanded="true"/, "comparison table is expanded by default");
+assert.match(output, /<table class="data-table">/, "expanded-by-default table shows the grid immediately");
 
 reportDialog.close();
 emit("click", "[data-v3-method-info]");
@@ -212,15 +227,32 @@ output = analyticsPanel.innerHTML;
 assert.match(output, /Select a group to begin/);
 assert.match(output, /Demo June/);
 assert.match(output, /HeyHi Demo/);
+assert.doesNotMatch(output, /Where the gaps sit/, "comparison table waits until a group is picked");
 
 emit("change", "[data-skills-group]", {}, "heyhi-demo");
 assert.equal(vm.runInContext("state.skillsGroup", context), "heyhi-demo");
-assert.match(analyticsPanel.innerHTML, /Select a sector to begin/, "picking a group still requires an explicit sector pick");
+output = analyticsPanel.innerHTML;
+assert.match(output, /Select a sector to begin/, "picking a group still requires an explicit sector pick");
+assert.doesNotMatch(output, /Where the gaps sit/, "comparison table still waits for the main content (a selected sector)");
 
 emit("click", "[data-v3-sector]", { v3Sector: "accountancy" });
 output = analyticsPanel.innerHTML;
 assert.match(output, /Forensic Accounting/);
-assert.match(output, /7 of 30 correct/, "group evidence pools every member's PALS answers");
+assert.match(output, /11 of 30 correct/, "group evidence pools every member's PALS answers");
+assert.match(output, /Where the gaps sit/, "comparison table appears once the main content (sector detail) is showing");
+assert.match(output, /data-v3-compare-toggle[^>]*aria-expanded="true"/, "comparison table is expanded by default");
+assert.match(output, /<th>Demo June<\/th><th>HeyHi Demo<\/th>/, "expanded table has one column per group");
+assert.equal((output.match(/<tr>/g) || []).length > 20, true, "expanded by default reveals every tracked skill");
+
+emit("click", "[data-v3-compare-toggle]");
+output = analyticsPanel.innerHTML;
+assert.match(output, /data-v3-compare-toggle[^>]*aria-expanded="false"/, "toggling collapses the whole section");
+assert.doesNotMatch(output, /<table class="data-table">/, "collapsed comparison table hides the grid entirely");
+
+emit("click", "[data-v3-compare-toggle]");
+output = analyticsPanel.innerHTML;
+assert.match(output, /data-v3-compare-toggle[^>]*aria-expanded="true"/, "toggling again re-expands it");
+assert.match(output, /<table class="data-table">/);
 
 vm.runInContext('openSkillEvidence("accountancy", "Forensic Accounting")', context);
 assert.equal(reportDialog.open, true);
@@ -233,7 +265,7 @@ assert.match(output, /skills-v3-breakdown-list/, "toggle expands the breakdown")
 assert.match(output, /Gam Mai/);
 assert.match(output, /Learner Chuen/);
 assert.match(output, /Learner Vin/);
-assert.match(output, /2\/10/, "per-student PALS counts sum to the group's pooled total");
+assert.match(output, /1\/10/, "per-student PALS counts sum to the group's pooled total");
 
 emit("click", "[data-v3-skill-breakdown-toggle]");
 assert.doesNotMatch(dialogContent.innerHTML, /skills-v3-breakdown-list/, "toggle collapses the breakdown again");
@@ -250,10 +282,11 @@ assert.match(analyticsPanel.innerHTML, /No skill evidence yet/);
 
 emit("change", "[data-skills-learner]", {}, "bima-23");
 emit("click", "[data-v3-sector]", { v3Sector: "accountancy" });
+assert.doesNotMatch(analyticsPanel.innerHTML, /Where the gaps sit/, "individual scope has no groups to compare");
 vm.runInContext('openSkillEvidence("accountancy", "Forensic Accounting")', context);
 assert.equal(reportDialog.open, true);
 assert.match(dialogContent.innerHTML, /Combined mastery/);
-assert.match(dialogContent.innerHTML, /3 of 10 tagged questions correct/, "evidence dialog reflects the selected learner, not the org aggregate");
+assert.match(dialogContent.innerHTML, /2 of 10 tagged questions correct/, "evidence dialog reflects the selected learner, not the org aggregate");
 assert.doesNotMatch(dialogContent.innerHTML, /data-v3-skill-breakdown-toggle/, "individual scope has no group to break down");
 assert.doesNotMatch(dialogContent.innerHTML, unapprovedScoringLanguage);
 

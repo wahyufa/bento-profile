@@ -1,0 +1,384 @@
+/* Ported from skills-overview.html's ranked-row treatment, renamed with a
+   gapc- prefix so it layers on top of admin-v3.css without clashing. */
+
+.gapc-summary-note {
+  margin: 6px 0 16px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+  max-width: 720px;
+}
+
+.gapc-attn-count {
+  color: #bf2f38;
+}
+
+.gapc-profile-title {
+  margin: 4px 0 0;
+  color: #283141;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 15px;
+}
+
+.gapc-profile-note {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.gapc-list-title {
+  margin: 0;
+  color: #283141;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 16px;
+}
+
+.gapc-list-count {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.gapc-rowlist {
+  display: flex;
+  flex-direction: column;
+}
+
+.gapc-row {
+  border-top: 1px solid var(--border);
+  border-left: 3px solid transparent;
+  padding: 13px 4px 13px 11px;
+  cursor: pointer;
+  transition: background 0.12s, opacity 0.12s;
+}
+
+.gapc-row:first-child {
+  border-top: 0;
+}
+
+.gapc-row:hover {
+  background: #f7f9fb;
+}
+
+.gapc-row.open {
+  background: #f7f9fb;
+}
+
+.gapc-row.crit {
+  background: #fdf4f4;
+  border-left-color: #e2626b;
+}
+
+.gapc-row.crit:hover,
+.gapc-row.crit.open {
+  background: #fceeee;
+}
+
+.gapc-row.crit .gapc-val {
+  color: #c0343c;
+}
+
+.gapc-row.crit .gapc-name {
+  font-weight: 750;
+}
+
+.gapc-row.watch {
+  border-left-color: #f0a04b;
+}
+
+.gapc-row.strong {
+  opacity: 0.55;
+}
+
+.gapc-row.strong:hover,
+.gapc-row.strong.open {
+  opacity: 1;
+}
+
+.gapc-row.strong .gapc-name {
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.gapc-row.strong .gapc-val {
+  color: var(--muted);
+}
+
+.gapc-row.strong .gapc-bar {
+  opacity: 0.55;
+}
+
+.gapc-row-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.gapc-name {
+  font-weight: 650;
+  color: #2b3444;
+  font-size: 13px;
+  flex: 1;
+  min-width: 0;
+}
+
+.gapc-cat {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.gapc-val {
+  font-weight: 750;
+  color: #14205c;
+  font-size: 15px;
+  width: 52px;
+  text-align: right;
+  flex: 0 0 auto;
+}
+
+.gapc-cover {
+  width: 128px;
+  flex: 0 0 auto;
+  text-align: right;
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.gapc-cover.low {
+  color: #a9640f;
+}
+
+.gapc-flag {
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.gapc-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 750;
+  padding: 2px 8px 2px 7px;
+  border-radius: 20px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-left: 9px;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.gapc-badge .bdot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex: 0 0 6px;
+}
+
+.gapc-badge.attn {
+  background: #fbe0e1;
+  color: #bf2f38;
+}
+
+.gapc-badge.watch {
+  background: #fdeed7;
+  color: #a9640f;
+}
+
+.gapc-badge.ok {
+  background: #e7f4ea;
+  color: #2f7b43;
+}
+
+.gapc-row.strong .gapc-badge.ok {
+  opacity: 0.8;
+}
+
+.gapc-bar {
+  height: 12px;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  background: #eef1f5;
+  margin: 9px 0 0 0;
+}
+
+.gapc-bar span {
+  height: 100%;
+  display: block;
+}
+
+.seg1 { background: #e2626b; }
+.seg2 { background: #f0a04b; }
+.seg3 { background: #8fce6a; }
+.seg4 { background: #3fae5a; }
+
+.gapc-bar-empty {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(45deg, #e4e8ee, #e4e8ee 5px, #eef1f5 5px, #eef1f5 10px);
+}
+
+.gapc-band-empty-note {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-strong);
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.gapc-detail {
+  margin: 12px 0 4px;
+  padding: 14px 16px;
+  background: #f7f9fb;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: none;
+}
+
+.gapc-row.open .gapc-detail {
+  display: block;
+  cursor: default;
+}
+
+.gapc-detail-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.gapc-comp {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.gapc-track {
+  flex: 1;
+  height: 22px;
+  border-radius: 6px;
+  background: #e9edf2;
+  display: flex;
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.gapc-track .pals {
+  background: var(--cyan);
+  display: flex;
+  align-items: center;
+  padding-left: 9px;
+  white-space: nowrap;
+}
+
+.gapc-track .cbl {
+  background: #7c5cbf;
+  display: flex;
+  align-items: center;
+  padding-left: 9px;
+  white-space: nowrap;
+}
+
+.gapc-track .cap {
+  background: repeating-linear-gradient(45deg, #dfe4ea, #dfe4ea 5px, #e9edf2 5px, #e9edf2 10px);
+}
+
+.gapc-kv {
+  font-size: 12px;
+  color: #5a6472;
+  margin-top: 10px;
+}
+
+.gapc-kv .is-pals-text {
+  color: var(--cyan);
+}
+
+.gapc-kv .is-cbl-text {
+  color: #7c5cbf;
+}
+
+.gapc-banddist {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.gapc-bd {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  text-align: center;
+}
+
+.gapc-bd .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+}
+
+.gapc-bn {
+  font-weight: 750;
+  color: #14205c;
+  font-size: 15px;
+}
+
+.gapc-bl {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.gapc-evidence-note {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border-strong);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.gapc-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--border-strong);
+}
+
+.gapc-legend .lg {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #5a6472;
+  font-weight: 600;
+}
+
+.gapc-legend .dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+}
+
+@media (max-width: 620px) {
+  .gapc-cover {
+    display: none;
+  }
+}

@@ -5,12 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="ATLAS Learning Analytics administration dashboard."
+      content="ATLAS People Insights — personality, training, and recommendation analytics for your team."
     />
-    <title>ATLAS Learning Analytics</title>
+    <title>ATLAS People Insights</title>
     <link rel="stylesheet" href="admin-v2-skills-replica.css?v=20260722-sample-data" />
     <link rel="stylesheet" href="admin-v2-skills-replica-analytics.css?v=20260722-sample-data" />
     <link rel="stylesheet" href="admin-v3.css?v=20260722-skills-hierarchy" />
+    <link rel="stylesheet" href="admin-v3-people-insights.css" />
   </head>
   <body>
     <div class="mobile-scrim" data-sidebar-scrim hidden></div>
@@ -40,9 +41,9 @@
             <span data-icon="chart"></span><span>Analytics</span><span class="nav-chevron" data-icon="chevron"></span>
           </button>
           <div class="nav-children">
-            <a class="nav-item nav-sub is-selected" href="#"><span data-icon="chart"></span><span>Learning Analytics</span></a>
+            <a class="nav-item nav-sub" href="admin-v3.html"><span data-icon="chart"></span><span>Learning Analytics</span></a>
             <a class="nav-item nav-sub" href="#"><span data-icon="database"></span><span>Data Overview</span></a>
-            <a class="nav-item nav-sub" href="admin-v3-people-insights.html"><span data-icon="sparkle"></span><span>People Insights</span></a>
+            <a class="nav-item nav-sub is-selected" href="admin-v3-people-insights.html"><span data-icon="brain"></span><span>People Insights</span></a>
           </div>
         </div>
 
@@ -70,53 +71,47 @@
       </header>
 
       <main class="main-content">
-        <header class="page-heading">
-          <h1>Learning Analytics</h1>
-          <p>Track your organization's learning performance</p>
-        </header>
+        <section class="pi-hero">
+          <span class="pi-hero-icon" data-icon="brain"></span>
+          <div>
+            <h1>People Insights</h1>
+            <p>Analytics-driven insights to optimize team dynamics and training effectiveness</p>
+          </div>
+        </section>
 
-        <section class="metric-grid" aria-label="Organization learning summary">
+        <section class="metric-grid" aria-label="People insights summary">
           <article class="metric-card">
             <span class="metric-icon" data-icon="users"></span>
-            <div><strong>13%</strong><span>Engagement Rate</span><small>4 of 30 users active</small></div>
+            <div><strong>30</strong><span>Total Members</span></div>
           </article>
           <article class="metric-card">
-            <span class="metric-icon" data-icon="clock"></span>
-            <div><strong>16h</strong><span>Time Spent</span><small>Total learning time</small></div>
+            <span class="metric-icon" data-icon="brain"></span>
+            <div><strong>12</strong><span>Profiled</span></div>
           </article>
           <article class="metric-card">
-            <span class="metric-icon" data-icon="check-circle"></span>
-            <div><strong>77%</strong><span>Avg. KP Mastery</span><small>Across 14 learner(s) with KP activity</small></div>
+            <span class="metric-icon" data-icon="trend"></span>
+            <div><strong>21%</strong><span>Avg. Progress</span></div>
           </article>
           <article class="metric-card">
-            <span class="metric-icon" data-icon="medal"></span>
-            <div><strong>61%</strong><span>Avg. Assessment Score</span><small>Across all assessments</small></div>
+            <span class="metric-icon" data-icon="cap"></span>
+            <div><strong>0</strong><span>Courses Completed</span></div>
           </article>
         </section>
 
-        <section class="analytics-workspace" aria-label="Learning analytics detail">
+        <section class="analytics-workspace" aria-label="People insights detail">
           <div class="analytics-tabs-scroll">
-            <div class="analytics-tabs" role="tablist" aria-label="Analytics views">
-              <button class="analytics-tab is-active" type="button" role="tab" id="tab-overview" aria-selected="true" aria-controls="analytics-panel" data-tab="overview"><span data-icon="grid"></span>Overview</button>
-              <button class="analytics-tab" type="button" role="tab" id="tab-pals" aria-selected="false" aria-controls="analytics-panel" data-tab="pals"><span data-icon="cap"></span>PALS Courses</button>
-              <button class="analytics-tab" type="button" role="tab" id="tab-cbl" aria-selected="false" aria-controls="analytics-panel" data-tab="cbl"><span data-icon="trophy"></span>CBL</button>
-              <button class="analytics-tab" type="button" role="tab" id="tab-skills" aria-selected="false" aria-controls="analytics-panel" data-tab="skills"><span data-icon="sparkle"></span>Skills</button>
-              <button class="analytics-tab" type="button" role="tab" id="tab-assessments" aria-selected="false" aria-controls="analytics-panel" data-tab="assessments"><span data-icon="clipboard"></span>Assessments</button>
-              <button class="analytics-tab" type="button" role="tab" id="tab-courses" aria-selected="false" aria-controls="analytics-panel" data-tab="courses"><span data-icon="book-open"></span>Courses</button>
-              <button class="analytics-tab" type="button" role="tab" id="tab-trends" aria-selected="false" aria-controls="analytics-panel" data-tab="trends"><span data-icon="trend"></span>Trends</button>
+            <div class="analytics-tabs" role="tablist" aria-label="People insights views">
+              <button class="analytics-tab is-active" type="button" role="tab" id="pi-tab-personality" aria-selected="true" aria-controls="pi-panel" data-pi-tab="personality"><span data-icon="brain"></span>Personality</button>
+              <button class="analytics-tab" type="button" role="tab" id="pi-tab-training" aria-selected="false" aria-controls="pi-panel" data-pi-tab="training"><span data-icon="book-open"></span>Training</button>
+              <button class="analytics-tab" type="button" role="tab" id="pi-tab-recommendations" aria-selected="false" aria-controls="pi-panel" data-pi-tab="recommendations"><span data-icon="sliders"></span>Recommendations</button>
             </div>
           </div>
 
-          <div id="analytics-panel" class="analytics-panel" role="tabpanel" tabindex="0" aria-labelledby="tab-courses"></div>
+          <div id="pi-panel" class="analytics-panel" role="tabpanel" tabindex="0" aria-labelledby="pi-tab-personality"></div>
         </section>
       </main>
     </div>
 
-    <dialog class="report-dialog" data-report-dialog aria-labelledby="report-dialog-title">
-      <div data-dialog-content></div>
-    </dialog>
-
-    <script src="admin-v2-skills-replica.js?v=20260722-sample-data"></script>
-    <script src="admin-v3.js?v=20260722-skills-hierarchy"></script>
+    <script src="admin-v3-people-panel.js"></script>
   </body>
 </html>
