@@ -206,6 +206,7 @@ const piPersonalityResult = {
   dimensions: [
     {
       title: "Energy",
+      key: "EI",
       left: { letter: "E", name: "Extravert", value: 48 },
       right: { letter: "I", name: "Introvert", value: 52 },
       points: [
@@ -220,6 +221,7 @@ const piPersonalityResult = {
     },
     {
       title: "Perception",
+      key: "SN",
       left: { letter: "S", name: "Sensing", value: 52 },
       right: { letter: "N", name: "Intuitive", value: 48 },
       points: [
@@ -234,6 +236,7 @@ const piPersonalityResult = {
     },
     {
       title: "Judgement",
+      key: "TF",
       left: { letter: "T", name: "Thinking", value: 52 },
       right: { letter: "F", name: "Feeling", value: 48 },
       points: [
@@ -248,6 +251,7 @@ const piPersonalityResult = {
     },
     {
       title: "Lifestyle",
+      key: "JP",
       left: { letter: "J", name: "Judging", value: 52 },
       right: { letter: "P", name: "Perceiving", value: 48 },
       points: [
@@ -271,6 +275,15 @@ const PI_DIMENSIONS = [
   { key: "TF", left: "T", right: "F", leftName: "Thinking", rightName: "Feeling" },
   { key: "JP", left: "J", right: "P", leftName: "Judging", rightName: "Perceiving" }
 ];
+
+// Matches the color theme used in the existing psychometric report: Energy = pink,
+// Perception = orange, Judgement = blue, Lifestyle = green.
+const PI_DIM_THEME = {
+  EI: { color: "#e91e8c", colorSoft: "#fbe0f0" },
+  SN: { color: "#e65100", colorSoft: "#fde3cc" },
+  TF: { color: "#1565c0", colorSoft: "#d6e9fa" },
+  JP: { color: "#558b2f", colorSoft: "#e3f0d9" }
+};
 
 const PI_RIASEC_KEYS = ["Realistic", "Investigative", "Artistic", "Social", "Enterprising", "Conventional"];
 
@@ -471,7 +484,7 @@ function renderTeamRiasec(riasec, orgNorm) {
         <div class="pi-bar-row">
           <span>${r.name}</span>
           <span class="progress-track pi-td-riasec-track">
-            <span class="progress-fill ${below ? "is-red" : "is-teal"}" style="width:${r.value}%"></span>
+            <span class="progress-fill ${below ? "is-red" : "is-blue"}" style="width:${r.value}%"></span>
             ${normVal != null ? `<span class="pi-td-norm-tick" style="left:${normVal}%"></span>` : ""}
           </span>
           <strong>${r.value}%</strong>
@@ -610,8 +623,9 @@ function renderPersonalityList() {
 }
 
 function renderDimensionBlock(dim) {
+  const theme = PI_DIM_THEME[dim.key];
   return `
-    <div class="pi-dim-block">
+    <div class="pi-dim-block" style="--dim-color:${theme.color};--dim-color-soft:${theme.colorSoft}">
       <h4 class="pi-dim-title">${dim.title}</h4>
       <div class="pi-dim-labels">
         <span class="is-left">${dim.left.letter} &middot; ${dim.left.name}</span>
@@ -659,7 +673,7 @@ function renderPersonalityDetail() {
                 (i) => `
               <div class="pi-bar-row">
                 <span>${i.name}</span>
-                ${progressBar(i.value, "is-teal", `${i.name} interest score`)}
+                ${progressBar(i.value, "is-blue", `${i.name} interest score`)}
                 <strong>${i.value}%</strong>
               </div>`
               )
@@ -742,8 +756,9 @@ function renderGenericDimBlock(d, dims) {
   const leftPct = dims[d.key];
   const rightPct = 100 - leftPct;
   const dominant = leftPct >= 50 ? d.left : d.right;
+  const theme = PI_DIM_THEME[d.key];
   return `
-    <div class="pi-dim-block">
+    <div class="pi-dim-block" style="--dim-color:${theme.color};--dim-color-soft:${theme.colorSoft}">
       <div class="pi-dim-labels"><span class="is-left">${d.leftName}</span><span class="is-right">${d.rightName}</span></div>
       <div class="pi-dim-bar">
         <span class="is-left" style="width:${leftPct}%">${leftPct}%</span>
@@ -783,7 +798,7 @@ function renderGenericPersonalityDetail(member) {
               (i) => `
             <div class="pi-bar-row">
               <span>${i.name}</span>
-              ${progressBar(i.value, "is-teal", `${i.name} interest score`)}
+              ${progressBar(i.value, "is-blue", `${i.name} interest score`)}
               <strong>${i.value}%</strong>
             </div>`
             )

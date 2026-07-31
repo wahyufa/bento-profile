@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Psychometric Assessment</title>
+  <title>Psychometric Assessment Prototype</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
@@ -900,6 +900,95 @@
       gap: 22px;
     }
 
+    .report-nav {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .report-nav-tab {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border: 2px solid var(--line-soft);
+      border-radius: 18px;
+      background: #fff;
+      text-align: left;
+      cursor: pointer;
+      transition: border-color .15s ease, box-shadow .15s ease;
+    }
+
+    .report-nav-icon {
+      display: grid;
+      flex: 0 0 auto;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border-radius: 12px;
+      background: #eef2f6;
+      color: var(--muted);
+    }
+
+    .report-nav-copy {
+      display: grid;
+      flex: 1 1 auto;
+      min-width: 0;
+      gap: 2px;
+    }
+
+    .report-nav-copy strong {
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .report-nav-copy span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .report-nav-chip {
+      flex: 0 0 auto;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: #f2f4f7;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .report-nav-tab.active {
+      border-color: var(--brand);
+      box-shadow: 0 10px 24px rgba(15, 176, 248, .16);
+    }
+
+    .report-nav-tab.active .report-nav-icon {
+      background: #e8f7ff;
+      color: var(--brand-dark);
+    }
+
+    .report-nav-tab.active .report-nav-chip {
+      background: #e8f7ff;
+      color: var(--brand-dark);
+    }
+
+    .report-nav-tab.preference.active {
+      border-color: var(--navy);
+      box-shadow: 0 10px 24px rgba(18, 38, 63, .16);
+    }
+
+    .report-nav-tab.preference.active .report-nav-icon {
+      background: #e8ebf1;
+      color: var(--navy);
+    }
+
+    .report-nav-tab.preference.active .report-nav-chip {
+      background: #e8ebf1;
+      color: var(--navy);
+    }
+
     .report-hero {
       display: grid;
       justify-items: center;
@@ -1428,28 +1517,13 @@
     }
 
     .insight-card {
+      padding: 16px;
       border: 1px solid var(--line-soft);
       border-radius: 16px;
-      background: #fff;
-      overflow: hidden;
-      transition: border-color .2s ease, box-shadow .2s ease;
+      background: #fbfdff;
     }
 
-    .insight-card[open] {
-      border-color: #c9daf8;
-      box-shadow: 0 10px 28px rgba(39, 103, 223, .08);
-    }
-
-    .insight-card-summary {
-      display: block;
-      padding: 18px;
-      cursor: pointer;
-      list-style: none;
-    }
-
-    .insight-card-summary::-webkit-details-marker { display: none; }
-
-    .insight-card-summary > span {
+    .insight-card span {
       display: block;
       margin-bottom: 8px;
       color: var(--muted);
@@ -1458,137 +1532,20 @@
       text-transform: uppercase;
     }
 
-    .insight-title-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      margin-bottom: 8px;
-    }
-
-    .insight-title-row strong {
+    .insight-card strong {
+      display: block;
+      margin-bottom: 6px;
       color: var(--text);
       font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 18px;
       font-weight: 700;
     }
 
-    .insight-chevron {
-      flex: 0 0 auto;
-      width: 34px;
-      height: 34px;
-      border-radius: 10px;
-      background: #eef4ff;
-      position: relative;
-    }
-
-    .insight-chevron::after {
-      content: "";
-      position: absolute;
-      left: 12px;
-      top: 10px;
-      width: 8px;
-      height: 8px;
-      border-right: 2px solid var(--brand-dark);
-      border-bottom: 2px solid var(--brand-dark);
-      transform: rotate(45deg);
-      transition: transform .2s ease, top .2s ease;
-    }
-
-    .insight-card[open] .insight-chevron::after {
-      top: 14px;
-      transform: rotate(225deg);
-    }
-
-    .insight-card-summary p {
+    .insight-card p {
       margin: 0;
       color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .insight-card-body {
-      padding: 18px;
-      border-top: 1px dashed var(--line-soft);
-      background: #fbfdff;
-    }
-
-    .insight-card-body h4 {
-      margin: 0 0 12px;
-      color: var(--muted);
       font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .02em;
-      text-transform: uppercase;
-    }
-
-    .insight-card-body .bullet-list {
-      padding-left: 22px;
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .insight-card-body .bullet-list li::marker { color: var(--brand-dark); }
-
-    .interest-strength {
-      margin: 16px 0 0;
-      padding-top: 14px;
-      border-top: 1px dashed var(--line-soft);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .interest-strength strong { color: var(--text); }
-
-    .more-interests {
-      border: 1px solid #d8e4f8;
-      border-radius: 16px;
-      background: #f7faff;
-      overflow: hidden;
-    }
-
-    .more-interests > summary {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      min-height: 52px;
-      padding: 0 20px;
-      color: var(--brand-dark);
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      list-style: none;
-    }
-
-    .more-interests > summary::-webkit-details-marker { display: none; }
-
-    .more-interests-hide { display: none; }
-    .more-interests[open] .more-interests-show { display: none; }
-    .more-interests[open] .more-interests-hide { display: inline; }
-
-    .more-interests-chevron {
-      width: 9px;
-      height: 9px;
-      border-right: 2px solid currentColor;
-      border-bottom: 2px solid currentColor;
-      transform: translateY(-2px) rotate(45deg);
-      transition: transform .2s ease;
-    }
-
-    .more-interests[open] .more-interests-chevron {
-      transform: translateY(2px) rotate(225deg);
-    }
-
-    .more-interests-body {
-      padding: 0 14px 14px;
-    }
-
-    .more-interest-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
+      line-height: 1.45;
     }
 
     .type-summary {
@@ -1749,8 +1706,7 @@
     }
 
     .preference-tablist {
-      display: flex;
-      width: 100%;
+      display: inline-flex;
       gap: 4px;
       padding: 4px;
       border-radius: 999px;
@@ -1758,7 +1714,6 @@
     }
 
     .preference-tab {
-      flex: 1;
       min-height: 38px;
       padding: 0 18px;
       border: 0;
@@ -1817,7 +1772,6 @@
       .snapshot-grid,
       .result-hero-grid,
       .insight-grid,
-      .more-interest-grid,
       .type-summary {
         grid-template-columns: 1fr;
       }
@@ -1842,6 +1796,7 @@
       .report-actions { flex-direction: column; }
       .preference-tablist { display: flex; width: 100%; }
       .preference-tab { flex: 1; }
+      .report-nav { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -2414,7 +2369,8 @@
       page: 0,
       answers: {},
       summaryType: null,
-      preferenceView: 'quick'
+      preferenceView: 'quick',
+      reportView: 'interest'
     };
 
     const perPage = 10;
@@ -2516,7 +2472,7 @@
       heroEl.classList.remove('hidden');
       heroTitle.textContent = resultMode ? 'Your Results' : 'Psychometric Assessment';
       heroSubtitle.textContent = resultMode
-        ? 'Explore your Interest Profile and Preference Profile, with more detail available whenever you need it.'
+        ? 'Switch between your Interest Profile and Preference Profile below.'
         : 'Answer a few simple statements to discover what you enjoy, how you like to learn, and what kind of activities may suit you. There are no right or wrong answers.';
       if (resultMode) return;
 
@@ -2708,7 +2664,7 @@
     }
 
     function interestOutcomeChart(scores) {
-      return Object.entries(scores).sort((a, b) => b[1] - a[1]).map(([name, score]) => {
+      return Object.entries(scores).map(([name, score]) => {
         const pct = Math.round(score / 60 * 100);
         return `
           <div class="horizontal-row">
@@ -2750,75 +2706,6 @@
         label: 'Conventional',
         short: 'Organised, structured, and detail-aware.',
         detail: 'You may enjoy clear plans, organised information, accurate work, and tasks with defined steps.'
-      }
-    };
-
-    const interestDetails = {
-      Realistic: {
-        traits: [
-          'Learns most effectively through hands-on practice, direct experience, and working with tangible tools or materials',
-          'Performs best in practical, task-oriented environments with clear, concrete outcomes',
-          'Brings technical skill, precision, and reliability to operational and applied roles',
-          'Prefers straightforward, structured work over open-ended or abstract tasks',
-          'Most comfortable in roles where problems have definable solutions and progress is measurable',
-          'Works best with clear instructions, defined processes, and visible results'
-        ],
-        strength: 'Applied problem-solving, technical execution, and consistent, dependable delivery'
-      },
-      Investigative: {
-        traits: [
-          'Learns most effectively through research, independent inquiry, and the systematic exploration of complex problems',
-          'Performs best in intellectually stimulating environments that reward analytical thinking and original ideas',
-          'Brings curiosity, rigour, and a methodical approach to knowledge-intensive roles',
-          'Prefers working independently with the freedom to investigate and develop well-reasoned conclusions',
-          'Most comfortable in roles where evidence, data, and critical thinking drive decisions',
-          'Works best when given adequate time and autonomy to examine problems in depth'
-        ],
-        strength: 'Analysis, research, problem diagnosis, and the ability to work through complexity'
-      },
-      Artistic: {
-        traits: [
-          'Learns most effectively through creative exploration, experimentation, and self-directed expression',
-          'Performs best in flexible, imaginative environments that value originality and resist rigid structure',
-          'Brings a distinctive creative perspective and aesthetic sensibility to design, communication, and innovation roles',
-          'Prefers work that allows for personal expression and the freedom to approach challenges in unconventional ways',
-          'Most comfortable in roles where imagination and individual contribution are recognised and encouraged',
-          'Works best with room to explore multiple approaches rather than following fixed procedures'
-        ],
-        strength: 'Creative thinking, visual or expressive communication, and generating original ideas'
-      },
-      Social: {
-        traits: [
-          'Learns most effectively through discussion, collaboration, and direct engagement with others',
-          'Performs best in people-centred environments focused on development, support, and meaningful human connection',
-          'Brings empathy, communication skill, and a genuine interest in others to facilitation, training, and helping roles',
-          'Prefers working in cooperative, relationship-driven settings over solitary or purely task-focused environments',
-          'Most comfortable in roles where their contribution has a visible positive impact on the people they work with',
-          'Works best when collaboration, trust, and shared purpose are central to the team culture'
-        ],
-        strength: 'Interpersonal communication, relationship-building, mentoring, and group facilitation'
-      },
-      Enterprising: {
-        traits: [
-          'Learns most effectively through leadership experience, competitive challenge, and pursuing ambitious goals',
-          'Performs best in dynamic, results-driven environments that reward initiative, persuasion, and strategic thinking',
-          'Brings energy, confidence, and a strong action orientation to sales, leadership, and entrepreneurial roles',
-          'Prefers high-visibility roles where they can influence outcomes, motivate others, and drive change',
-          'Most comfortable in fast-paced settings where decisiveness and risk-taking are valued',
-          'Works best with clear goals, significant autonomy, and the opportunity to lead and inspire others'
-        ],
-        strength: 'Strategic thinking, negotiation, team motivation, and identifying and pursuing new opportunities'
-      },
-      Conventional: {
-        traits: [
-          'Learns most effectively through structured instruction, clear guidelines, and systematic step-by-step processes',
-          'Performs best in organised, process-driven environments where accuracy, consistency, and compliance are valued',
-          'Brings strong attention to detail, reliability, and a methodical approach to administrative and operational roles',
-          'Prefers well-defined tasks with clear expectations, established procedures, and measurable standards',
-          'Most comfortable in stable, predictable environments where quality and precision are consistently recognised',
-          'Works best within clear organisational structures with defined roles and reliable workflows'
-        ],
-        strength: 'Data management, procedural accuracy, organisation, and the dependable execution of complex processes'
       }
     };
 
@@ -2895,32 +2782,16 @@
       return Object.entries(scores).sort((a, b) => b[1] - a[1]).slice(0, limit);
     }
 
-    function interestCards(scores, limit = 3, offset = 0) {
-      const rankedInterests = Object.entries(scores)
-        .sort((a, b) => b[1] - a[1])
-        .slice(offset, offset + limit);
-
-      return rankedInterests.map(([name, score], index) => {
-        const rank = offset + index;
+    function interestCards(scores) {
+      return topScoreEntries(scores, 3).map(([name, score], index) => {
         const pct = Math.round(score / 60 * 100);
         const info = interestInfo[name] || { short: '', detail: '' };
-        const details = interestDetails[name] || { traits: [], strength: '' };
         return `
-          <details class="insight-card">
-            <summary class="insight-card-summary">
-              <span>${rank === 0 ? 'Top interest' : `Interest ${rank + 1}`}</span>
-              <div class="insight-title-row">
-                <strong>${name} ${pct}%</strong>
-                <span class="insight-chevron" aria-hidden="true"></span>
-              </div>
-              <p>${info.detail}</p>
-            </summary>
-            <div class="insight-card-body">
-              <h4>Work &amp; learning traits</h4>
-              ${listHtml(details.traits, 6)}
-              <p class="interest-strength"><strong>Strengths:</strong> ${details.strength}</p>
-            </div>
-          </details>
+          <article class="insight-card">
+            <span>${index === 0 ? 'Top interest' : `Interest ${index + 1}`}</span>
+            <strong>${name} ${pct}%</strong>
+            <p>${info.detail}</p>
+          </article>
         `;
       }).join('');
     }
@@ -3097,101 +2968,112 @@
 
       screenEl.innerHTML = `
         <div class="report-shell">
+          <div class="report-nav" role="tablist" aria-label="Report sections">
+            <button class="report-nav-tab ${state.reportView === 'interest' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.reportView === 'interest'}" data-report-tab="interest">
+              <span class="report-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/></svg></span>
+              <span class="report-nav-copy">
+                <strong>Interest Profile</strong>
+                <span>What you enjoy &amp; how you like to work</span>
+              </span>
+              <span class="report-nav-chip">${iCode}</span>
+            </button>
+            <button class="report-nav-tab preference ${state.reportView === 'preference' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.reportView === 'preference'}" data-report-tab="preference">
+              <span class="report-nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none"><path d="M9 4a3 3 0 0 0-3 3v.2A3.5 3.5 0 0 0 5 14.4V16a3 3 0 0 0 3 3h1V4Zm6 0a3 3 0 0 1 3 3v.2a3.5 3.5 0 0 1 1 6.7V16a3 3 0 0 1-3 3h-1V4Z" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+              <span class="report-nav-copy">
+                <strong>Preference Profile</strong>
+                <span>How you think, decide &amp; learn</span>
+              </span>
+              <span class="report-nav-chip">${pCode}</span>
+            </button>
+          </div>
+
           <div class="report-pages">
-            <section class="report-page">
-              <div class="report-page-header">
-                <div>
-                  <p class="report-page-label">Interest result</p>
-                  <h2 class="report-page-title">Interest Profile</h2>
-                  <p class="report-page-subtitle">Your RIASEC interest pattern highlights activities and work areas that may feel more natural, motivating, or enjoyable for you.</p>
+            ${state.reportView === 'interest' ? `
+              <section class="report-page">
+                <div class="report-page-header">
+                  <div>
+                    <p class="report-page-label">Interest result</p>
+                    <h2 class="report-page-title">Interest Profile</h2>
+                    <p class="report-page-subtitle">Your RIASEC interest pattern highlights activities and work areas that may feel more natural, motivating, or enjoyable for you.</p>
+                  </div>
+                  <span class="page-chip">${iCode}</span>
                 </div>
-                <span class="page-chip">${iCode}</span>
-              </div>
-              <div class="result-hero-grid">
-                <article class="result-big-card">
-                  <span>Your strongest interest</span>
-                  <strong>${topInterest[0]}</strong>
-                  <p>${topInterestInfo.short} Your score for this area is ${topInterestPct}%.</p>
-                </article>
-                <div class="horizontal-chart">${interestOutcomeChart(iScores)}</div>
-              </div>
-              <div class="insight-grid">${interestCards(iScores)}</div>
-              <details class="more-interests">
+                <div class="result-hero-grid">
+                  <article class="result-big-card">
+                    <span>Your strongest interest</span>
+                    <strong>${topInterest[0]}</strong>
+                    <p>${topInterestInfo.short} Your score for this area is ${topInterestPct}%.</p>
+                  </article>
+                  <div class="horizontal-chart">${interestOutcomeChart(iScores)}</div>
+                </div>
+                <div class="insight-grid">${interestCards(iScores)}</div>
+                <div class="definition-block">Interest Profile uses the RIASEC model: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional. Your highest areas can guide career exploration, project choices, and learning activities.</div>
+              </section>
+            ` : `
+              <details class="personality-result">
                 <summary>
-                  <span class="more-interests-show">View 3 more interest areas</span>
-                  <span class="more-interests-hide">Hide additional interest areas</span>
-                  <span class="more-interests-chevron" aria-hidden="true"></span>
+                  <span class="personality-result-title">
+                    <span>Personality test result</span>
+                    <strong>${pCode} Preference Profile</strong>
+                    <em>Click to view details</em>
+                  </span>
+                  <span class="personality-code">${pCode}</span>
                 </summary>
-                <div class="more-interests-body">
-                  <div class="more-interest-grid">${interestCards(iScores, 3, 3)}</div>
+                <div class="personality-detail">
+                  <p>${preferenceProfile.overview}</p>
+                  ${listHtml(preferenceProfile.characterised, 3)}
                 </div>
               </details>
-              <div class="definition-block">Interest Profile uses the RIASEC model: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional. Your highest areas can guide career exploration, project choices, and learning activities.</div>
-            </section>
 
-            <details class="personality-result">
-              <summary>
-                <span class="personality-result-title">
-                  <span>Personality test result</span>
-                  <strong>${pCode} Preference Profile</strong>
-                  <em>Click to view details</em>
-                </span>
-                <span class="personality-code">${pCode}</span>
-              </summary>
-              <div class="personality-detail">
-                <p>${preferenceProfile.overview}</p>
-                ${listHtml(preferenceProfile.characterised, 3)}
-              </div>
-            </details>
-
-            <section class="report-page">
-              <div class="report-page-header">
-                <div>
-                  <p class="report-page-label">Preference overview</p>
-                  <h2 class="report-page-title">Preference Profile</h2>
-                  <p class="report-page-subtitle">Your preference profile shows how you may prefer to use energy, take in information, make decisions, and organise your work.</p>
+              <section class="report-page">
+                <div class="report-page-header">
+                  <div>
+                    <p class="report-page-label">Preference overview</p>
+                    <h2 class="report-page-title">Preference Profile</h2>
+                    <p class="report-page-subtitle">Your preference profile shows how you may prefer to use energy, take in information, make decisions, and organise your work.</p>
+                  </div>
+                  <span class="page-chip">${pCode}</span>
                 </div>
-                <span class="page-chip">${pCode}</span>
-              </div>
-              <div class="result-hero-grid">
-                <article class="result-big-card">
-                  <span>Your preference type</span>
-                  <strong>${pCode}</strong>
-                  <p>${preferenceProfile.overview}</p>
-                </article>
-                <div class="type-summary">${typeLetters(pCode)}</div>
-              </div>
-
-              <div class="preference-tabs-wrap">
-                <div class="preference-tablist" role="tablist" aria-label="Preference Profile views">
-                  <button class="preference-tab ${state.preferenceView === 'quick' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'quick'}" data-preference-tab="quick">Learning &amp; Work Snapshot</button>
-                  <button class="preference-tab ${state.preferenceView === 'detail' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'detail'}" data-preference-tab="detail">Full ${pCode} detail</button>
+                <div class="result-hero-grid">
+                  <article class="result-big-card">
+                    <span>Your preference type</span>
+                    <strong>${pCode}</strong>
+                    <p>${preferenceProfile.overview}</p>
+                  </article>
+                  <div class="type-summary">${typeLetters(pCode)}</div>
                 </div>
 
-                ${state.preferenceView === 'quick' ? `
-                  <p class="preference-tab-intro">A dimension-by-dimension look at how your ${pCode} result may show up day to day.</p>
-                  <div class="preference-tabpanel">
-                    <div class="preference-grid">${preferenceDimensionRows(pPercents)}</div>
+                <div class="preference-tabs-wrap">
+                  <div class="preference-tablist" role="tablist" aria-label="Preference Profile views">
+                    <button class="preference-tab ${state.preferenceView === 'quick' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'quick'}" data-preference-tab="quick">Learning &amp; Work Snapshot</button>
+                    <button class="preference-tab ${state.preferenceView === 'detail' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'detail'}" data-preference-tab="detail">Full ${pCode} detail</button>
                   </div>
-                ` : `
-                  <p class="preference-tab-intro">The full ${pCode} write-up, translated into practical notes from the detailed type description.</p>
-                  <div class="preference-tabpanel">
-                    <section class="quick-summary">
-                      <h3>How to read this result</h3>
-                      <p>Your profile describes preferences, not ability. Use it to notice what gives you energy, where you may thrive, and which situations may need extra support.</p>
-                    </section>
-                    <section class="profile-panels">
-                      <article class="profile-panel"><div class="panel-icon">1</div><h3>Often characterised as</h3>${listHtml(preferenceProfile.characterised, 4)}</article>
-                      <article class="profile-panel"><div class="panel-icon">2</div><h3>What may motivate you</h3>${listHtml(preferenceProfile.motivated, 4)}</article>
-                      <article class="profile-panel"><div class="panel-icon">3</div><h3>Work environments you may thrive in</h3>${listHtml(preferenceProfile.environment, 5)}</article>
-                      <article class="profile-panel"><div class="panel-icon">4</div><h3>Strengths</h3>${listHtml(preferenceProfile.strengths, 6)}</article>
-                      <article class="profile-panel"><div class="panel-icon">5</div><h3>Possible challenges</h3>${listHtml(preferenceProfile.challenges, 5)}</article>
-                      <article class="profile-panel"><div class="panel-icon">6</div><h3>Demotivated by</h3>${listHtml(preferenceProfile.demotivated, 5)}</article>
-                    </section>
-                  </div>
-                `}
-              </div>
-            </section>
+
+                  ${state.preferenceView === 'quick' ? `
+                    <p class="preference-tab-intro">A dimension-by-dimension look at how your ${pCode} result may show up day to day.</p>
+                    <div class="preference-tabpanel">
+                      <div class="preference-grid">${preferenceDimensionRows(pPercents)}</div>
+                    </div>
+                  ` : `
+                    <p class="preference-tab-intro">The full ${pCode} write-up, translated into practical notes from the detailed type description.</p>
+                    <div class="preference-tabpanel">
+                      <section class="quick-summary">
+                        <h3>How to read this result</h3>
+                        <p>Your profile describes preferences, not ability. Use it to notice what gives you energy, where you may thrive, and which situations may need extra support.</p>
+                      </section>
+                      <section class="profile-panels">
+                        <article class="profile-panel"><div class="panel-icon">1</div><h3>Often characterised as</h3>${listHtml(preferenceProfile.characterised, 4)}</article>
+                        <article class="profile-panel"><div class="panel-icon">2</div><h3>What may motivate you</h3>${listHtml(preferenceProfile.motivated, 4)}</article>
+                        <article class="profile-panel"><div class="panel-icon">3</div><h3>Work environments you may thrive in</h3>${listHtml(preferenceProfile.environment, 5)}</article>
+                        <article class="profile-panel"><div class="panel-icon">4</div><h3>Strengths</h3>${listHtml(preferenceProfile.strengths, 6)}</article>
+                        <article class="profile-panel"><div class="panel-icon">5</div><h3>Possible challenges</h3>${listHtml(preferenceProfile.challenges, 5)}</article>
+                        <article class="profile-panel"><div class="panel-icon">6</div><h3>Demotivated by</h3>${listHtml(preferenceProfile.demotivated, 5)}</article>
+                      </section>
+                    </div>
+                  `}
+                </div>
+              </section>
+            `}
           </div>
 
           <div class="report-actions">
@@ -3225,6 +3107,8 @@
       if (event.target.closest('#backToDashboard')) { window.location.href = 'atlas-student-dashboard.html'; return; }
       const preferenceTab = event.target.closest('[data-preference-tab]');
       if (preferenceTab) { state.preferenceView = preferenceTab.dataset.preferenceTab; render(); return; }
+      const reportTab = event.target.closest('[data-report-tab]');
+      if (reportTab) { state.reportView = reportTab.dataset.reportTab; render(); return; }
       const answer = event.target.closest('[data-answer-id]');
       if (answer) { setAnswer(answer.dataset.answerId, Number(answer.dataset.answerValue)); return; }
       if (event.target.closest('[data-start]')) { state.screen = 'questions'; state.assessment = 'interest'; state.page = 0; render(); return; }

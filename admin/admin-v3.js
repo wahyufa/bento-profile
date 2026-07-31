@@ -268,6 +268,26 @@ function v3FilteredSkills(sector) {
   return v3SortSkills(filtered);
 }
 
+// Unused by the production row (see v3SkillRow below), kept because the
+// admin-v3-gap-a.js / admin-v3-gap-b.js comparison variants still call it.
+function v3SourcePanel(type, skill) {
+  const isPals = type === "pals";
+  const score = isPals ? palsSkillScore(skill) : skill.cbl?.score ?? null;
+  const scenarios = skill.cbl?.scenarios || 0;
+  const meta = isPals
+    ? (skill.total ? `${skill.correct} of ${skill.total} correct` : "No tagged questions yet")
+    : (scenarios ? `${scenarios} scored ${scenarios === 1 ? "scenario" : "scenarios"}` : "No scored scenarios yet");
+
+  return `
+    <article class="skills-v3-source ${isPals ? "is-pals" : "is-cbl"}">
+      <div class="skills-v3-source-head">
+        <span><i></i>${isPals ? "PALS knowledge" : "CBL application"}</span>
+        <strong>${score == null ? "—" : `${score}%`}</strong>
+      </div>
+      <p>${meta}</p>
+    </article>`;
+}
+
 function v3SkillGuidance(skill, sourceType) {
   if (skill.mastery == null) return "Waiting for tagged learning evidence";
   if (skill.mastery < 70) return "Review this skill next";

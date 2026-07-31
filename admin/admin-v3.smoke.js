@@ -176,7 +176,8 @@ assert.doesNotMatch(output, /questions answered correctly/, "composition detail 
 emit("click", "[data-v3-skill-toggle]", { v3SkillToggle: "Forensic Accounting" });
 output = analyticsPanel.innerHTML;
 assert.match(output, /data-v3-skill-toggle="Forensic Accounting"[^>]*aria-expanded="true"/);
-assert.match(output, /8 pts PALS/);
+assert.match(output, /56 pts PALS/);
+assert.match(output, /21 pts CBL/);
 assert.match(output, /Learners per band \(sample of 4\)/);
 
 emit("click", "[data-v3-skill-toggle]", { v3SkillToggle: "Forensic Accounting" });
@@ -238,7 +239,12 @@ assert.doesNotMatch(output, /Where the gaps sit/, "comparison table still waits 
 emit("click", "[data-v3-sector]", { v3Sector: "accountancy" });
 output = analyticsPanel.innerHTML;
 assert.match(output, /Forensic Accounting/);
-assert.match(output, /11 of 30 correct/, "group evidence pools every member's PALS answers");
+
+emit("click", "[data-v3-skill-toggle]", { v3SkillToggle: "Forensic Accounting" });
+output = analyticsPanel.innerHTML;
+assert.match(output, /26 pts PALS/, "group evidence pools every member's PALS answers");
+assert.match(output, /32 pts CBL/, "group evidence pools every member's CBL scores");
+
 assert.match(output, /Where the gaps sit/, "comparison table appears once the main content (sector detail) is showing");
 assert.match(output, /data-v3-compare-toggle[^>]*aria-expanded="true"/, "comparison table is expanded by default");
 assert.match(output, /<th>Demo June<\/th><th>HeyHi Demo<\/th>/, "expanded table has one column per group");

@@ -59,6 +59,11 @@
   color: var(--teal);
 }
 
+/* Interest/RIASEC bars use the same blue as the Judgement dimension in the psychometric report theme */
+.progress-fill.is-blue {
+  background: #1565c0;
+}
+
 .pi-section-note {
   margin: 14px 0 0;
   border-radius: 10px;

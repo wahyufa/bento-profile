@@ -1,3 +1,108 @@
+/* This variant's v3SkillRow still renders the pre-merge two-card PALS/CBL
+   layout (admin-v3.css dropped these rules once the production row switched
+   to the ranked/expand-to-see-composition style), so they're kept here. */
+.skills-v3-row-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+}
+
+.skills-v3-score {
+  min-width: 70px;
+  text-align: right;
+}
+
+.skills-v3-score span,
+.skills-v3-score strong {
+  display: block;
+}
+
+.skills-v3-score span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.skills-v3-score strong {
+  margin-top: 2px;
+  color: #283141;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 18px;
+}
+
+.skills-v3-overall-track {
+  margin-top: 11px;
+}
+
+.skills-v3-source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.skills-v3-source {
+  border: 1px solid #e5e7eb;
+  border-radius: 9px;
+  padding: 10px;
+}
+
+.skills-v3-source.is-pals {
+  border-color: #c9e5ee;
+  background: #f3fbfd;
+}
+
+.skills-v3-source.is-cbl {
+  border-color: #d1ece8;
+  background: #f6fbfa;
+}
+
+.skills-v3-source-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  color: #485161;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.skills-v3-source-head span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.skills-v3-source-head i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.skills-v3-source.is-pals i { background: var(--cyan); }
+.skills-v3-source.is-cbl i { background: var(--teal); }
+
+.skills-v3-source p {
+  min-height: 24px;
+  margin: 7px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+.skills-v3-row-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.skills-v3-row-foot > span {
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .skills-v3-tier-badge {
   display: inline-block;
   margin-left: 8px;
