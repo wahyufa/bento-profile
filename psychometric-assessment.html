@@ -1,0 +1,3247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Psychometric Assessment</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
+
+    :root {
+      --bg: #f6f8fa;
+      --panel: #ffffff;
+      --text: #12263f;
+      --muted: #66738a;
+      --line: #dbe4ec;
+      --line-soft: #eef3f7;
+      --brand: #0fb0f8;
+      --brand-dark: #078fd0;
+      --navy: #31445f;
+      --green: #18a777;
+      --amber: #c88400;
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+    }
+
+    button { font: inherit; }
+
+    .topbar {
+      min-height: 70px;
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .topbar-inner {
+      width: min(1250px, calc(100% - 40px));
+      margin: 0 auto;
+      min-height: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .atlas-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      color: #111827;
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .atlas-mark {
+      display: grid;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border: 2px solid #38a3cf;
+      border-radius: 8px;
+      color: #ef7d22;
+      transform: rotate(-3deg);
+    }
+
+    .atlas-mark svg {
+      width: 25px;
+      height: 25px;
+    }
+
+    .atlas-byline {
+      display: block;
+      margin-top: -5px;
+      color: #111827;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .top-nav {
+      display: inline-flex;
+      align-items: center;
+      gap: 30px;
+      color: #687386;
+      font-size: 15px;
+      font-weight: 500;
+    }
+
+    .top-nav span {
+      position: relative;
+      white-space: nowrap;
+    }
+
+    .top-nav span.active {
+      color: #0c789d;
+      font-weight: 700;
+    }
+
+    .top-nav span.active::after {
+      position: absolute;
+      left: 50%;
+      bottom: -22px;
+      width: 31px;
+      height: 4px;
+      border-radius: 999px;
+      background: #ffb000;
+      content: "";
+      transform: translateX(-50%);
+    }
+
+    .top-actions {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      color: #0c789d;
+    }
+
+    .icon-only {
+      display: inline-grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #0c789d;
+      cursor: pointer;
+    }
+
+    .help-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #0c789d;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .user-dot {
+      display: inline-grid;
+      width: 36px;
+      height: 36px;
+      place-items: center;
+      border-radius: 999px;
+      background: #20b7c6;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      border: 0;
+      background: transparent;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,.82);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--brand);
+    }
+
+    .brand-pill {
+      visibility: hidden;
+    }
+
+    main {
+      width: min(1120px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 54px 0 70px;
+    }
+
+    .hero {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      margin: 24px auto 26px;
+      text-align: center;
+    }
+
+    .hero-icon {
+      display: grid;
+      width: 46px;
+      height: 46px;
+      place-items: center;
+      border-radius: 14px;
+      background: #e8f7ff;
+      color: var(--brand-dark);
+      font-size: 23px;
+    }
+
+    .hero-icon svg {
+      width: 28px;
+      height: 28px;
+      fill: currentColor;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(25px, 3vw, 36px);
+      line-height: 1.1;
+      font-weight: 700;
+    }
+
+    .hero p {
+      max-width: 660px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .assessment-shell {
+      width: min(960px, 100%);
+      margin: 0 auto;
+    }
+
+    .card, .report-card {
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: var(--panel);
+      box-shadow: none;
+    }
+
+    .content-stack { display: grid; gap: 18px; }
+
+    .progress-card {
+      padding: 16px 18px;
+      border: 1px solid var(--line-soft);
+      border-radius: var(--radius);
+      background: rgba(255, 255, 255, .86);
+    }
+
+    .progress-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .progress-track {
+      height: 7px;
+      padding: 2px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #eef4f8;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #8ddfff 0%, var(--brand) 100%);
+      transition: width .35s ease;
+    }
+
+    .card { padding: 22px 24px; }
+
+    .dashboard-screen {
+      display: block;
+      width: 100vw;
+      margin-top: -54px;
+      margin-left: calc(50% - 50vw);
+      padding: 0 0 58px;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .dashboard-banner {
+      position: relative;
+      overflow: hidden;
+      min-height: 228px;
+      background: #31445f;
+      color: #fff;
+    }
+
+    .dashboard-banner::before {
+      position: absolute;
+      inset: -90px auto auto -70px;
+      width: 1250px;
+      height: 410px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow:
+        145px 0 0 rgba(255,255,255,.07),
+        290px 0 0 rgba(255,255,255,.07),
+        435px 0 0 rgba(255,255,255,.07),
+        580px 0 0 rgba(255,255,255,.07),
+        725px 0 0 rgba(255,255,255,.07),
+        870px 0 0 rgba(255,255,255,.07),
+        1015px 0 0 rgba(255,255,255,.07);
+      content: "";
+    }
+
+    .dashboard-banner-inner {
+      position: relative;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 280px;
+      align-items: end;
+      width: min(1250px, calc(100% - 40px));
+      min-height: 228px;
+      margin: 0 auto;
+      gap: 32px;
+    }
+
+    .dashboard-banner-copy {
+      align-self: center;
+      max-width: 610px;
+      padding: 28px 0;
+    }
+
+    .dashboard-banner h2 {
+      margin: 0 0 10px;
+      color: #fff;
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(31px, 4vw, 40px);
+      line-height: 1.12;
+      font-weight: 700;
+    }
+
+    .dashboard-banner p {
+      max-width: 430px;
+      margin: 0;
+      color: rgba(255,255,255,.92);
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    .type-pill {
+      display: inline-flex;
+      margin-top: 12px;
+      min-height: 27px;
+      align-items: center;
+      padding: 0 11px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.18);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .banner-person {
+      position: relative;
+      display: grid;
+      width: 235px;
+      height: 205px;
+      place-items: end center;
+      justify-self: center;
+    }
+
+    .banner-person::before {
+      position: absolute;
+      bottom: -54px;
+      width: 235px;
+      height: 235px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      content: "";
+    }
+
+    .person-illustration {
+      position: relative;
+      display: grid;
+      width: 144px;
+      height: 170px;
+      justify-items: center;
+      align-content: start;
+    }
+
+    .person-hair {
+      position: absolute;
+      top: 2px;
+      width: 86px;
+      height: 86px;
+      border-radius: 50%;
+      background: #6e3f28;
+    }
+
+    .person-face {
+      position: relative;
+      z-index: 1;
+      width: 72px;
+      height: 78px;
+      margin-top: 17px;
+      border-radius: 45% 45% 48% 48%;
+      background: #f2c7a7;
+    }
+
+    .person-face::before,
+    .person-face::after {
+      position: absolute;
+      top: 28px;
+      width: 15px;
+      height: 10px;
+      border: 2px solid #12263f;
+      border-radius: 999px;
+      content: "";
+    }
+
+    .person-face::before { left: 15px; }
+    .person-face::after { right: 15px; }
+
+    .person-body {
+      position: relative;
+      z-index: 2;
+      width: 124px;
+      height: 86px;
+      margin-top: -6px;
+      border-radius: 34px 34px 0 0;
+      background: #c99360;
+    }
+
+    .person-paper {
+      position: absolute;
+      z-index: 3;
+      bottom: 10px;
+      width: 88px;
+      height: 64px;
+      border-radius: 7px;
+      background: #f4eadb;
+      transform: rotate(-2deg);
+    }
+
+    .dashboard-welcome {
+      width: min(840px, calc(100% - 40px));
+      margin: 26px auto 30px;
+      text-align: center;
+    }
+
+    .assistant-avatar {
+      display: grid;
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 12px;
+      place-items: center;
+      border-radius: 50%;
+      background: #f1d2bf;
+      color: #8b4e39;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    .dashboard-welcome h2 {
+      margin: 0 0 8px;
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(25px, 3vw, 32px);
+      line-height: 1.12;
+      font-weight: 700;
+    }
+
+    .dashboard-welcome p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .ask-box {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 42px;
+      gap: 8px;
+      width: min(670px, 100%);
+      margin: 30px auto 12px;
+      padding: 11px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .ask-placeholder {
+      display: flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 12px;
+      border-radius: 10px;
+      background: #f2f4f7;
+      color: #7a8394;
+      text-align: left;
+      font-size: 15px;
+    }
+
+    .send-button {
+      display: grid;
+      width: 42px;
+      height: 42px;
+      place-items: center;
+      border: 0;
+      border-radius: 12px;
+      background: #89bdd0;
+      color: #fff;
+    }
+
+    .prompt-chips {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 9px;
+      max-width: 620px;
+      margin: 0 auto;
+    }
+
+    .prompt-chip {
+      min-height: 34px;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fff;
+      color: #66738a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      width: min(1250px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .dashboard-card {
+      display: grid;
+      gap: 12px;
+      min-height: 184px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      text-align: left;
+    }
+
+    .dashboard-card-icon {
+      display: grid;
+      width: 40px;
+      height: 40px;
+      place-items: center;
+      border-radius: 12px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .dashboard-card h3 {
+      margin: 2px 0 0;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .dashboard-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .dashboard-link {
+      align-self: end;
+      justify-self: start;
+      border: 0;
+      background: transparent;
+      color: #0c789d;
+      font-weight: 700;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .section-kicker {
+      margin: 0 0 4px;
+      color: var(--brand-dark);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .card h2 {
+      margin: 0;
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .card-caption {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .matrix-note {
+      margin: 16px 0 0;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #f4f7fa;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .question-matrix-wrap {
+      margin-top: 0;
+      overflow-x: auto;
+      border: 1px solid var(--line);
+      border-top: 0;
+      border-radius: 0 0 16px 16px;
+      background: #fff;
+    }
+
+    .scale-sticky {
+      position: sticky;
+      z-index: 8;
+      top: 0;
+      display: grid;
+      grid-template-columns: 44% repeat(6, minmax(0, 1fr));
+      align-items: stretch;
+      min-width: 820px;
+      margin-top: 18px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px 16px 0 0;
+      background: var(--navy);
+      color: #fff;
+    }
+
+    .scale-sticky-spacer,
+    .scale-sticky-item {
+      padding: 12px 14px;
+    }
+
+    .scale-sticky-spacer {
+      display: flex;
+      align-items: center;
+      color: rgba(255,255,255,.8);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .scale-sticky-item {
+      display: grid;
+      gap: 3px;
+      justify-items: center;
+      text-align: center;
+      line-height: 1.15;
+      font-weight: 700;
+    }
+
+    .scale-sticky-item strong {
+      font-size: 13px;
+    }
+
+    .scale-sticky-item span {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 10px;
+    }
+
+    .question-matrix {
+      width: 100%;
+      min-width: 820px;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .question-matrix th {
+      padding: 13px 14px;
+      background: var(--navy);
+      color: #fff;
+      text-align: center;
+      vertical-align: top;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .question-matrix th:first-child {
+      width: 44%;
+      text-align: left;
+    }
+
+    .question-matrix th:not(:first-child),
+    .question-matrix td:not(:first-child) {
+      width: 9.333%;
+    }
+
+    .question-matrix td:first-child {
+      width: 44%;
+    }
+
+    .scale-head {
+      display: grid;
+      gap: 3px;
+      justify-items: center;
+      align-content: start;
+      min-height: 48px;
+      line-height: 1.15;
+    }
+
+    .scale-head strong {
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .scale-head span {
+      color: rgba(255, 255, 255, 0.78);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: none;
+      white-space: normal;
+    }
+
+    .question-matrix td {
+      padding: 14px;
+      border-bottom: 1px solid var(--line-soft);
+      text-align: center;
+      vertical-align: middle;
+      background: #fff;
+    }
+
+    .question-matrix tr:nth-child(even) td {
+      background: #fbfcfd;
+    }
+
+    .question-matrix tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .statement-cell {
+      display: grid;
+      gap: 5px;
+      color: var(--text);
+      text-align: left;
+      font-size: 14px;
+      line-height: 1.38;
+      font-weight: 700;
+    }
+
+    .statement-cell span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .matrix-option {
+      position: relative;
+      display: inline-grid;
+      width: 24px;
+      height: 24px;
+      place-items: center;
+      border: 2px solid #c7ced6;
+      border-radius: 999px;
+      background: #fff;
+      color: transparent;
+      cursor: pointer;
+    }
+
+    .matrix-option:hover {
+      border-color: var(--brand);
+      background: #f1fbff;
+    }
+
+    .matrix-option.selected {
+      border-color: var(--brand);
+      background: var(--brand);
+    }
+
+    .matrix-option.selected::after {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #fff;
+      content: "";
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 0 18px;
+      border: 1px solid var(--brand);
+      border-radius: 999px;
+      background: var(--brand);
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .button.secondary { background: #fff; color: var(--brand-dark); }
+    .button:disabled { border-color: #cbd5df; background: #e7edf3; color: #8a97a8; cursor: not-allowed; }
+
+    .hint { color: var(--muted); font-size: 12px; }
+
+    .demo-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 14px;
+    }
+
+    .demo-button {
+      min-height: 34px;
+      padding: 0 12px;
+      border: 1px solid #c7e8f9;
+      border-radius: 999px;
+      background: #f2fbff;
+      color: var(--brand-dark);
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .demo-button:hover {
+      border-color: var(--brand);
+      background: #e5f7ff;
+    }
+
+    .start-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+
+    .mini-card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fbfdff;
+    }
+
+    .mini-card strong { display: block; margin-bottom: 7px; font-size: 15px; }
+    .mini-card span { color: var(--muted); font-size: 12px; line-height: 1.45; }
+
+    .review-grid, .report-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+    }
+
+    .report-card { padding: 18px; }
+    .report-card h3 {
+      margin: 0 0 10px;
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .report-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
+
+    .score-list { display: grid; gap: 11px; }
+    .score-row { display: grid; gap: 6px; }
+    .score-meta { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; font-weight: 700; }
+    .score-bar { height: 8px; overflow: hidden; border-radius: 999px; background: #e8eef4; }
+    .score-bar span { display: block; height: 100%; border-radius: inherit; background: var(--brand); }
+
+    .report-shell {
+      display: grid;
+      gap: 22px;
+    }
+
+    .report-hero {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+      padding: 8px 0 6px;
+      text-align: center;
+    }
+
+    .profile-illustration {
+      display: grid;
+      width: 168px;
+      height: 138px;
+      place-items: center;
+      border-radius: 50%;
+      background: #f3f7fa;
+      color: var(--brand-dark);
+    }
+
+    .profile-illustration svg {
+      width: 84px;
+      height: 84px;
+    }
+
+    .role-ribbon {
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      margin-top: -30px;
+      padding: 0 28px;
+      border-radius: 999px;
+      background: var(--brand);
+      color: #fff;
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      transform: rotate(-3deg);
+    }
+
+    .role-title {
+      margin: 4px 0 0;
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 700;
+    }
+
+    .role-title span {
+      color: var(--brand-dark);
+    }
+
+    .profile-quote {
+      margin: 0;
+      color: #3c4654;
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.45;
+    }
+
+    .profile-code {
+      display: inline-flex;
+      align-items: center;
+      min-height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: #eef9ff;
+      color: var(--brand-dark);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .question-matrix thead {
+      display: none;
+    }
+
+    .snapshot-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .snapshot-card {
+      display: grid;
+      gap: 8px;
+      padding: 16px;
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .snapshot-card span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .snapshot-card strong {
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .snapshot-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .quick-summary {
+      display: grid;
+      gap: 16px;
+      padding: 20px;
+      border: 1px solid #d8edf8;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #f4fbff 0%, #ffffff 100%);
+    }
+
+    .quick-summary h3 {
+      margin: 0;
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .quick-summary p {
+      margin: 0;
+      color: #3d4856;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .keyword-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .keyword-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: #eef6fb;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .loading-state {
+      display: grid;
+      justify-items: center;
+      gap: 14px;
+      padding: 56px 20px;
+      text-align: center;
+    }
+
+    .loader {
+      width: 44px;
+      height: 44px;
+      border: 4px solid #dff3fd;
+      border-top-color: var(--brand);
+      border-radius: 999px;
+      animation: spin .8s linear infinite;
+    }
+
+    .loading-state h2 {
+      margin: 0;
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .loading-state p {
+      max-width: 460px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .character-box {
+      padding: 22px;
+      border-radius: 6px;
+      background: #f1f4f7;
+    }
+
+    .character-box h3,
+    .report-section h3 {
+      margin: 0 0 12px;
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .report-section {
+      display: grid;
+      gap: 14px;
+    }
+
+    .report-section p {
+      margin: 0;
+      color: #333d4b;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .teal-heading {
+      color: #249c9b !important;
+    }
+
+    .bullet-list {
+      margin: 0;
+      padding-left: 20px;
+      color: #333d4b;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .bullet-list li + li {
+      margin-top: 4px;
+    }
+
+    .profile-panels {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .profile-panel {
+      min-height: 0;
+      padding: 18px;
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      background: #fff;
+      text-align: left;
+    }
+
+    .panel-icon {
+      display: inline-grid;
+      width: 38px;
+      height: 38px;
+      margin: 0 0 10px;
+      place-items: center;
+      border-radius: 999px;
+      background: #edf8ff;
+      color: var(--brand-dark);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .profile-panel h3 {
+      display: block;
+      margin: 0 0 14px;
+      font-size: 16px;
+    }
+
+    .profile-panel .bullet-list {
+      text-align: left;
+    }
+
+    .outcome-grid {
+      display: grid;
+      grid-template-columns: minmax(280px, .9fr) minmax(0, 1fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .horizontal-chart {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border: 1px solid var(--line-soft);
+      border-radius: 18px;
+      background: #fbfdff;
+    }
+
+    .horizontal-row {
+      display: grid;
+      grid-template-columns: 112px minmax(0, 1fr) 42px;
+      gap: 12px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .horizontal-track {
+      height: 10px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8eef4;
+    }
+
+    .horizontal-track span {
+      display: block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #8ddfff 0%, var(--brand) 100%);
+    }
+
+    .horizontal-row strong {
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .preference-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 22px;
+    }
+
+    .preference-card {
+      display: grid;
+      gap: 14px;
+      padding: 20px;
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .preference-card-title {
+      margin: 0;
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 21px;
+      font-weight: 700;
+    }
+
+    .split-labels {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .split-label-side {
+      display: grid;
+      gap: 2px;
+    }
+
+    .split-label-side:last-child {
+      text-align: right;
+    }
+
+    .split-label-side strong {
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .split-label-side span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .split-label-side:first-child strong { color: var(--left-color); }
+    .split-label-side:last-child strong { color: var(--right-color); }
+
+    .split-bar {
+      display: flex;
+      height: 30px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #e8eef4;
+    }
+
+    .split-bar span {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .split-bar span:first-child {
+      border-radius: 999px 0 0 999px;
+      background: var(--left-color);
+      color: #fff;
+    }
+
+    .split-bar span:last-child {
+      border-radius: 0 999px 999px 0;
+      background: var(--right-color);
+      color: var(--text);
+    }
+
+    .preference-bullets {
+      margin-top: 2px;
+      padding-top: 14px;
+      padding-left: 18px;
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .result-code {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: #eef9ff;
+      color: var(--brand-dark);
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .report-pages {
+      display: grid;
+      gap: 22px;
+    }
+
+    .report-page {
+      display: grid;
+      gap: 22px;
+      padding: 28px;
+      border: 1px solid var(--line-soft);
+      border-radius: 20px;
+      background: #fff;
+    }
+
+    .report-page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .report-page-label {
+      margin: 0 0 6px;
+      color: var(--brand-dark);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .report-page-title {
+      margin: 0;
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(22px, 3vw, 30px);
+      line-height: 1.15;
+      font-weight: 700;
+    }
+
+    .report-page-subtitle {
+      max-width: 680px;
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .page-chip {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 0 13px;
+      border-radius: 999px;
+      background: #eef9ff;
+      color: var(--brand-dark);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .result-hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .result-big-card {
+      display: grid;
+      align-content: center;
+      gap: 10px;
+      min-height: 190px;
+      min-width: 0;
+      padding: 24px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #eef9ff 0%, #ffffff 100%);
+      border: 1px solid #d8edf8;
+      overflow: hidden;
+    }
+
+    .result-big-card span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .result-big-card strong {
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(29px, 4vw, 44px);
+      line-height: 1;
+      font-weight: 700;
+      overflow-wrap: anywhere;
+    }
+
+    .result-big-card p {
+      margin: 0;
+      color: #3d4856;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .insight-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .insight-card {
+      border: 1px solid var(--line-soft);
+      border-radius: 16px;
+      background: #fff;
+      overflow: hidden;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+
+    .insight-card[open] {
+      border-color: #c9daf8;
+      box-shadow: 0 10px 28px rgba(39, 103, 223, .08);
+    }
+
+    .insight-card-summary {
+      display: block;
+      padding: 18px;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .insight-card-summary::-webkit-details-marker { display: none; }
+
+    .insight-card-summary > span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .insight-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .insight-title-row strong {
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .insight-chevron {
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: #eef4ff;
+      position: relative;
+    }
+
+    .insight-chevron::after {
+      content: "";
+      position: absolute;
+      left: 12px;
+      top: 10px;
+      width: 8px;
+      height: 8px;
+      border-right: 2px solid var(--brand-dark);
+      border-bottom: 2px solid var(--brand-dark);
+      transform: rotate(45deg);
+      transition: transform .2s ease, top .2s ease;
+    }
+
+    .insight-card[open] .insight-chevron::after {
+      top: 14px;
+      transform: rotate(225deg);
+    }
+
+    .insight-card-summary p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .insight-card-body {
+      padding: 18px;
+      border-top: 1px dashed var(--line-soft);
+      background: #fbfdff;
+    }
+
+    .insight-card-body h4 {
+      margin: 0 0 12px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      text-transform: uppercase;
+    }
+
+    .insight-card-body .bullet-list {
+      padding-left: 22px;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .insight-card-body .bullet-list li::marker { color: var(--brand-dark); }
+
+    .interest-strength {
+      margin: 16px 0 0;
+      padding-top: 14px;
+      border-top: 1px dashed var(--line-soft);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .interest-strength strong { color: var(--text); }
+
+    .interest-tabs-wrap { padding-top: 4px; }
+
+    .interest-tabpanel {
+      padding-top: 22px;
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .interest-tab-copy {
+      display: grid;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .interest-tab-copy p { margin: 0; }
+
+    .interest-full-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .interest-full-intro {
+      margin: 0 0 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .type-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .type-letter {
+      padding: 14px;
+      border: 1px solid var(--line-soft);
+      border-radius: 14px;
+      background: #fbfdff;
+    }
+
+    .type-letter b {
+      display: block;
+      color: var(--brand-dark);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 24px;
+      font-weight: 700;
+    }
+
+    .type-letter span {
+      display: block;
+      margin-top: 3px;
+      color: var(--text);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .type-letter p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .definition-block {
+      padding: 16px;
+      border-radius: 12px;
+      background: #f4f8fb;
+      color: #3d4856;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .personality-result {
+      display: grid;
+      gap: 0;
+      border: 1px solid #d8edf8;
+      border-radius: 18px;
+      background: linear-gradient(180deg, #f4fbff 0%, #ffffff 100%);
+      overflow: hidden;
+    }
+
+    .personality-result summary {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 20px;
+      cursor: pointer;
+      list-style: none;
+    }
+
+    .personality-result summary:hover .personality-code,
+    .personality-result[open] .personality-code {
+      background: #088fcb;
+      transform: translateY(-1px);
+    }
+
+    .personality-result summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .personality-result-title {
+      display: grid;
+      gap: 4px;
+    }
+
+    .personality-result-title span {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .personality-result-title strong {
+      color: var(--text);
+      font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .personality-result-title em {
+      color: var(--brand-dark);
+      font-style: normal;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .personality-code {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 0 14px;
+      border-radius: 999px;
+      background: var(--brand);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      transition: background .18s ease, transform .18s ease;
+    }
+
+    .personality-code::after {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-right: 2px solid currentColor;
+      border-bottom: 2px solid currentColor;
+      transform: rotate(45deg) translateY(-2px);
+      transition: transform .18s ease;
+    }
+
+    .personality-result[open] .personality-code::after {
+      transform: rotate(225deg) translateY(-2px);
+    }
+
+    .personality-detail {
+      display: grid;
+      gap: 14px;
+      padding: 0 20px 20px;
+      border-top: 1px solid #d8edf8;
+    }
+
+    .personality-detail p {
+      margin: 14px 0 0;
+      color: #3d4856;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .report-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding-top: 4px;
+    }
+
+    .hidden { display: none !important; }
+
+    .preference-tabs-wrap {
+      margin-top: 6px;
+      padding-top: 22px;
+      border-top: 1px solid var(--line-soft);
+    }
+
+    .preference-tablist {
+      display: flex;
+      width: 100%;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 999px;
+      background: #eef2f6;
+    }
+
+    .preference-tab {
+      flex: 1;
+      min-height: 38px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .preference-tab.active {
+      background: #fff;
+      color: var(--brand-dark);
+      box-shadow: 0 4px 10px rgba(18, 38, 63, .08);
+    }
+
+    .preference-tab-intro {
+      max-width: 640px;
+      margin: 14px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .preference-tabpanel {
+      margin-top: 18px;
+    }
+
+    .modal-close:hover { background: #e7edf3; }
+
+    @media (max-width: 900px) {
+      .question-matrix {
+        min-width: 720px;
+      }
+
+      .top-nav {
+        display: none;
+      }
+
+      .dashboard-banner-inner {
+        grid-template-columns: 1fr;
+      }
+
+      .banner-person {
+        display: none;
+      }
+
+      .dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .profile-panels,
+      .outcome-grid,
+      .preference-grid,
+      .snapshot-grid,
+      .result-hero-grid,
+      .insight-grid,
+      .interest-full-grid,
+      .type-summary {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 650px) {
+      main { width: min(100% - 24px, 1120px); padding-top: 24px; }
+      .dashboard-screen { margin-top: -24px; }
+      .topbar-inner { width: min(100% - 24px, 1250px); }
+      .top-actions { display: none; }
+      .atlas-brand { font-size: 23px; }
+      .dashboard-grid { grid-template-columns: 1fr; }
+      .dashboard-banner-inner,
+      .dashboard-welcome,
+      .dashboard-grid { width: min(100% - 24px, 1250px); }
+      .hero { margin-top: 24px; }
+      .start-grid, .review-grid, .report-grid { grid-template-columns: 1fr; }
+      .actions { align-items: stretch; flex-direction: column-reverse; }
+      .button { width: 100%; }
+      .report-page { padding: 20px; }
+      .report-page-header { flex-direction: column; }
+      .report-actions { flex-direction: column; }
+      .interest-tabs-wrap .preference-tablist,
+      .preference-tablist { display: flex; width: 100%; }
+      .interest-tabs-wrap .preference-tab,
+      .preference-tab { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <button class="back-link" type="button" id="backToDashboard">Back to Dashboard</button>
+      <div class="brand-pill"><span class="brand-dot"></span> Psychometric Assessment</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <div class="hero-icon" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+          <path d="M248,124a56.11,56.11,0,0,0-32-50.61V72a48,48,0,0,0-88-26.49A48,48,0,0,0,40,72v1.39a56,56,0,0,0,0,101.2V176a48,48,0,0,0,88,26.49A48,48,0,0,0,216,176v-1.41A56.09,56.09,0,0,0,248,124ZM88,208a32,32,0,0,1-31.81-28.56A55.87,55.87,0,0,0,64,180h8a8,8,0,0,0,0-16H64A40,40,0,0,1,50.67,86.27,8,8,0,0,0,56,78.73V72a32,32,0,0,1,64,0v68.26A47.8,47.8,0,0,0,88,128a8,8,0,0,0,0,16,32,32,0,0,1,0,64Zm104-44h-8a8,8,0,0,0,0,16h8a55.87,55.87,0,0,0,7.81-.56A32,32,0,1,1,168,144a8,8,0,0,0,0-16,47.8,47.8,0,0,0-32,12.26V72a32,32,0,0,1,64,0v6.73a8,8,0,0,0,5.33,7.54A40,40,0,0,1,192,164Zm16-52a8,8,0,0,1-8,8h-4a36,36,0,0,1-36-36V80a8,8,0,0,1,16,0v4a20,20,0,0,0,20,20h4A8,8,0,0,1,208,112ZM60,120H56a8,8,0,0,1,0-16h4A20,20,0,0,0,80,84V80a8,8,0,0,1,16,0v4A36,36,0,0,1,60,120Z"></path>
+        </svg>
+      </div>
+      <h1 id="heroTitle">Psychometric Assessment</h1>
+      <p id="heroSubtitle">Answer a few simple statements to discover what you enjoy, how you like to learn, and what kind of activities may suit you. There are no right or wrong answers.</p>
+    </section>
+
+    <section class="assessment-shell">
+      <div class="content-stack">
+        <div class="progress-card" id="progressCard">
+          <div class="progress-top">
+            <span id="progressLabel">Ready to begin</span>
+            <span id="progressPercent">0% complete</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        </div>
+
+        <section class="card" id="screen"></section>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const interestQuestions = [
+  {
+    "id": "IP-R-1",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I enjoy working with tools to complete a task."
+  },
+  {
+    "id": "IP-R-2",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I like being actively involved in physical activities."
+  },
+  {
+    "id": "IP-R-3",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I like setting up do-it-yourself furniture in my house."
+  },
+  {
+    "id": "IP-R-4",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I enjoy carpentry."
+  },
+  {
+    "id": "IP-R-5",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I enjoy gardening."
+  },
+  {
+    "id": "IP-R-6",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I enjoy doing housework."
+  },
+  {
+    "id": "IP-R-7",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I enjoy cooking."
+  },
+  {
+    "id": "IP-R-8",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I enjoy setting up electronic and electrical devices."
+  },
+  {
+    "id": "IP-R-9",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I want to learn carpentry."
+  },
+  {
+    "id": "IP-R-10",
+    "type": "Realistic",
+    "dimension": null,
+    "text": "I want to learn to set up electronic and electrical devices."
+  },
+  {
+    "id": "IP-I-1",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I enjoy having enough time to research a topic before I start work on it."
+  },
+  {
+    "id": "IP-I-2",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I enjoy learning new things."
+  },
+  {
+    "id": "IP-I-3",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I feel comfortable when I am given enough time to work things out by myself."
+  },
+  {
+    "id": "IP-I-4",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I enjoy learning about social science concepts (sociology, anthropology, psychology, etc.)."
+  },
+  {
+    "id": "IP-I-5",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I enjoy learning about humanities concepts (literature, history, languages, politics, business, etc.)."
+  },
+  {
+    "id": "IP-I-6",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I enjoy reading pages on Wikipedia or other informational webpages."
+  },
+  {
+    "id": "IP-I-7",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I enjoy learning about new developments in technology."
+  },
+  {
+    "id": "IP-I-8",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I want to know more about social science concepts (sociology, anthropology, psychology, etc.)."
+  },
+  {
+    "id": "IP-I-9",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I want to know more about humanities concepts (literature, history, languages, politics, business, etc.)."
+  },
+  {
+    "id": "IP-I-10",
+    "type": "Investigative",
+    "dimension": null,
+    "text": "I want to learn more about new developments in technology."
+  },
+  {
+    "id": "IP-A-1",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "I enjoy expressing myself creatively through various forms of media (writing, music, drama, comedy, etc.)."
+  },
+  {
+    "id": "IP-A-2",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "I like taking part in creative productions (stage plays, musical pieces, art shows, etc.) to express my personality."
+  },
+  {
+    "id": "IP-A-3",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "Creating something new (artwork, piece of writing, performance piece) gives me a sense of satisfaction."
+  },
+  {
+    "id": "IP-A-4",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "I enjoy letting my imagination soar free."
+  },
+  {
+    "id": "IP-A-5",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "I consider myself a creative person."
+  },
+  {
+    "id": "IP-A-6",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "I enjoy writing poetry or short stories."
+  },
+  {
+    "id": "IP-A-7",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "I want to be involved in the performing arts."
+  },
+  {
+    "id": "IP-A-8",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "I want to spend more time redecorating my house."
+  },
+  {
+    "id": "IP-A-9",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "I want to learn how to perform spoken word poetry."
+  },
+  {
+    "id": "IP-A-10",
+    "type": "Artistic",
+    "dimension": null,
+    "text": "I want to spend more time writing poetry or short stories."
+  },
+  {
+    "id": "IP-S-1",
+    "type": "Social",
+    "dimension": null,
+    "text": "I enjoy helping others."
+  },
+  {
+    "id": "IP-S-2",
+    "type": "Social",
+    "dimension": null,
+    "text": "I consider myself a people person."
+  },
+  {
+    "id": "IP-S-3",
+    "type": "Social",
+    "dimension": null,
+    "text": "I prefer doing work that allows me to connect with many people around me."
+  },
+  {
+    "id": "IP-S-4",
+    "type": "Social",
+    "dimension": null,
+    "text": "I feel more comfortable working with others in a team rather than by myself."
+  },
+  {
+    "id": "IP-S-5",
+    "type": "Social",
+    "dimension": null,
+    "text": "I enjoy working with children and teenagers to build their skills and capabilities."
+  },
+  {
+    "id": "IP-S-6",
+    "type": "Social",
+    "dimension": null,
+    "text": "I want to spend more time volunteering for causes I believe in."
+  },
+  {
+    "id": "IP-S-7",
+    "type": "Social",
+    "dimension": null,
+    "text": "I want to spend more time helping the elderly feel more comfortable and happy."
+  },
+  {
+    "id": "IP-S-8",
+    "type": "Social",
+    "dimension": null,
+    "text": "I want to make a difference in the world around me for the benefit of humankind."
+  },
+  {
+    "id": "IP-S-9",
+    "type": "Social",
+    "dimension": null,
+    "text": "I like teaching."
+  },
+  {
+    "id": "IP-S-10",
+    "type": "Social",
+    "dimension": null,
+    "text": "I like conducting trainings."
+  },
+  {
+    "id": "IP-E-1",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "I like thinking of ideas for new projects."
+  },
+  {
+    "id": "IP-E-2",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "I enjoy leading a team."
+  },
+  {
+    "id": "IP-E-3",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "Tasks that I enjoy usually allow me to reach a goal."
+  },
+  {
+    "id": "IP-E-4",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "I enjoy pitching ideas to other people."
+  },
+  {
+    "id": "IP-E-5",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "It gives me a sense of satisfaction to lead and motivate a team to success."
+  },
+  {
+    "id": "IP-E-6",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "I enjoy communicating ideas to others through public speaking."
+  },
+  {
+    "id": "IP-E-7",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "I enjoy promoting products or services."
+  },
+  {
+    "id": "IP-E-8",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "I enjoy learning about small businesses."
+  },
+  {
+    "id": "IP-E-9",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "I want to spend more time building my sales and marketing skills."
+  },
+  {
+    "id": "IP-E-10",
+    "type": "Enterprising",
+    "dimension": null,
+    "text": "I want to spend more time learning about setting up my own business."
+  },
+  {
+    "id": "IP-C-1",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "I like tasks that are structured and detailed."
+  },
+  {
+    "id": "IP-C-2",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "Tasks that I enjoy usually come with clear instructions and known outcomes."
+  },
+  {
+    "id": "IP-C-3",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "I prefer to pay attention to small details in completing any task."
+  },
+  {
+    "id": "IP-C-4",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "I consider myself well-organised."
+  },
+  {
+    "id": "IP-C-5",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "I feel comfortable with work that progresses in a linear fashion with no distractions."
+  },
+  {
+    "id": "IP-C-6",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "I am comfortable with a similar daily routine."
+  },
+  {
+    "id": "IP-C-7",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "I enjoy cleaning and organising my surroundings."
+  },
+  {
+    "id": "IP-C-8",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "I enjoy putting things away in the places they belong."
+  },
+  {
+    "id": "IP-C-9",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "I enjoy learning new methods of keeping things neat and orderly."
+  },
+  {
+    "id": "IP-C-10",
+    "type": "Conventional",
+    "dimension": null,
+    "text": "I want to spend more time organising my things."
+  }
+];
+    const preferenceQuestions = [
+  {
+    "id": "PP-ENERGY-1",
+    "type": "Introvert",
+    "dimension": "Energy",
+    "text": "I feel recharged when I am given time to think on my own."
+  },
+  {
+    "id": "PP-ENERGY-2",
+    "type": "Extravert",
+    "dimension": "Energy",
+    "text": "When joining a group, I prefer to jump right in and introduce myself to everyone."
+  },
+  {
+    "id": "PP-ENERGY-3",
+    "type": "Extravert",
+    "dimension": "Energy",
+    "text": "I find myself speaking more than listening."
+  },
+  {
+    "id": "PP-ENERGY-4",
+    "type": "Extravert",
+    "dimension": "Energy",
+    "text": "I prefer to discuss my ideas with others rather than reflect quietly on them."
+  },
+  {
+    "id": "PP-ENERGY-5",
+    "type": "Introvert",
+    "dimension": "Energy",
+    "text": "I feel comfortable by myself."
+  },
+  {
+    "id": "PP-PERCEPTION-1",
+    "type": "Sensing",
+    "dimension": "Perception",
+    "text": "I am most comfortable when things proceed according to plan."
+  },
+  {
+    "id": "PP-PERCEPTION-2",
+    "type": "Sensing",
+    "dimension": "Perception",
+    "text": "I am more comfortable relying on established rules and procedures."
+  },
+  {
+    "id": "PP-PERCEPTION-3",
+    "type": "Intuitive",
+    "dimension": "Perception",
+    "text": "I am a 'big picture'-oriented person."
+  },
+  {
+    "id": "PP-PERCEPTION-4",
+    "type": "Intuitive",
+    "dimension": "Perception",
+    "text": "I am most comfortable when I have room to adapt and adjust to unfolding circumstances."
+  },
+  {
+    "id": "PP-PERCEPTION-5",
+    "type": "Intuitive",
+    "dimension": "Perception",
+    "text": "When learning new things, I prefer to deal with relationships and connections between concepts."
+  },
+  {
+    "id": "PP-PERCEPTION-6",
+    "type": "Intuitive",
+    "dimension": "Perception",
+    "text": "I am most interested in tasks that allow me to link different theoretical outcomes to form a big picture."
+  },
+  {
+    "id": "PP-PERCEPTION-7",
+    "type": "Sensing",
+    "dimension": "Perception",
+    "text": "I am a detail-oriented person."
+  },
+  {
+    "id": "PP-PERCEPTION-8",
+    "type": "Intuitive",
+    "dimension": "Perception",
+    "text": "I work best with global aims and targets."
+  },
+  {
+    "id": "PP-PERCEPTION-9",
+    "type": "Sensing",
+    "dimension": "Perception",
+    "text": "I prefer information that I can verify."
+  },
+  {
+    "id": "PP-DECISION-1",
+    "type": "Thinking",
+    "dimension": "Decision-Making",
+    "text": "I often consider the pros and cons of alternative decisions when making a choice."
+  },
+  {
+    "id": "PP-DECISION-2",
+    "type": "Feeling",
+    "dimension": "Decision-Making",
+    "text": "I tend to let my feelings affect my decisions."
+  },
+  {
+    "id": "PP-DECISION-3",
+    "type": "Thinking",
+    "dimension": "Decision-Making",
+    "text": "My decisions are guided by my principles."
+  },
+  {
+    "id": "PP-DECISION-4",
+    "type": "Feeling",
+    "dimension": "Decision-Making",
+    "text": "In any decision, what is most important is that everyone involved is satisfied with the outcome."
+  },
+  {
+    "id": "PP-DECISION-5",
+    "type": "Feeling",
+    "dimension": "Decision-Making",
+    "text": "I would emphasize harmony over fairness."
+  },
+  {
+    "id": "PP-LIFESTYLE-1",
+    "type": "Judging",
+    "dimension": "Lifestyle",
+    "text": "I am very structured in my work flow."
+  },
+  {
+    "id": "PP-LIFESTYLE-2",
+    "type": "Judging",
+    "dimension": "Lifestyle",
+    "text": "I am a goal-oriented person."
+  },
+  {
+    "id": "PP-LIFESTYLE-3",
+    "type": "Judging",
+    "dimension": "Lifestyle",
+    "text": "Being able to plan ahead is very important to me."
+  },
+  {
+    "id": "PP-LIFESTYLE-4",
+    "type": "Perceiving",
+    "dimension": "Lifestyle",
+    "text": "I prefer to deal with problems when I am ready."
+  },
+  {
+    "id": "PP-LIFESTYLE-5",
+    "type": "Perceiving",
+    "dimension": "Lifestyle",
+    "text": "I am very flexible in my work flow."
+  }
+];
+
+    const preferenceTypeCounts = preferenceQuestions.reduce((acc, q) => {
+      acc[q.type] = (acc[q.type] || 0) + 1;
+      return acc;
+    }, {});
+
+    function preferencePercents(scores) {
+      const percents = {};
+      Object.keys(preferenceTypeCounts).forEach((type) => {
+        const max = preferenceTypeCounts[type] * 6;
+        percents[type] = max ? ((scores[type] || 0) / max) * 100 : 0;
+      });
+      return percents;
+    }
+
+    function formatPercent(value) {
+      const rounded = Math.round(value * 10) / 10;
+      return Number.isInteger(rounded) ? `${rounded}%` : `${rounded.toFixed(1)}%`;
+    }
+
+    const state = {
+      screen: 'intro',
+      assessment: 'interest',
+      page: 0,
+      answers: {},
+      summaryType: null,
+      interestView: 'snapshot',
+      preferenceView: 'quick'
+    };
+
+    const perPage = 10;
+    const scaleOptions = [
+      { value: 1, label: 'Strongly disagree' },
+      { value: 2, label: 'Disagree' },
+      { value: 3, label: 'Slightly disagree' },
+      { value: 4, label: 'Slightly agree' },
+      { value: 5, label: 'Agree' },
+      { value: 6, label: 'Strongly agree' }
+    ];
+    const screenEl = document.getElementById('screen');
+    const progressLabel = document.getElementById('progressLabel');
+    const progressPercent = document.getElementById('progressPercent');
+    const progressFill = document.getElementById('progressFill');
+    const progressCard = document.getElementById('progressCard');
+    const heroTitle = document.getElementById('heroTitle');
+    const heroSubtitle = document.getElementById('heroSubtitle');
+    const heroEl = document.getElementById('hero');
+
+    const interestLetters = { Realistic: 'R', Investigative: 'I', Artistic: 'A', Social: 'S', Enterprising: 'E', Conventional: 'C' };
+    const pairRules = [
+      ['Extravert', 'Introvert', 'E', 'I', 'I'],
+      ['Intuitive', 'Sensing', 'N', 'S', 'N'],
+      ['Thinking', 'Feeling', 'T', 'F', 'F'],
+      ['Judging', 'Perceiving', 'J', 'P', 'P']
+    ];
+
+    function currentQuestions() { return state.assessment === 'interest' ? interestQuestions : preferenceQuestions; }
+    function answerKey(question) { return `${state.assessment}:${question.id}`; }
+    function answeredCount(list) { return list.filter((q) => state.answers[`${state.assessment}:${q.id}`]).length; }
+    function allAnswered() { return interestQuestions.concat(preferenceQuestions).filter((q) => state.answers[`interest:${q.id}`] || state.answers[`preference:${q.id}`]).length; }
+    function totalQuestions() { return interestQuestions.length + preferenceQuestions.length; }
+
+    function setAnswer(id, value) {
+      state.answers[id] = value;
+      render();
+    }
+
+    const demoInterestValues = {
+      Realistic: [4, 3, 4, 5, 3, 4, 5, 4, 3, 4],
+      Investigative: [6, 5, 6, 5, 5, 6, 6, 5, 6, 5],
+      Artistic: [3, 4, 3, 4, 2, 3, 4, 3, 4, 3],
+      Social: [5, 4, 5, 4, 5, 5, 4, 5, 4, 5],
+      Enterprising: [6, 5, 5, 6, 5, 6, 4, 5, 6, 5],
+      Conventional: [3, 2, 3, 4, 3, 2, 3, 3, 4, 2]
+    };
+
+    const demoPreferenceValues = {
+      Extravert: [5, 4, 5, 4, 5],
+      Introvert: [4, 3, 4, 3, 4],
+      Intuitive: [6, 5, 5, 6, 5],
+      Sensing: [3, 4, 3, 4, 3],
+      Thinking: [5, 6, 5, 5, 4],
+      Feeling: [3, 4, 4, 3, 4],
+      Judging: [6, 5, 5, 6, 5],
+      Perceiving: [3, 4, 3, 4, 3]
+    };
+
+    function demoAnswerValue(question, index, assessment) {
+      const source = assessment === 'interest' ? demoInterestValues : demoPreferenceValues;
+      const values = source[question.type] || [4, 5, 3, 6, 4, 5, 2, 4, 5, 3];
+      return values[index % values.length];
+    }
+
+    function fillQuestions(list, assessment) {
+      list.forEach((question, index) => {
+        state.answers[`${assessment}:${question.id}`] = demoAnswerValue(question, index, assessment);
+      });
+    }
+
+    function fillCurrentPage() {
+      const list = currentQuestions();
+      const start = state.page * perPage;
+      list.slice(start, start + perPage).forEach((question, index) => {
+        state.answers[answerKey(question)] = demoAnswerValue(question, start + index, state.assessment);
+      });
+      render();
+    }
+
+    function fillAllAndReview() {
+      fillQuestions(interestQuestions, 'interest');
+      fillQuestions(preferenceQuestions, 'preference');
+      state.screen = 'loading';
+      state.assessment = 'preference';
+      state.page = Math.ceil(preferenceQuestions.length / perPage) - 1;
+      render();
+      setTimeout(showReport, 900);
+    }
+
+    function showReport() {
+      state.screen = 'report';
+      render();
+    }
+
+    function updateProgress() {
+      const resultMode = state.screen === 'report';
+      progressCard.classList.toggle('hidden', resultMode);
+      heroEl.classList.remove('hidden');
+      heroTitle.textContent = resultMode ? 'Your Results' : 'Psychometric Assessment';
+      heroSubtitle.textContent = resultMode
+        ? 'Explore your Interest Profile and Preference Profile, with more detail available whenever you need it.'
+        : 'Answer a few simple statements to discover what you enjoy, how you like to learn, and what kind of activities may suit you. There are no right or wrong answers.';
+      if (resultMode) return;
+
+      const total = totalQuestions();
+      const count = Object.keys(state.answers).length;
+      const pct = Math.round((count / total) * 100);
+      progressFill.style.width = `${pct}%`;
+      progressPercent.textContent = `${pct}% complete`;
+      if (state.screen === 'questions') {
+        const list = currentQuestions();
+        const start = state.page * perPage + 1;
+        const end = Math.min(list.length, start + perPage - 1);
+        progressLabel.textContent = `${state.assessment === 'interest' ? 'Interest Profile' : 'Preference Profile'} - Questions ${start}-${end} of ${list.length}`;
+      } else if (state.screen === 'loading') {
+        progressLabel.textContent = 'Preparing your summary';
+      } else {
+        progressLabel.textContent = 'Ready to begin';
+      }
+    }
+
+    function renderIntro() {
+      screenEl.className = 'card';
+      screenEl.innerHTML = `
+        <p class="section-kicker">Before you start</p>
+        <h2>Let's find what fits you best</h2>
+        <p class="card-caption">Take your time and choose the answer that feels most like you. At the end, you will receive a personal summary of your interests and learning preferences.</p>
+        <div class="start-grid">
+          <div class="mini-card"><strong>Your interests</strong><span>Explore the activities, topics, and ways of working that you may naturally enjoy.</span></div>
+          <div class="mini-card"><strong>Your preferences</strong><span>Understand how you may prefer to communicate, make choices, and approach learning.</span></div>
+        </div>
+        <div class="actions">
+          <span class="hint">Scale: 1 = Strongly Disagree, 6 = Strongly Agree</span>
+          <button class="button" type="button" data-start>Start Assessment</button>
+        </div>
+      `;
+    }
+
+    function dashboardCard(iconName, title, description, action, bg, color, canStart = false) {
+      const icons = {
+        book: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H7a3 3 0 0 0-3 3V5.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="2"/>',
+        clipboard: '<path d="M9 4h6l1 2h3v15H5V6h3l1-2Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m9 12 2 2 4-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>',
+        target: '<circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/>',
+        nodes: '<path d="M7 7h10M7 17h10M7 7a3 3 0 1 1-3 3M17 17a3 3 0 1 0 3-3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>',
+        brain: '<path d="M9 4a3 3 0 0 0-3 3v.2A3.5 3.5 0 0 0 5 14.4V16a3 3 0 0 0 3 3h1V4Zm6 0a3 3 0 0 1 3 3v.2a3.5 3.5 0 0 1 1 6.7V16a3 3 0 0 1-3 3h-1V4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+        chat: '<path d="M5 5h14v10H8l-3 4V5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M8 9h8M8 12h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>'
+      };
+      return `
+        <article class="dashboard-card">
+          <div class="dashboard-card-icon" style="background:${bg}; color:${color}">
+            <svg viewBox="0 0 24 24" width="21" height="21" fill="none">${icons[iconName]}</svg>
+          </div>
+          <div>
+            <h3>${title}</h3>
+            <p>${description}</p>
+          </div>
+          <button class="dashboard-link" type="button" ${canStart ? 'data-start' : ''}>${action} -></button>
+        </article>
+      `;
+    }
+
+    function renderQuestions() {
+      screenEl.className = 'card';
+      const list = currentQuestions();
+      const pageCount = Math.ceil(list.length / perPage);
+      const start = state.page * perPage;
+      const pageQuestions = list.slice(start, start + perPage);
+      const title = state.assessment === 'interest' ? 'Interest Profile' : 'Preference Profile';
+      const caption = state.assessment === 'interest'
+        ? 'Think about the activities and topics you naturally enjoy.'
+        : 'Think about how you prefer to communicate, make choices, and approach learning.';
+      const pageComplete = pageQuestions.every((q) => state.answers[answerKey(q)]);
+
+      screenEl.innerHTML = `
+        <p class="section-kicker">${title}</p>
+        <h2>Page ${state.page + 1} of ${pageCount}</h2>
+        <p class="card-caption">${caption}</p>
+        <div class="demo-tools" aria-label="Prototype shortcuts">
+          <button class="demo-button" type="button" data-fill-page>Fill this page</button>
+          <button class="demo-button" type="button" data-fill-all>Fill all & submit</button>
+        </div>
+        <div class="matrix-note">Select one response for each statement. The scale moves from strongly disagree to strongly agree.</div>
+        <div class="scale-sticky" aria-hidden="true">
+          <div class="scale-sticky-spacer">Statement</div>
+          ${scaleOptions.map((option) => `<div class="scale-sticky-item"><strong>${option.value}</strong><span>${option.label}</span></div>`).join('')}
+        </div>
+        <div class="question-matrix-wrap">
+          <table class="question-matrix">
+            <thead>
+              <tr>
+                <th>Statement</th>
+                <th><span class="scale-head"><strong>1</strong><span>Strongly disagree</span></span></th>
+                <th><span class="scale-head"><strong>2</strong><span>Disagree</span></span></th>
+                <th><span class="scale-head"><strong>3</strong><span>Slightly disagree</span></span></th>
+                <th><span class="scale-head"><strong>4</strong><span>Slightly agree</span></span></th>
+                <th><span class="scale-head"><strong>5</strong><span>Agree</span></span></th>
+                <th><span class="scale-head"><strong>6</strong><span>Strongly agree</span></span></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${pageQuestions.map((q, index) => `
+                <tr>
+                  <td><div class="statement-cell"><span>Q${start + index + 1}</span>${q.text}</div></td>
+                  ${[1,2,3,4,5,6].map((value) => `
+                    <td>
+                      <button class="matrix-option ${state.answers[answerKey(q)] === value ? 'selected' : ''}" type="button" aria-label="Question ${start + index + 1}, answer ${value}" data-answer-id="${answerKey(q)}" data-answer-value="${value}">${value}</button>
+                    </td>
+                  `).join('')}
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        </div>
+        <div class="actions">
+          <button class="button secondary" type="button" data-prev ${state.page === 0 && state.assessment === 'interest' ? 'disabled' : ''}>Previous</button>
+          <span class="hint">${pageComplete ? 'Page complete' : 'Answer all statements to continue'}</span>
+          <button class="button" type="button" data-next ${pageComplete ? '' : 'disabled'}>${state.assessment === 'preference' && state.page === pageCount - 1 ? 'Submit' : 'Next'}</button>
+        </div>
+      `;
+    }
+
+    function renderLoading() {
+      screenEl.className = 'card';
+      screenEl.innerHTML = `
+        <div class="loading-state">
+          <div class="loader" aria-hidden="true"></div>
+          <h2>Preparing your summary</h2>
+          <p>We are putting together your interest and preference profile. This will only take a moment.</p>
+        </div>
+      `;
+    }
+
+    function scoresFor(list, assessment) {
+      return list.reduce((acc, q) => {
+        const value = state.answers[`${assessment}:${q.id}`] || 0;
+        acc[q.type] = (acc[q.type] || 0) + value;
+        return acc;
+      }, {});
+    }
+
+    function interestCode(scores) {
+      return Object.entries(scores)
+        .sort((a, b) => b[1] - a[1] || 'RIASEC'.indexOf(interestLetters[a[0]]) - 'RIASEC'.indexOf(interestLetters[b[0]]))
+        .slice(0, 3)
+        .map(([type]) => interestLetters[type])
+        .join('');
+    }
+
+    function preferenceCode(percents) {
+      return pairRules.map(([left, right, leftCode, rightCode, tieCode]) => {
+        const leftPct = percents[left] || 0;
+        const rightPct = percents[right] || 0;
+        if (leftPct === rightPct) return tieCode;
+        return leftPct > rightPct ? leftCode : rightCode;
+      }).join('');
+    }
+
+    function barRows(scores, maxScore) {
+      return Object.entries(scores).sort((a,b) => b[1] - a[1]).map(([name, score]) => `
+        <div class="score-row">
+          <div class="score-meta"><span>${name}</span><span>${score}</span></div>
+          <div class="score-bar"><span style="width:${Math.round(score / maxScore * 100)}%"></span></div>
+        </div>
+      `).join('');
+    }
+
+    function renderReview() {
+      screenEl.className = 'card';
+      const interestAnswered = interestQuestions.filter((q) => state.answers[`interest:${q.id}`]).length;
+      const preferenceAnswered = preferenceQuestions.filter((q) => state.answers[`preference:${q.id}`]).length;
+      screenEl.innerHTML = `
+        <p class="section-kicker">Review</p>
+        <h2>Review your answers</h2>
+        <p class="card-caption">Make sure both sections are complete. You can still go back if you want to change anything.</p>
+        <div class="review-grid">
+          <div class="mini-card"><strong>Interest Profile</strong><span>${interestAnswered} of ${interestQuestions.length} statements answered</span></div>
+          <div class="mini-card"><strong>Preference Profile</strong><span>${preferenceAnswered} of ${preferenceQuestions.length} statements answered</span></div>
+        </div>
+        <div class="actions">
+          <button class="button secondary" type="button" data-edit-preference>Back to Preference</button>
+          <button class="button" type="button" data-submit>View My Summary</button>
+        </div>
+      `;
+    }
+
+    function listHtml(items, limit = 7) {
+      const visible = items.slice(0, limit);
+      if (!visible.length) return '<p>No details available yet.</p>';
+      return `<ul class="bullet-list">${visible.map((item) => `<li>${item}</li>`).join('')}</ul>`;
+    }
+
+    function interestOutcomeChart(scores) {
+      return Object.entries(scores).sort((a, b) => b[1] - a[1]).map(([name, score]) => {
+        const pct = Math.round(score / 60 * 100);
+        return `
+          <div class="horizontal-row">
+            <span>${name}</span>
+            <div class="horizontal-track"><span style="width:${pct}%"></span></div>
+            <strong>${pct}%</strong>
+          </div>
+        `;
+      }).join('');
+    }
+
+    const interestInfo = {
+      Realistic: {
+        label: 'Realistic',
+        short: 'Hands-on, practical, and action-oriented.',
+        detail: 'You may enjoy practical tasks, tools, activities, and work where you can see clear results.'
+      },
+      Investigative: {
+        label: 'Investigative',
+        short: 'Curious, analytical, and problem-focused.',
+        detail: 'You may enjoy exploring ideas, asking why things happen, and solving problems through research or analysis.'
+      },
+      Artistic: {
+        label: 'Artistic',
+        short: 'Creative, expressive, and original.',
+        detail: 'You may enjoy creating, designing, writing, performing, or finding new ways to express ideas.'
+      },
+      Social: {
+        label: 'Social',
+        short: 'Helpful, supportive, and people-focused.',
+        detail: 'You may enjoy helping others learn, grow, solve problems, or feel supported.'
+      },
+      Enterprising: {
+        label: 'Enterprising',
+        short: 'Persuasive, confident, and goal-driven.',
+        detail: 'You may enjoy leading, presenting ideas, making decisions, and moving people toward a goal.'
+      },
+      Conventional: {
+        label: 'Conventional',
+        short: 'Organised, structured, and detail-aware.',
+        detail: 'You may enjoy clear plans, organised information, accurate work, and tasks with defined steps.'
+      }
+    };
+
+    const interestDetails = {
+      Realistic: {
+        traits: [
+          'Learns most effectively through hands-on practice, direct experience, and working with tangible tools or materials',
+          'Performs best in practical, task-oriented environments with clear, concrete outcomes',
+          'Brings technical skill, precision, and reliability to operational and applied roles',
+          'Prefers straightforward, structured work over open-ended or abstract tasks',
+          'Most comfortable in roles where problems have definable solutions and progress is measurable',
+          'Works best with clear instructions, defined processes, and visible results'
+        ],
+        strength: 'Applied problem-solving, technical execution, and consistent, dependable delivery'
+      },
+      Investigative: {
+        traits: [
+          'Learns most effectively through research, independent inquiry, and the systematic exploration of complex problems',
+          'Performs best in intellectually stimulating environments that reward analytical thinking and original ideas',
+          'Brings curiosity, rigour, and a methodical approach to knowledge-intensive roles',
+          'Prefers working independently with the freedom to investigate and develop well-reasoned conclusions',
+          'Most comfortable in roles where evidence, data, and critical thinking drive decisions',
+          'Works best when given adequate time and autonomy to examine problems in depth'
+        ],
+        strength: 'Analysis, research, problem diagnosis, and the ability to work through complexity'
+      },
+      Artistic: {
+        traits: [
+          'Learns most effectively through creative exploration, experimentation, and self-directed expression',
+          'Performs best in flexible, imaginative environments that value originality and resist rigid structure',
+          'Brings a distinctive creative perspective and aesthetic sensibility to design, communication, and innovation roles',
+          'Prefers work that allows for personal expression and the freedom to approach challenges in unconventional ways',
+          'Most comfortable in roles where imagination and individual contribution are recognised and encouraged',
+          'Works best with room to explore multiple approaches rather than following fixed procedures'
+        ],
+        strength: 'Creative thinking, visual or expressive communication, and generating original ideas'
+      },
+      Social: {
+        traits: [
+          'Learns most effectively through discussion, collaboration, and direct engagement with others',
+          'Performs best in people-centred environments focused on development, support, and meaningful human connection',
+          'Brings empathy, communication skill, and a genuine interest in others to facilitation, training, and helping roles',
+          'Prefers working in cooperative, relationship-driven settings over solitary or purely task-focused environments',
+          'Most comfortable in roles where their contribution has a visible positive impact on the people they work with',
+          'Works best when collaboration, trust, and shared purpose are central to the team culture'
+        ],
+        strength: 'Interpersonal communication, relationship-building, mentoring, and group facilitation'
+      },
+      Enterprising: {
+        traits: [
+          'Learns most effectively through leadership experience, competitive challenge, and pursuing ambitious goals',
+          'Performs best in dynamic, results-driven environments that reward initiative, persuasion, and strategic thinking',
+          'Brings energy, confidence, and a strong action orientation to sales, leadership, and entrepreneurial roles',
+          'Prefers high-visibility roles where they can influence outcomes, motivate others, and drive change',
+          'Most comfortable in fast-paced settings where decisiveness and risk-taking are valued',
+          'Works best with clear goals, significant autonomy, and the opportunity to lead and inspire others'
+        ],
+        strength: 'Strategic thinking, negotiation, team motivation, and identifying and pursuing new opportunities'
+      },
+      Conventional: {
+        traits: [
+          'Learns most effectively through structured instruction, clear guidelines, and systematic step-by-step processes',
+          'Performs best in organised, process-driven environments where accuracy, consistency, and compliance are valued',
+          'Brings strong attention to detail, reliability, and a methodical approach to administrative and operational roles',
+          'Prefers well-defined tasks with clear expectations, established procedures, and measurable standards',
+          'Most comfortable in stable, predictable environments where quality and precision are consistently recognised',
+          'Works best within clear organisational structures with defined roles and reliable workflows'
+        ],
+        strength: 'Data management, procedural accuracy, organisation, and the dependable execution of complex processes'
+      }
+    };
+
+    const preferenceInfo = {
+      E: { label: 'Extravert', dimension: 'Energy', summary: 'The Extravert type is often characterized as: Sociable, enthusiastic, proactive.' },
+      I: { label: 'Introvert', dimension: 'Energy', summary: 'The Introvert type is often characterized as: Persistent, determined, thorough.' },
+      S: { label: 'Sensing', dimension: 'Perception', summary: 'The Sensing type is often characterized as: Sturdy, sensible, practical.' },
+      N: { label: 'Intuitive', dimension: 'Perception', summary: 'The iNtuitive type is often characterized as: Visionary, innovative, creative.' },
+      T: { label: 'Thinking', dimension: 'Decision-Making', summary: 'The Thinking type is often characterized as: Logical, fair, critical.' },
+      F: { label: 'Feeling', dimension: 'Decision-Making', summary: 'The Feeling type is often characterized as: Warm, friendly, emotion-based.' },
+      J: { label: 'Judging', dimension: 'Lifestyle', summary: 'The Judging type is often characterized as: Hardworking, efficient, goal-oriented.' },
+      P: { label: 'Perceiving', dimension: 'Lifestyle', summary: 'The Perceiving type is often characterized as: Flexible, spontaneous, freely expressive.' }
+    };
+
+    const preferenceTypeNotes = {
+      ENFJ: ['Supportive and socially aware', 'Organised around people, values, and shared goals', 'May need care when handling conflict or detached analysis'],
+      ENFP: ['Idea-driven and enthusiastic', 'Motivated by possibilities, meaning, and people growth', 'May need support with routines, details, and finishing tasks'],
+      ENTJ: ['Strategic and goal-oriented', 'Motivated by leadership, competence, and long-term plans', 'May need care when decisions affect people emotionally'],
+      ENTP: ['Inventive and debate-friendly', 'Motivated by new ideas, freedom, and problem-solving', 'May need support with follow-through and routine detail'],
+      ESFJ: ['Helpful, loyal, and responsible', 'Motivated by appreciation, cooperation, and useful support', 'May need care when plans change or situations feel unclear'],
+      ESFP: ['Warm, lively, and practical', 'Motivated by people, action, and immediate experience', 'May need support with long-term planning and abstract tasks'],
+      ESTJ: ['Efficient, direct, and structured', 'Motivated by results, responsibility, and clear systems', 'May need care when flexibility or softer communication is needed'],
+      ESTP: ['Action-oriented and adaptable', 'Motivated by fast-moving tasks and practical problem-solving', 'May need support with patience, planning, and follow-up'],
+      INFJ: ['Insightful and values-led', 'Motivated by meaning, development, and thoughtful contribution', 'May need care when conflict or criticism becomes intense'],
+      INFP: ['Reflective, idealistic, and independent', 'Motivated by meaning, creativity, and personal values', 'May need support with structure, deadlines, and objective critique'],
+      INTJ: ['Strategic, independent, and future-focused', 'Motivated by competence, systems, and long-term improvement', 'May need care when collaboration needs more warmth or detail'],
+      INTP: ['Analytical, curious, and independent', 'Motivated by understanding, theories, and precise thinking', 'May need support with decisions, routines, and practical closure'],
+      ISFJ: ['Steady, supportive, and detail-aware', 'Motivated by helpful work, stability, and reliable systems', 'May need care when change arrives quickly or expectations are vague'],
+      ISFP: ['Practical, sensitive, and flexible', 'Motivated by freedom, values, and hands-on expression', 'May need support with direct conflict and long-term structure'],
+      ISTJ: ['Reliable, precise, and orderly', 'Motivated by facts, clear rules, and responsible completion', 'May need care when change, ambiguity, or abstract ideas dominate'],
+      ISTP: ['Practical, calm, and problem-focused', 'Motivated by independence, action, and troubleshooting', 'May need support with long-term plans and people-centred communication']
+    };
+
+    const latestPreferenceProfiles = {
+      ENTJ: {
+        overview: 'People whose preferred functions are Thinking and iNtuitive develop their natural skill sets by comprehending and developing theoretical connections. They usually organize groups and events, and enjoy competitive sports. These skills and preferences will evolve in jobs with theoretical/technical development.',
+        characterised: ['Sociable, independent, rational, knowledgeable, theoretical, strategic, ambitious, logical, critical, fair, goal-oriented, charismatic, decisive, structured, and systematic'],
+        motivated: ['lead and take control', 'focus on results and make decisions', 'work independently'],
+        environment: ['Intellectual challenges', 'Room for long-term planning', 'Discussions with creative and charismatic people', 'Respect and recognition from people they hold in high regard', 'Logical, competent, and result-oriented people'],
+        strengths: ['Logic and analysis', 'Goal-oriented actions and implementations', 'Visions and new opportunities', 'High sense of standards and quality', 'Ability to develop new ideas', 'Clear communication'],
+        challenges: ['Emotional issues', 'Showing appreciation and giving recognition', 'Making rushed decisions', 'Neglecting consideration for other people and their feelings'],
+        demotivated: ['Incompetence', 'Lack of action', 'Lack of intellectual challenges and ambitions', 'Dependence on others']
+      },
+      INTJ: {
+        overview: 'People whose preferred functions are Intuitive and Thinking often develop strengths through theoretical connections, strategy, systems, analysis, and technical or intellectual problem-solving.',
+        characterised: ['Visionary, intellectual, systematic, and logical', 'Ambitious, competitive, organised, independent, and determined', 'Goal-oriented, decisive, impatient, and argumentative'],
+        motivated: ['Create new ideas of high quality', 'Focus on tasks and results before people and feelings', 'Concentrate and work without distractions'],
+        environment: ['Respect and recognition from valued people', 'Room to work independently', 'Logical and innovative people', 'Creative and intellectual challenges', 'Space to concentrate without distractions'],
+        strengths: ['Visionary thinking', 'Seeing opportunities and relations', 'Problem-solving', 'Building systems or organisations', 'High standards and quality', 'Decisive implementation'],
+        challenges: ['Staying grounded and pragmatic', 'Focusing case by case', 'Practical routine work', 'Emotional problems and personal crises'],
+        demotivated: ['Incompetence', 'Lack of action', 'Lack of intellectual challenges and ambition', 'Strong dependence on others', 'Too much focus on feelings']
+      },
+      ISTJ: {
+        overview: 'People whose preferred functions are Sensing and Thinking often develop strengths through practical facts, experience, attention to detail, and immediate action.',
+        characterised: ['Sturdy, practical, rule-aware, and factual', 'Traditional, organised, accurate, conscientious, and reliable', 'Sensible, stable, loyal to authority, and trustworthy'],
+        motivated: ['Concentrate and perform without distractions', 'Focus on details', 'Complete tasks in structured, orderly, and stable surroundings'],
+        environment: ['Clear deadlines and outcomes', 'Long-term planning', 'Safety and security', 'Pragmatic decision-makers', 'Hardworking and results-oriented people'],
+        strengths: ['Awareness of relevant facts', 'Identifying necessary actions', 'Stability and structure', 'Understanding financial literacy', 'Procedural work', 'Responsibility'],
+        challenges: ['Changes and insecurity', 'Creativity and innovation', 'Long-term perspectives', 'Consideration for others', 'Being flexible and open-minded'],
+        demotivated: ['Disorder', 'Ambiguous decisions', 'Lack of structure', 'Unpredictable environments']
+      },
+      ESFJ: {
+        overview: 'People whose preferred functions are Feeling and Sensing often develop strengths by responding to other people needs through hands-on service, assistance, care, and practical support.',
+        characterised: ['Helpful, loyal, sympathetic, compassionate, and cooperative', 'Dutiful, responsible, steadfast, accurate, and respectful', 'Detail-oriented and efficient'],
+        motivated: ['Help others', 'Focus on details', 'Finalise tasks in structured and steady surroundings'],
+        environment: ['Clear deadlines and results', 'Safety and security', 'Warm and caring people', 'Opportunities for long-term planning', 'Efficient systems', 'Pragmatic decision-makers'],
+        strengths: ['Compassion', 'Understanding and empathy', 'Support and desire to help others', 'Contributing to stability and harmony', 'Seeing what must be done and doing it', 'Sense of responsibility'],
+        challenges: ['Acting too quickly without a holistic understanding', 'Being emotionally distant in objective analysis', 'Responding firmly and directly to conflicts', 'Overlooking own needs and interests'],
+        demotivated: ['Criticism', 'Lack of feedback', 'Lack of structure', 'Unpredictable situations']
+      }
+    };
+
+    function topScoreEntries(scores, limit = 3) {
+      return Object.entries(scores).sort((a, b) => b[1] - a[1]).slice(0, limit);
+    }
+
+    function interestCards(scores, limit = 3) {
+      return topScoreEntries(scores, limit).map(([name, score], index) => {
+        const pct = Math.round(score / 60 * 100);
+        const info = interestInfo[name] || { short: '', detail: '' };
+        const details = interestDetails[name] || { traits: [], strength: '' };
+        return `
+          <details class="insight-card">
+            <summary class="insight-card-summary">
+              <span>${index === 0 ? 'Top interest' : `Interest ${index + 1}`}</span>
+              <div class="insight-title-row">
+                <strong>${name} ${pct}%</strong>
+                <span class="insight-chevron" aria-hidden="true"></span>
+              </div>
+              <p>${info.detail}</p>
+            </summary>
+            <div class="insight-card-body">
+              <h4>Work &amp; learning traits</h4>
+              ${listHtml(details.traits, 6)}
+              <p class="interest-strength"><strong>Strengths:</strong> ${details.strength}</p>
+            </div>
+          </details>
+        `;
+      }).join('');
+    }
+
+    function typeLetters(code) {
+      return code.split('').map((letter) => {
+        const item = preferenceInfo[letter];
+        return `
+          <article class="type-letter">
+            <b>${letter}</b>
+            <span>${item.label}</span>
+            <p>${item.summary}</p>
+          </article>
+        `;
+      }).join('');
+    }
+
+    const preferenceDimensionBullets = {
+      Extravert: [
+        'Builds energy through collaboration, discussion, and active engagement with others',
+        'Thinks out loud and often arrives at best ideas through conversation',
+        'Prefers working in team-based, socially dynamic environments',
+        'Communicates most effectively in real-time, face-to-face, or live discussions',
+        'Tends to take initiative and move quickly from ideas to action',
+        'Breadth of interests and connections is a key professional strength',
+        'Works best when given regular opportunities for interaction and group problem-solving'
+      ],
+      Introvert: [
+        'Builds energy by stepping back from situations to reflect before acting',
+        'Thinks deeply and independently, preferring to fully understand something before contributing',
+        'Performs best in focused, low-distraction work environments',
+        'Communicates most effectively through written formats or prepared discussion',
+        'Brings persistence and depth of thinking to complex, long-term tasks',
+        'Works best when given adequate time and space to process before being asked to respond',
+        'Strengths lie in careful analysis, independent execution, and considered decision-making'
+      ],
+      Sensing: [
+        'Focuses on concrete, verifiable information and real-world application',
+        'Learns most effectively through structured, step-by-step instruction and hands-on practice',
+        'Detail-oriented with a strong grasp of facts, procedures, and established methods',
+        'Prefers tasks with clear, practical outcomes and measurable results',
+        'Brings reliability and precision to routine and process-driven work',
+        'Works best with well-defined expectations and proven approaches',
+        'Most comfortable building on existing knowledge rather than speculating on untested ideas'
+      ],
+      Intuitive: [
+        'Focuses on patterns, possibilities, and the connections between ideas',
+        'Learns most effectively through exploration, theory, and conceptual frameworks',
+        'Thinks broadly and is drawn to innovative, future-oriented challenges',
+        'Prefers working with the big picture rather than getting into operational detail',
+        'Brings creativity and original thinking to complex, open-ended problems',
+        'Works best when given room to experiment and pursue new approaches',
+        'Energised by variety, intellectual challenge, and work that involves envisioning what could be'
+      ],
+      Thinking: [
+        'Makes decisions based on objective analysis, logic, and evidence',
+        'Evaluates options systematically by weighing pros and cons against clear criteria',
+        'Brings consistency and fairness to decision-making by applying principles rather than precedent',
+        'Most effective in roles that require critical evaluation and impartial judgement',
+        'Comfortable delivering honest, direct feedback even when it may be unwelcome',
+        'Driven by the need for accuracy and rational justification in conclusions',
+        'Works best in environments that value analytical rigour and evidence-based reasoning'
+      ],
+      Feeling: [
+        'Makes decisions with strong consideration for the impact on people and relationships',
+        'Prioritises team harmony and collective wellbeing when evaluating options',
+        'Brings empathy and interpersonal sensitivity to leadership, facilitation, and collaborative roles',
+        'Most effective in roles involving people development, mediation, and values-driven work',
+        'Motivated by a clear sense of purpose and the human significance of their contribution',
+        'Skilled at reading group dynamics and building consensus',
+        'Works best in environments that value cooperation, trust, and person-centred outcomes'
+      ],
+      Judging: [
+        'Prefers organised, structured approaches to work with clearly defined goals and timelines',
+        'Plans ahead and works systematically toward completion',
+        'Performs best when tasks are well-scoped and expectations are clearly established',
+        'Brings decisiveness and follow-through to project execution',
+        'Finds satisfaction in finalising tasks and closing open loops',
+        'Works best in environments with consistent routines and reliable processes',
+        'Strengths lie in time management, planning, and disciplined delivery'
+      ],
+      Perceiving: [
+        'Prefers flexible, adaptive approaches to work that allow for adjustment as circumstances evolve',
+        'Performs best when given autonomy to determine their own process and pace',
+        'Brings spontaneity and resourcefulness to dynamic, fast-changing environments',
+        'Comfortable managing multiple tasks simultaneously and shifting priorities as needed',
+        'Energised by open-ended challenges that leave room for exploration',
+        'Works best in environments that value adaptability over rigid structure',
+        'Strengths lie in creative problem-solving, responsiveness, and finding new angles on familiar challenges'
+      ]
+    };
+
+    const preferenceDimensionMeta = [
+      { dimension: 'Energy', leftCode: 'E', leftName: 'Extravert', rightCode: 'I', rightName: 'Introvert', tieDefault: 'Introvert', leftColor: '#e6399b', rightColor: '#f8d3ef' },
+      { dimension: 'Perception', leftCode: 'S', leftName: 'Sensing', rightCode: 'N', rightName: 'Intuitive', tieDefault: 'Intuitive', leftColor: '#e2600a', rightColor: '#ffe0c7' },
+      { dimension: 'Decision-Making', leftCode: 'T', leftName: 'Thinking', rightCode: 'F', rightName: 'Feeling', tieDefault: 'Feeling', leftColor: '#1c7fc4', rightColor: '#d9effb' },
+      { dimension: 'Lifestyle', leftCode: 'J', leftName: 'Judging', rightCode: 'P', rightName: 'Perceiving', tieDefault: 'Perceiving', leftColor: '#4f8f2c', rightColor: '#dcefcc' }
+    ];
+
+    function preferenceDimensionRows(percents) {
+      return preferenceDimensionMeta.map((row) => {
+        const leftPct = percents[row.leftName] || 0;
+        const rightPct = percents[row.rightName] || 0;
+        const winnerName = leftPct === rightPct ? row.tieDefault : (leftPct > rightPct ? row.leftName : row.rightName);
+        const bullets = preferenceDimensionBullets[winnerName] || [];
+        const total = leftPct + rightPct;
+        const leftShare = total ? (leftPct / total) * 100 : 50;
+        const rightShare = 100 - leftShare;
+        return `
+          <article class="preference-card" style="--left-color:${row.leftColor}; --right-color:${row.rightColor};">
+            <h4 class="preference-card-title">${row.dimension}</h4>
+            <div class="split-labels">
+              <div class="split-label-side"><strong>${row.leftCode}</strong><span>${row.leftName}</span></div>
+              <div class="split-label-side"><strong>${row.rightCode}</strong><span>${row.rightName}</span></div>
+            </div>
+            <div class="split-bar">
+              <span style="width:${leftShare}%">${formatPercent(leftShare)}</span>
+              <span style="width:${rightShare}%">${formatPercent(rightShare)}</span>
+            </div>
+            <ul class="bullet-list preference-bullets">${bullets.map((item) => `<li>${item}</li>`).join('')}</ul>
+          </article>
+        `;
+      }).join('');
+    }
+
+    function preferenceTypeDetail(code) {
+      const notes = preferenceTypeNotes[code] || [
+        'Your pattern shows a mix of natural preferences.',
+        'Use it as a guide for how you like to learn, work, and make decisions.',
+        'It is not a fixed label; different situations may bring out different sides.'
+      ];
+      return notes;
+    }
+
+    function latestPreferenceProfile(code) {
+      const notes = preferenceTypeDetail(code);
+      return latestPreferenceProfiles[code] || {
+        overview: 'Your preference type is a guide to how you may prefer to use energy, take in information, make decisions, and organise your work. It describes natural preferences, not fixed ability.',
+        characterised: [notes[0], preferenceInfo[code[0]].summary, preferenceInfo[code[1]].summary],
+        motivated: [notes[1], preferenceInfo[code[2]].summary, preferenceInfo[code[3]].summary],
+        environment: ['Work settings that fit your strongest preferences', 'Tasks that let you use your natural strengths', 'Support when a task requires your less preferred side'],
+        strengths: [notes[0], preferenceInfo[code[1]].summary, preferenceInfo[code[2]].summary],
+        challenges: [notes[2], 'Situations that require sustained use of the opposite preferences'],
+        demotivated: ['Low fit between the task and your natural preferences', 'Unclear expectations or limited support']
+      };
+    }
+
+    function showSavedSummaryFromUrl() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('summary') !== '1') return;
+
+      fillQuestions(interestQuestions, 'interest');
+      fillQuestions(preferenceQuestions, 'preference');
+      state.summaryType = params.get('type') || localStorage.getItem('psychometricPreferenceCode') || null;
+      state.screen = 'report';
+    }
+
+    function renderReport() {
+      screenEl.className = 'card';
+      const iScores = scoresFor(interestQuestions, 'interest');
+      const pScores = scoresFor(preferenceQuestions, 'preference');
+      const pPercents = preferencePercents(pScores);
+      const iCode = interestCode(iScores);
+      const pCode = state.summaryType || preferenceCode(pPercents);
+      try {
+        localStorage.setItem('psychometricPreferenceCode', pCode);
+      } catch (error) {}
+      const topInterests = topScoreEntries(iScores, 3);
+      const topInterest = topInterests[0] || ['Interest', 0];
+      const topInterestPct = Math.round(topInterest[1] / 60 * 100);
+      const topInterestInfo = interestInfo[topInterest[0]] || { short: '', detail: '' };
+      const typeNotes = preferenceTypeDetail(pCode);
+      const preferenceProfile = latestPreferenceProfile(pCode);
+
+      screenEl.innerHTML = `
+        <div class="report-shell">
+          <div class="report-pages">
+            <section class="report-page">
+              <div class="report-page-header">
+                <div>
+                  <p class="report-page-label">Interest result</p>
+                  <h2 class="report-page-title">Interest Profile</h2>
+                  <p class="report-page-subtitle">Your RIASEC interest pattern highlights activities and work areas that may feel more natural, motivating, or enjoyable for you.</p>
+                </div>
+                <span class="page-chip">${iCode}</span>
+              </div>
+              <div class="result-hero-grid">
+                <article class="result-big-card">
+                  <span>Your strongest interest</span>
+                  <strong>${topInterest[0]}</strong>
+                  <p>${topInterestInfo.short} Your score for this area is ${topInterestPct}%.</p>
+                </article>
+                <div class="horizontal-chart">${interestOutcomeChart(iScores)}</div>
+              </div>
+              <div class="insight-grid">${interestCards(iScores)}</div>
+              <div class="definition-block">Interest Profile uses the RIASEC model: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional. Your highest areas can guide career exploration, project choices, and learning activities.</div>
+
+              <div class="interest-tabs-wrap">
+                <div class="preference-tablist" role="tablist" aria-label="Interest Profile views">
+                  <button id="interestTabSnapshot" class="preference-tab ${state.interestView === 'snapshot' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.interestView === 'snapshot'}" aria-controls="interestPanelSnapshot" tabindex="${state.interestView === 'snapshot' ? '0' : '-1'}" data-interest-tab="snapshot">Interest Snapshot</button>
+                  <button id="interestTabDetail" class="preference-tab ${state.interestView === 'detail' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.interestView === 'detail'}" aria-controls="interestPanelDetail" tabindex="${state.interestView === 'detail' ? '0' : '-1'}" data-interest-tab="detail">Full Interest Profile detail</button>
+                </div>
+
+                ${state.interestView === 'snapshot' ? `
+                  <div id="interestPanelSnapshot" class="interest-tabpanel" role="tabpanel" aria-labelledby="interestTabSnapshot">
+                    <div class="interest-tab-copy">
+                      <p>Your top three interest areas, at a glance.</p>
+                      <p>Open any card above for its work and learning traits, or use the <strong>Full Interest Profile detail</strong> tab for all six RIASEC areas.</p>
+                    </div>
+                  </div>
+                ` : `
+                  <div id="interestPanelDetail" class="interest-tabpanel" role="tabpanel" aria-labelledby="interestTabDetail">
+                    <p class="interest-full-intro">Explore how every RIASEC area may show up in how you learn, work, solve problems, and contribute.</p>
+                    <div class="interest-full-grid">${interestCards(iScores, 6)}</div>
+                  </div>
+                `}
+              </div>
+            </section>
+
+            <details class="personality-result">
+              <summary>
+                <span class="personality-result-title">
+                  <span>Personality test result</span>
+                  <strong>${pCode} Preference Profile</strong>
+                  <em>Click to view details</em>
+                </span>
+                <span class="personality-code">${pCode}</span>
+              </summary>
+              <div class="personality-detail">
+                <p>${preferenceProfile.overview}</p>
+                ${listHtml(preferenceProfile.characterised, 3)}
+              </div>
+            </details>
+
+            <section class="report-page">
+              <div class="report-page-header">
+                <div>
+                  <p class="report-page-label">Preference overview</p>
+                  <h2 class="report-page-title">Preference Profile</h2>
+                  <p class="report-page-subtitle">Your preference profile shows how you may prefer to use energy, take in information, make decisions, and organise your work.</p>
+                </div>
+                <span class="page-chip">${pCode}</span>
+              </div>
+              <div class="result-hero-grid">
+                <article class="result-big-card">
+                  <span>Your preference type</span>
+                  <strong>${pCode}</strong>
+                  <p>${preferenceProfile.overview}</p>
+                </article>
+                <div class="type-summary">${typeLetters(pCode)}</div>
+              </div>
+
+              <div class="preference-tabs-wrap">
+                <div class="preference-tablist" role="tablist" aria-label="Preference Profile views">
+                  <button class="preference-tab ${state.preferenceView === 'quick' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'quick'}" data-preference-tab="quick">Learning &amp; Work Snapshot</button>
+                  <button class="preference-tab ${state.preferenceView === 'detail' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'detail'}" data-preference-tab="detail">Full ${pCode} detail</button>
+                </div>
+
+                ${state.preferenceView === 'quick' ? `
+                  <p class="preference-tab-intro">A dimension-by-dimension look at how your ${pCode} result may show up day to day.</p>
+                  <div class="preference-tabpanel">
+                    <div class="preference-grid">${preferenceDimensionRows(pPercents)}</div>
+                  </div>
+                ` : `
+                  <p class="preference-tab-intro">The full ${pCode} write-up, translated into practical notes from the detailed type description.</p>
+                  <div class="preference-tabpanel">
+                    <section class="quick-summary">
+                      <h3>How to read this result</h3>
+                      <p>Your profile describes preferences, not ability. Use it to notice what gives you energy, where you may thrive, and which situations may need extra support.</p>
+                    </section>
+                    <section class="profile-panels">
+                      <article class="profile-panel"><div class="panel-icon">1</div><h3>Often characterised as</h3>${listHtml(preferenceProfile.characterised, 4)}</article>
+                      <article class="profile-panel"><div class="panel-icon">2</div><h3>What may motivate you</h3>${listHtml(preferenceProfile.motivated, 4)}</article>
+                      <article class="profile-panel"><div class="panel-icon">3</div><h3>Work environments you may thrive in</h3>${listHtml(preferenceProfile.environment, 5)}</article>
+                      <article class="profile-panel"><div class="panel-icon">4</div><h3>Strengths</h3>${listHtml(preferenceProfile.strengths, 6)}</article>
+                      <article class="profile-panel"><div class="panel-icon">5</div><h3>Possible challenges</h3>${listHtml(preferenceProfile.challenges, 5)}</article>
+                      <article class="profile-panel"><div class="panel-icon">6</div><h3>Demotivated by</h3>${listHtml(preferenceProfile.demotivated, 5)}</article>
+                    </section>
+                  </div>
+                `}
+              </div>
+            </section>
+          </div>
+
+          <div class="report-actions">
+            <button class="button secondary" type="button" data-edit-interest>Review Interest</button>
+            <button class="button" type="button" data-back-dashboard="${pCode}">Back to Dashboard</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      updateProgress();
+      if (state.screen === 'intro') renderIntro();
+      if (state.screen === 'questions') renderQuestions();
+      if (state.screen === 'loading') renderLoading();
+      if (state.screen === 'report') renderReport();
+    }
+
+    document.addEventListener('click', (event) => {
+      const dashboardButton = event.target.closest('[data-back-dashboard]');
+      if (dashboardButton) {
+        const type = dashboardButton.dataset.backDashboard;
+        if (type) {
+          try { localStorage.setItem('psychometricPreferenceCode', type); } catch (error) {}
+          window.location.href = `atlas-student-dashboard.html?type=${encodeURIComponent(type)}`;
+        } else {
+          window.location.href = 'atlas-student-dashboard.html';
+        }
+        return;
+      }
+      if (event.target.closest('#backToDashboard')) { window.location.href = 'atlas-student-dashboard.html'; return; }
+      const interestTab = event.target.closest('[data-interest-tab]');
+      if (interestTab) { state.interestView = interestTab.dataset.interestTab; render(); return; }
+      const preferenceTab = event.target.closest('[data-preference-tab]');
+      if (preferenceTab) { state.preferenceView = preferenceTab.dataset.preferenceTab; render(); return; }
+      const answer = event.target.closest('[data-answer-id]');
+      if (answer) { setAnswer(answer.dataset.answerId, Number(answer.dataset.answerValue)); return; }
+      if (event.target.closest('[data-start]')) { state.screen = 'questions'; state.assessment = 'interest'; state.page = 0; render(); return; }
+      if (event.target.closest('[data-fill-page]')) { fillCurrentPage(); return; }
+      if (event.target.closest('[data-fill-all]')) { fillAllAndReview(); return; }
+      if (event.target.closest('[data-next]')) {
+        const list = currentQuestions();
+        const pageCount = Math.ceil(list.length / perPage);
+        if (state.page < pageCount - 1) state.page += 1;
+        else if (state.assessment === 'interest') { state.assessment = 'preference'; state.page = 0; }
+        else { state.screen = 'loading'; render(); setTimeout(showReport, 900); return; }
+        render(); return;
+      }
+      if (event.target.closest('[data-prev]')) {
+        if (state.page > 0) state.page -= 1;
+        else if (state.assessment === 'preference') { state.assessment = 'interest'; state.page = Math.ceil(interestQuestions.length / perPage) - 1; }
+        render(); return;
+      }
+      if (event.target.closest('[data-edit-preference]')) { state.screen = 'questions'; state.assessment = 'preference'; state.page = 0; render(); return; }
+      if (event.target.closest('[data-edit-interest]')) { state.screen = 'questions'; state.assessment = 'interest'; state.page = 0; render(); return; }
+      if (event.target.closest('[data-submit]')) { state.screen = 'loading'; render(); setTimeout(showReport, 900); return; }
+      if (event.target.closest('[data-restart]')) { state.screen = 'intro'; state.assessment = 'interest'; state.page = 0; state.answers = {}; render(); return; }
+    });
+
+    showSavedSummaryFromUrl();
+    render();
+  </script>
+</body>
+</html>
