@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Psychometric Assessment</title>
+  <title>Psychometric Assessment - Synchronized Interest Details</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap');
 
@@ -1425,10 +1425,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 14px;
-      scroll-margin-top: 88px;
     }
-
-    .insight-grid:focus { outline: none; }
 
     .insight-card {
       border: 1px solid var(--line-soft);
@@ -1513,27 +1510,24 @@
 
     .interest-strength strong { color: var(--text); }
 
-    .interest-details-toggle {
+    .insight-toggle {
+      flex: 0 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
-      gap: 12px;
-      width: 100%;
-      min-height: 52px;
-      padding: 0 20px;
-      border: 1px solid #d8e4f8;
-      border-radius: 14px;
-      background: #f7faff;
+      width: 34px;
+      height: 34px;
+      padding: 0;
+      border: 0;
+      border-radius: 10px;
+      background: #eef4ff;
       color: var(--brand-dark);
-      font: inherit;
-      font-size: 14px;
-      font-weight: 700;
       cursor: pointer;
     }
 
-    .interest-details-toggle:hover { background: #eef4ff; }
+    .insight-toggle:hover { background: #e3edff; }
 
-    .interest-details-toggle-icon {
+    .insight-toggle-icon {
       width: 9px;
       height: 9px;
       border-right: 2px solid currentColor;
@@ -1542,7 +1536,7 @@
       transition: transform .2s ease;
     }
 
-    .interest-details-toggle[aria-expanded="true"] .interest-details-toggle-icon {
+    .insight-toggle[aria-expanded="true"] .insight-toggle-icon {
       transform: translateY(2px) rotate(225deg);
     }
 
@@ -2861,6 +2855,9 @@
               <span>${index === 0 ? 'Top interest' : `Interest ${index + 1}`}</span>
               <div class="insight-title-row">
                 <strong>${name} ${pct}%</strong>
+                <button class="insight-toggle" type="button" data-toggle-interest-details data-interest-index="${index}" aria-expanded="${showDetails}" aria-label="${showDetails ? 'Hide' : 'View'} details for ${name}">
+                  <span class="insight-toggle-icon" aria-hidden="true"></span>
+                </button>
               </div>
               <p>${info.detail}</p>
             </div>
@@ -3066,11 +3063,7 @@
                 </article>
                 <div class="horizontal-chart">${interestOutcomeChart(iScores)}</div>
               </div>
-              <div id="interestDetails" class="insight-grid" role="region" aria-label="Top interest areas" tabindex="-1">${interestCards(iScores, state.interestDetailsExpanded)}</div>
-              <button class="interest-details-toggle" type="button" data-toggle-interest-details aria-expanded="${state.interestDetailsExpanded}">
-                <span>${state.interestDetailsExpanded ? 'Hide work & learning traits' : 'View work & learning traits'}</span>
-                <span class="interest-details-toggle-icon" aria-hidden="true"></span>
-              </button>
+              <div class="insight-grid">${interestCards(iScores, state.interestDetailsExpanded)}</div>
               <div class="definition-block">Interest Profile uses the RIASEC model: Realistic, Investigative, Artistic, Social, Enterprising, and Conventional. Your highest areas can guide career exploration, project choices, and learning activities.</div>
             </section>
 
@@ -3168,16 +3161,12 @@
         return;
       }
       if (event.target.closest('#backToDashboard')) { window.location.href = 'atlas-student-dashboard.html'; return; }
-      if (event.target.closest('[data-toggle-interest-details]')) {
+      const interestToggle = event.target.closest('[data-toggle-interest-details]');
+      if (interestToggle) {
+        const interestIndex = interestToggle.dataset.interestIndex;
         state.interestDetailsExpanded = !state.interestDetailsExpanded;
         render();
-        if (state.interestDetailsExpanded) {
-          const interestDetails = document.getElementById('interestDetails');
-          interestDetails?.focus({ preventScroll: true });
-          interestDetails?.scrollIntoView({ block: 'start' });
-        } else {
-          document.querySelector('[data-toggle-interest-details]')?.focus();
-        }
+        document.querySelector(`[data-toggle-interest-details][data-interest-index="${interestIndex}"]`)?.focus();
         return;
       }
       const preferenceTab = event.target.closest('[data-preference-tab]');
