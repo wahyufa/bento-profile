@@ -24,7 +24,9 @@ const icons = {
   cap: '<path d="m22 10-10-5-10 5 10 5 10-5Z"></path><path d="M6 12v5c3 2 9 2 12 0v-5"></path>',
   trend: '<path d="m3 17 6-6 4 4 8-8"></path><path d="M14 7h7v7"></path>',
   close: '<path d="m6 6 12 12"></path><path d="m18 6-12 12"></path>',
-  arrow: '<path d="m9 18 6-6-6-6"></path>'
+  arrow: '<path d="m9 18 6-6-6-6"></path>',
+  'chevron-down': '<path d="m6 9 6 6 6-6"></path>',
+  'chevrons-updown': '<path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path>'
 };
 
 const courses = [
@@ -57,7 +59,12 @@ const palsLearnerScores = [
 
 const taxonomyGroups = [
   { id: "demo-june", name: "Demo June", meta: "1 learner", completion: 100, score: 86 },
-  { id: "heyhi-demo", name: "HeyHi Demo", meta: "8 learners", completion: 56, score: 88 }
+  { id: "heyhi-demo", name: "HeyHi Demo", meta: "8 learners", completion: 56, score: 88 },
+  // Simulation-only groups so the "Where the gaps sit" heatmap can be previewed
+  // with 5 columns. Safe to remove once the real cohorts exist.
+  { id: "finance-team", name: "Finance Team", meta: "3 learners", completion: 72, score: 84 },
+  { id: "risk-compliance", name: "Risk & Compliance", meta: "3 learners", completion: 68, score: 90 },
+  { id: "advisory", name: "Advisory", meta: "2 learners", completion: 55, score: 78 }
 ];
 
 const taxonomyLearners = [
@@ -92,7 +99,16 @@ const skillsLearners = [
   { id: "bima-learner", label: "bima leraner · bimalearner@heyhi.sg", hasData: false, groupId: "heyhi-demo" },
   { id: "gam-mai", label: "Gam Mai · maigam08092000@gmail.com", hasData: true, groupId: "heyhi-demo" },
   { id: "learner-chuen", label: "Learner Chuen · zhichuen+learner7@heyhi.sg", hasData: true, groupId: "heyhi-demo" },
-  { id: "learner-vin", label: "Learner Vin · learnerdemo_vin@heyhi.sg", hasData: true, groupId: "heyhi-demo" }
+  { id: "learner-vin", label: "Learner Vin · learnerdemo_vin@heyhi.sg", hasData: true, groupId: "heyhi-demo" },
+  // Simulation-only members backing the 3 extra groups above.
+  { id: "sim-finance-1", label: "Aditya · aditya+finance@heyhi.sg", hasData: true, groupId: "finance-team" },
+  { id: "sim-finance-2", label: "Nadia · nadia+finance@heyhi.sg", hasData: true, groupId: "finance-team" },
+  { id: "sim-finance-3", label: "Reza · reza+finance@heyhi.sg", hasData: true, groupId: "finance-team" },
+  { id: "sim-risk-1", label: "Farah · farah+risk@heyhi.sg", hasData: true, groupId: "risk-compliance" },
+  { id: "sim-risk-2", label: "Hendra · hendra+risk@heyhi.sg", hasData: true, groupId: "risk-compliance" },
+  { id: "sim-risk-3", label: "Citra · citra+risk@heyhi.sg", hasData: true, groupId: "risk-compliance" },
+  { id: "sim-advisory-1", label: "Budi · budi+advisory@heyhi.sg", hasData: true, groupId: "advisory" },
+  { id: "sim-advisory-2", label: "Sari · sari+advisory@heyhi.sg", hasData: true, groupId: "advisory" }
 ];
 
 const skillSectors = [

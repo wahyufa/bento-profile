@@ -6,6 +6,18 @@
       "runtimeExecutable": "python",
       "runtimeArgs": ["-m", "http.server", "8843", "--directory", "admin"],
       "port": 8843
+    },
+    {
+      "name": "root-static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8844"],
+      "port": 8844
+    },
+    {
+      "name": "k12-static",
+      "runtimeExecutable": "python",
+      "runtimeArgs": ["-m", "http.server", "8845", "--directory", "C:/Users/mailw/Downloads/Claude/k12"],
+      "port": 8845
     }
   ]
 }

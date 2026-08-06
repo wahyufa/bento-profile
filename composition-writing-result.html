@@ -46,8 +46,12 @@
       padding: 0;
     }
 
-    /* Form controls don't inherit font-family by default in most browsers
-       (they fall back to the OS UI font, e.g. Arial on Windows) — force it. */
+    /* Form controls don't inherit font by default in most browsers (they
+       fall back to the OS UI font/size, e.g. Arial 13.3px on Windows) —
+       force it. Without font-size here, any text sized in em inside a
+       button (e.g. .fb-quote inside .fb-card__head) ignores the Font Size
+       control, since its 1em resolves against the button's own fixed
+       default instead of the ancestor it's supposed to scale with. */
     button,
     select,
     input,
@@ -55,6 +59,7 @@
     optgroup,
     option {
       font-family: inherit;
+      font-size: inherit;
     }
 
     html,
@@ -456,7 +461,9 @@
     .global-settings {
       flex: 0 0 auto;
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      /* Remark Style carries the longest labels; Language and Font Size are
+         compact by design, so they don't need an equal third. */
+      grid-template-columns: 1.5fr 0.85fr 0.85fr;
       gap: 8px;
       padding: 8px 18px;
       background: #fff;
@@ -468,9 +475,141 @@
       color: var(--ink-soft);
       margin-bottom: 3px;
     }
-    .global-settings .select select {
-      padding: 6px 28px 6px 10px;
-      font-size: 13px;
+    /* Same track-with-pill base as the Overview/Details segmented control
+       (.segmented/.seg-btn below), scoped with its own class names so its
+       click handling doesn't collide with the global ".seg-btn" listeners.
+       Each of the three controls gets a shape tied to what it means,
+       instead of three identical text pills. */
+    .gset-seg {
+      position: relative;
+      display: flex;
+      height: 32px;
+      box-sizing: border-box;
+      background: #d7e1ec;
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .gset-seg__btn {
+      flex: 1 1 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      outline: none;
+      border-radius: 7px;
+      padding: 5px 4px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.15s ease;
+    }
+    .gset-seg__btn--active {
+      background: #fff;
+      color: var(--ink);
+    }
+    /* Remark Style: label always visible on all three buttons. Slightly
+       tighter padding than the default .gset-seg__btn so the three labels
+       fit without truncating. */
+    #globalRemark .gset-seg__btn {
+      padding: 5px 2px;
+      font-size: 11px;
+    }
+    /* Font Size: the button glyph itself is small/medium/large, so sizing
+       is shown rather than described. Fixed row height keeps the three
+       buttons aligned despite their different font sizes. */
+    .gset-fontbtn {
+      height: 26px;
+      font-family: var(--font-body);
+      line-height: 1;
+    }
+    .gset-fontbtn[data-value="12"] { font-size: 12px; }
+    .gset-fontbtn[data-value="14"] { font-size: 15px; }
+    .gset-fontbtn[data-value="18"] { font-size: 20px; }
+    /* Language: a compact menu button instead of a text pill row — the
+       list of languages can grow (4-5+) without the control outgrowing its
+       column, which a fixed-width segmented row or 2-state switch can't do. */
+    .gset-menu {
+      position: relative;
+    }
+    .gset-menu__trigger {
+      width: 100%;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 5px;
+      background: #d7e1ec;
+      border: none;
+      outline: none;
+      border-radius: 10px;
+      padding: 0 8px;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .gset-menu__trigger svg {
+      flex: 0 0 auto;
+      opacity: 0.7;
+    }
+    .gset-menu__chevron {
+      margin-left: auto;
+      transition: transform 0.15s ease;
+    }
+    .gset-menu--open .gset-menu__chevron {
+      transform: rotate(180deg);
+    }
+    .gset-menu__list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      z-index: 50;
+      margin: 0;
+      padding: 4px;
+      list-style: none;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(24, 39, 57, 0.14);
+      max-height: 170px;
+      overflow-y: auto;
+    }
+    .gset-menu__list[hidden] {
+      display: none;
+    }
+    .gset-menu__item {
+      padding: 7px 9px;
+      border-radius: 7px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .gset-menu__item:hover {
+      background: #f2f5f8;
+    }
+    .gset-menu__item--active {
+      background: var(--blue);
+      color: #fff;
+    }
+    /* Deliberate keyboard-focus ring, tight to each control's own shape,
+       instead of the browser's default outline (which ignores our
+       border-radius and looks like a mismatched glitch on this row). */
+    .gset-seg__btn:focus-visible,
+    .gset-menu__trigger:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--blue);
     }
 
     /* Per-section label inside the scroll — a light divider, not a
@@ -1178,7 +1317,8 @@
       /* --- Global settings: keep 3 columns, tighten padding --- */
       .global-settings { grid-template-columns: 1fr 1fr 1fr; padding: 6px 10px; gap: 5px; }
       .global-settings .field label { font-size: 10px; }
-      .global-settings .select select { font-size: 11px; padding: 5px 20px 5px 7px; }
+      .gset-seg__btn { font-size: 11px; padding: 5px 3px; }
+      .gset-menu__trigger { font-size: 11px; padding: 0 5px; }
 
       /* --- Good Points: no line break in bottom tab bar --- */
       .farrail .rnav br { display: none; }
@@ -1701,32 +1841,42 @@
            inside each one. -->
       <div class="global-settings">
         <div class="field">
-          <label for="globalRemark">Remark Style</label>
-          <div class="select">
-            <select id="globalRemark">
-              <option>Detailed</option>
-              <option>Simplified</option>
-              <option>Concise</option>
-            </select>
+          <label id="globalRemarkLabel">Remark Style</label>
+          <div class="gset-seg" id="globalRemark" role="group" aria-labelledby="globalRemarkLabel">
+            <button type="button" class="gset-seg__btn gset-seg__btn--active" data-value="Detailed" title="Detailed">
+              <span>Detailed</span>
+            </button>
+            <button type="button" class="gset-seg__btn" data-value="Simplified" title="Simplified">
+              <span>Simplified</span>
+            </button>
+            <button type="button" class="gset-seg__btn" data-value="Concise" title="Concise">
+              <span>Concise</span>
+            </button>
           </div>
         </div>
         <div class="field">
-          <label for="globalLang">Language</label>
-          <div class="select">
-            <select id="globalLang">
-              <option>English</option>
-              <option>Bahasa Indonesia</option>
-            </select>
+          <label id="globalLangLabel">Language</label>
+          <div class="gset-menu" id="globalLang">
+            <button type="button" class="gset-menu__trigger" id="globalLangTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="globalLangLabel">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z"/></svg>
+              <span class="gset-menu__value" id="globalLangValue">EN</span>
+              <svg class="gset-menu__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <ul class="gset-menu__list" id="globalLangList" role="listbox" aria-labelledby="globalLangLabel" hidden>
+              <li class="gset-menu__item gset-menu__item--active" role="option" aria-selected="true" data-value="English" data-short="EN">English</li>
+              <li class="gset-menu__item" role="option" aria-selected="false" data-value="Bahasa Indonesia" data-short="ID">Bahasa Indonesia</li>
+              <li class="gset-menu__item" role="option" aria-selected="false" data-value="Mandarin" data-short="ZH">Mandarin</li>
+              <li class="gset-menu__item" role="option" aria-selected="false" data-value="Malay" data-short="MS">Malay</li>
+              <li class="gset-menu__item" role="option" aria-selected="false" data-value="Tamil" data-short="TA">Tamil</li>
+            </ul>
           </div>
         </div>
         <div class="field">
-          <label for="globalFontSize">Font Size</label>
-          <div class="select">
-            <select id="globalFontSize">
-              <option value="12">Small</option>
-              <option value="14" selected>Medium</option>
-              <option value="18">Large</option>
-            </select>
+          <label id="globalFontSizeLabel">Font Size</label>
+          <div class="gset-seg" id="globalFontSize" role="group" aria-labelledby="globalFontSizeLabel">
+            <button type="button" class="gset-seg__btn gset-fontbtn" data-value="12" title="Small">A</button>
+            <button type="button" class="gset-seg__btn gset-fontbtn gset-seg__btn--active" data-value="14" title="Medium">A</button>
+            <button type="button" class="gset-seg__btn gset-fontbtn" data-value="18" title="Large">A</button>
           </div>
         </div>
       </div>
@@ -1764,7 +1914,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Subject&ndash;verb agreement: &ldquo;the number&rdquo; is singular, so use &ldquo;was&rdquo;. Also prefer &ldquo;decreased slightly&rdquo; over &ldquo;were slightly decreased&rdquo;.</p>
+              <p data-detailed="Subject–verb agreement: “the number” is singular, so use “was”. Also prefer “decreased slightly” over “were slightly decreased”." data-simplified="Use “was”, not “were” — “the number” is singular. Also say “decreased slightly” instead of “were slightly decreased”." data-concise="Fix: “was”, not “were”.">Subject&ndash;verb agreement: &ldquo;the number&rdquo; is singular, so use &ldquo;was&rdquo;. Also prefer &ldquo;decreased slightly&rdquo; over &ldquo;were slightly decreased&rdquo;.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -1779,7 +1929,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Use the past tense to match the rest of the description: &ldquo;the percentage of households owning a car increased to 60%&rdquo;.</p>
+              <p data-detailed="Use the past tense to match the rest of the description: “the percentage of households owning a car increased to 60%”." data-simplified="This should be past tense too: “increased”, not “increase”." data-concise="Use “increased”, not “increase”.">Use the past tense to match the rest of the description: &ldquo;the percentage of households owning a car increased to 60%&rdquo;.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -1794,7 +1944,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Avoid repeating &lsquo;and it&rsquo;; split this into two sentences or use one clear clause, for example by using only one &lsquo;and&rsquo;.</p>
+              <p data-detailed="Avoid repeating ‘and it’; split this into two sentences or use one clear clause, for example by using only one ‘and’." data-simplified="Don’t repeat “and it” twice. Split it into two sentences, or use just one “and”." data-concise="Don’t repeat “and it” — split the sentence.">Avoid repeating &lsquo;and it&rsquo;; split this into two sentences or use one clear clause, for example by using only one &lsquo;and&rsquo;.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -1814,7 +1964,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Tighten the phrasing so the reader follows the trend easily, e.g. &ldquo;bicycle sales decreased slightly to around 500 units by 2017&rdquo;.</p>
+              <p data-detailed="Tighten the phrasing so the reader follows the trend easily, e.g. “bicycle sales decreased slightly to around 500 units by 2017”." data-simplified="Make this shorter and clearer, like: “bicycle sales decreased slightly to around 500 units by 2017”." data-concise="Shorten this sentence for clarity.">Tighten the phrasing so the reader follows the trend easily, e.g. &ldquo;bicycle sales decreased slightly to around 500 units by 2017&rdquo;.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -1834,7 +1984,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Spelling: &ldquo;propotion&rdquo; &rarr; &ldquo;proportion&rdquo;.</p>
+              <p data-detailed="Spelling: “propotion” → “proportion”." data-simplified="Spelling: “propotion” should be “proportion”." data-concise="“propotion” → “proportion”">Spelling: &ldquo;propotion&rdquo; &rarr; &ldquo;proportion&rdquo;.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -1849,7 +1999,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Spelling: &ldquo;decreesed&rdquo; &rarr; &ldquo;decreased&rdquo;.</p>
+              <p data-detailed="Spelling: “decreesed” → “decreased”." data-simplified="Spelling: “decreesed” should be “decreased”." data-concise="“decreesed” → “decreased”">Spelling: &ldquo;decreesed&rdquo; &rarr; &ldquo;decreased&rdquo;.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -1864,7 +2014,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Spelling: &ldquo;favuor&rdquo; &rarr; &ldquo;favour&rdquo;.</p>
+              <p data-detailed="Spelling: “favuor” → “favour”." data-simplified="Spelling: “favuor” should be “favour”." data-concise="“favuor” → “favour”">Spelling: &ldquo;favuor&rdquo; &rarr; &ldquo;favour&rdquo;.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -1884,7 +2034,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Clear overview and logical paragraphing. The response covers both trends well and ends with a strong summary.</p>
+              <p data-detailed="Clear overview and logical paragraphing. The response covers both trends well and ends with a strong summary." data-simplified="Good structure. You covered both trends and finished with a strong summary." data-concise="Clear structure, strong summary.">Clear overview and logical paragraphing. The response covers both trends well and ends with a strong summary.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -1899,7 +2049,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Good use of specific figures to support each point. Vary the verbs you use to describe change to avoid repetition.</p>
+              <p data-detailed="Good use of specific figures to support each point. Vary the verbs you use to describe change to avoid repetition." data-simplified="You used good figures to support your points. Try using different verbs for change instead of repeating the same ones." data-concise="Good figures. Vary your verbs.">Good use of specific figures to support each point. Vary the verbs you use to describe change to avoid repetition.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -1914,7 +2064,7 @@
               <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="fb-body">
-              <p>Solid range of linking phrases. Try introducing a few higher-level synonyms such as &ldquo;surpassed&rdquo; or &ldquo;plummeted&rdquo; where appropriate.</p>
+              <p data-detailed="Solid range of linking phrases. Try introducing a few higher-level synonyms such as “surpassed” or “plummeted” where appropriate." data-simplified="Good linking phrases. Try adding stronger words like “surpassed” or “plummeted” sometimes." data-concise="Good linking words. Add stronger synonyms.">Solid range of linking phrases. Try introducing a few higher-level synonyms such as &ldquo;surpassed&rdquo; or &ldquo;plummeted&rdquo; where appropriate.</p>
               <span class="ai-tag">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
                 AI Generated
@@ -2365,11 +2515,84 @@
       });
     });
 
+    // ---- Global settings segmented controls (Remark Style / Font Size):
+    // one active button per group, click to switch ----
+    document.querySelectorAll(".gset-seg").forEach(function (seg) {
+      seg.querySelectorAll(".gset-seg__btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          seg.querySelectorAll(".gset-seg__btn").forEach(function (b) {
+            b.classList.remove("gset-seg__btn--active");
+          });
+          btn.classList.add("gset-seg__btn--active");
+          seg.dispatchEvent(new CustomEvent("seg-change", { detail: { value: btn.dataset.value } }));
+        });
+      });
+    });
+
+    // ---- Language menu: button opens a short list, click outside or Esc
+    // closes it. Scales to any number of languages, unlike a 2-state switch. ----
+    (function () {
+      var menu = document.getElementById("globalLang");
+      var trigger = document.getElementById("globalLangTrigger");
+      var valueEl = document.getElementById("globalLangValue");
+      var list = document.getElementById("globalLangList");
+      if (!menu || !trigger || !list) return;
+
+      function closeMenu() {
+        menu.classList.remove("gset-menu--open");
+        trigger.setAttribute("aria-expanded", "false");
+        list.hidden = true;
+      }
+      function openMenu() {
+        menu.classList.add("gset-menu--open");
+        trigger.setAttribute("aria-expanded", "true");
+        list.hidden = false;
+      }
+
+      trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (list.hidden) openMenu(); else closeMenu();
+      });
+      list.querySelectorAll(".gset-menu__item").forEach(function (item) {
+        item.addEventListener("click", function () {
+          list.querySelectorAll(".gset-menu__item").forEach(function (i) {
+            i.classList.remove("gset-menu__item--active");
+            i.setAttribute("aria-selected", "false");
+          });
+          item.classList.add("gset-menu__item--active");
+          item.setAttribute("aria-selected", "true");
+          valueEl.textContent = item.dataset.short;
+          closeMenu();
+          menu.dispatchEvent(new CustomEvent("seg-change", { detail: { value: item.dataset.value } }));
+        });
+      });
+      document.addEventListener("click", function (e) {
+        if (!menu.contains(e.target)) closeMenu();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closeMenu();
+      });
+    })();
+
+    // ---- Remark Style: rewrites every feedback remark to match the
+    // selected verbosity (Detailed/Simplified/Concise), like a real AI
+    // regeneration rather than a cosmetic toggle ----
+    var remarkSeg = document.getElementById("globalRemark");
+    if (remarkSeg) {
+      remarkSeg.addEventListener("seg-change", function (e) {
+        var attr = "data-" + e.detail.value.toLowerCase();
+        document.querySelectorAll(".fb-body p[data-detailed]").forEach(function (p) {
+          var text = p.getAttribute(attr);
+          if (text) p.textContent = text;
+        });
+      });
+    }
+
     // ---- Font size: scales all card scrolls + feedback panel ----
-    var fontSizeSelect = document.getElementById("globalFontSize");
-    if (fontSizeSelect) {
-      fontSizeSelect.addEventListener("change", function () {
-        var px = fontSizeSelect.value + "px";
+    var fontSizeSeg = document.getElementById("globalFontSize");
+    if (fontSizeSeg) {
+      fontSizeSeg.addEventListener("seg-change", function (e) {
+        var px = e.detail.value + "px";
         if (feedbackScroll) feedbackScroll.style.fontSize = px;
         document.querySelectorAll(".card__scroll").forEach(function (el) {
           el.style.fontSize = px;

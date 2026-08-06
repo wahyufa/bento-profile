@@ -2,7 +2,8 @@ const v3SkillState = {
   sourceFilter: "all",
   sort: "low",
   compareExpanded: true,
-  expandedRow: null
+  expandedRow: null,
+  compareSort: { key: "gap", dir: "desc" }
 };
 
 const v3SkillEvidenceState = {
@@ -338,7 +339,9 @@ function v3SkillRow(skill, sector) {
     <article class="skills-v3-row ${tier}" data-v3-skill-name="${skill.name}">
       <div class="skills-v3-row-top">
         <div class="skills-v3-row-name">
-          <strong>${skill.name}</strong>${tier ? V3_TIER_BADGE[tier] : ""}
+          <div class="skills-v3-row-name-top">
+            <strong>${skill.name}</strong>${tier ? V3_TIER_BADGE[tier] : ""}
+          </div>
           <small>${v3SectorName(sector)}</small>
         </div>
         <span class="skills-v3-row-coverage ${lowCoverage ? "is-low" : ""}">${hasEvidence ? `${cover} of ${V3_BAND_LEARNERS.length} learners${lowCoverage ? '<span class="skills-v3-row-coverage-flag" title="Few sample learners have data for this skill — read with caution">&#9888;&#65038;</span>' : ""}` : "No evidence yet"}</span>
@@ -387,28 +390,64 @@ function v3ScopeSubtitle(scope) {
   return "Bird’s-eye view across every sector before drilling into individual skills.";
 }
 
+// Continuous red -> amber -> green gradient (same anchor colors as the v2
+// skill heatmap) so cell color alone is scannable without reading numbers.
+function v3HeatColor(v) {
+  let r, g, b;
+  if (v < 50) { const t = v / 50; r = 231 + (245 - 231) * t; g = 54 + (184 - 54) * t; b = 54 + (61 - 54) * t; }
+  else { const t = (v - 50) / 50; r = 245 + (12 - 245) * t; g = 184 + (173 - 184) * t; b = 61 + (96 - 61) * t; }
+  return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+}
+
+function v3HeatTextColor(v) { return (v >= 40 && v < 68) ? "#5a4008" : "#ffffff"; }
+
 function v3SkillGroupComparisonTable() {
   const groups = v3SkillGroups().filter((group) => group.memberIds.length);
   if (groups.length < 2) return "";
 
   const expanded = v3SkillState.compareExpanded;
+  const sort = v3SkillState.compareSort || { key: "gap", dir: "desc" };
+  const sortGroupIndex = groups.findIndex((group) => group.id === sort.key);
 
   const table = !expanded ? "" : (() => {
-    const rows = skillSectors.flatMap((sector) => sector.skills.map((skill) => ({
-      sector,
-      skill,
-      scores: groups.map((group) => v3SkillForGroup(skill, group.memberIds).mastery)
-    })));
-    const sorted = [...rows].sort((a, b) => (v3Average(a.scores) ?? 999) - (v3Average(b.scores) ?? 999));
+    const rows = skillSectors.flatMap((sector) => sector.skills.map((skill) => {
+      const scores = groups.map((group) => v3SkillForGroup(skill, group.memberIds).mastery);
+      const available = scores.filter((score) => score != null);
+      const gap = available.length >= 2 ? Math.max(...available) - Math.min(...available) : -1;
+      return { sector, skill, scores, gap };
+    }));
+
+    const sorted = [...rows].sort((a, b) => {
+      if (sortGroupIndex === -1) return sort.dir === "asc" ? a.gap - b.gap : b.gap - a.gap;
+      const scoreA = a.scores[sortGroupIndex];
+      const scoreB = b.scores[sortGroupIndex];
+      if (scoreA == null && scoreB == null) return 0;
+      if (scoreA == null) return 1;
+      if (scoreB == null) return -1;
+      return sort.dir === "asc" ? scoreA - scoreB : scoreB - scoreA;
+    });
+
     return `
       <div class="table-scroll">
-        <table class="data-table">
-          <thead><tr><th>Skill</th>${groups.map((group) => `<th>${group.name}</th>`).join("")}</tr></thead>
+        <table class="data-table skills-v3-heat-table">
+          <thead><tr>
+            <th>Skill</th>
+            ${groups.map((group) => {
+              const active = sort.key === group.id;
+              const iconName = active ? (sort.dir === "asc" ? "chevron" : "chevron-down") : "chevrons-updown";
+              return `<th><button type="button" class="skills-v3-heat-sort-btn ${active ? "is-active" : ""}" data-v3-compare-sort="${group.id}" aria-label="Sort by ${group.name}, ${active && sort.dir === "desc" ? "currently highest first" : active ? "currently lowest first" : "not sorted"}">${group.name}<span class="skills-v3-heat-sort-icon" data-icon="${iconName}" aria-hidden="true"></span></button></th>`;
+            }).join("")}
+          </tr></thead>
           <tbody>
             ${sorted.map((row) => `
               <tr>
-                <td><strong>${row.skill.name}</strong><br><small>${v3SectorName(row.sector)}</small></td>
-                ${row.scores.map((score) => `<td>${score == null ? "—" : `<span class="skills-v3-score-pill ${toneFor(score)}">${score}%</span>`}</td>`).join("")}
+                <td>
+                  <strong>${row.skill.name}</strong><br><small>${v3SectorName(row.sector)}</small>
+                </td>
+                ${row.scores.map((score, i) => `
+                  <td class="skills-v3-heat-td">${score == null
+                    ? `<span class="skills-v3-heat-empty">—</span>`
+                    : `<button type="button" class="skills-v3-heat-cell" style="background:${v3HeatColor(score)};color:${v3HeatTextColor(score)}" data-v3-heat-cell data-v3-heat-sector="${row.sector.id}" data-v3-heat-skill="${row.skill.name}" data-v3-heat-group="${groups[i].id}" title="${row.skill.name} · ${groups[i].name}: ${score}%">${score}%</button>`}</td>`).join("")}
               </tr>`).join("")}
           </tbody>
         </table>
@@ -416,11 +455,11 @@ function v3SkillGroupComparisonTable() {
   })();
 
   return `
-    <section class="panel skills-v3-compare" aria-label="Skill mastery by group">
+    <section class="panel skills-v3-compare" aria-label="Skill proficiency by group">
       <button class="skills-v3-compare-head" type="button" data-v3-compare-toggle aria-expanded="${expanded}">
         <div>
           <div class="table-title"><span data-icon="sparkle"></span><h3>Where the gaps sit</h3></div>
-          <p class="skills-v3-compare-note">Combined mastery per group for every skill, sorted with the widest gaps first.</p>
+          <p class="skills-v3-compare-note">Cell color shows proficiency at a glance — red is weakest, green is strongest. Click a group name to sort that column high→low, click again to reverse. Default view leads with the widest gap between groups.</p>
         </div>
         <span class="skills-v3-compare-chevron" aria-hidden="true"><span data-icon="chevron"></span></span>
       </button>
@@ -505,7 +544,7 @@ function v3SkillsDetailSection(sector, sectors) {
           <p>${sectorStats.tracked} of ${sector.skills.length} skills tracked &middot; ${sectorStats.questions} PALS questions &middot; ${sectorStats.scenarios} CBL scenarios</p>
         </div>
         <div class="skills-v3-controls">
-          <button class="skills-v3-method-trigger" type="button" data-v3-method-info aria-haspopup="dialog"><span data-icon="help"></span>How mastery works</button>
+          <button class="skills-v3-method-trigger" type="button" data-v3-method-info aria-haspopup="dialog"><span data-icon="help"></span>How proficiency works</button>
           <div class="field">
             <label for="v3-source-filter">Evidence</label>
             <select id="v3-source-filter" data-v3-source-filter>
@@ -516,7 +555,7 @@ function v3SkillsDetailSection(sector, sectors) {
             <label for="v3-skill-sort">Sort by</label>
             <select id="v3-skill-sort" data-v3-skill-sort>
               <option value="low" ${v3SkillState.sort === "low" ? "selected" : ""}>Needs attention first</option>
-              <option value="high" ${v3SkillState.sort === "high" ? "selected" : ""}>Mastery: high first</option>
+              <option value="high" ${v3SkillState.sort === "high" ? "selected" : ""}>Proficiency: high first</option>
               <option value="name" ${v3SkillState.sort === "name" ? "selected" : ""}>Skill name</option>
             </select>
           </div>
@@ -527,10 +566,10 @@ function v3SkillsDetailSection(sector, sectors) {
         <aside class="skills-v3-profile" aria-label="Selected sector profile">
           <p class="skill-category-label">Sector profile</p>
           <h3 class="skills-v3-profile-title">${v3SectorName(sector)}</h3>
-          <p class="skills-v3-profile-note">Average mastery by skill within this sector, combining PALS and CBL evidence.</p>
-          ${radarChart(sector.skills.map((skill) => ({ name: skill.name, value: skill.mastery || 0 })), "skills-v3-radar", `${v3SectorName(sector)} skill mastery`)}
+          <p class="skills-v3-profile-note">Average proficiency by skill within this sector, combining PALS and CBL evidence.</p>
+          ${radarChart(sector.skills.map((skill) => ({ name: skill.name, value: skill.mastery || 0 })), "skills-v3-radar", `${v3SectorName(sector)} skill proficiency`)}
           <div class="skills-v3-profile-summary">
-            <article><span>Sector mastery</span><strong>${sectorStats.mastery == null ? "—" : `${sectorStats.mastery}%`}</strong></article>
+            <article><span>Sector proficiency</span><strong>${sectorStats.mastery == null ? "—" : `${sectorStats.mastery}%`}</strong></article>
             <article><span>Both sources</span><strong>${sectorStats.both}/${sector.skills.length}</strong></article>
           </div>
         </aside>
@@ -622,7 +661,7 @@ function renderSkillsV3() {
         <div class="skills-v3-summary">
           <article class="is-primary">
             <span class="skills-v3-summary-icon" data-icon="sparkle"></span>
-            <span class="skills-v3-summary-label">Combined mastery</span>
+            <span class="skills-v3-summary-label">Combined proficiency</span>
             <strong>${overall.mastery}%</strong>
             <small>Average across ${overall.tracked} tracked skills</small>
           </article>
@@ -805,7 +844,7 @@ function renderOverviewV3() {
     },
     {
       tab: "skills", icon: "sparkle", title: "Skills", status: "Outcome", statusTone: "is-good",
-      metric: `${skills.mastery}%`, metricLabel: `combined mastery · ${skills.coverage}% evidence coverage`,
+      metric: `${skills.mastery}%`, metricLabel: `combined proficiency · ${skills.coverage}% evidence coverage`,
       description: "Skills consolidates PALS knowledge and CBL application without hiding the source breakdown.", priority: true
     },
     {
@@ -838,21 +877,21 @@ function renderOverviewV3() {
 
 function openSkillsMethodV3() {
   showReportDialog({
-    title: "How skill mastery works",
+    title: "How skill proficiency works",
     subtitle: "Skills analytics",
-    summaryLabel: "Mastery evidence sources",
+    summaryLabel: "Proficiency evidence sources",
     summary: `
       <article><span>PALS knowledge</span><strong>Knowledge checks</strong></article>
       <article><span>CBL application</span><strong>Applied performance</strong></article>
-      <article><span>Combined mastery</span><strong>Unified result</strong></article>`,
+      <article><span>Combined proficiency</span><strong>Unified result</strong></article>`,
     body: `
       <div class="panel-heading"><div><h3>Evidence composition</h3><p>Source-level results remain visible so administrators can understand what contributes to each skill result.</p></div></div>
       <div class="skills-v3-method-explainer">
-        <article><span data-icon="book-open"></span><div><strong>PALS knowledge</strong><p>Uses performance from correctly answered PALS questions tagged to the skill. PALS alone can contribute up to ${PALS_MASTERY_CAP} of the 100 mastery points.</p></div></article>
-        <article class="is-cbl"><span data-icon="trophy"></span><div><strong>CBL application</strong><p>Uses scored CBL cases mapped to the skill through Learning Objectives, worth up to ${CBL_MASTERY_CAP} of the 100 mastery points. A case mapped to more than one skill splits its weight evenly across every mapped skill.</p></div></article>
-        <article><span data-icon="chart"></span><div><strong>Combined mastery</strong><p>Adds the PALS and CBL points together, so a skill needs evidence from both sources to reach 100% mastery.</p></div></article>
+        <article><span data-icon="book-open"></span><div><strong>PALS knowledge</strong><p>Uses performance from correctly answered PALS questions tagged to the skill. PALS alone can contribute up to ${PALS_MASTERY_CAP} of the 100 proficiency points.</p></div></article>
+        <article class="is-cbl"><span data-icon="trophy"></span><div><strong>CBL application</strong><p>Uses scored CBL cases mapped to the skill through Learning Objectives, worth up to ${CBL_MASTERY_CAP} of the 100 proficiency points. A case mapped to more than one skill splits its weight evenly across every mapped skill.</p></div></article>
+        <article><span data-icon="chart"></span><div><strong>Combined proficiency</strong><p>Adds the PALS and CBL points together, so a skill needs evidence from both sources to reach 100% proficiency.</p></div></article>
       </div>
-      <p class="skills-v3-evidence-note"><strong>Source transparency:</strong> PALS and CBL scores remain available independently alongside combined mastery.</p>`
+      <p class="skills-v3-evidence-note"><strong>Source transparency:</strong> PALS and CBL scores remain available independently alongside combined proficiency.</p>`
   });
 }
 
@@ -877,6 +916,32 @@ function v3SkillBreakdownRows(sectorId, skillName, memberIds) {
         <div><span>Combined</span><strong>${memberSkill.mastery == null ? "—" : `${memberSkill.mastery}%`}</strong></div>
       </article>`;
   }).join("");
+}
+
+function openHeatCellDetailV3(sectorId, skillName, groupId) {
+  const rawSkill = v3RawSkill(sectorId, skillName);
+  const sector = skillSectors.find((item) => item.id === sectorId);
+  const group = v3SkillGroups().find((item) => item.id === groupId);
+  if (!rawSkill || !sector || !group) return;
+
+  const skill = v3SkillForGroup(rawSkill, group.memberIds);
+  const palsScore = palsSkillScore(skill);
+  const cblScore = skill.cbl?.score ?? null;
+  const scenarioCount = skill.cbl?.scenarios || 0;
+
+  showReportDialog({
+    title: skill.name,
+    subtitle: `${group.name} · ${v3SectorName(sector)}`,
+    summaryLabel: "Group skill summary",
+    summary: `
+      <article><span>Combined proficiency</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong></article>
+      <article><span>PALS</span><strong>${palsScore == null ? "—" : `${palsScore}%`}</strong></article>
+      <article><span>CBL</span><strong>${cblScore == null ? "—" : `${cblScore}%`}</strong></article>`,
+    body: `
+      <div class="skills-v3-detail-label">Learners in ${group.name} (${v3CountLabel(group.memberIds.length, "student")})</div>
+      <div class="skills-v3-breakdown-list">${v3SkillBreakdownRows(sectorId, skillName, group.memberIds)}</div>
+      ${scenarioCount ? "" : `<p class="skills-v3-band-empty-note">No CBL cases have been mapped to this skill through Learning Objectives yet.</p>`}`
+  });
 }
 
 function openSkillEvidenceV3(sectorId, skillName) {
@@ -920,17 +985,17 @@ function renderSkillEvidenceDialogV3() {
     subtitle: `${v3SectorName(sector)} · ${evidenceState.label}`,
     summaryLabel: "Skill evidence summary",
     summary: `
-      <article><span>Combined mastery</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong></article>
+      <article><span>Combined proficiency</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong></article>
       <article><span>PALS knowledge</span><strong>${palsScore == null ? "—" : `${palsScore}%`}</strong></article>
       <article><span>CBL application</span><strong>${cblScore == null ? "—" : `${cblScore}%`}</strong></article>`,
     body: `
-      <div class="panel-heading"><div><h3>Evidence composition</h3><p>Each source stays visible so an administrator can understand why this mastery result exists.</p></div></div>
+      <div class="panel-heading"><div><h3>Evidence composition</h3><p>Each source stays visible so an administrator can understand why this proficiency result exists.</p></div></div>
       <div class="skills-v3-evidence-flow">
         <article><span>PALS knowledge</span><strong>${palsScore == null ? "—" : `${palsScore}%`}</strong><small>${skill.total ? `${skill.correct} of ${skill.total} tagged questions correct` : "No question evidence"}</small></article>
         <span class="skills-v3-flow-plus">+</span>
         <article><span>CBL application</span><strong>${cblScore == null ? "—" : `${cblScore}%`}</strong><small>${scenarioCount ? `${scenarioCount} scored ${scenarioCount === 1 ? "scenario" : "scenarios"}` : "No scenario evidence"}</small></article>
         <span class="skills-v3-flow-plus">→</span>
-        <article><span>Combined mastery</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong><small>${skill.mastery == null ? "Knowledge and application evidence combined" : `${palsPoints} PALS pt${palsPoints === 1 ? "" : "s"} + ${cblPoints} CBL pt${cblPoints === 1 ? "" : "s"} (capped at ${PALS_MASTERY_CAP}/${CBL_MASTERY_CAP})`}</small></article>
+        <article><span>Combined proficiency</span><strong>${skill.mastery == null ? "—" : `${skill.mastery}%`}</strong><small>${skill.mastery == null ? "Knowledge and application evidence combined" : `${palsPoints} PALS pt${palsPoints === 1 ? "" : "s"} + ${cblPoints} CBL pt${cblPoints === 1 ? "" : "s"} (capped at ${PALS_MASTERY_CAP}/${CBL_MASTERY_CAP})`}</small></article>
       </div>
       <p class="skills-v3-evidence-note"><strong>Learning objective mapping:</strong> ${cblMappingNote} PALS questions use the same canonical skill taxonomy, preventing duplicate or fragmented skill names.</p>
       <article class="question-card"><strong>PALS question evidence</strong><p>${skill.total ? `${skill.correct} correct answers from ${skill.total} questions tagged to ${skill.name}.` : "No PALS question evidence has been recorded for this skill yet."}</p></article>
@@ -981,6 +1046,29 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  const heatCell = event.target.closest("[data-v3-heat-cell]");
+  if (heatCell) {
+    openHeatCellDetailV3(heatCell.dataset.v3HeatSector, heatCell.dataset.v3HeatSkill, heatCell.dataset.v3HeatGroup);
+    return;
+  }
+
+  const compareSort = event.target.closest("[data-v3-compare-sort]");
+  if (compareSort) {
+    // Cycle per group column: 1st click highest first, 2nd click lowest
+    // first, 3rd click back to the default widest-gap-first view.
+    const key = compareSort.dataset.v3CompareSort;
+    const current = v3SkillState.compareSort || { key: "gap", dir: "desc" };
+    if (current.key !== key) {
+      v3SkillState.compareSort = { key, dir: "desc" };
+    } else if (current.dir === "desc") {
+      v3SkillState.compareSort = { key, dir: "asc" };
+    } else {
+      v3SkillState.compareSort = { key: "gap", dir: "desc" };
+    }
+    renderAndFocus(`[data-v3-compare-sort="${key}"]`);
+    return;
+  }
+
   const skillToggle = event.target.closest("[data-v3-skill-toggle]");
   if (skillToggle) {
     const name = skillToggle.dataset.v3SkillToggle;
@@ -1005,6 +1093,7 @@ document.addEventListener("click", (event) => {
     state.skillsSector = null;
     v3SkillState.sourceFilter = "all";
     v3SkillState.sort = "low";
+    v3SkillState.compareSort = { key: "gap", dir: "desc" };
     renderAndFocus(`[data-skills-mode="${state.skillsMode}"]`);
     return;
   }
@@ -1014,6 +1103,7 @@ document.addEventListener("click", (event) => {
   state.skillsSector = sectorButton.dataset.v3Sector;
   v3SkillState.sourceFilter = "all";
   v3SkillState.expandedRow = null;
+  v3SkillState.compareSort = { key: "gap", dir: "desc" };
   renderAndFocus(`[data-v3-sector="${state.skillsSector}"]`);
 });
 
