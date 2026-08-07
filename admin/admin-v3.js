@@ -3,7 +3,9 @@ const v3SkillState = {
   sort: "low",
   compareExpanded: true,
   expandedRow: null,
-  compareSort: { key: "gap", dir: "desc" }
+  compareSort: { key: "gap", dir: "desc" },
+  untaggedOpen: false,
+  untaggedQuery: ""
 };
 
 const v3SkillEvidenceState = {
@@ -249,8 +251,7 @@ function v3SourceFilterLabel(value) {
     all: "All evidence",
     both: "Both sources",
     "pals-only": "PALS only",
-    "cbl-only": "CBL only",
-    none: "No evidence"
+    "cbl-only": "CBL only"
   }[value] || "All evidence";
 }
 
@@ -262,11 +263,50 @@ function v3SortSkills(skills) {
   });
 }
 
+// Evidence-first: only skills with at least one PALS/CBL evidence item ever
+// render as full cards. This is what keeps the list short as the taxonomy
+// grows — untagged skills live in v3UntaggedSkills() instead, collapsed by
+// default and only searched, never rendered in bulk.
 function v3FilteredSkills(sector) {
+  const tagged = sector.skills.filter((skill) => skill.mastery != null);
   const filtered = v3SkillState.sourceFilter === "all"
-    ? sector.skills
-    : sector.skills.filter((skill) => v3SkillSourceType(skill) === v3SkillState.sourceFilter);
+    ? tagged
+    : tagged.filter((skill) => v3SkillSourceType(skill) === v3SkillState.sourceFilter);
   return v3SortSkills(filtered);
+}
+
+function v3UntaggedSkills(sector) {
+  return sector.skills.filter((skill) => skill.mastery == null);
+}
+
+const V3_UNTAGGED_SEARCH_CAP = 30;
+
+function v3UntaggedSkillsSection(untaggedSkills) {
+  if (!untaggedSkills.length) return "";
+  const open = v3SkillState.untaggedOpen;
+  const query = v3SkillState.untaggedQuery.trim().toLowerCase();
+  const matches = query ? untaggedSkills.filter((skill) => skill.name.toLowerCase().includes(query)) : untaggedSkills;
+  const shown = matches.slice(0, V3_UNTAGGED_SEARCH_CAP);
+
+  return `
+    <div class="skills-v3-untagged">
+      <button class="skills-v3-untagged-toggle" type="button" data-v3-untagged-toggle aria-expanded="${open}">
+        <span><strong>No evidence yet (${untaggedSkills.length})</strong><small>Not rendered by default — search to find one, or map PALS/CBL evidence to bring it into the list above.</small></span>
+        <span class="skills-v3-untagged-chevron" data-icon="chevron" aria-hidden="true"></span>
+      </button>
+      ${open ? `
+      <div class="skills-v3-untagged-body">
+        <input type="search" class="skills-v3-untagged-search" data-v3-untagged-search placeholder="Search ${untaggedSkills.length} untagged skill${untaggedSkills.length === 1 ? "" : "s"} by name&hellip;" value="${v3SkillState.untaggedQuery}" />
+        <div class="skills-v3-untagged-list">
+          ${shown.length
+            ? shown.map((skill) => `<div class="skills-v3-untagged-item"><span>${skill.name}</span><span>not tagged</span></div>`).join("")
+            : `<p class="skills-v3-untagged-empty">No untagged skills match that search.</p>`}
+        </div>
+        ${matches.length > V3_UNTAGGED_SEARCH_CAP
+          ? `<p class="skills-v3-untagged-more">+${matches.length - V3_UNTAGGED_SEARCH_CAP} more match &mdash; refine your search to narrow it down.</p>`
+          : ""}
+      </div>` : ""}
+    </div>`;
 }
 
 function v3SkillGuidance(skill, sourceType) {
@@ -532,6 +572,7 @@ function v3SectorPicker(sectors, selectedSectorId, promptText) {
 function v3SkillsDetailSection(sector, sectors) {
   const sectorStats = v3SectorStats(sector);
   const visibleSkills = v3FilteredSkills(sector);
+  const untaggedSkills = v3UntaggedSkills(sector);
   const attentionCount = sector.skills.filter((skill) => skill.mastery != null && skill.mastery < 50).length;
 
   return `
@@ -548,7 +589,7 @@ function v3SkillsDetailSection(sector, sectors) {
           <div class="field">
             <label for="v3-source-filter">Evidence</label>
             <select id="v3-source-filter" data-v3-source-filter>
-              ${["all", "both", "pals-only", "cbl-only", "none"].map((value) => `<option value="${value}" ${v3SkillState.sourceFilter === value ? "selected" : ""}>${v3SourceFilterLabel(value)}</option>`).join("")}
+              ${["all", "both", "pals-only", "cbl-only"].map((value) => `<option value="${value}" ${v3SkillState.sourceFilter === value ? "selected" : ""}>${v3SourceFilterLabel(value)}</option>`).join("")}
             </select>
           </div>
           <div class="field">
@@ -575,8 +616,8 @@ function v3SkillsDetailSection(sector, sectors) {
         </aside>
         <div>
           <h3 class="skills-v3-list-title">Skills across the organisation</h3>
-          <p class="skills-v3-list-count">${sector.skills.length} skill${sector.skills.length === 1 ? "" : "s"} &middot; ${v3SectorName(sector)}${attentionCount ? ` &middot; <b class="skills-v3-attn-count">${attentionCount} need${attentionCount === 1 ? "s" : ""} attention</b>` : ""}</p>
-          <p class="skills-v3-list-note">Skills needing attention are pulled to the top and flagged red; strong skills are dimmed. Each bar shows how sample learners spread across the four competency bands — expand a skill for its PALS / CBL make-up.</p>
+          <p class="skills-v3-list-count">${sectorStats.tracked} tracked skill${sectorStats.tracked === 1 ? "" : "s"} &middot; ${v3SectorName(sector)}${attentionCount ? ` &middot; <b class="skills-v3-attn-count">${attentionCount} need${attentionCount === 1 ? "s" : ""} attention</b>` : ""}</p>
+          <p class="skills-v3-list-note">Only skills with PALS or CBL evidence render here — skills needing attention are pulled to the top and flagged red, strong skills are dimmed. Each bar shows how sample learners spread across the four competency bands — expand a skill for its PALS / CBL make-up.</p>
           <div class="skills-v3-list">
             ${visibleSkills.length
               ? visibleSkills.map((skill) => v3SkillRow(skill, sector)).join("")
@@ -585,6 +626,7 @@ function v3SkillsDetailSection(sector, sectors) {
           <div class="skills-v3-band-legend">
             ${V3_BAND_DEFS.map((band) => `<span><span class="skills-v3-band-dot is-${band.key}"></span>${band.label}</span>`).join("")}
           </div>
+          ${v3UntaggedSkillsSection(untaggedSkills)}
         </div>
       </div>
     </section>`;
@@ -1077,6 +1119,13 @@ document.addEventListener("click", (event) => {
     return;
   }
 
+  if (event.target.closest("[data-v3-untagged-toggle]")) {
+    v3SkillState.untaggedOpen = !v3SkillState.untaggedOpen;
+    if (!v3SkillState.untaggedOpen) v3SkillState.untaggedQuery = "";
+    renderAndFocus("[data-v3-untagged-toggle]");
+    return;
+  }
+
   const overviewLink = event.target.closest("[data-v3-overview-tab]");
   if (overviewLink) {
     state.tab = overviewLink.dataset.v3OverviewTab;
@@ -1094,6 +1143,8 @@ document.addEventListener("click", (event) => {
     v3SkillState.sourceFilter = "all";
     v3SkillState.sort = "low";
     v3SkillState.compareSort = { key: "gap", dir: "desc" };
+    v3SkillState.untaggedOpen = false;
+    v3SkillState.untaggedQuery = "";
     renderAndFocus(`[data-skills-mode="${state.skillsMode}"]`);
     return;
   }
@@ -1104,6 +1155,8 @@ document.addEventListener("click", (event) => {
   v3SkillState.sourceFilter = "all";
   v3SkillState.expandedRow = null;
   v3SkillState.compareSort = { key: "gap", dir: "desc" };
+  v3SkillState.untaggedOpen = false;
+  v3SkillState.untaggedQuery = "";
   renderAndFocus(`[data-v3-sector="${state.skillsSector}"]`);
 });
 
@@ -1135,6 +1188,18 @@ document.addEventListener("change", (event) => {
   if (event.target.matches("[data-v3-skill-sort]")) {
     v3SkillState.sort = event.target.value;
     renderAndFocus("[data-v3-skill-sort]");
+  }
+});
+
+document.addEventListener("input", (event) => {
+  if (event.target.matches("[data-v3-untagged-search]")) {
+    v3SkillState.untaggedQuery = event.target.value;
+    render();
+    const input = document.querySelector("[data-v3-untagged-search]");
+    if (input) {
+      input.focus();
+      input.setSelectionRange(v3SkillState.untaggedQuery.length, v3SkillState.untaggedQuery.length);
+    }
   }
 });
 

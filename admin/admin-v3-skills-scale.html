@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Prototype: how the Skills component stays usable once the SkillsFuture taxonomy (~45,000 skills) is loaded — hierarchy-first navigation plus evidence-based filtering."
+    />
+    <title>Skills at Scale — Prototype</title>
+    <style>
+      :root {
+        --background: #f6f7f9;
+        --surface: #ffffff;
+        --surface-muted: #f1f3f6;
+        --border: #e6e9ee;
+        --border-strong: #d9dee6;
+        --text: #172033;
+        --muted: #687386;
+        --muted-soft: #929aaa;
+        --cyan: #23a7c9;
+        --cyan-soft: #e4f7fb;
+        --green: #12b76a;
+        --amber: #f6b900;
+        --red: #ef4444;
+        --shadow: 0 10px 28px rgba(30, 41, 59, 0.055);
+        color-scheme: light;
+      }
+
+      * { box-sizing: border-box; }
+
+      html, body {
+        margin: 0;
+        background: var(--background);
+        color: var(--text);
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      button, input { font: inherit; color: inherit; }
+
+      .page {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 32px 24px 80px;
+      }
+
+      .page-head h1 {
+        margin: 0 0 6px;
+        font-family: "Space Grotesk", Inter, sans-serif;
+        font-size: 24px;
+      }
+
+      .page-head p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        max-width: 620px;
+        line-height: 1.55;
+      }
+
+      .principles {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin: 20px 0 28px;
+      }
+
+      .principle-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 18px;
+      }
+
+      .principle-card span {
+        display: inline-block;
+        margin-bottom: 8px;
+        border-radius: 999px;
+        background: var(--cyan-soft);
+        color: var(--cyan);
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        padding: 3px 10px;
+      }
+
+      .principle-card h3 {
+        margin: 0 0 6px;
+        font-size: 14px;
+      }
+
+      .principle-card p {
+        margin: 0;
+        color: var(--muted);
+        font-size: 12.5px;
+        line-height: 1.55;
+      }
+
+      .scale-note {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        background: #fff8e6;
+        border: 1px solid #f3e2ad;
+        border-radius: 10px;
+        padding: 10px 14px;
+        color: #8a6b12;
+        font-size: 12.5px;
+        margin-bottom: 24px;
+      }
+
+      .scale-note strong { color: #6b520e; }
+
+      .crumbs {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: 16px;
+        font-size: 13px;
+      }
+
+      .crumb {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        cursor: pointer;
+        padding: 4px 6px;
+        border-radius: 6px;
+      }
+
+      .crumb:hover { background: var(--surface-muted); color: var(--text); }
+      .crumb.is-current { color: var(--text); font-weight: 700; cursor: default; }
+      .crumb.is-current:hover { background: transparent; }
+      .crumb-sep { color: var(--muted-soft); }
+
+      .level-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .level-head h2 {
+        margin: 0;
+        font-family: "Space Grotesk", Inter, sans-serif;
+        font-size: 18px;
+      }
+
+      .level-head p {
+        margin: 3px 0 0;
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+
+      .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 12px;
+      }
+
+      .drill-card {
+        text-align: left;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        cursor: pointer;
+        transition: box-shadow 0.12s, border-color 0.12s;
+      }
+
+      .drill-card:hover, .drill-card:focus-visible {
+        border-color: #a7d3e3;
+        box-shadow: var(--shadow);
+        outline: none;
+      }
+
+      .drill-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .drill-card-top strong {
+        font-size: 14px;
+        line-height: 1.35;
+      }
+
+      .drill-card-metric {
+        flex: 0 0 auto;
+        font-family: "Space Grotesk", Inter, sans-serif;
+        font-size: 16px;
+        font-weight: 750;
+      }
+
+      .drill-card-metric.is-empty { color: var(--muted-soft); font-size: 12px; font-weight: 600; }
+
+      .drill-card-meta {
+        margin-top: 8px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .drill-card-coverage {
+        margin-top: 10px;
+        height: 6px;
+        border-radius: 4px;
+        background: var(--surface-muted);
+        overflow: hidden;
+      }
+
+      .drill-card-coverage span {
+        display: block;
+        height: 100%;
+        background: var(--cyan);
+      }
+
+      .skill-section {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+      }
+
+      .skill-section-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .skill-section-head h3 {
+        margin: 0;
+        font-size: 13px;
+      }
+
+      .skill-section-head p {
+        margin: 2px 0 0;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .tagged-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 90px auto;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 0;
+        border-top: 1px solid var(--border);
+      }
+
+      .tagged-row:first-of-type { border-top: 0; }
+
+      .tagged-row strong { font-size: 13px; display: block; }
+      .tagged-row small { color: var(--muted); font-size: 11.5px; }
+
+      .tagged-bar {
+        height: 8px;
+        border-radius: 5px;
+        background: var(--surface-muted);
+        overflow: hidden;
+      }
+
+      .tagged-bar span { display: block; height: 100%; }
+
+      .tagged-value {
+        min-width: 40px;
+        text-align: right;
+        font-weight: 750;
+        font-size: 13px;
+      }
+
+      .untagged-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        padding: 4px 0;
+        text-align: left;
+      }
+
+      .untagged-toggle strong { font-size: 13px; }
+      .untagged-toggle small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+      .untagged-toggle .chev {
+        transition: transform 0.15s;
+        color: var(--muted);
+      }
+
+      .untagged-toggle[aria-expanded="true"] .chev { transform: rotate(180deg); }
+
+      .untagged-body { margin-top: 14px; display: none; }
+      .untagged-body.is-open { display: block; }
+
+      .untagged-search {
+        width: 100%;
+        border: 1px solid var(--border-strong);
+        border-radius: 8px;
+        padding: 9px 12px;
+        font-size: 13px;
+        margin-bottom: 10px;
+      }
+
+      .untagged-search:focus { outline: 2px solid var(--cyan-soft); border-color: var(--cyan); }
+
+      .untagged-list {
+        display: grid;
+        gap: 2px;
+      }
+
+      .untagged-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 7px 8px;
+        border-radius: 6px;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+
+      .untagged-item:hover { background: var(--surface-muted); }
+      .untagged-item span:last-child { color: var(--muted-soft); font-size: 11px; }
+
+      .untagged-more {
+        margin-top: 8px;
+        color: var(--muted-soft);
+        font-size: 12px;
+        text-align: center;
+      }
+
+      .untagged-empty {
+        color: var(--muted-soft);
+        font-size: 12.5px;
+        padding: 10px 0;
+      }
+
+      @media (max-width: 640px) {
+        .principles { grid-template-columns: 1fr; }
+        .tagged-row { grid-template-columns: minmax(0, 1fr) 70px auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <div class="page-head">
+        <h1>Skills at scale — prototype</h1>
+        <p>A response to the concern about the Skills component overloading once the org's full SkillsFuture taxonomy (~45,000 unique skills, structured Sector → Category → Job Role → Skill) is loaded. This demonstrates two techniques working together.</p>
+      </div>
+
+      <div class="principles">
+        <div class="principle-card">
+          <span>1 · Hierarchy as navigation</span>
+          <h3>Drill down, don't scroll down</h3>
+          <p>Sector, Category and Job Role are now real screens, not just data fields. Each shows only its own children — a handful of cards, never a flat list of thousands.</p>
+        </div>
+        <div class="principle-card">
+          <span>2 · Evidence-first filtering</span>
+          <h3>Show what's tagged, hide the rest</h3>
+          <p>Only skills with at least one PALS/CBL evidence item render as full cards. Everything else collapses into a lightweight, searchable list — never rendered in bulk.</p>
+        </div>
+      </div>
+
+      <div class="scale-note" data-scale-note></div>
+
+      <nav class="crumbs" data-crumbs aria-label="Skills taxonomy breadcrumb"></nav>
+
+      <div data-level-content></div>
+    </div>
+
+    <script>
+      function hashSeed(str) {
+        let hash = 0;
+        for (let i = 0; i < str.length; i++) hash = (hash * 31 + str.charCodeAt(i)) >>> 0;
+        return hash;
+      }
+
+      function seededInt(seedStr, min, max) {
+        const seed = hashSeed(seedStr);
+        return min + (seed % (max - min + 1));
+      }
+
+      const WORD_A = ["Regulatory", "Client", "Data", "Risk", "Process", "Digital", "Operational", "Compliance", "Service", "Strategic", "Technical", "Quality", "Analytical", "Communication", "Systems", "Workflow", "Vendor", "Financial", "Clinical", "Infrastructure"];
+      const WORD_B = ["Reporting", "Analysis", "Handling", "Management", "Assessment", "Documentation", "Monitoring", "Planning", "Coordination", "Auditing", "Advisory", "Governance", "Optimization", "Facilitation", "Integration", "Evaluation", "Execution", "Review", "Design", "Escalation"];
+      const WORD_C = ["Fundamentals", "Level 2", "Level 3", "Advanced", "Intermediate", "Specialist Track", "Practitioner", "Foundation", "Applied", "Core"];
+
+      function skillNameFor(jobRoleName, index) {
+        const seed = `${jobRoleName}::${index}`;
+        const a = WORD_A[seededInt(seed + "a", 0, WORD_A.length - 1)];
+        const b = WORD_B[seededInt(seed + "b", 0, WORD_B.length - 1)];
+        const c = WORD_C[seededInt(seed + "c", 0, WORD_C.length - 1)];
+        const code = String(seededInt(seed + "code", 10000, 99999));
+        return `${a} ${b} — ${c} · TSC-${code}`;
+      }
+
+      function heatColor(v) {
+        let r, g, b;
+        if (v < 50) { const t = v / 50; r = 231 + (245 - 231) * t; g = 54 + (184 - 54) * t; b = 54 + (61 - 54) * t; }
+        else { const t = (v - 50) / 50; r = 245 + (12 - 245) * t; g = 184 + (173 - 184) * t; b = 61 + (96 - 61) * t; }
+        return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+      }
+
+      const TAXONOMY = [
+        {
+          name: "Financial Services",
+          categories: [
+            { name: "Advisory & Planning", roles: ["Advisory Associate", "Planning Analyst", "Senior Advisory Specialist"] },
+            { name: "Risk & Compliance", roles: ["Compliance Analyst", "Risk Associate", "Senior Compliance Specialist"] },
+            { name: "Operations & Reporting", roles: ["Operations Analyst", "Reporting Associate", "Senior Operations Specialist"] }
+          ]
+        },
+        {
+          name: "Healthcare",
+          categories: [
+            { name: "Clinical Support", roles: ["Clinical Support Associate", "Care Coordinator", "Senior Clinical Specialist"] },
+            { name: "Patient Services", roles: ["Patient Services Associate", "Intake Analyst", "Senior Patient Services Specialist"] },
+            { name: "Compliance & Safety", roles: ["Safety Analyst", "Compliance Associate", "Senior Safety Specialist"] }
+          ]
+        },
+        {
+          name: "Infocomm Technology",
+          categories: [
+            { name: "Cloud & Infrastructure", roles: ["Cloud Associate", "Infrastructure Analyst", "Senior Cloud Specialist"] },
+            { name: "Data & Analytics", roles: ["Data Analyst", "Analytics Associate", "Senior Data Specialist"] },
+            { name: "Cybersecurity", roles: ["Security Analyst", "Security Associate", "Senior Security Specialist"] }
+          ]
+        }
+      ];
+
+      function buildJobRole(sectorName, categoryName, roleName) {
+        const seedBase = `${sectorName}::${categoryName}::${roleName}`;
+        const poolSize = seededInt(seedBase + "pool", 60, 380);
+        const taggedCount = seededInt(seedBase + "tagged", 3, 9);
+
+        const skills = [];
+        for (let i = 0; i < poolSize; i++) {
+          const isTagged = i < taggedCount;
+          const name = skillNameFor(roleName, i);
+          skills.push({
+            name,
+            tagged: isTagged,
+            proficiency: isTagged ? seededInt(`${seedBase}::${i}::score`, 22, 97) : null
+          });
+        }
+        return { name: roleName, skills };
+      }
+
+      const DATA = TAXONOMY.map((sector) => ({
+        name: sector.name,
+        categories: sector.categories.map((category) => ({
+          name: category.name,
+          roles: category.roles.map((roleName) => buildJobRole(sector.name, category.name, roleName))
+        }))
+      }));
+
+      function allSkills(node) {
+        if (node.skills) return node.skills;
+        if (node.roles) return node.roles.flatMap(allSkills);
+        if (node.categories) return node.categories.flatMap(allSkills);
+        return [];
+      }
+
+      function aggregate(node) {
+        const skills = allSkills(node);
+        const tagged = skills.filter((s) => s.tagged);
+        const avg = tagged.length ? Math.round(tagged.reduce((sum, s) => sum + s.proficiency, 0) / tagged.length) : null;
+        return { total: skills.length, tagged: tagged.length, proficiency: avg };
+      }
+
+      const state = { sectorIndex: null, categoryIndex: null, roleIndex: null, untaggedOpen: false, untaggedQuery: "" };
+
+      const crumbsEl = document.querySelector("[data-crumbs]");
+      const contentEl = document.querySelector("[data-level-content]");
+      const scaleNoteEl = document.querySelector("[data-scale-note]");
+
+      function goHome() { state.sectorIndex = null; state.categoryIndex = null; state.roleIndex = null; render(); }
+      function goSector(i) { state.sectorIndex = i; state.categoryIndex = null; state.roleIndex = null; render(); }
+      function goCategory(i) { state.categoryIndex = i; state.roleIndex = null; render(); }
+      function goRole(i) { state.roleIndex = i; state.untaggedOpen = false; state.untaggedQuery = ""; render(); }
+
+      function renderCrumbs() {
+        const parts = [{ label: "All sectors", onClick: goHome }];
+        if (state.sectorIndex != null) {
+          const sector = DATA[state.sectorIndex];
+          parts.push({ label: sector.name, onClick: () => goSector(state.sectorIndex) });
+        }
+        if (state.categoryIndex != null) {
+          const category = DATA[state.sectorIndex].categories[state.categoryIndex];
+          parts.push({ label: category.name, onClick: () => goCategory(state.categoryIndex) });
+        }
+        if (state.roleIndex != null) {
+          const role = DATA[state.sectorIndex].categories[state.categoryIndex].roles[state.roleIndex];
+          parts.push({ label: role.name, onClick: null });
+        }
+
+        crumbsEl.innerHTML = "";
+        parts.forEach((part, i) => {
+          const btn = document.createElement("button");
+          btn.className = "crumb" + (part.onClick ? "" : " is-current");
+          btn.textContent = part.label;
+          if (part.onClick) btn.addEventListener("click", part.onClick);
+          else btn.disabled = true;
+          crumbsEl.appendChild(btn);
+          if (i < parts.length - 1) {
+            const sep = document.createElement("span");
+            sep.className = "crumb-sep";
+            sep.textContent = "/";
+            crumbsEl.appendChild(sep);
+          }
+        });
+      }
+
+      function drillCard({ title, meta, stats, onClick }) {
+        const btn = document.createElement("button");
+        btn.className = "drill-card";
+        btn.type = "button";
+        const metricHtml = stats.tagged
+          ? `<span class="drill-card-metric" style="color:${heatColor(stats.proficiency)}">${stats.proficiency}%</span>`
+          : `<span class="drill-card-metric is-empty">No evidence yet</span>`;
+        const coveragePct = stats.total ? Math.min(100, (stats.tagged / stats.total) * 100) : 0;
+        btn.innerHTML = `
+          <div class="drill-card-top"><strong>${title}</strong>${metricHtml}</div>
+          <div class="drill-card-meta">${meta}</div>
+          <div class="drill-card-meta">${stats.tagged.toLocaleString()} of ${stats.total.toLocaleString()} skills tagged</div>
+          <div class="drill-card-coverage"><span style="width:${coveragePct}%"></span></div>`;
+        btn.addEventListener("click", onClick);
+        return btn;
+      }
+
+      function renderSectorLevel() {
+        const grandTotal = DATA.reduce((sum, sector) => sum + aggregate(sector).total, 0);
+        scaleNoteEl.innerHTML = `<strong>${grandTotal.toLocaleString()} skills</strong> loaded from the taxonomy across ${DATA.length} sectors (a scaled-down stand-in for the real ~45,000). Only the tagged ones ever render as full cards.`;
+
+        contentEl.innerHTML = "";
+        const head = document.createElement("div");
+        head.className = "level-head";
+        head.innerHTML = `<div><h2>Sectors</h2><p>Pick a sector to see its categories.</p></div>`;
+        contentEl.appendChild(head);
+
+        const grid = document.createElement("div");
+        grid.className = "card-grid";
+        DATA.forEach((sector, i) => {
+          const stats = aggregate(sector);
+          grid.appendChild(drillCard({
+            title: sector.name,
+            meta: `${sector.categories.length} categories`,
+            stats,
+            onClick: () => goSector(i)
+          }));
+        });
+        contentEl.appendChild(grid);
+      }
+
+      function renderCategoryLevel() {
+        const sector = DATA[state.sectorIndex];
+        const sectorStats = aggregate(sector);
+        scaleNoteEl.innerHTML = `<strong>${sectorStats.total.toLocaleString()} skills</strong> sit under ${sector.name}. Only ${sectorStats.tagged} are tagged with evidence so far.`;
+
+        contentEl.innerHTML = "";
+        const head = document.createElement("div");
+        head.className = "level-head";
+        head.innerHTML = `<div><h2>${sector.name}</h2><p>Pick a category to see its job roles.</p></div>`;
+        contentEl.appendChild(head);
+
+        const grid = document.createElement("div");
+        grid.className = "card-grid";
+        sector.categories.forEach((category, i) => {
+          const stats = aggregate(category);
+          grid.appendChild(drillCard({
+            title: category.name,
+            meta: `${category.roles.length} job roles`,
+            stats,
+            onClick: () => goCategory(i)
+          }));
+        });
+        contentEl.appendChild(grid);
+      }
+
+      function renderRoleLevel() {
+        const sector = DATA[state.sectorIndex];
+        const category = sector.categories[state.categoryIndex];
+        const categoryStats = aggregate(category);
+        scaleNoteEl.innerHTML = `<strong>${categoryStats.total.toLocaleString()} skills</strong> sit under ${category.name}. Only ${categoryStats.tagged} are tagged with evidence so far.`;
+
+        contentEl.innerHTML = "";
+        const head = document.createElement("div");
+        head.className = "level-head";
+        head.innerHTML = `<div><h2>${category.name}</h2><p>Pick a job role to see its individual skills.</p></div>`;
+        contentEl.appendChild(head);
+
+        const grid = document.createElement("div");
+        grid.className = "card-grid";
+        category.roles.forEach((role, i) => {
+          const stats = aggregate(role);
+          grid.appendChild(drillCard({
+            title: role.name,
+            meta: `${stats.total.toLocaleString()} mapped skills`,
+            stats,
+            onClick: () => goRole(i)
+          }));
+        });
+        contentEl.appendChild(grid);
+      }
+
+      function renderRoleSkills() {
+        const sector = DATA[state.sectorIndex];
+        const category = sector.categories[state.categoryIndex];
+        const role = category.roles[state.roleIndex];
+        const tagged = role.skills.filter((s) => s.tagged);
+        const untagged = role.skills.filter((s) => !s.tagged);
+
+        scaleNoteEl.innerHTML = `<strong>${role.skills.length.toLocaleString()} skills</strong> are mapped to ${role.name} in the taxonomy. Only ${tagged.length} have PALS/CBL evidence — that's the only reason this screen stays short.`;
+
+        contentEl.innerHTML = "";
+        const head = document.createElement("div");
+        head.className = "level-head";
+        head.innerHTML = `<div><h2>${role.name}</h2><p>${sector.name} · ${category.name}</p></div>`;
+        contentEl.appendChild(head);
+
+        const taggedSection = document.createElement("div");
+        taggedSection.className = "skill-section";
+        taggedSection.innerHTML = `
+          <div class="skill-section-head">
+            <div><h3>Tagged skills — evidence available (${tagged.length})</h3><p>Rendered in full because the list is always small: it only grows as your org actually maps evidence.</p></div>
+          </div>`;
+        const rows = document.createElement("div");
+        [...tagged].sort((a, b) => b.proficiency - a.proficiency).forEach((skill) => {
+          const row = document.createElement("div");
+          row.className = "tagged-row";
+          row.innerHTML = `
+            <div><strong>${skill.name}</strong><small>PALS + CBL evidence combined</small></div>
+            <div class="tagged-bar"><span style="width:${skill.proficiency}%;background:${heatColor(skill.proficiency)}"></span></div>
+            <div class="tagged-value" style="color:${heatColor(skill.proficiency)}">${skill.proficiency}%</div>`;
+          rows.appendChild(row);
+        });
+        taggedSection.appendChild(rows);
+        contentEl.appendChild(taggedSection);
+
+        const untaggedSection = document.createElement("div");
+        untaggedSection.className = "skill-section";
+        const toggle = document.createElement("button");
+        toggle.className = "untagged-toggle";
+        toggle.type = "button";
+        toggle.setAttribute("aria-expanded", String(state.untaggedOpen));
+        toggle.innerHTML = `
+          <span><strong>No evidence yet (${untagged.length.toLocaleString()})</strong><small>Never rendered in bulk — search to find one, or map evidence to bring it into the list above.</small></span>
+          <span class="chev">&#9660;</span>`;
+        toggle.addEventListener("click", () => { state.untaggedOpen = !state.untaggedOpen; render(); });
+        untaggedSection.appendChild(toggle);
+
+        const body = document.createElement("div");
+        body.className = "untagged-body" + (state.untaggedOpen ? " is-open" : "");
+
+        const search = document.createElement("input");
+        search.className = "untagged-search";
+        search.type = "search";
+        search.placeholder = `Search ${untagged.length.toLocaleString()} untagged skills by name…`;
+        search.value = state.untaggedQuery;
+        search.addEventListener("input", (e) => { state.untaggedQuery = e.target.value; renderUntaggedList(list, untagged); });
+        body.appendChild(search);
+
+        const list = document.createElement("div");
+        list.className = "untagged-list";
+        body.appendChild(list);
+        untaggedSection.appendChild(body);
+        contentEl.appendChild(untaggedSection);
+
+        if (state.untaggedOpen) renderUntaggedList(list, untagged);
+      }
+
+      function renderUntaggedList(listEl, untagged) {
+        const query = state.untaggedQuery.trim().toLowerCase();
+        const matches = query ? untagged.filter((s) => s.name.toLowerCase().includes(query)) : untagged;
+        const CAP = 30;
+        const shown = matches.slice(0, CAP);
+
+        listEl.innerHTML = "";
+        if (!shown.length) {
+          const empty = document.createElement("div");
+          empty.className = "untagged-empty";
+          empty.textContent = query ? "No untagged skills match that search." : "Nothing to show.";
+          listEl.appendChild(empty);
+          return;
+        }
+
+        shown.forEach((skill) => {
+          const item = document.createElement("div");
+          item.className = "untagged-item";
+          item.innerHTML = `<span>${skill.name}</span><span>not tagged</span>`;
+          listEl.appendChild(item);
+        });
+
+        if (matches.length > CAP) {
+          const more = document.createElement("div");
+          more.className = "untagged-more";
+          more.textContent = query
+            ? `+${(matches.length - CAP).toLocaleString()} more match — refine your search to narrow it down.`
+            : `Showing ${CAP} of ${matches.length.toLocaleString()} — search by name to find a specific one.`;
+          listEl.appendChild(more);
+        }
+      }
+
+      function render() {
+        renderCrumbs();
+        if (state.sectorIndex == null) renderSectorLevel();
+        else if (state.categoryIndex == null) renderCategoryLevel();
+        else if (state.roleIndex == null) renderRoleLevel();
+        else renderRoleSkills();
+      }
+
+      render();
+    </script>
+  </body>
+</html>

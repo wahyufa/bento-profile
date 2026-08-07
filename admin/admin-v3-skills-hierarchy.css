@@ -1,0 +1,152 @@
+/* Skills hierarchy prototype — adds Sector > Category > Job Role drill-down
+   navigation on top of the existing admin-v3 Skills tab. Reuses admin-v3.css
+   tokens/classes wherever the shape matches (skills-v3-row, skills-v3-untagged,
+   skills-v3-empty-filter); only the new grid/breadcrumb/card pieces live here. */
+
+.skills-v3-hier-scale-note {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #fff8e6;
+  border: 1px solid #f3e2ad;
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #8a6b12;
+  font-size: 12.5px;
+  margin-bottom: 16px;
+}
+
+.skills-v3-hier-scale-note strong {
+  color: #6b520e;
+}
+
+.skills-v3-hier-crumbs {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 14px;
+  font-size: 13px;
+}
+
+.skills-v3-hier-crumb {
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.skills-v3-hier-crumb:hover {
+  background: var(--surface-muted);
+  color: var(--text);
+}
+
+.skills-v3-hier-crumb.is-current {
+  color: var(--text);
+  font-weight: 700;
+  cursor: default;
+}
+
+.skills-v3-hier-crumb.is-current:hover {
+  background: transparent;
+}
+
+.skills-v3-hier-crumb-sep {
+  color: var(--muted-soft);
+  padding: 0 1px;
+}
+
+.skills-v3-hier-head {
+  margin-bottom: 12px;
+}
+
+.skills-v3-hier-head h3 {
+  margin: 0;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 15px;
+}
+
+.skills-v3-hier-head p {
+  margin: 3px 0 0;
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.skills-v3-hier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.skills-v3-hier-card {
+  text-align: left;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  padding: 14px;
+  cursor: pointer;
+  transition: box-shadow 0.12s, border-color 0.12s;
+  font: inherit;
+  color: inherit;
+}
+
+.skills-v3-hier-card:hover,
+.skills-v3-hier-card:focus-visible {
+  border-color: #a7d3e3;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
+  outline: none;
+}
+
+.skills-v3-hier-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.skills-v3-hier-card-top strong {
+  font-size: 13.5px;
+  line-height: 1.35;
+}
+
+.skills-v3-hier-card-metric {
+  flex: 0 0 auto;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 15px;
+  font-weight: 750;
+}
+
+.skills-v3-hier-card-metric.is-empty {
+  color: var(--muted-soft);
+  font-size: 11.5px;
+  font-weight: 600;
+}
+
+.skills-v3-hier-card-meta {
+  margin-top: 7px;
+  color: var(--muted);
+  font-size: 11.5px;
+}
+
+.skills-v3-hier-card-coverage {
+  margin-top: 9px;
+  height: 6px;
+  border-radius: 4px;
+  background: var(--surface-muted);
+  overflow: hidden;
+}
+
+.skills-v3-hier-card-coverage span {
+  display: block;
+  height: 100%;
+  background: var(--cyan);
+}
+
+@media (max-width: 640px) {
+  .skills-v3-hier-grid {
+    grid-template-columns: 1fr;
+  }
+}
