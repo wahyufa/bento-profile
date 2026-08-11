@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ATLAS — Leaderboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --navy-900: #101d33;
+    --navy-800: #16274a;
+    --navy-700: #1c3157;
+    --teal: #1a7a95;
+    --teal-dark: #145f74;
+    --gold: #f5b942;
+    --silver: #b7bfc9;
+    --bronze: #e0965a;
+    --badge-orange: #ef6a3c;
+    --progress-blue: #2f6fed;
+    --text-dark: #1c2a3d;
+    --text-muted: #6c7788;
+    --text-faint: #99a2b0;
+    --bg-page: #eef1f4;
+    --border: #e6e9ee;
+    --card-shadow: 0 1px 3px rgba(16, 29, 51, 0.06);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg-page);
+    color: var(--text-dark);
+    font-family: Montserrat, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+
+  a { text-decoration: none; color: inherit; }
+
+  .wrap {
+    width: min(1200px, calc(100% - 48px));
+    margin: 0 auto;
+  }
+
+  /* ---------- Top nav ---------- */
+  .topbar {
+    background: #fff;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .topbar .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 68px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .brand-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    background: linear-gradient(135deg, #ff9a3c, #16274a 60%);
+    display: grid;
+    place-items: center;
+    color: #fff;
+    font-size: 17px;
+  }
+
+  .brand-text {
+    line-height: 1.1;
+  }
+
+  .brand-text .name {
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: 0.5px;
+    color: var(--navy-800);
+  }
+
+  .brand-text .tag {
+    font-size: 10.5px;
+    color: var(--text-faint);
+    font-weight: 600;
+  }
+
+  .top-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 30px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #4a5568;
+  }
+
+  .top-nav a { padding: 6px 0; }
+  .top-nav a:hover { color: var(--navy-800); }
+
+  .top-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .bell {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    color: #46536b;
+    cursor: pointer;
+  }
+  .bell:hover { background: #f2f4f7; }
+
+  .bell .badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    min-width: 15px;
+    height: 15px;
+    padding: 0 3px;
+    border-radius: 999px;
+    background: #f5a623;
+    color: #fff;
+    font-size: 9.5px;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    border: 2px solid #fff;
+  }
+
+  .avatar-user {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: var(--navy-800);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+
+  /* ---------- Header banner ---------- */
+  .hero {
+    background:
+      radial-gradient(rgba(255,255,255,0.06) 1px, transparent 1px) 0 0/16px 16px,
+      linear-gradient(120deg, #142644, #0f1c31 70%);
+    padding: 44px 0 56px;
+  }
+
+  .hero h1 {
+    margin: 0 0 8px;
+    color: #fff;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: 0.2px;
+  }
+
+  .hero p {
+    margin: 0;
+    color: #a9b4c6;
+    font-size: 14.5px;
+  }
+
+  /* ---------- Page body ---------- */
+  .page {
+    padding-top: 28px;
+    padding-bottom: 60px;
+  }
+
+  /* Category selector ("one door" into each feature's leaderboard) —
+     plain underline tabs read as product navigation, not a game menu. */
+  .category-tabs {
+    display: flex;
+    gap: 30px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 22px;
+  }
+
+  .cat-tab {
+    background: transparent;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-muted);
+    padding: 0 0 12px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+
+  .cat-tab.active {
+    color: var(--navy-800);
+    border-bottom-color: var(--navy-800);
+  }
+
+  .cat-tab:not(.active):hover { color: var(--text-dark); }
+
+  /* Tabs row */
+  .tabs-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+
+  .tabs {
+    display: inline-flex;
+    background: #e3e7ec;
+    border-radius: 999px;
+    padding: 4px;
+    gap: 2px;
+  }
+
+  .tab {
+    border: 0;
+    background: transparent;
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 600;
+    color: #5b6576;
+    padding: 10px 26px;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+
+  .tab.active {
+    background: var(--teal);
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(26, 122, 149, 0.35);
+  }
+
+  .tab:not(.active):hover { color: var(--navy-800); }
+
+  .xp-info-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-dark);
+    cursor: pointer;
+    box-shadow: var(--card-shadow);
+  }
+  .xp-info-btn:hover { border-color: #d5dae1; }
+
+  /* Top performers + rank row */
+  .top-row {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .top-performers {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    padding: 22px;
+  }
+
+  .top-performers h2 {
+    margin: 0 0 16px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .performer-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .performer-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .performer-card.r1 { border-color: #ecd9a6; background: #fffaf0; }
+  .performer-card.r2 { border-color: #dfe3e8; background: #f9fafb; }
+  .performer-card.r3 { border-color: #f0dcc7; background: #fdf8f3; }
+
+  .performer-top { display: flex; align-items: center; justify-content: space-between; }
+
+  .rank-chip {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-size: 12px;
+    font-weight: 800;
+    flex-shrink: 0;
+    background: #eef1f4;
+    color: var(--text-muted);
+  }
+  .rank-chip.r1 { background: #f5b942; color: #5c3d05; }
+  .rank-chip.r2 { background: #c7ccd3; color: #37404d; }
+  .rank-chip.r3 { background: #e0965a; color: #5c3005; }
+
+  .performer-id { display: flex; align-items: center; gap: 10px; }
+
+  .performer-id .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    background: var(--teal);
+    color: #fff;
+    font-weight: 700;
+    font-size: 12px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .performer-id .pname { font-weight: 700; font-size: 14px; color: var(--text-dark); }
+  .performer-xp { font-size: 20px; font-weight: 800; color: var(--navy-800); line-height: 1; }
+
+  .performer-stats {
+    display: flex;
+    gap: 16px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    padding-top: 12px;
+  }
+  .performer-stats span { display: inline-flex; align-items: center; gap: 5px; }
+
+  .rank-card {
+    background: linear-gradient(160deg, #1c3157, #101d33);
+    border-radius: 16px;
+    color: #fff;
+    padding: 24px 22px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .rank-card .rank-num {
+    font-size: 40px;
+    font-weight: 800;
+    line-height: 1;
+  }
+  .rank-card .rank-num .hash { font-size: 22px; font-weight: 700; vertical-align: 6px; margin-right: 2px; color: #9fb0cc; }
+
+  .rank-card .rank-label {
+    font-size: 12.5px;
+    color: #a9b4c6;
+    margin: 4px 0 12px;
+  }
+
+  .rank-card .org-pill {
+    display: inline-block;
+    margin: 0 auto 20px;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.14);
+    border-radius: 999px;
+    padding: 5px 14px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #cdd6e4;
+  }
+
+  .rank-stats {
+    display: flex;
+    justify-content: space-between;
+    border-top: 1px solid rgba(255,255,255,0.12);
+    padding-top: 16px;
+    margin-top: auto;
+  }
+
+  .rank-stats div { flex: 1; }
+
+  .rank-stats .val {
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  .rank-stats .lbl {
+    font-size: 10px;
+    color: #93a0b8;
+    margin-top: 2px;
+    line-height: 1.3;
+  }
+
+  /* Table */
+  .table-card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+
+  .table-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f7f8fa;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 12px;
+    flex: 1;
+    max-width: 280px;
+    color: var(--text-faint);
+  }
+
+  .search-box input {
+    border: 0;
+    background: transparent;
+    outline: 0;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--text-dark);
+    width: 100%;
+  }
+
+  .export-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dark);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .export-btn:hover { border-color: #c9d2dd; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  thead th {
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.4px;
+    color: var(--text-faint);
+    background: #f7f8fa;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  tbody td {
+    padding: 13px 20px;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+    vertical-align: middle;
+  }
+
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr.me { background: #e9f1fb; }
+
+  .col-rank { width: 70px; }
+  .col-xp { width: 220px; }
+  .col-streak { width: 150px; }
+  .col-badges { width: 110px; }
+
+  .rank-cell { display: flex; align-items: center; }
+  .rank-plain { padding-left: 8px; font-weight: 600; color: var(--text-dark); }
+
+  .learner-cell { display: flex; align-items: center; gap: 12px; }
+
+  .init-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: var(--teal);
+    color: #fff;
+    font-size: 11.5px;
+    font-weight: 700;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+
+  .learner-name { font-weight: 600; color: var(--text-dark); display: inline-flex; align-items: center; gap: 8px; }
+
+  .you-pill {
+    background: var(--navy-800);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 999px;
+    letter-spacing: 0.3px;
+  }
+
+  .xp-cell .xp-val { font-weight: 700; color: var(--text-dark); margin-bottom: 6px; }
+  .xp-bar { width: 100%; max-width: 140px; height: 5px; border-radius: 999px; background: #e6e9ee; overflow: hidden; }
+  .xp-bar span { display: block; height: 100%; background: var(--progress-blue); border-radius: 999px; }
+
+  .streak-cell { display: inline-flex; align-items: center; gap: 6px; color: var(--text-dark); font-weight: 600; }
+  .bolt { color: #f5a623; }
+
+  .badges-cell { display: inline-flex; align-items: center; gap: 6px; color: var(--text-dark); font-weight: 600; }
+  .badge-check {
+    width: 17px;
+    height: 17px;
+    border-radius: 5px;
+    background: var(--badge-orange);
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .badge-check svg { width: 10px; height: 10px; }
+
+  .table-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    font-size: 12.5px;
+    color: var(--text-muted);
+  }
+
+  .pg-btns { display: flex; gap: 6px; }
+
+  .pg-btn {
+    width: 28px;
+    height: 28px;
+    border: 1px solid var(--border);
+    background: #fff;
+    border-radius: 7px;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    color: var(--text-dark);
+    font-family: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+  }
+  .pg-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .pg-btn.active { background: var(--navy-800); color: #fff; border-color: var(--navy-800); }
+
+  @media (max-width: 860px) {
+    .top-row { grid-template-columns: 1fr; }
+    .top-nav { display: none; }
+    .performer-grid { grid-template-columns: 1fr; }
+    thead th:nth-child(4), tbody td:nth-child(4) { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <header class="topbar">
+    <div class="wrap">
+      <div class="brand">
+        <span class="brand-icon">📖</span>
+        <span class="brand-text">
+          <div class="name">ATLAS</div>
+          <div class="tag">By HeyHi</div>
+        </span>
+      </div>
+
+      <nav class="top-nav">
+        <a href="#">Dashboard</a>
+        <a href="#">Courses</a>
+        <a href="#">Assessments</a>
+        <a href="#">CBL</a>
+        <a href="#">Performance</a>
+        <a href="#">PALS</a>
+      </nav>
+
+      <div class="top-actions">
+        <span class="bell">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <span class="badge">2</span>
+        </span>
+        <span class="avatar-user">S</span>
+      </div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="wrap">
+      <h1 id="hero-title">Leaderboard</h1>
+      <p id="hero-subtitle">XP earned across all learning activities — PALS, Assessments, Bites, CBL &amp; Chapter Reviews.</p>
+    </div>
+  </section>
+
+  <main class="page">
+    <div class="wrap">
+
+      <div class="category-tabs" id="category-row"></div>
+
+      <div class="tabs-row">
+        <div class="tabs" id="tabs">
+          <button class="tab active" data-tab="Organization">Organization</button>
+          <button class="tab" data-tab="Department">Department</button>
+          <button class="tab" data-tab="Group">Group</button>
+        </div>
+        <button class="xp-info-btn">✦ How XP is earned?</button>
+      </div>
+
+      <div class="top-row">
+        <div class="top-performers">
+          <h2>Top performers</h2>
+          <div class="performer-grid" id="performer-grid"></div>
+        </div>
+        <div class="rank-card" id="rank-card"></div>
+      </div>
+
+      <div class="table-card">
+        <div class="table-toolbar">
+          <label class="search-box">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            <input type="text" id="search-input" placeholder="Search learner..." />
+          </label>
+          <button class="export-btn" id="export-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Export CSV
+          </button>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th class="col-rank">RANK</th>
+              <th>LEARNER</th>
+              <th class="col-xp">XP</th>
+              <th class="col-streak">CURRENT STREAK</th>
+              <th class="col-badges">BADGES</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body"></tbody>
+        </table>
+        <div class="table-footer">
+          <span id="footer-count"></span>
+          <div class="pg-btns" id="pg-btns"></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const boltIcon = '<svg class="bolt" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2 3 14h7l-1 8 11-14h-7l1-6z"/></svg>';
+    const checkIcon = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+    const PAGE_SIZE = 10;
+
+    function rankChip(rank) {
+      return rank <= 3
+        ? `<span class="rank-chip r${rank}">${rank}</span>`
+        : `<span class="rank-plain">${rank}</span>`;
+    }
+
+    // Shared pool of learners so the same people can rank differently in each
+    // feature's leaderboard (index 13 = the signed-in user, Nathan Langosh).
+    const NAME_POOL = [
+      { init: 'WL', name: 'Wei Lin' },
+      { init: 'M',  name: 'Marcus' },
+      { init: 'R',  name: 'Richard' },
+      { init: 'EM', name: 'Earnest Marvin' },
+      { init: 'JH', name: 'Jody Hyatt DVM' },
+      { init: 'EK', name: 'Evan Kirlin' },
+      { init: 'BK', name: 'Brandon Krajcik DDS' },
+      { init: 'KH', name: 'Kelvin Hirthe' },
+      { init: 'SO', name: 'Sherman Oberbrunner' },
+      { init: 'BB', name: 'Beverly Boyer' },
+      { init: 'MK', name: 'Miss Marc Kilback' },
+      { init: 'DB', name: 'Dana Bartoletti' },
+      { init: 'PW', name: 'Mr. Peggy Wolff' },
+      { init: 'NL', name: 'Nathan Langosh', me: true },
+      { init: 'BA', name: 'Byron Armstrong' },
+      { init: 'RC', name: 'Randolph Conn' },
+      { init: 'RN', name: 'Ron Cronin' },
+      { init: 'RH', name: 'Rickey Harber' },
+      { init: 'JM', name: 'Mrs. Jimmy McGlynn' },
+      { init: 'TH', name: 'Tracey Heidenreich IV' },
+    ];
+
+    // Rank-position pattern for streak/badge counts — engagement tapers the
+    // further down the board a learner sits, regardless of category.
+    const STREAKS = ['18d', '15d', '12d', '8d', '5d', '3d', '-', '2d', '4d', '5d', '5d', '5d', '5d', '5d', '5d', '5d', '5d', '5d', '5d', '5d'];
+    const BADGES  = [9, 7, 6, 4, 3, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1];
+
+    function buildRows(order, topXp, decay) {
+      return order.map((personIdx, i) => {
+        const p = NAME_POOL[personIdx];
+        return {
+          rank: i + 1,
+          init: p.init,
+          name: p.name,
+          me: !!p.me,
+          xp: Math.round((topXp * Math.pow(decay, i)) / 5) * 5,
+          streak: STREAKS[i],
+          badges: BADGES[i],
+        };
+      });
+    }
+
+    const CATEGORIES = {
+      overall: {
+        label: 'Overall',
+        subtitle: 'XP earned across all learning activities — PALS, Assessments, Bites, CBL & Chapter Reviews.',
+        // Exact figures from the original design — kept as-is rather than generated.
+        rows: [
+          { rank: 1,  init: 'WL', name: 'Wei Lin',             xp: 6820, streak: '18d', badges: 9 },
+          { rank: 2,  init: 'M',  name: 'Marcus',               xp: 5940, streak: '15d', badges: 7 },
+          { rank: 3,  init: 'R',  name: 'Richard',              xp: 4210, streak: '12d', badges: 6 },
+          { rank: 4,  init: 'EM', name: 'Earnest Marvin',       xp: 3660, streak: '8d',  badges: 4 },
+          { rank: 5,  init: 'JH', name: 'Jody Hyatt DVM',       xp: 3200, streak: '5d',  badges: 3 },
+          { rank: 6,  init: 'EK', name: 'Evan Kirlin',          xp: 2590, streak: '3d',  badges: 2 },
+          { rank: 7,  init: 'BK', name: 'Brandon Krajcik DDS',  xp: 2575, streak: '-',   badges: 2 },
+          { rank: 8,  init: 'KH', name: 'Kelvin Hirthe',        xp: 2560, streak: '2d',  badges: 1 },
+          { rank: 9,  init: 'SO', name: 'Sherman Oberbrunner',  xp: 2545, streak: '4d',  badges: 1 },
+          { rank: 10, init: 'BB', name: 'Beverly Boyer',        xp: 2535, streak: '5d',  badges: 1 },
+          { rank: 11, init: 'MK', name: 'Miss Marc Kilback',    xp: 2525, streak: '5d',  badges: 1 },
+          { rank: 12, init: 'DB', name: 'Dana Bartoletti',      xp: 2500, streak: '5d',  badges: 1 },
+          { rank: 13, init: 'PW', name: 'Mr. Peggy Wolff',      xp: 2485, streak: '5d',  badges: 1 },
+          { rank: 14, init: 'NL', name: 'Nathan Langosh',       xp: 2480, streak: '12d', badges: 6, me: true },
+          { rank: 15, init: 'BA', name: 'Byron Armstrong',      xp: 2400, streak: '5d',  badges: 1 },
+          { rank: 16, init: 'RC', name: 'Randolph Conn',        xp: 2320, streak: '5d',  badges: 1 },
+          { rank: 17, init: 'RN', name: 'Ron Cronin',           xp: 2310, streak: '5d',  badges: 1 },
+          { rank: 18, init: 'RH', name: 'Rickey Harber',        xp: 2105, streak: '5d',  badges: 1 },
+          { rank: 19, init: 'JM', name: 'Mrs. Jimmy McGlynn',   xp: 2005, streak: '5d',  badges: 1 },
+          { rank: 20, init: 'TH', name: 'Tracey Heidenreich IV',xp: 1935, streak: '5d',  badges: 1 },
+        ],
+      },
+      assessments: {
+        label: 'Assessments',
+        subtitle: 'XP earned from quizzes, mock tests & chapter assessments.',
+        rows: buildRows([1, 3, 7, 13, 0, 5, 2, 9, 4, 6, 8, 10, 12, 14, 11, 15, 16, 17, 18, 19], 4850, 0.93),
+      },
+      cbl: {
+        label: 'CBL',
+        subtitle: 'XP earned from Case-Based Learning discussions & submissions.',
+        rows: buildRows([2, 5, 0, 8, 11, 1, 6, 4, 13, 9, 3, 7, 10, 12, 14, 15, 16, 17, 18, 19], 3400, 0.935),
+      },
+      course: {
+        label: 'Course',
+        subtitle: 'XP earned from course lessons, videos & reading materials.',
+        rows: buildRows([4, 0, 7, 2, 9, 1, 11, 6, 3, 8, 5, 10, 12, 14, 15, 13, 16, 17, 18, 19], 5200, 0.925),
+      },
+      pals: {
+        label: 'PALS Course',
+        subtitle: 'XP earned from PALS practice sessions & peer reviews.',
+        rows: buildRows([6, 13, 0, 3, 9, 2, 8, 5, 11, 4, 7, 10, 12, 14, 15, 16, 17, 18, 19, 1], 2900, 0.93),
+      },
+    };
+
+    const performerGrid = document.getElementById('performer-grid');
+    const rankEl = document.getElementById('rank-card');
+    const tbody = document.getElementById('leaderboard-body');
+    const subtitleEl = document.getElementById('hero-subtitle');
+    const catRow = document.getElementById('category-row');
+    const searchInput = document.getElementById('search-input');
+    const exportBtn = document.getElementById('export-btn');
+    const footerCount = document.getElementById('footer-count');
+    const pgBtns = document.getElementById('pg-btns');
+
+    let currentKey = 'overall';
+    let currentPage = 1;
+    let currentQuery = '';
+
+    function performerCard(rank, r) {
+      return `
+        <div class="performer-card r${rank}">
+          <div class="performer-top">
+            ${rankChip(rank)}
+            ${r.me ? '<span class="you-pill">YOU</span>' : ''}
+          </div>
+          <div class="performer-id">
+            <span class="avatar">${r.init}</span>
+            <span class="pname">${r.name}</span>
+          </div>
+          <div class="performer-xp">${r.xp.toLocaleString()} XP</div>
+          <div class="performer-stats">
+            <span>${boltIcon} ${r.streak}</span>
+            <span><span class="badge-check">${checkIcon}</span> ${r.badges}</span>
+          </div>
+        </div>`;
+    }
+
+    function filteredRows(cat) {
+      const q = currentQuery.trim().toLowerCase();
+      return q ? cat.rows.filter(r => r.name.toLowerCase().includes(q)) : cat.rows;
+    }
+
+    function renderTable() {
+      const cat = CATEGORIES[currentKey];
+      const maxXp = cat.rows[0].xp;
+      const rows = filteredRows(cat);
+      const totalPages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+      currentPage = Math.min(currentPage, totalPages);
+      const start = (currentPage - 1) * PAGE_SIZE;
+      const pageRows = rows.slice(start, start + PAGE_SIZE);
+
+      tbody.innerHTML = pageRows.map(r => `
+        <tr class="${r.me ? 'me' : ''}">
+          <td class="col-rank">
+            <div class="rank-cell">${rankChip(r.rank)}</div>
+          </td>
+          <td>
+            <div class="learner-cell">
+              <span class="init-avatar">${r.init}</span>
+              <span class="learner-name">${r.name} ${r.me ? '<span class="you-pill">YOU</span>' : ''}</span>
+            </div>
+          </td>
+          <td class="xp-cell col-xp">
+            <div class="xp-val">${r.xp.toLocaleString()}</div>
+            <div class="xp-bar"><span style="width:${Math.max(4, (r.xp / maxXp) * 100)}%"></span></div>
+          </td>
+          <td class="col-streak">
+            <span class="streak-cell">${boltIcon} ${r.streak}</span>
+          </td>
+          <td class="col-badges">
+            <span class="badges-cell"><span class="badge-check">${checkIcon}</span> ${r.badges}</span>
+          </td>
+        </tr>
+      `).join('') || `<tr><td colspan="5" style="padding:32px 20px; text-align:center; color:var(--text-faint);">No learners match "${currentQuery}".</td></tr>`;
+
+      footerCount.textContent = rows.length
+        ? `Showing ${start + 1}–${Math.min(start + PAGE_SIZE, rows.length)} of ${rows.length}`
+        : 'No results';
+
+      pgBtns.innerHTML = Array.from({ length: totalPages }, (_, i) => i + 1).map(p => `
+        <button class="pg-btn ${p === currentPage ? 'active' : ''}" data-page="${p}">${p}</button>
+      `).join('');
+    }
+
+    function renderCategory(key) {
+      currentKey = key;
+      currentPage = 1;
+      currentQuery = '';
+      searchInput.value = '';
+
+      const cat = CATEGORIES[key];
+      const [first, second, third] = cat.rows;
+      const me = cat.rows.find(r => r.me);
+
+      subtitleEl.textContent = cat.subtitle;
+
+      performerGrid.innerHTML = performerCard(1, first) + performerCard(2, second) + performerCard(3, third);
+
+      rankEl.innerHTML = `
+        <div class="rank-num"><span class="hash">#</span>${me.rank}</div>
+        <div class="rank-label">Your Rank — ${cat.label}</div>
+        <span class="org-pill">HeyHi Organisation</span>
+        <div class="rank-stats">
+          <div><div class="val">${me.xp.toLocaleString()}</div><div class="lbl">Total XP</div></div>
+          <div><div class="val">${me.streak.replace('d', '')}</div><div class="lbl">Day streak</div></div>
+          <div><div class="val">${me.badges}</div><div class="lbl">Badges</div></div>
+        </div>`;
+
+      renderTable();
+    }
+
+    catRow.innerHTML = Object.entries(CATEGORIES).map(([key, cat], i) => `
+      <button class="cat-tab ${i === 0 ? 'active' : ''}" data-cat="${key}">${cat.label}</button>
+    `).join('');
+
+    catRow.addEventListener('click', (e) => {
+      const btn = e.target.closest('.cat-tab');
+      if (!btn) return;
+      catRow.querySelectorAll('.cat-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderCategory(btn.dataset.cat);
+    });
+
+    document.getElementById('tabs').addEventListener('click', (e) => {
+      const btn = e.target.closest('.tab');
+      if (!btn) return;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      btn.classList.add('active');
+    });
+
+    searchInput.addEventListener('input', (e) => {
+      currentQuery = e.target.value;
+      currentPage = 1;
+      renderTable();
+    });
+
+    pgBtns.addEventListener('click', (e) => {
+      const btn = e.target.closest('.pg-btn');
+      if (!btn) return;
+      currentPage = Number(btn.dataset.page);
+      renderTable();
+    });
+
+    exportBtn.addEventListener('click', () => {
+      const cat = CATEGORIES[currentKey];
+      const header = 'Rank,Learner,XP,Current Streak,Badges\n';
+      const csv = header + filteredRows(cat)
+        .map(r => `${r.rank},"${r.name}",${r.xp},${r.streak},${r.badges}`)
+        .join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `leaderboard-${currentKey}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    renderCategory('overall');
+  </script>
+
+</body>
+</html>
