@@ -56,6 +56,20 @@ function clickIsInside(e, selector) {
   return e.composedPath().some((el) => el.nodeType === 1 && el.matches(selector));
 }
 
+// Wires the "closed until clicked, stays open while interacting, closes on
+// outside click" behavior shared by the Topic and Tag accordion fields.
+function bindClickToOpenAccordion(searchSelector, accordionSelector, containerSelector) {
+  const searchEl = $(searchSelector);
+  const open = () => {
+    $(accordionSelector).hidden = false;
+  };
+  searchEl.addEventListener("focus", open);
+  searchEl.addEventListener("click", open);
+  document.addEventListener("click", (e) => {
+    if (!clickIsInside(e, containerSelector)) $(accordionSelector).hidden = true;
+  });
+}
+
 /* ---------- Shared multiselect (chips + optional search + checkbox list) ---------- */
 
 function renderMsChips(chipsEl, options, selectedValues, onRemove) {
@@ -311,8 +325,14 @@ const TOPIC_POOLS = {
   ]
 };
 
+function nonEmptyKeys(map) {
+  return Object.keys(map).filter((k) => map[k] && map[k].length > 0);
+}
+
 function questionSubjectValues(item) {
-  return Object.keys(item.topicsBySubject).filter((v) => item.topicsBySubject[v] && item.topicsBySubject[v].length > 0);
+  return [
+    ...new Set([...nonEmptyKeys(item.topicsBySubject), ...nonEmptyKeys(item.tagsBySubject), ...nonEmptyKeys(item.difficultyBySubject)])
+  ];
 }
 
 function topicPoolForSubjects(subjectValues) {
@@ -348,6 +368,8 @@ const TAG_OPTIONS = [
 
 const RUBRIC_OPTIONS = ["PSLE Composition Rubric", "Situational Writing Rubric", "General Writing Rubric"];
 
+const DIFFICULTY_LEVELS = ["Easy", "Normal", "Hard"];
+
 let builderState = null;
 let builderBound = false;
 
@@ -355,14 +377,18 @@ function createItem(id, parentId) {
   return {
     id,
     parentId,
-    difficulty: "easy",
+    difficultyMode: "shared", // "shared" | "perSubject"
+    difficultyShared: ["Easy"], // string[] — used when difficultyMode === "shared"
+    difficultyBySubject: {}, // { [subjectValue]: string[] } — used when difficultyMode === "perSubject"
+    expandedDifficulty: [], // subject values currently expanded in the per-subject Difficulty accordion
     type: null,
     fitbMode: "without",
     answerType: "",
     marksMode: MARKS_MODES[0],
     topicsBySubject: {}, // { [subjectValue]: string[] of selected topics }
     expandedTopics: [], // subject values currently expanded in the Topic accordion
-    tag: "",
+    tagsBySubject: {}, // { [subjectValue]: string[] of selected strategy tags }
+    expandedTags: [], // subject values currently expanded in the Tag accordion
     marks: "1",
     instructionOn: false,
     instructionText: "",
@@ -453,10 +479,14 @@ function toggleWorksheetSubject(value, checked) {
     }
   } else {
     builderState.subjects = builderState.subjects.filter((s) => s.value !== value);
-    // Drop this subject's chosen topics (and its expanded state) from every question.
+    // Drop this subject's chosen topics/tags/difficulty (and expanded state) from every question.
     builderState.items.forEach((item) => {
       delete item.topicsBySubject[value];
       item.expandedTopics = item.expandedTopics.filter((v) => v !== value);
+      delete item.tagsBySubject[value];
+      item.expandedTags = item.expandedTags.filter((v) => v !== value);
+      delete item.difficultyBySubject[value];
+      item.expandedDifficulty = item.expandedDifficulty.filter((v) => v !== value);
     });
   }
   renderTopbarSubjects();
@@ -559,10 +589,6 @@ function renderConfigPanel() {
   const item = getItem(builderState.activeId);
   $("#wc-q-heading").textContent = "Question " + getLabel(item).slice(1);
 
-  document.querySelectorAll('#wc-difficulty input[name="difficulty"]').forEach((r) => {
-    r.checked = r.value === item.difficulty;
-  });
-
   $("#wc-qtype-grid").innerHTML = QUESTION_TYPES.map(
     (t) => `<button type="button" class="qtype-btn ${item.type === t.id ? "is-active" : ""}" data-qtype="${t.id}">${svg(t.icon)} ${t.label}</button>`
   ).join("");
@@ -595,98 +621,152 @@ function renderConfigPanel() {
     marksModeSel.hidden = true;
   }
 
-  renderQuestionTopics(item);
-  $("#wc-tag").value = item.tag;
+  renderDifficulty(item);
+  topicField.render(item);
+  tagField.render(item);
 
   $("#wc-marks").innerHTML = MARKS_VALUES.map(
     (v) => `<option value="${v}" ${item.marks === v ? "selected" : ""}>${v}</option>`
   ).join("");
 }
 
-function renderQuestionTopicChips(item) {
-  const chipsEl = $("#wc-q-topics-chips");
-  const pairs = [];
-  Object.entries(item.topicsBySubject).forEach(([subjVal, topics]) => {
-    topics.forEach((topic) => pairs.push({ subjVal, topic }));
-  });
-  chipsEl.innerHTML = pairs
-    .map(
-      (p) =>
-        `<span class="ms-chip">${escapeHtml(p.topic)}<button type="button" data-remove-subject="${escapeHtml(p.subjVal)}" data-remove-topic="${escapeHtml(p.topic)}">&times;</button></span>`
-    )
-    .join("");
-  chipsEl.querySelectorAll("[data-remove-topic]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      toggleTopicSelection(item, btn.dataset.removeSubject, btn.dataset.removeTopic, false);
+/* ---------- Generic "pick one or more, grouped by subject" field ---------- */
+/* Used for Topic, Tag - Sub Strategy, and per-subject Difficulty Level. */
+
+function makeAccordionField({ fieldName, expandedField, chipsElId, searchElId, accordionElId, poolFn }) {
+  function renderChips(item) {
+    const chipsEl = $(chipsElId);
+    const pairs = [];
+    Object.entries(item[fieldName]).forEach(([subjVal, values]) => {
+      values.forEach((value) => pairs.push({ subjVal, value }));
     });
-  });
-}
-
-function toggleTopicSelection(item, subjectValue, topic, checked) {
-  const list = item.topicsBySubject[subjectValue] || [];
-  item.topicsBySubject[subjectValue] = checked ? [...list, topic] : list.filter((t) => t !== topic);
-  if (item.topicsBySubject[subjectValue].length === 0) delete item.topicsBySubject[subjectValue];
-  renderQuestionTopicChips(item);
-  renderQuestionTopicAccordion(item);
-}
-
-function toggleTopicGroup(item, subjectValue) {
-  item.expandedTopics = item.expandedTopics.includes(subjectValue)
-    ? item.expandedTopics.filter((v) => v !== subjectValue)
-    : [...item.expandedTopics, subjectValue];
-  renderQuestionTopicAccordion(item);
-}
-
-function renderQuestionTopicAccordion(item) {
-  const container = $("#wc-q-topics-accordion");
-  if (builderState.subjects.length === 0) {
-    container.innerHTML = `<p class="hint-note">Add subjects to the worksheet first (top bar).</p>`;
-    return;
+    chipsEl.innerHTML = pairs
+      .map(
+        (p) =>
+          `<span class="ms-chip">${escapeHtml(p.value)}<button type="button" data-rs="${escapeHtml(p.subjVal)}" data-rv="${escapeHtml(p.value)}">&times;</button></span>`
+      )
+      .join("");
+    chipsEl.querySelectorAll("[data-rv]").forEach((btn) => {
+      btn.addEventListener("click", () => toggleValue(item, btn.dataset.rs, btn.dataset.rv, false));
+    });
   }
 
-  const term = $("#wc-q-topics-search").value.trim().toLowerCase();
+  function toggleValue(item, subjectValue, value, checked) {
+    const list = item[fieldName][subjectValue] || [];
+    item[fieldName][subjectValue] = checked ? [...list, value] : list.filter((v) => v !== value);
+    if (item[fieldName][subjectValue].length === 0) delete item[fieldName][subjectValue];
+    renderChips(item);
+    renderAccordion(item);
+  }
 
-  container.innerHTML = builderState.subjects
-    .map((subj) => {
-      const selected = item.topicsBySubject[subj.value] || [];
-      const pool = topicPoolForSubjects([subj.value]);
-      const filtered = term ? pool.filter((t) => t.toLowerCase().includes(term)) : pool;
-      const expanded = term ? filtered.length > 0 : item.expandedTopics.includes(subj.value);
+  function toggleGroup(item, subjectValue) {
+    item[expandedField] = item[expandedField].includes(subjectValue)
+      ? item[expandedField].filter((v) => v !== subjectValue)
+      : [...item[expandedField], subjectValue];
+    renderAccordion(item);
+  }
 
-      const rows =
-        filtered
-          .map(
-            (t) =>
-              `<label class="ms-item"><input type="checkbox" data-subject="${escapeHtml(subj.value)}" value="${escapeHtml(t)}" ${selected.includes(t) ? "checked" : ""} /> ${escapeHtml(t)}</label>`
-          )
-          .join("") || `<p class="hint-note">No matches.</p>`;
+  function renderAccordion(item) {
+    const container = $(accordionElId);
+    if (builderState.subjects.length === 0) {
+      container.innerHTML = `<p class="hint-note">Add subjects to the worksheet first (top bar).</p>`;
+      return;
+    }
 
-      return `
-        <div class="ms-group ${expanded ? "is-expanded" : ""}">
-          <button type="button" class="ms-group-head" data-toggle-group="${escapeHtml(subj.value)}">
-            <svg class="ms-group-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
-            <span>${escapeHtml(subj.label)}</span>
-            ${selected.length ? `<span class="ms-group-count">${selected.length}</span>` : ""}
-          </button>
-          <div class="ms-group-body" ${expanded ? "" : "hidden"}>${rows}</div>
-        </div>`;
-    })
-    .join("");
+    const term = searchElId ? $(searchElId).value.trim().toLowerCase() : "";
 
-  container.querySelectorAll("[data-toggle-group]").forEach((btn) => {
-    btn.addEventListener("click", () => toggleTopicGroup(item, btn.dataset.toggleGroup));
-  });
-  container.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
-    cb.addEventListener("change", () => toggleTopicSelection(item, cb.dataset.subject, cb.value, cb.checked));
-  });
+    container.innerHTML = builderState.subjects
+      .map((subj) => {
+        const selected = item[fieldName][subj.value] || [];
+        const pool = poolFn(subj.value);
+        const filtered = term ? pool.filter((v) => v.toLowerCase().includes(term)) : pool;
+        const expanded = term ? filtered.length > 0 : item[expandedField].includes(subj.value);
+
+        const rows =
+          filtered
+            .map(
+              (v) =>
+                `<label class="ms-item"><input type="checkbox" data-subject="${escapeHtml(subj.value)}" value="${escapeHtml(v)}" ${selected.includes(v) ? "checked" : ""} /> ${escapeHtml(v)}</label>`
+            )
+            .join("") || `<p class="hint-note">No matches.</p>`;
+
+        return `
+          <div class="ms-group ${expanded ? "is-expanded" : ""}">
+            <button type="button" class="ms-group-head" data-toggle-group="${escapeHtml(subj.value)}">
+              <svg class="ms-group-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m9 6 6 6-6 6"></path></svg>
+              <span>${escapeHtml(subj.label)}</span>
+              ${selected.length ? `<span class="ms-group-count">${selected.length}</span>` : ""}
+            </button>
+            <div class="ms-group-body" ${expanded ? "" : "hidden"}>${rows}</div>
+          </div>`;
+      })
+      .join("");
+
+    container.querySelectorAll("[data-toggle-group]").forEach((btn) => {
+      btn.addEventListener("click", () => toggleGroup(item, btn.dataset.toggleGroup));
+    });
+    container.querySelectorAll('input[type="checkbox"]').forEach((cb) => {
+      cb.addEventListener("change", () => toggleValue(item, cb.dataset.subject, cb.value, cb.checked));
+    });
+  }
+
+  function render(item) {
+    renderChips(item);
+    renderAccordion(item);
+  }
+
+  return { render, renderAccordion };
 }
 
-function renderQuestionTopics(item) {
-  renderQuestionTopicChips(item);
-  renderQuestionTopicAccordion(item);
-}
+const topicField = makeAccordionField({
+  fieldName: "topicsBySubject",
+  expandedField: "expandedTopics",
+  chipsElId: "#wc-q-topics-chips",
+  searchElId: "#wc-q-topics-search",
+  accordionElId: "#wc-q-topics-accordion",
+  poolFn: (subjectValue) => topicPoolForSubjects([subjectValue])
+});
 
-$("#wc-tag-options").innerHTML = TAG_OPTIONS.map((t) => `<option value="${escapeHtml(t)}"></option>`).join("");
+const tagField = makeAccordionField({
+  fieldName: "tagsBySubject",
+  expandedField: "expandedTags",
+  chipsElId: "#wc-q-tag-chips",
+  searchElId: "#wc-q-tag-search",
+  accordionElId: "#wc-q-tag-accordion",
+  poolFn: () => TAG_OPTIONS // strategy tags aren't subject-specific, same list under every group
+});
+
+const difficultyField = makeAccordionField({
+  fieldName: "difficultyBySubject",
+  expandedField: "expandedDifficulty",
+  chipsElId: "#wc-difficulty-chips",
+  searchElId: null,
+  accordionElId: "#wc-difficulty-accordion",
+  poolFn: () => DIFFICULTY_LEVELS
+});
+
+/* ---------- Difficulty Level (Whole Question vs. Per Subject) ---------- */
+
+function renderDifficulty(item) {
+  $("#wc-difficulty-mode").querySelectorAll("[data-difficulty-mode]").forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.difficultyMode === item.difficultyMode);
+  });
+
+  const sharedWrap = $("#wc-difficulty-shared");
+  const perSubjectWrap = $("#wc-difficulty-persubject-ms");
+
+  if (item.difficultyMode === "perSubject") {
+    sharedWrap.hidden = true;
+    perSubjectWrap.hidden = false;
+    difficultyField.render(item);
+  } else {
+    sharedWrap.hidden = false;
+    perSubjectWrap.hidden = true;
+    sharedWrap.querySelectorAll('input[name="difficulty"]').forEach((cb) => {
+      cb.checked = item.difficultyShared.includes(cb.value);
+    });
+  }
+}
 
 /* ---------- Content panel (steps 6-8) ---------- */
 
@@ -902,8 +982,20 @@ function bindBuilderEvents() {
     renderSidebar();
   });
 
-  $("#wc-difficulty").addEventListener("change", (e) => {
-    getItem(builderState.activeId).difficulty = e.target.value;
+  $("#wc-difficulty-mode").addEventListener("click", (e) => {
+    const btn = e.target.closest("[data-difficulty-mode]");
+    if (!btn) return;
+    const item = getItem(builderState.activeId);
+    item.difficultyMode = btn.dataset.difficultyMode;
+    renderDifficulty(item);
+  });
+
+  $("#wc-difficulty-shared").addEventListener("change", (e) => {
+    if (e.target.name !== "difficulty") return;
+    const item = getItem(builderState.activeId);
+    item.difficultyShared = e.target.checked
+      ? [...item.difficultyShared, e.target.value]
+      : item.difficultyShared.filter((v) => v !== e.target.value);
   });
 
   $("#wc-qtype-grid").addEventListener("click", (e) => {
@@ -947,24 +1039,16 @@ function bindBuilderEvents() {
   });
 
   $("#wc-q-topics-search").addEventListener("input", () => {
-    renderQuestionTopicAccordion(getItem(builderState.activeId));
+    topicField.renderAccordion(getItem(builderState.activeId));
+  });
+  $("#wc-q-tag-search").addEventListener("input", () => {
+    tagField.renderAccordion(getItem(builderState.activeId));
   });
 
-  // The accordion only appears once the user interacts with the field, and
-  // stays open while picking topics — it closes on an outside click.
-  $("#wc-q-topics-search").addEventListener("focus", () => {
-    $("#wc-q-topics-accordion").hidden = false;
-  });
-  $("#wc-q-topics-search").addEventListener("click", () => {
-    $("#wc-q-topics-accordion").hidden = false;
-  });
-  document.addEventListener("click", (e) => {
-    if (!clickIsInside(e, "#wc-q-topics-ms")) $("#wc-q-topics-accordion").hidden = true;
-  });
-
-  $("#wc-tag").addEventListener("input", (e) => {
-    getItem(builderState.activeId).tag = e.target.value;
-  });
+  // Each accordion only appears once the user interacts with its field, and
+  // stays open while picking values — it closes on an outside click.
+  bindClickToOpenAccordion("#wc-q-topics-search", "#wc-q-topics-accordion", "#wc-q-topics-ms");
+  bindClickToOpenAccordion("#wc-q-tag-search", "#wc-q-tag-accordion", "#wc-q-tag-ms");
 
   $("#wc-marks").addEventListener("change", (e) => {
     getItem(builderState.activeId).marks = e.target.value;
@@ -1230,15 +1314,22 @@ function openPreview() {
     .map((v) => builderState.subjects.find((s) => s.value === v)?.label || v)
     .join(", ");
   const allTopics = Object.values(item.topicsBySubject).flat();
+  const allTags = Object.values(item.tagsBySubject).flat();
+  const difficultyLabel =
+    item.difficultyMode === "perSubject"
+      ? Object.entries(item.difficultyBySubject)
+          .map(([v, levels]) => `${builderState.subjects.find((s) => s.value === v)?.label || v}: ${levels.join("/")}`)
+          .join(", ") || "none"
+      : item.difficultyShared.join(", ") || "none";
 
   $("#wc-preview-body").innerHTML = `
     <div class="preview-meta">
       <span>${getLabel(item)}</span>
       <span>${typeLabel}</span>
-      <span>Difficulty: ${item.difficulty}</span>
+      <span>Difficulty: ${escapeHtml(difficultyLabel)}</span>
       <span>Marks: ${item.marks}</span>
     </div>
-    <p class="hint-note">Subjects: ${subjectLabels || "none"} &middot; Topics: ${allTopics.length ? escapeHtml(allTopics.join(", ")) : "none"}</p>
+    <p class="hint-note">Subjects: ${subjectLabels || "none"} &middot; Topics: ${allTopics.length ? escapeHtml(allTopics.join(", ")) : "none"} &middot; Tags: ${allTags.length ? escapeHtml(allTags.join(", ")) : "none"}</p>
     ${item.instructionOn && item.instructionText ? `<h4>Instruction</h4><div class="preview-content">${escapeHtml(item.instructionText)}</div>` : ""}
     ${item.articleOn && item.articleText ? `<h4>Article</h4><div class="preview-content">${escapeHtml(item.articleText)}</div>` : ""}
     <h4>Question</h4>
