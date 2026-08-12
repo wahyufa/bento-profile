@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Worksheet Creator · K12</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body class="has-view-intake">
+    <!-- ============ VIEW 1: INTAKE ============ -->
+    <section class="view" id="view-intake">
+      <header class="topbar">
+        <a class="back-link" href="#" data-back>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+          Go back
+        </a>
+        <h1>Worksheet Creator</h1>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+
+      <main class="wsc-wrap">
+        <section class="wsc-card" aria-labelledby="wsc-title">
+          <div class="wsc-top">
+            <div class="wsc-top-copy">
+              <h2 id="wsc-title">Worksheet Creator</h2>
+              <p>The Worksheet creator makes it easier to design questions and store them as Worksheets.</p>
+            </div>
+            <div class="wsc-icon" aria-hidden="true">
+              <img src="https://elb-onlinequiz.smartjen.com/img/ws-creator/icon-note.svg" alt="" />
+            </div>
+          </div>
+
+          <form class="wsc-mid" id="wsc-form" novalidate>
+            <div class="wsc-field">
+              <label for="wsc-name">Worksheet Name</label>
+              <input id="wsc-name" name="name" type="text" placeholder="Please input Worksheet name" autocomplete="off" />
+            </div>
+
+            <div class="wsc-field">
+              <label for="wsc-bank">Question Bank</label>
+              <select id="wsc-bank" name="bank"></select>
+            </div>
+
+            <div class="wsc-field">
+              <label>Subject &amp; Level <small class="field-hint">(select one or more)</small></label>
+              <div class="multiselect" id="wsc-subject-multiselect">
+                <div class="ms-chips" id="wsc-subject-chips"></div>
+                <input type="text" class="ms-search" id="wsc-subject-search" placeholder="Search subject &amp; level..." autocomplete="off" />
+                <div class="ms-list" id="wsc-subject-list"></div>
+              </div>
+            </div>
+          </form>
+
+          <div class="wsc-bottom">
+            <button type="button" class="btn btn-trans" id="wsc-cancel">Cancel</button>
+            <button type="submit" form="wsc-form" class="btn btn-primary" id="wsc-submit" disabled>Create Worksheet</button>
+          </div>
+        </section>
+      </main>
+    </section>
+
+    <!-- ============ VIEW 2: BUILDER ============ -->
+    <section class="view" id="view-builder" hidden>
+      <header class="topbar wc-breadcrumb">
+        <a class="back-link" href="#" data-builder-back>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+          Go back
+        </a>
+        <h1>Worksheet Creator</h1>
+        <span class="topbar-spacer" aria-hidden="true"></span>
+      </header>
+
+      <div class="wc-body">
+        <aside class="wc-sidebar">
+          <div class="wc-sidebar-inner">
+            <div class="dropdown-wrap">
+              <button type="button" class="btn btn-primary max-width" id="wc-add-question-toggle" aria-haspopup="true" aria-expanded="false">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                Add Question
+              </button>
+              <ul class="dropdown-menu-custom" id="wc-add-question-menu" hidden>
+                <li><button type="button" data-add-action="new"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"></rect><path d="M12 8v8M8 12h8"></path></svg> Add New Question</button></li>
+                <li><button type="button" data-add-action="pdf"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg> Import PDF</button></li>
+                <li><button type="button" data-add-action="docx"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><path d="M14 2v6h6"></path></svg> Import from Microsoft docx</button></li>
+                <li><button type="button" data-add-action="image"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><path d="m21 15-5-5L5 21"></path></svg> Import Image</button></li>
+              </ul>
+            </div>
+            <div class="wc-question-list" id="wc-question-list"></div>
+          </div>
+        </aside>
+
+        <div class="wc-main">
+          <header class="wc-topbar">
+        <div class="wc-topbar-fields">
+          <div class="ws-name-field">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>
+            <input type="text" id="wc-ws-name" placeholder="Worksheet Name" />
+          </div>
+          <div class="dropdown-wrap">
+            <button type="button" class="wc-subject-toggle" id="wc-subjects-toggle" aria-haspopup="true" aria-expanded="false">
+              <span id="wc-subjects-toggle-label">Select Subject &amp; Level</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+            </button>
+            <div class="dropdown-panel multiselect" id="wc-subjects-panel" hidden>
+              <div class="ms-chips" id="wc-subject-chips"></div>
+              <input type="text" class="ms-search" id="wc-subject-search" placeholder="Search subject &amp; level..." autocomplete="off" />
+              <div class="ms-list" id="wc-subject-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="wc-topbar-actions">
+          <button type="button" class="btn btn-primary-line btn-sm" id="wc-preview">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+            Preview
+          </button>
+          <div class="btn-split">
+            <button type="button" class="btn btn-primary btn-sm" id="wc-save-draft">Save as Draft</button>
+            <button type="button" class="btn-split-toggle" id="wc-draft-toggle" aria-haspopup="true" aria-expanded="false">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+            </button>
+            <div class="btn-split-menu" id="wc-draft-menu" hidden>
+              <button type="button" data-draft-action="worksheet">Save Worksheet as Draft</button>
+              <button type="button" data-draft-action="question">Save Question Only as Draft</button>
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary-green btn-sm" id="wc-finish">Finish and Save</button>
+        </div>
+      </header>
+
+          <div class="wc-frame">
+          <section class="wc-box wc-config">
+            <div class="wc-config-head">
+              <h3 id="wc-q-heading">Question 1</h3>
+              <button type="button" class="link-btn" id="wc-reorder-toggle">Reorder Question &gt;</button>
+            </div>
+
+            <div class="wc-step">
+              <h4 class="step-h"><span class="step-no">1</span>Difficulty Level</h4>
+              <div class="wc-difficulty" id="wc-difficulty">
+                <label class="opt-label"><input type="radio" name="difficulty" value="easy" /> Easy</label>
+                <label class="opt-label"><input type="radio" name="difficulty" value="normal" /> Normal</label>
+                <label class="opt-label"><input type="radio" name="difficulty" value="hard" /> Hard</label>
+              </div>
+            </div>
+
+            <div class="wc-step">
+              <h4 class="step-h"><span class="step-no">2</span>Question Type</h4>
+              <div class="wc-qtype-grid" id="wc-qtype-grid"></div>
+              <div class="wc-fitb-mode" id="wc-fitb-mode" hidden></div>
+            </div>
+
+            <div class="wc-step">
+              <h4 class="step-h"><span class="step-no">3</span>Answer Type</h4>
+              <select id="wc-answer-type" class="wc-select"></select>
+              <select id="wc-marks-mode" class="wc-select" style="margin-top:10px" hidden></select>
+            </div>
+
+            <div class="wc-step">
+              <h4 class="step-h"><span class="step-no">4</span>Topic &amp; Strategy</h4>
+
+              <label class="field-label">Topic <small class="field-hint">(click to open, pick a subject to expand its topics)</small></label>
+              <div class="multiselect" id="wc-q-topics-ms">
+                <div class="ms-chips" id="wc-q-topics-chips"></div>
+                <input type="text" class="ms-search" id="wc-q-topics-search" placeholder="Search topics or click to browse by subject..." autocomplete="off" />
+                <div class="ms-accordion" id="wc-q-topics-accordion" hidden></div>
+              </div>
+
+              <label class="field-label" style="margin-top:14px">Tag - Sub Strategy</label>
+              <input list="wc-tag-options" id="wc-tag" class="wc-select" placeholder="Search or select a strategy" />
+              <datalist id="wc-tag-options"></datalist>
+            </div>
+
+            <div class="wc-step">
+              <h4 class="step-h"><span class="step-no">5</span>Marks</h4>
+              <select id="wc-marks" class="wc-select"></select>
+            </div>
+          </section>
+
+          <section class="wc-box wc-content">
+            <div class="wc-step">
+              <h4 class="step-h"><span class="step-no">6</span>Question Content</h4>
+              <div class="wc-content-toggles">
+                <label class="opt-label sm"><input type="checkbox" id="wc-add-instruction" /> Add Instruction</label>
+                <label class="opt-label sm"><input type="checkbox" id="wc-add-article" /> Add Article</label>
+              </div>
+              <div class="wc-instruction-wrap" id="wc-instruction-wrap" hidden>
+                <textarea id="wc-instruction-text" placeholder="Instruction for this question"></textarea>
+              </div>
+              <div class="wc-article-wrap" id="wc-article-wrap" hidden>
+                <textarea id="wc-article-text" placeholder="Paste or write the reading passage / article"></textarea>
+              </div>
+
+              <div class="rte">
+                <div class="rte-toolbar" id="wc-rte-toolbar">
+                  <button type="button" data-cmd="bold" title="Bold (Ctrl+B)"><b>B</b></button>
+                  <button type="button" data-cmd="italic" title="Italic (Ctrl+I)"><i>I</i></button>
+                  <button type="button" data-cmd="underline" title="Underline (Ctrl+U)"><u>U</u></button>
+                  <button type="button" data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button>
+                  <button type="button" data-cmd="subscript" title="Subscript">X<sub>2</sub></button>
+                  <button type="button" data-cmd="superscript" title="Superscript">X<sup>2</sup></button>
+                  <button type="button" data-cmd="removeFormat" title="Remove Format">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7V4h16v3"></path><path d="M9 20h6"></path><path d="M12 4 9 20"></path><path d="m4 4 16 16"></path></svg>
+                  </button>
+                  <span class="rte-sep"></span>
+                  <button type="button" data-cmd="justifyLeft" title="Align Left">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h12M3 18h15"></path></svg>
+                  </button>
+                  <button type="button" data-cmd="justifyCenter" title="Center">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M6 12h12M4 18h16"></path></svg>
+                  </button>
+                  <button type="button" data-cmd="justifyRight" title="Align Right">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M9 12h12M6 18h15"></path></svg>
+                  </button>
+                  <button type="button" data-cmd="justifyFull" title="Justify">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M3 12h18M3 18h18"></path></svg>
+                  </button>
+                  <span class="rte-sep"></span>
+                  <button type="button" data-soon="Embed media" title="Embed Media from External Sites">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="14" rx="2"></rect><path d="m10 9 5 3-5 3z"></path></svg>
+                  </button>
+                  <button type="button" data-soon="Math symbols" title="Math (coming soon)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 5H7l7 7-7 7h11"></path></svg>
+                  </button>
+                  <button type="button" data-soon="Tables" title="Table (coming soon)">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"></rect><path d="M3 10h18M3 16h18M9 4v16"></path></svg>
+                  </button>
+                  <button type="button" data-soon="Font size" title="Font Size">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7V5h12v2"></path><path d="M10 5v14M8 19h4"></path><path d="M16 12v-1h5v1"></path><path d="M18.5 11v8"></path></svg>
+                  </button>
+                  <button type="button" data-soon="Text color" title="Text Color">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m5 17 5-13 5 13"></path><path d="M6.5 13h7"></path><rect x="3" y="19" width="18" height="3" fill="currentColor" stroke="none"></rect></svg>
+                  </button>
+                  <button type="button" data-soon="Background color" title="Background Color">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m19 11-6-6-9 9 6 6 9-9Z"></path><path d="m5 14 6 6"></path><path d="M19 11c1.5 1.7 2 3 2 4a2 2 0 1 1-4 0c0-1 .5-2.3 2-4Z"></path></svg>
+                  </button>
+                  <span class="rte-sep"></span>
+                  <button type="button" class="rte-add-answer" id="wc-add-answer-btn" hidden title="Select text, then click to mark it as a blank">+ Add Answer</button>
+                </div>
+                <div class="rte-editor" id="wc-editor" contenteditable="true" data-placeholder="Type the question here..."></div>
+              </div>
+
+              <div class="wc-blocks" id="wc-blocks"></div>
+              <button type="button" class="link-btn" id="wc-add-block">+ Add Content Block</button>
+            </div>
+
+            <div class="wc-step" id="wc-answer-section"></div>
+
+            <div class="wc-step">
+              <h4 class="step-h"><span class="step-no">8</span>View Solution</h4>
+              <label class="opt-label sm"><input type="checkbox" id="wc-add-solution" /> Add Solution</label>
+              <div class="wc-solution-wrap" id="wc-solution-wrap" hidden>
+                <textarea id="wc-solution-text" placeholder="Explain the solution / working, shown to learners after they submit"></textarea>
+              </div>
+            </div>
+          </section>
+        </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="toast" id="wc-toast" hidden></div>
+
+    <div class="preview-modal" id="wc-preview-modal" hidden>
+      <div class="preview-modal-inner">
+        <button type="button" class="del-btn preview-close" id="wc-preview-close">✕</button>
+        <div id="wc-preview-body"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
