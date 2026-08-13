@@ -91,7 +91,10 @@ body.has-view-builder {
 .wsc-card {
   width: 100%;
   max-width: 640px;
-  overflow: hidden;
+  /* Not overflow:hidden — the Subject & Level level-picker dropdown inside this
+     card needs to be able to render outside the card's bounds. The rounded
+     corners are achieved by giving the top/bottom sections their own radius
+     instead of relying on clipping. */
   border-radius: var(--radius-card);
   background: #fff;
   box-shadow: 0 20px 45px rgba(48, 37, 116, 0.14);
@@ -104,6 +107,7 @@ body.has-view-builder {
   gap: 20px;
   background: var(--card-top);
   padding: 30px 40px 20px;
+  border-radius: var(--radius-card) var(--radius-card) 0 0;
 }
 
 .wsc-top-copy h2 {
@@ -184,6 +188,7 @@ body.has-view-builder {
   justify-content: center;
   gap: 16px;
   padding: 20px 0;
+  border-radius: 0 0 var(--radius-card) var(--radius-card);
 }
 
 .btn {
@@ -251,6 +256,23 @@ body.has-view-builder {
 .multiselect {
   border: 1px solid var(--input-border);
   border-radius: 12px;
+  background: #fff;
+  padding: 10px;
+}
+
+/* Topic & Tag fields nest a search input directly inside .multiselect. Idle (no
+   chips picked, accordion closed) that read as a border inside a border — drop
+   the outer box then and let the search input's own border be the only one
+   visible, restoring the full boxed look once there's chips or it's open. */
+.multiselect:has(> .ms-search) {
+  border-color: transparent;
+  background: transparent;
+  padding: 0;
+}
+
+.multiselect:has(> .ms-search):has(.ms-chips:not(:empty)),
+.multiselect:has(> .ms-search):has(.ms-accordion:not([hidden])) {
+  border-color: var(--input-border);
   background: #fff;
   padding: 10px;
 }
@@ -448,7 +470,19 @@ body.has-view-builder {
   box-shadow: 0 12px 28px rgba(18, 38, 63, 0.16);
 }
 
-/* ===================== SUBJECT/TOPIC ROWS (v3) ===================== */
+/* Wider variant for panels containing subject rows (Curriculum + Subject selects
+   side by side need more room than the default 320px). No max-height/overflow
+   here on purpose — that would clip the level-picker popover nested inside each
+   row, same issue the intake card's overflow:hidden caused earlier. */
+.wc-subjects-panel-wide {
+  width: 460px;
+}
+
+.wc-subjects-panel-wide .answer-add-btn {
+  margin-top: 10px;
+}
+
+/* ===================== SUBJECT/TOPIC ROWS (v3, reused by v2's intake) ===================== */
 
 .subject-row,
 .topic-tag-row {
@@ -1166,6 +1200,33 @@ body.has-view-builder {
   font-family: "Nunito Sans", sans-serif;
   font-size: 13px;
   font-weight: 700;
+}
+
+.info-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  margin-left: 4px;
+  border-radius: 50%;
+  color: #9a9a9a;
+  cursor: help;
+  vertical-align: -2px;
+}
+
+.info-icon svg {
+  width: 100%;
+  height: 100%;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.info-icon:hover,
+.info-icon:focus-visible {
+  color: var(--accent);
+  outline: none;
 }
 
 .wc-content-toggles {
