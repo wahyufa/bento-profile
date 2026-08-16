@@ -824,10 +824,59 @@
       color: #fff;
       font-weight: 700;
       cursor: pointer;
+      transition: box-shadow .18s ease, transform .18s ease, border-color .18s ease;
+    }
+
+    .button:hover {
+      box-shadow: 0 8px 18px rgba(15, 176, 248, .25);
+      transform: translateY(-1px);
+    }
+
+    .button:active {
+      box-shadow: 0 2px 6px rgba(15, 176, 248, .25);
+      transform: translateY(0);
     }
 
     .button.secondary { background: #fff; color: var(--brand-dark); }
-    .button:disabled { border-color: #cbd5df; background: #e7edf3; color: #8a97a8; cursor: not-allowed; }
+
+    .button.secondary:hover {
+      background: #f4fbff;
+      border-color: var(--brand-dark);
+      box-shadow: 0 8px 18px rgba(15, 176, 248, .14);
+    }
+
+    .button.secondary:active {
+      background: #eaf7ff;
+      box-shadow: none;
+    }
+
+    .button.tertiary {
+      border-color: var(--line);
+      background: #fff;
+      color: var(--muted);
+    }
+
+    .button.tertiary:hover {
+      border-color: #cbd5df;
+      background: #f4f7fa;
+      box-shadow: 0 6px 14px rgba(18, 38, 63, .08);
+    }
+
+    .button.tertiary:active {
+      background: #eef2f6;
+      box-shadow: none;
+    }
+
+    .button:disabled,
+    .button:disabled:hover,
+    .button:disabled:active {
+      border-color: #cbd5df;
+      background: #e7edf3;
+      color: #8a97a8;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
+    }
 
     .hint { color: var(--muted); font-size: 12px; }
 
@@ -1481,40 +1530,6 @@
       line-height: 1.55;
     }
 
-    .insight-card-body {
-      padding: 18px;
-      border-top: 1px dashed var(--line-soft);
-      background: #fbfdff;
-    }
-
-    .insight-card-body h4 {
-      margin: 0 0 12px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .02em;
-      text-transform: uppercase;
-    }
-
-    .insight-card-body .bullet-list {
-      padding-left: 22px;
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .insight-card-body .bullet-list li::marker { color: var(--brand-dark); }
-
-    .interest-strength {
-      margin: 16px 0 0;
-      padding-top: 14px;
-      border-top: 1px dashed var(--line-soft);
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.55;
-    }
-
-    .interest-strength strong { color: var(--text); }
-
     .type-summary {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1691,12 +1706,16 @@
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      transition: background .15s ease, color .15s ease, box-shadow .15s ease;
+      transition: background .15s ease, color .15s ease, box-shadow .15s ease, transform .1s ease;
     }
 
     .preference-tab:hover:not(.active) {
       background: rgba(255, 255, 255, .65);
       color: var(--brand-dark);
+    }
+
+    .preference-tab:active {
+      transform: scale(.97);
     }
 
     .preference-tab:focus-visible {
@@ -1758,6 +1777,11 @@
       transform: translateY(-2px);
     }
 
+    .choice-row:active {
+      box-shadow: 0 6px 14px rgba(15, 176, 248, .18);
+      transform: translateY(0);
+    }
+
     .choice-row-icon {
       display: grid;
       width: 34px;
@@ -1790,10 +1814,25 @@
     }
 
     .choice-row-body em {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
       font-style: normal;
       color: var(--brand-dark);
       font-size: 13px;
       font-weight: 700;
+    }
+
+    .icon-arrow {
+      display: inline-flex;
+      width: 13px;
+      height: 13px;
+      flex: 0 0 auto;
+    }
+
+    .icon-arrow svg {
+      width: 100%;
+      height: 100%;
     }
 
     .combo-hero-grid {
@@ -3089,7 +3128,6 @@
       return topScoreEntries(scores, limit).map(([name, score], index) => {
         const pct = Math.round(score / 60 * 100);
         const info = interestInfo[name] || { short: '', detail: '' };
-        const details = interestDetails[name] || { traits: [], strength: '' };
         return `
           <div class="insight-card">
             <div class="insight-card-summary">
@@ -3098,11 +3136,6 @@
                 <strong>${name} ${pct}%</strong>
               </div>
               <p>${info.detail}</p>
-            </div>
-            <div class="insight-card-body">
-              <h4>Work &amp; learning traits</h4>
-              ${listHtml(details.traits, 6)}
-              <p class="interest-strength"><strong>Strengths:</strong> ${details.strength}</p>
             </div>
           </div>
         `;
@@ -3460,15 +3493,15 @@
               <span class="choice-row-body">
                 <strong>Detailed Report</strong>
                 <span>The full Interest and Preference Profile write-up, including strengths, motivators, and challenges.</span>
-                <em>View report &rarr;</em>
+                <em>View report <span class="icon-arrow">${traitIcons.arrow}</span></em>
               </span>
             </button>
             <button class="choice-row" type="button" data-report-view="traits">
               <span class="choice-row-icon">2</span>
               <span class="choice-row-body">
-                <strong>Work &amp; Learning Traits</strong>
+                <strong>Work and Learning traits</strong>
                 <span>One combined page based on your top interest area and your ${pCode} preference type.</span>
-                <em>View traits &rarr;</em>
+                <em>View traits <span class="icon-arrow">${traitIcons.arrow}</span></em>
               </span>
             </button>
           </div>
@@ -3481,6 +3514,7 @@
     }
 
     const traitIcons = {
+      arrow: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>',
       compass: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>',
       book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>',
       home: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',
@@ -3507,7 +3541,7 @@
           <section class="report-page">
             <div class="report-page-header">
               <div>
-                <h2 class="report-page-title">Work &amp; Learning Traits</h2>
+                <h2 class="report-page-title">Work and Learning traits</h2>
                 <p class="report-page-subtitle">This page combines your strongest interest area with your preference type to describe how you tend to work, learn, and communicate.</p>
               </div>
             </div>
@@ -3548,9 +3582,9 @@
           <div class="report-actions">
             <div class="report-actions-group">
               <button class="button secondary" type="button" data-report-view="snapshot">Back to Snapshot</button>
-              <button class="button" type="button" data-back-dashboard="${pCode}">Back to Dashboard</button>
+              <button class="button tertiary" type="button" data-back-dashboard="${pCode}">Back to Dashboard</button>
             </div>
-            <button class="button secondary" type="button" data-report-view="${state.reportView === 'detailed' ? 'traits' : 'detailed'}">View ${state.reportView === 'detailed' ? 'Work &amp; Learning Traits' : 'Detailed Report'}</button>
+            <button class="button" type="button" data-report-view="${state.reportView === 'detailed' ? 'traits' : 'detailed'}">${state.reportView === 'detailed' ? 'View combined Work and Learning traits' : 'View Detailed Report'} <span class="icon-arrow">${traitIcons.arrow}</span></button>
           </div>
         </div>
       `;
@@ -3616,7 +3650,7 @@
 
               <div class="preference-tabs-wrap">
                 <div class="preference-tablist" role="tablist" aria-label="Preference Profile views">
-                  <button class="preference-tab ${state.preferenceView === 'quick' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'quick'}" data-preference-tab="quick">Learning &amp; Work Snapshot</button>
+                  <button class="preference-tab ${state.preferenceView === 'quick' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'quick'}" data-preference-tab="quick">Work and Learning traits</button>
                   <button class="preference-tab ${state.preferenceView === 'detail' ? 'active' : ''}" type="button" role="tab" aria-selected="${state.preferenceView === 'detail'}" data-preference-tab="detail">Full ${pCode} detail</button>
                 </div>
 
@@ -3649,9 +3683,9 @@
           <div class="report-actions">
             <div class="report-actions-group">
               <button class="button secondary" type="button" data-report-view="snapshot">Back to Snapshot</button>
-              <button class="button" type="button" data-back-dashboard="${pCode}">Back to Dashboard</button>
+              <button class="button tertiary" type="button" data-back-dashboard="${pCode}">Back to Dashboard</button>
             </div>
-            <button class="button secondary" type="button" data-report-view="${state.reportView === 'detailed' ? 'traits' : 'detailed'}">View ${state.reportView === 'detailed' ? 'Work &amp; Learning Traits' : 'Detailed Report'}</button>
+            <button class="button" type="button" data-report-view="${state.reportView === 'detailed' ? 'traits' : 'detailed'}">${state.reportView === 'detailed' ? 'View combined Work and Learning traits' : 'View Detailed Report'} <span class="icon-arrow">${traitIcons.arrow}</span></button>
           </div>
         </div>
       `;
