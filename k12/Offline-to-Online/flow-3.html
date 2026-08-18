@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeyHi — Flow 3 (Student Quiz)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Nunito+Sans:wght@400;700&family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css?v=8" />
+</head>
+<body>
+
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ============ QUIZ-TAKING SCREEN ============ -->
+<div class="worksheet-review-screen" id="screen-quiz">
+  <div class="wr-header">
+    <span class="wr-header-title" id="qz-worksheet-title">Primary Maths WS</span>
+    <div class="qz-header-actions">
+      <button class="qz-header-btn qz-header-btn--outline" id="qz-save-exit">Save and Exit</button>
+      <button class="qz-header-btn qz-header-btn--solid" id="qz-submit-quiz">Submit Quiz</button>
+    </div>
+  </div>
+
+  <div class="qz-progress-bar">
+    <div class="qz-progress-info">
+      <span class="qz-progress-label">Progress</span>
+      <span class="qz-progress-value" id="qz-progress-value">0/5 Questions (0%)</span>
+    </div>
+    <div class="qz-progress-track">
+      <div class="qz-progress-fill" id="qz-progress-fill"></div>
+    </div>
+    <div class="qz-timer" id="qz-timer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span id="qz-timer-text">05:00:00</span>
+    </div>
+  </div>
+
+  <div class="wr-body">
+    <div class="wr-dots" id="qz-dots"></div>
+
+    <div class="qz-card-wrap">
+      <div class="qz-card">
+        <div class="qz-card-head">
+          <h2 class="qz-question-title" id="qz-question-title">Question 1</h2>
+          <div class="qz-nav-arrows">
+            <button class="qz-nav-arrow" id="qz-prev-q" aria-label="Previous question">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="qz-nav-arrow" id="qz-next-q" aria-label="Next question">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <p class="qz-question-marks" id="qz-question-marks"></p>
+        <p class="qz-question-prompt" id="qz-question-prompt"></p>
+
+        <div id="qz-answer-area"></div>
+      </div>
+
+      <a class="send-feedback-link qz-send-feedback" href="#">Send Feedback</a>
+    </div>
+
+    <div class="qz-toolbar">
+      <button class="qz-toolbar-btn" title="Attachments">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M9 15l6-6M9 8h-.5A3.5 3.5 0 005 11.5v0A3.5 3.5 0 008.5 15H9M15 16h.5a3.5 3.5 0 003.5-3.5v0A3.5 3.5 0 0015.5 9H15" stroke="#0fb0f8" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <button class="qz-toolbar-btn" title="Notes">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M4 20l1-4.5L16.5 4 20 7.5 8.5 19 4 20z" stroke="#0fb0f8" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="qz-toolbar-btn" title="Bookmark">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M6 4h12v16l-6-4-6 4V4z" stroke="#0fb0f8" stroke-width="2" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="qz-toolbar-btn" title="Raise hand">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><path d="M8 11V6a2 2 0 114 0v4M12 10V5a2 2 0 114 0v6M16 11V8a2 2 0 114 0v6a6 6 0 01-6 6H10a5 5 0 01-4-2l-2.5-3.5a1.5 1.5 0 012.3-1.9L8 14" stroke="#0fb0f8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal A: Add a paper answer -->
+<div class="modal-overlay" id="modal-add-paper">
+  <div class="modal-card modal-card--center">
+    <div class="modal-head modal-head--center">
+      <h2>Add a paper answer</h2>
+    </div>
+    <p class="resolve-desc">Choose how you want to attach your handwritten work.</p>
+    <div class="modal-foot modal-foot--center">
+      <button class="btn btn-outline" id="qz-take-photo">Take a photo</button>
+      <button class="btn btn-solid" id="qz-choose-device">Choose from device</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal B: Check your answer (loading -> success) -->
+<div class="modal-overlay" id="modal-check-answer">
+  <div class="modal-card modal-card--wide">
+    <div class="modal-head modal-head--center">
+      <h2>Check your answer</h2>
+    </div>
+    <p class="resolve-desc">Make sure your full answer is visible and easy to read before submitting</p>
+
+    <div class="modal-body">
+      <div class="qz-photo-stage">
+        <div class="qz-photo-page qz-photo-page--capture">
+          <div class="wr-handwriting qz-handwriting-text" id="qz-check-handwriting"></div>
+        </div>
+      </div>
+
+      <div class="qz-check-banner" id="qz-check-banner">
+        <div>
+          <p class="qz-check-banner-title" id="qz-check-banner-title">Checking uploaded content.</p>
+          <p class="qz-check-banner-desc" id="qz-check-banner-desc">Analyzing photo clarity and detecting your handwriting.</p>
+        </div>
+        <span class="qz-check-banner-icon" id="qz-check-banner-icon"><span class="toast-spinner"></span></span>
+      </div>
+    </div>
+
+    <div class="modal-foot modal-foot--center">
+      <button class="btn btn-outline" id="qz-retake-photo">Retake photo</button>
+      <button class="btn btn-outline" id="qz-edit-as-text">Edit as Text</button>
+      <button class="btn btn-solid" id="qz-submit-photo" disabled>Submit Photo</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal C: Check and edit your converted answer -->
+<div class="modal-overlay" id="modal-check-convert">
+  <div class="modal-card modal-card--wide">
+    <div class="modal-head modal-head--center">
+      <h2>Check and edit your converted answer</h2>
+    </div>
+    <p class="resolve-desc">Compare the text with your original handwriting. Your original photo will still be saved.</p>
+
+    <div class="modal-body">
+      <div class="qz-convert-grid">
+        <div class="qz-convert-col">
+          <p class="qz-convert-label">Original Photo</p>
+          <div class="qz-photo-stage qz-photo-stage--small">
+            <div class="qz-photo-page qz-photo-page--capture">
+              <div class="wr-handwriting qz-handwriting-text" id="qz-convert-handwriting"></div>
+            </div>
+          </div>
+        </div>
+        <div class="qz-convert-col">
+          <p class="qz-convert-label">Editable answer</p>
+          <textarea class="qz-convert-textarea" id="qz-convert-textarea"></textarea>
+          <p class="qz-convert-hint">Handwriting converted · Review before submitting</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-foot modal-foot--center">
+      <button class="btn btn-outline" id="qz-use-photo-instead">Use photo instead</button>
+      <button class="btn btn-solid" id="qz-submit-text">Submit text answer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal D: Your Answer viewer (photo) -->
+<div class="modal-overlay" id="modal-view-answer">
+  <div class="modal-card modal-card--wide">
+    <div class="modal-head">
+      <h2>Your Answer</h2>
+      <div class="qz-view-answer-actions">
+        <button class="btn btn-outline qz-view-edit-text" id="qz-view-edit-as-text">Edit as Text</button>
+        <button class="modal-close" id="close-view-answer-x" aria-label="Close">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="modal-body">
+      <div class="qz-photo-stage">
+        <div class="qz-photo-page qz-photo-page--capture">
+          <div class="wr-handwriting qz-handwriting-text" id="qz-view-handwriting"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ QUIZ RESULT / MARKING SCREEN ============ -->
+<div class="worksheet-review-screen" id="screen-quiz-result" hidden>
+  <div class="wr-header">
+    <span class="wr-header-title">Primary Maths WS</span>
+    <a class="qr-exit-link" id="qr-exit-btn" href="#">Exit</a>
+  </div>
+
+  <div class="qr-status-bar">
+    <span class="qr-status-pill qr-status-pill--marked">All Questions Marked</span>
+    <span class="qr-status-pill qr-status-pill--score" id="qr-score-pill">ⓘ 6/10 Marks (60%)</span>
+  </div>
+
+  <div class="wr-body wr-body--result">
+    <div class="wr-dots" id="qr-dots"></div>
+    <div class="qr-list" id="qr-list"></div>
+  </div>
+</div>
+
+<script src="app-flow3.js?v=5"></script>
+</body>
+</html>

@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeyHi — Worksheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css?v=6" />
+</head>
+<body>
+
+<div class="toast-container" id="toast-container"></div>
+
+<div class="app">
+
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="logo">
+        <span class="logo-mark">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="#E8843A" stroke-width="2"/><path d="M8 9c2 0 2 2 4 2s2-2 4-2" stroke="#E8843A" stroke-width="2" stroke-linecap="round"/></svg>
+        </span>
+        <span class="logo-text">HeyHi</span>
+      </div>
+      <nav class="topnav">
+        <a class="topnav-link">Dashboard</a>
+        <a class="topnav-link active">Worksheet</a>
+        <a class="topnav-link">Lesson</a>
+        <a class="topnav-link">Question</a>
+        <a class="topnav-link">Evaluation</a>
+        <a class="topnav-link">Classroom</a>
+        <a class="topnav-link">Analytic</a>
+        <a class="topnav-link">Leaderboard</a>
+      </nav>
+      <div class="topbar-right">
+        <button class="icon-chip" aria-label="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 8a6 6 0 0112 0c0 4 1.5 5.5 1.5 5.5H4.5S6 12 6 8z" stroke="#0FB0F8" stroke-width="1.8" stroke-linejoin="round"/><path d="M10 17a2 2 0 004 0" stroke="#0FB0F8" stroke-width="1.8" stroke-linecap="round"/><circle cx="18" cy="6" r="4" fill="#16D8A7"/></svg>
+        </button>
+        <div class="avatar" aria-hidden="true">🐵</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="subtabs">
+    <div class="subtabs-inner">
+      <button class="subtab active">My Worksheet</button>
+      <button class="subtab">Admin Worksheet</button>
+      <button class="subtab">Archived Worksheet</button>
+    </div>
+  </div>
+
+  <main class="page-content">
+    <section class="page active" data-page="my-worksheet">
+      <div class="page-header-row">
+        <h1 class="page-title">My Worksheet</h1>
+        <div class="page-header-actions">
+          <div class="search-input">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#9CA3AF" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+            <input type="text" placeholder="Search for a Worksheet" />
+          </div>
+          <button class="btn btn-solid">Create Worksheet</button>
+          <button class="btn btn-solid" id="generate-btn">Generate Worksheet</button>
+          <div class="dropdown-wrap">
+            <button class="kebab-btn" id="kebab-btn" aria-label="More options">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="#2E9BEB"/><circle cx="12" cy="12" r="1.6" fill="#2E9BEB"/><circle cx="12" cy="19" r="1.6" fill="#2E9BEB"/></svg>
+            </button>
+            <div class="dropdown-menu" id="generate-dropdown">
+              <button class="dropdown-item" id="open-upload-result">Upload Result</button>
+              <button class="dropdown-item">Upload Bubble Sheet</button>
+              <button class="dropdown-item">Worksheet Library</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <button class="filter-chip">All subject <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="filter-chip">All status <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="filter-chip">All Time <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="16" rx="2" stroke="#6B7280" stroke-width="2"/><path d="M3 10h18M8 3v4M16 3v4" stroke="#6B7280" stroke-width="2" stroke-linecap="round"/></svg></button>
+        <button class="filter-chip">Sort by recent activity <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+
+      <div class="worksheet-table">
+        <div class="table-row table-row--head">
+          <span class="col-worksheet">Worksheet</span>
+          <span class="col-category">Category</span>
+          <span class="col-status">Status</span>
+          <span class="col-created">Created on</span>
+          <span class="col-actions">Actions</span>
+        </div>
+
+        <div class="table-row">
+          <span class="col-worksheet" data-open-worksheet="English for Basic" data-open-created="Oct 5, 2024 1:24 PM" data-open-category="PRIMARY 1 / ENGLISH">
+            <span class="worksheet-icon">📘</span>
+            <span class="worksheet-name">English for Basic</span>
+          </span>
+          <span class="col-category">Primary 1 English</span>
+          <span class="col-status"><span class="status-pill status-pill--warn">4/10</span></span>
+          <span class="col-created">Oct 5, 2024 1:24 PM</span>
+          <span class="col-actions">
+            <button class="action-icon" aria-label="View"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="2"/></svg></button>
+            <button class="action-icon" aria-label="Assign"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.5" stroke="#fff" stroke-width="2"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M19 8v6M16 11h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button class="action-icon" aria-label="Review"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.5" stroke="#fff" stroke-width="2"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M16 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="action-icon" aria-label="Analytics"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M12 20V4M20 20v-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button class="action-icon" aria-label="Copy link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 15l6-6M9 8h-.5A3.5 3.5 0 005 11.5v0A3.5 3.5 0 008.5 15H9M15 16h.5a3.5 3.5 0 003.5-3.5v0A3.5 3.5 0 0015.5 9H15" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button class="kebab-btn kebab-btn--row" aria-label="More"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="#2E9BEB"/><circle cx="12" cy="12" r="1.6" fill="#2E9BEB"/><circle cx="12" cy="19" r="1.6" fill="#2E9BEB"/></svg></button>
+          </span>
+        </div>
+
+        <div class="table-row">
+          <span class="col-worksheet" data-open-worksheet="English Week 1" data-open-created="Oct 4, 2024 1:24 PM" data-open-category="PRIMARY 1 / ENGLISH">
+            <span class="worksheet-icon">📘</span>
+            <span class="worksheet-name">English Week 1</span>
+          </span>
+          <span class="col-category">Primary 1 English</span>
+          <span class="col-status"><span class="status-pill status-pill--ok">10/10</span></span>
+          <span class="col-created">Oct 4, 2024 1:24 PM</span>
+          <span class="col-actions">
+            <button class="action-icon" aria-label="View"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="2"/></svg></button>
+            <button class="action-icon" aria-label="Assign"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.5" stroke="#fff" stroke-width="2"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M19 8v6M16 11h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button class="action-icon" aria-label="Review"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.5" stroke="#fff" stroke-width="2"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M16 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="action-icon" aria-label="Analytics"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M12 20V4M20 20v-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button class="action-icon" aria-label="Copy link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 15l6-6M9 8h-.5A3.5 3.5 0 005 11.5v0A3.5 3.5 0 008.5 15H9M15 16h.5a3.5 3.5 0 003.5-3.5v0A3.5 3.5 0 0015.5 9H15" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button class="kebab-btn kebab-btn--row" aria-label="More"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="#2E9BEB"/><circle cx="12" cy="12" r="1.6" fill="#2E9BEB"/><circle cx="12" cy="19" r="1.6" fill="#2E9BEB"/></svg></button>
+          </span>
+        </div>
+
+        <div class="table-row">
+          <span class="col-worksheet" data-open-worksheet="Fractions Practice" data-open-created="—" data-open-category="PRIMARY 1 / MATH" data-correlated="true">
+            <span class="worksheet-icon">🧮</span>
+            <span class="worksheet-name">Fractions Practice</span>
+          </span>
+          <span class="col-category">Primary 1 Math</span>
+          <span class="col-status"><span class="status-pill status-pill--neutral" id="fractions-status-pill">0/3</span></span>
+          <span class="col-created" id="fractions-created-on">—</span>
+          <span class="col-actions">
+            <button class="action-icon" aria-label="View"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z" stroke="#fff" stroke-width="2"/><circle cx="12" cy="12" r="3" stroke="#fff" stroke-width="2"/></svg></button>
+            <button class="action-icon" aria-label="Assign"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.5" stroke="#fff" stroke-width="2"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M19 8v6M16 11h6" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button class="action-icon" aria-label="Review"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="9" cy="8" r="3.5" stroke="#fff" stroke-width="2"/><path d="M2 20c0-3.5 3-6 7-6s7 2.5 7 6" stroke="#fff" stroke-width="2" stroke-linecap="round"/><path d="M16 12l2 2 4-4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+            <button class="action-icon" aria-label="Analytics"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M4 20V10M12 20V4M20 20v-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button class="action-icon" aria-label="Copy link"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 15l6-6M9 8h-.5A3.5 3.5 0 005 11.5v0A3.5 3.5 0 008.5 15H9M15 16h.5a3.5 3.5 0 003.5-3.5v0A3.5 3.5 0 0015.5 9H15" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></button>
+            <button class="kebab-btn kebab-btn--row" aria-label="More"><svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="#2E9BEB"/><circle cx="12" cy="12" r="1.6" fill="#2E9BEB"/><circle cx="12" cy="19" r="1.6" fill="#2E9BEB"/></svg></button>
+          </span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- Upload Result modal -->
+<div class="modal-overlay" id="modal-upload-result">
+  <div class="modal-card">
+    <div class="modal-head">
+      <h2>Upload Result</h2>
+      <button class="modal-close" id="close-upload-result-x" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="file-picker-row">
+        <button class="btn btn-outline btn-file" id="choose-files-btn">Choose Files</button>
+        <div class="file-picker-count" id="file-picker-count">No files chosen</div>
+      </div>
+      <p class="hint-text-left">Upload one or more files. PDF, JPG or PNG allowed.</p>
+
+      <div class="file-list" id="file-list"></div>
+
+      <div class="toggle-row">
+        <span class="toggle-label">Already marked?</span>
+        <button class="toggle-switch active" id="already-marked-toggle" aria-pressed="true">
+          <span class="toggle-knob"></span>
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <div class="how-it-works-wrap">
+        <a class="link-text" href="#" id="how-it-works-link">How it works?</a>
+        <div class="how-it-works-popover" id="how-it-works-popover">
+          <p class="popover-title">How matching works</p>
+          <ul>
+            <li>Upload one file per student, in any order.</li>
+            <li>HEYHI matches each file to a student using the worksheet layout.</li>
+            <li>Turn on "Already marked?" if scores are already written on the page.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="modal-foot-actions">
+        <button class="btn btn-outline" id="close-upload-result">Close</button>
+        <button class="btn btn-solid" id="match-submissions-btn" disabled>
+          Match Submissions
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Check Student Matches modal (loading -> results table) -->
+<div class="modal-overlay" id="modal-check-matches">
+  <div class="modal-card modal-card--wide">
+    <div class="modal-head">
+      <div>
+        <h2>Check Student Matches</h2>
+        <p class="modal-subtitle" id="check-matches-worksheet-line" hidden>Worksheet: <strong>Fractions Practice</strong></p>
+        <p class="modal-subtitle" id="check-matches-subtitle">Detecting worksheet and matching students…</p>
+      </div>
+      <button class="modal-close" id="close-check-matches-x" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="loading-state" id="check-matches-loading">
+        <div class="spinner"></div>
+      </div>
+
+      <div class="match-table" id="check-matches-table" hidden>
+        <div class="match-row match-row--head">
+          <span>File</span>
+          <span>Student</span>
+          <span>Class</span>
+          <span>Status</span>
+          <span>Action</span>
+        </div>
+        <div id="match-rows"></div>
+      </div>
+    </div>
+
+    <div class="modal-foot" id="check-matches-foot" hidden>
+      <button class="btn btn-outline" id="check-matches-back">Back</button>
+      <button class="btn btn-solid" id="confirm-process-btn" disabled>
+        Confirm &amp; Process
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Review submission match modal (read-only preview) -->
+<div class="modal-overlay" id="modal-review-match">
+  <div class="modal-card modal-card--wide">
+    <div class="modal-head">
+      <div>
+        <h2>Review submission match</h2>
+        <p class="modal-subtitle">Check the scanned pages and detected student details before processing.</p>
+      </div>
+      <button class="modal-close" id="close-review-match-x" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="scan-stage">
+        <div class="scan-page">
+          <div class="scan-page-head">
+            <span class="scan-worksheet-name">WORKSHEET NAME</span>
+            <span class="scan-student-meta">
+              NAME: <span id="review-student-name">AMELIA TAN</span><br />
+              CLASS: <span id="review-student-class">NEWTON CLASS</span>
+            </span>
+          </div>
+          <div class="scan-question">
+            <span class="scan-qnum">1.</span>
+            <div class="scan-qbody">
+              <p>Solve 3x + 5 = 20. Show your working.</p>
+              <div class="scan-line"></div>
+              <div class="scan-line"></div>
+              <div class="scan-line"></div>
+            </div>
+          </div>
+          <div class="scan-question">
+            <span class="scan-qnum">2.</span>
+            <div class="scan-qbody">
+              <p>Expand and simplify 2(x + 4) − 3.</p>
+              <div class="scan-line"></div>
+              <div class="scan-line"></div>
+              <div class="scan-line"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="matched-student-label">Matched student</p>
+      <div class="matched-student-row"><span>Student name:</span><strong id="review-matched-name">Amelia Tan</strong></div>
+      <div class="matched-student-row"><span>Class name:</span><strong id="review-matched-class">Newton Class</strong></div>
+    </div>
+  </div>
+</div>
+
+<!-- Match pages to a student modal (resolve flow) -->
+<div class="modal-overlay" id="modal-resolve-student">
+  <div class="modal-card modal-card--center">
+    <div class="modal-head modal-head--center">
+      <h2>Match pages to a student</h2>
+      <button class="modal-close" id="close-resolve-student-x" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <p class="resolve-desc">
+      We could not read the student name on pages 5–6 on <strong id="resolve-file-name">Upload Answer 2.png</strong>.
+      Select the correct student before processing.
+    </p>
+
+    <div class="modal-body modal-body--center">
+      <label class="select-label" for="resolve-student-select">Select Student</label>
+      <select class="select-input" id="resolve-student-select"></select>
+      <p class="resolve-hint" id="resolve-hint"></p>
+    </div>
+
+    <div class="modal-foot modal-foot--center">
+      <button class="btn btn-outline" id="resolve-back">Back</button>
+      <button class="btn btn-solid" id="confirm-student-btn" disabled>Confirm Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- Processing Submission modal -->
+<div class="modal-overlay" id="modal-processing">
+  <div class="modal-card modal-card--wide">
+    <div class="modal-head">
+      <div>
+        <h2>Processing Submission</h2>
+        <p class="modal-subtitle">Worksheet: <strong>Fractions Practice</strong></p>
+        <p class="modal-subtitle">Turning paper into structured results</p>
+      </div>
+      <button class="modal-close" id="close-processing-x" aria-label="Minimize">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="processing-spinner-wrap">
+        <div class="spinner"></div>
+      </div>
+      <div class="processing-steps" id="processing-steps"></div>
+    </div>
+
+    <div class="processing-banner">You can leave this page. You'll be notified when review is ready.</div>
+  </div>
+</div>
+
+<!-- Minimized processing toast -->
+<div class="processing-toast" id="processing-toast" hidden>
+  <div class="processing-toast-head">Processing Submission</div>
+  <div class="processing-toast-body">
+    <span class="toast-spinner"></span>
+    <span id="processing-toast-text">0 of 4 process complete</span>
+    <button class="btn btn-solid processing-toast-view" id="processing-toast-view">View</button>
+  </div>
+</div>
+
+<!-- Review Result modal -->
+<div class="modal-overlay" id="modal-review-result">
+  <div class="modal-card modal-card--wide">
+    <div class="modal-head">
+      <div>
+        <h2>Review Result</h2>
+        <p class="modal-subtitle">Worksheet: <strong>Fractions Practice</strong></p>
+      </div>
+      <button class="modal-close" id="close-review-result-x" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="match-table">
+        <div class="match-row match-row--head match-row--result">
+          <span>File</span>
+          <span>Student</span>
+          <span>Class</span>
+          <span>Score</span>
+          <span>Status</span>
+          <span>Action</span>
+        </div>
+        <div id="review-result-rows"></div>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn btn-outline" id="review-result-back">Back</button>
+      <button class="btn btn-solid" id="submit-publish-btn" disabled>Submit &amp; Publish Result</button>
+    </div>
+  </div>
+</div>
+
+<!-- Full-page worksheet reviewer (teacher approve flow) -->
+<div class="worksheet-review-screen" id="screen-worksheet-review" hidden>
+  <div class="wr-header">
+    <span class="wr-header-title" id="wr-worksheet-title">Worksheet Name</span>
+    <button class="wr-exit-btn" id="wr-exit-btn">✕ Exit</button>
+  </div>
+
+  <div class="wr-status-bar">
+    <div class="wr-student-switcher">
+      <button class="wr-switch-btn" id="wr-prev-student" aria-label="Previous student">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <span class="wr-switch-label" id="wr-switch-label">Amelia Tan (1 of 3)</span>
+      <button class="wr-switch-btn" id="wr-next-student" aria-label="Next student">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <div class="wr-status-bar-right">
+      <span class="wr-status-pill" id="wr-status-pill">Pending Review</span>
+      <span class="wr-score-pill" id="wr-score-pill">ⓘ 0/0 Marks (0%)</span>
+      <button class="wr-approve-btn" id="wr-approve-btn">Approve to Publish</button>
+    </div>
+  </div>
+
+  <div class="wr-body">
+    <div class="wr-dots" id="wr-dots"></div>
+
+    <div class="wr-scan-wrap">
+      <div class="wr-scan-page" id="wr-scan-page"></div>
+    </div>
+
+    <div class="wr-detail-panel" id="wr-detail-panel"></div>
+  </div>
+</div>
+
+<!-- Upload Result Complete (final success) modal -->
+<div class="modal-overlay" id="modal-upload-complete">
+  <div class="modal-card modal-card--center">
+    <div class="upload-complete-body">
+      <div class="success-badge">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <p class="upload-complete-title">Upload Result Complete!</p>
+      <p class="upload-complete-subtitle" id="upload-complete-subtitle">3 Results published to Worksheet</p>
+
+      <div class="upload-complete-table">
+        <div class="upload-complete-row upload-complete-row--head">
+          <span>Student</span>
+          <span>Score</span>
+        </div>
+        <div id="upload-complete-rows"></div>
+      </div>
+
+      <button class="btn btn-solid upload-complete-close" id="upload-complete-close">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Worksheet details modal (entry point: click a worksheet row) -->
+<div class="modal-overlay" id="modal-worksheet-details">
+  <div class="modal-card modal-card--wide modal-card--wsd">
+    <div class="modal-head">
+      <h2>Worksheet details</h2>
+      <button class="modal-close" id="close-worksheet-details-x" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="#111827" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="wsd-info-row">
+        <div class="wsd-info-left">
+          <span class="wsd-icon">📘</span>
+          <div>
+            <p class="wsd-category" id="wsd-category">PRIMARY 1 / ENGLISH</p>
+            <p class="wsd-title" id="wsd-title">Worksheet Name</p>
+          </div>
+        </div>
+        <div class="wsd-info-stat">
+          <span class="wsd-info-label">Created by</span>
+          <span class="wsd-info-value">Smartjen Admin</span>
+        </div>
+        <div class="wsd-info-stat">
+          <span class="wsd-info-label">Created on</span>
+          <span class="wsd-info-value" id="wsd-created-on">—</span>
+        </div>
+        <div class="wsd-info-stat">
+          <span class="wsd-info-label">No. of assigned</span>
+          <span class="wsd-info-value" id="wsd-assigned-count">—</span>
+        </div>
+        <div class="wsd-info-stat">
+          <span class="wsd-info-label">Marked</span>
+          <span class="wsd-info-value" id="wsd-marked-count">—</span>
+        </div>
+        <span class="status-pill status-pill--warn" id="wsd-marked-pill">0/0</span>
+      </div>
+
+      <div class="filter-row wsd-filter-row">
+        <button class="filter-chip">By Class <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="filter-chip">Rose Class <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#6B7280" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="search-input wsd-search">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="#9CA3AF" stroke-width="2"/><path d="M21 21l-4.3-4.3" stroke="#9CA3AF" stroke-width="2" stroke-linecap="round"/></svg>
+          <input type="text" placeholder="Search for a Student" />
+        </div>
+      </div>
+
+      <div class="match-table">
+        <div class="wsd-row wsd-row--head">
+          <span>No.</span>
+          <span>Student</span>
+          <span>Class Name</span>
+          <span>Attempts</span>
+          <span>Score</span>
+          <span>Status</span>
+          <span>Assigned date</span>
+          <span>Action</span>
+        </div>
+        <div id="wsd-rows"></div>
+      </div>
+
+      <p class="wsd-record-count" id="wsd-record-count">0 records</p>
+    </div>
+  </div>
+</div>
+
+<script src="app.js?v=3"></script>
+</body>
+</html>

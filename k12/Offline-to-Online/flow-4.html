@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeyHi — Flow 4 (Self-Upload Worksheet)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css?v=8" />
+</head>
+<body>
+
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ============ CHALLENGE / WORKSHEET LANDING SCREEN ============ -->
+<div id="screen-challenge">
+  <div class="f4-hero">
+    <div class="f4-hero-top">
+      <div class="f4-breadcrumb">Worksheets <span>/</span> To do <span>/</span></div>
+      <a class="f4-exit-btn" href="#">✕ Exit</a>
+    </div>
+    <span class="f4-challenge-pill">CHALLENGE</span>
+    <div class="f4-hero-icon">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="7" r="2.2" stroke="#0d93cc" stroke-width="1.6"/><path d="M12 9.2L6 19h12L12 9.2z" stroke="#0d93cc" stroke-width="1.6" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+
+  <div class="f4-card-wrap">
+    <div class="f4-card">
+      <p class="f4-category">Primary Maths</p>
+      <h1 class="f4-title">Worksheet Name</h1>
+
+      <div class="f4-meta-grid">
+        <div class="f4-meta-item">
+          <p class="f4-meta-label">Assigned By</p>
+          <p class="f4-meta-value">HeyHi Admin</p>
+        </div>
+        <div class="f4-meta-item">
+          <p class="f4-meta-label">Assigned On</p>
+          <p class="f4-meta-value">2025-08-27</p>
+        </div>
+        <div class="f4-meta-item">
+          <p class="f4-meta-label">Max no of attempts</p>
+          <p class="f4-meta-value">1</p>
+        </div>
+        <div class="f4-meta-item">
+          <p class="f4-meta-label">No of questions</p>
+          <p class="f4-meta-value">5</p>
+        </div>
+        <div class="f4-meta-item">
+          <p class="f4-meta-label">Quiz time</p>
+          <p class="f4-meta-value">60 Minutes</p>
+        </div>
+      </div>
+
+      <div class="f4-instructions">
+        <ol>
+          <li>Download or use the worksheet your teacher shared.</li>
+          <li>Complete every question on paper.</li>
+          <li>Scan or photograph all pages and upload them.</li>
+        </ol>
+      </div>
+
+      <div id="f4-action-area">
+        <button class="btn btn-solid f4-upload-btn" id="f4-upload-btn">
+          Upload Completed Worksheet
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 16V4M12 4l-4 4M12 4l4 4M5 16v3a2 2 0 002 2h10a2 2 0 002-2v-3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <a class="f4-download-link" href="#" id="f4-download-link">Download Worksheet in PDF</a>
+      </div>
+
+      <div id="f4-result-area" hidden>
+        <span class="f4-ready-pill">✓ Results Ready</span>
+        <button class="btn btn-solid f4-upload-btn" id="f4-view-result-btn">View Result</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Review your worksheet upload -->
+<div class="modal-overlay" id="modal-review-upload">
+  <div class="modal-card modal-card--wide">
+    <div class="modal-head modal-head--center">
+      <h2>Review your worksheet upload</h2>
+    </div>
+    <p class="resolve-desc" style="text-align:center;">Check that every page is included, upright and readable.</p>
+
+    <div class="modal-body">
+      <div class="f4-review-stage">
+        <div class="f4-review-page"></div>
+      </div>
+
+      <label class="f4-confirm-row">
+        <input type="checkbox" id="f4-confirm-checkbox" checked />
+        <span>I confirm this is my own completed work</span>
+      </label>
+    </div>
+
+    <div class="modal-foot modal-foot--center">
+      <button class="btn btn-outline" id="f4-reupload-btn">Reupload</button>
+      <button class="btn btn-solid" id="f4-submit-worksheet-btn">Submit Worksheet</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Processing Submission -->
+<div class="modal-overlay" id="modal-f4-processing">
+  <div class="modal-card modal-card--center">
+    <div class="modal-head modal-head--center">
+      <h2>Processing Submission</h2>
+    </div>
+    <p class="resolve-desc">Turning paper into structured results</p>
+    <div class="processing-spinner-wrap"><div class="spinner"></div></div>
+  </div>
+</div>
+
+<!-- Modal: Upload Result Complete -->
+<div class="modal-overlay" id="modal-f4-complete">
+  <div class="modal-card modal-card--center">
+    <div class="upload-complete-body">
+      <div class="success-badge">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2 class="upload-complete-title">Upload Result Complete!</h2>
+      <p class="upload-complete-subtitle">Your answers are being marked. Results will be ready soon</p>
+      <button class="btn btn-solid upload-complete-close" id="f4-back-dashboard-btn">Back to Dashboard</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ RESULT / WORKSHEET REVIEWER SCREEN ============ -->
+<div class="worksheet-review-screen" id="screen-f4-result" hidden>
+  <div class="wr-header">
+    <span class="wr-header-title">Worksheet Name</span>
+    <button class="wr-exit-btn wr-exit-btn--solid" id="f4-result-exit-btn">✕ Exit</button>
+  </div>
+
+  <div class="qr-status-bar">
+    <span class="qr-status-pill qr-status-pill--marked">All Questions Marked</span>
+    <span class="qr-status-pill qr-status-pill--score" id="f4-score-pill"></span>
+  </div>
+
+  <div class="wr-body">
+    <div class="wr-dots" id="f4-dots"></div>
+    <div class="wr-scan-wrap">
+      <div class="wr-scan-page" id="f4-scan-page"></div>
+    </div>
+    <div class="wr-detail-panel" id="f4-detail-panel"></div>
+  </div>
+</div>
+
+<script src="app-flow4.js?v=1"></script>
+</body>
+</html>
