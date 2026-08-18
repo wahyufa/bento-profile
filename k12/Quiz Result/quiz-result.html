@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HeyHi — Quiz Result</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Nunito:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --amber: #fec53c;
+      --amber-soft: #fff7ee;
+      --blue: #0fb0f8;
+      --blue-ink: #0a93d4;
+      --green: #16d8a7;
+      --red: #ff1744;
+      --purple: #8a8fb0;
+      --slate: #708eb1;
+
+      --ink: #303b49;
+      --ink-soft: #5c6672;
+      --muted: #98a2ad;
+      --line: #e7ebef;
+      --page-bg: #f6f8fa;
+      --card: #ffffff;
+      --chip-bg: #f3f4f6;
+
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-pill: 16px;
+      --shadow-card: 0 1px 3px rgba(33, 43, 54, 0.06), 0 8px 24px rgba(33, 43, 54, 0.05);
+
+      --font-display: "Nunito", system-ui, sans-serif;
+      --font-body: "Poppins", system-ui, sans-serif;
+      --font-mont: "Montserrat", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    button, select, input, textarea, optgroup, option { font-family: inherit; font-size: inherit; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--page-bg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ---------- Top app bar ---------- */
+    .topbar {
+      position: relative;
+      flex: 0 0 auto;
+      height: 55px;
+      background: var(--amber) url("https://demo.heyhi.sg/images/bg-smartjen.png") repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .topbar__title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.2px;
+      color: #fff;
+      z-index: 1;
+    }
+    .btn-exit {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 15px;
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+    }
+    .btn-download {
+      position: absolute;
+      right: 128px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 15px;
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+    .btn-download:hover { transform: translateY(-50%) translateY(-1px); }
+    .btn-download:disabled { opacity: 0.65; cursor: wait; }
+
+    /* ---------- Sub bar: student info + status pills ---------- */
+    .subbar {
+      flex: 0 0 auto;
+      min-height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 0 24px;
+      background: #fff url("https://demo.heyhi.sg/images/bg-smartjen-color.png") repeat;
+      box-shadow: rgba(18, 38, 63, 0.03) 0px 0.75rem 1.5rem;
+    }
+    .student-meta { display: flex; align-items: center; gap: 28px; }
+    .student-meta__field label {
+      display: block;
+      font-family: var(--font-mont);
+      font-weight: 700;
+      font-size: 10px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 3px;
+    }
+    .student-meta__field .value { font-weight: 700; font-size: 15px; color: var(--ink); }
+
+    .pill-row { display: flex; align-items: center; gap: 14px; }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 2px solid var(--green);
+      color: var(--green);
+      font-family: var(--font-mont);
+      font-weight: 700;
+      font-size: 15px;
+      padding: 9px 22px;
+      border-radius: var(--radius-pill);
+      white-space: nowrap;
+    }
+    .pill--info { border-color: var(--blue); color: var(--blue-ink); }
+
+    /* ---------- Stage layout ---------- */
+    .stage { flex: 1 1 auto; display: flex; min-height: 0; }
+
+    .qrail {
+      flex: 0 0 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 0;
+      gap: 20px;
+      background: #fff;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .qrail::-webkit-scrollbar { display: none; }
+    .qnode {
+      outline: none;
+      appearance: none;
+      width: 37px;
+      height: 37px;
+      border-radius: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: #ffb300;
+      border: 2px solid #ffb300;
+      box-shadow: 0 0 0 3px #fff;
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 16px;
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .qnode:hover { transform: scale(1.08); }
+    .qnode--active { outline: 3px solid rgba(15, 176, 248, 0.5); outline-offset: 2px; }
+
+    /* Marks status: yellow = partial marks, green = full marks, red = zero/no answer */
+    .qnode--partial { background: #ffb300; border-color: #ffb300; }
+    .qnode--full { background: var(--green); border-color: var(--green); }
+    .qnode--zero { background: var(--red); border-color: var(--red); }
+
+    .main {
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 40px;
+      padding: 16px 24px;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .main::-webkit-scrollbar { display: none; }
+
+    .tabs {
+      flex: 0 0 auto;
+      display: flex;
+      gap: 0;
+      width: 100%;
+      background: #e8e8e8;
+      border-radius: 16px 16px 0 0;
+      padding: 8px 16px 0;
+    }
+    .tab {
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: 14px;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      padding: 12px 20px;
+      cursor: pointer;
+      border-radius: 12px 12px 0 0;
+    }
+    .tab--active { color: var(--blue); background: var(--card); }
+
+    .card {
+      background: var(--card) url("https://elb-onlinequiz.smartjen.com/images/main/bg_quiz.jpg") repeat;
+      border-radius: 0 0 16px 16px;
+      box-shadow: var(--shadow-card);
+    }
+    .card__scroll { padding: 24px 30px 30px; font-size: 14px; }
+
+    .stat-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .stat-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--ink-soft);
+      font-size: 13px;
+      cursor: default;
+    }
+    .stat-links { display: flex; gap: 18px; }
+    .show-annotations { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink); }
+
+    .prompt-text { font-size: 1.05em; line-height: 1.6; color: var(--ink); margin-bottom: 18px; }
+    .given-text { font-size: 1.05em; line-height: 1.6; color: var(--ink); margin-bottom: 0; }
+
+    .question-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .question-images img {
+      max-width: 260px;
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+
+    /* Fill-blank inline answers — underlined, letter label + color-coded */
+    .answer-annotation {
+      font-weight: 700;
+      cursor: help;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      text-decoration-thickness: 2px;
+    }
+    .answer-annotation--correct { color: rgb(14, 157, 120); text-decoration-color: rgb(63, 198, 153); }
+    .answer-annotation--incorrect { color: rgb(214, 30, 66); text-decoration-color: rgb(239, 68, 68); }
+    .answer-annotation--partial { color: rgb(97, 97, 97); text-decoration-color: rgb(242, 119, 119); }
+    .blank-label { color: var(--muted); font-weight: 600; margin-right: 1px; }
+
+    /* OE (rewrite) inline answer — background-highlight, exact colors from the live app */
+    .oe-annotation { font-weight: 700; cursor: help; }
+    .oe-annotation--correct { background: rgb(202, 237, 227); border-bottom: 1px solid rgb(63, 198, 153); }
+    .oe-annotation--incorrect { background: rgb(247, 215, 215); border-bottom: 1px solid rgb(239, 68, 68); }
+    .oe-annotation--partial { background: rgb(247, 215, 215); border-bottom: 2px solid rgb(242, 119, 119); color: rgb(97, 97, 97); }
+
+    .no-answer-text { color: var(--muted); }
+
+    .model-answer-line { font-size: 1.05em; line-height: 1.6; color: var(--ink); margin: 16px 0; }
+    .model-answer-value { color: rgb(22, 216, 167); font-weight: 700; border-bottom: 2px solid rgb(22, 216, 167); }
+
+    .marks-obtained {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-top: 18px;
+      font-size: 1em;
+    }
+
+    /* MCQ options */
+    .mcq-options { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+    .mcq-option {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1.5px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 12px 16px;
+      font-size: 0.95em;
+      color: var(--ink);
+    }
+    .mcq-option--correct {
+      border-color: var(--green);
+      background: #eefdf8;
+      color: var(--green);
+      font-weight: 700;
+    }
+    .mcq-option--wrong {
+      border-color: var(--red);
+      background: #fff0f1;
+      color: var(--red);
+      font-weight: 700;
+    }
+    .mcq-option__tick {
+      flex: 0 0 auto;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--green);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px;
+    }
+
+    /* Not-answered note (plain, matches "The Student has not answered this question") */
+    .answer-block--empty { color: var(--muted); font-style: italic; margin-bottom: 14px; }
+
+    /* Fill-blank paragraph */
+    .fb-passage { font-size: 1.02em; line-height: 1.85; color: var(--ink); margin-bottom: 16px; }
+    .fb-passage p { margin-bottom: 14px; }
+    .blank {
+      display: inline-block;
+      background: var(--amber-soft);
+      border: 1px solid #ffe6c2;
+      border-radius: 5px;
+      padding: 0 6px;
+      font-weight: 700;
+      color: #b9860d;
+      font-size: 0.92em;
+      margin: 0 2px;
+    }
+    .blank-key__label {
+      font-weight: 700;
+      font-size: 0.86em;
+      color: var(--ink-soft);
+      margin-bottom: 6px;
+    }
+    .blank-key {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 6px 14px;
+      margin-bottom: 16px;
+      font-size: 0.86em;
+      color: var(--ink-soft);
+    }
+    .blank-key li b { color: var(--ink); }
+    .blank-key .zero { color: var(--red); }
+
+    /* AI remark — plain bordered box, matching the live app's
+       <textarea class="form-control remarks"> (not a colored callout) */
+    .remarks-block { margin-top: 16px; }
+    .remarks-block__head {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: 1em;
+      color: var(--ink);
+      margin-bottom: 10px;
+    }
+    .remarks-block__head img { width: 16px; height: 16px; }
+    .remark-box {
+      border: 1px solid rgb(224, 224, 224);
+      border-radius: 8px;
+      background: #fff;
+      padding: 12px;
+      font-size: 1em;
+      line-height: 1.6;
+      color: var(--ink);
+      white-space: pre-line;
+    }
+
+    /* Placeholder for inert Notes/Video/Correction/Attachment tabs */
+    .placeholder { padding: 50px 24px; text-align: center; color: var(--muted); font-size: 15px; }
+
+    @media (max-width: 900px) {
+      .subbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 16px; min-height: auto; }
+      .pill-row { flex-wrap: wrap; }
+    }
+    @media (max-width: 768px) {
+      .btn-download { right: auto; left: 12px; font-size: 12px; padding: 5px 11px; gap: 5px; }
+      .btn-download svg { width: 14px; height: 14px; }
+      .btn-exit { font-size: 12px; padding: 5px 11px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <span class="topbar__title" id="quizTitle">Pending Marking Check</span>
+    <button class="btn-download" type="button" id="downloadPdfBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v13" /><path d="M7 12l5 5 5-5" /><path d="M5 20h14" />
+      </svg>
+      <span id="downloadPdfLabel">Download PDF</span>
+    </button>
+    <button class="btn-exit" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      Exit
+    </button>
+  </header>
+
+  <div class="subbar">
+    <div class="student-meta">
+      <div class="student-meta__field">
+        <label>Student Name</label>
+        <div class="value" id="studentName">Samantha Wardhana</div>
+      </div>
+      <div class="student-meta__field">
+        <label>Attempts</label>
+        <div class="value" id="attempts">6/6</div>
+      </div>
+    </div>
+    <div class="pill-row">
+      <span class="pill" id="statusPill">All Questions Marked</span>
+      <span class="pill pill--info" id="marksPill">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5v.5" stroke-linecap="round" /></svg>
+        1.5/33 Marks (5%)
+      </span>
+    </div>
+  </div>
+
+  <div class="stage">
+    <nav class="qrail" id="qrail" aria-label="Questions"></nav>
+    <section class="main" id="mainScroll"></section>
+  </div>
+
+  <script src="quiz-data.js?v=1787035175"></script>
+  <script src="quiz-render.js?v=1787035175"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="heyhi-logo.js?v=1787035175"></script>
+  <script src="question-images.js?v=1787035175"></script>
+  <script src="quiz-pdf-generator.js?v=1787035175"></script>
+</body>
+</html>

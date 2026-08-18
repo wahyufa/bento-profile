@@ -1,0 +1,2770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HeyHi — Composition Writing · Quiz Result</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Nunito:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      /* Brand colors sampled from the Figma frame */
+      --amber: #fec53c;
+      --amber-soft: #fff7ee;
+      --blue: #0fb0f8;
+      --blue-ink: #0a93d4;
+      --green: #16d8a7;
+      --red: #ff1744;
+      --purple: #8a8fb0;
+      --slate: #708eb1;
+
+      --ink: #303b49;
+      --ink-soft: #5c6672;
+      --muted: #98a2ad;
+      --line: #e7ebef;
+      --page-bg: #F6F8FA;
+      --card: #ffffff;
+      --chip-bg: #f3f4f6;
+
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-pill: 16px;
+      --shadow-card: 0 1px 3px rgba(33, 43, 54, 0.06), 0 8px 24px rgba(33, 43, 54, 0.05);
+
+      --font-display: "Nunito", system-ui, sans-serif;
+      --font-body: "Poppins", system-ui, sans-serif;
+      --font-mont: "Montserrat", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Form controls don't inherit font by default in most browsers (they
+       fall back to the OS UI font/size, e.g. Arial 13.3px on Windows) —
+       force it. Without font-size here, any text sized in em inside a
+       button (e.g. .fb-quote inside .fb-card__head) ignores the Font Size
+       control, since its 1em resolves against the button's own fixed
+       default instead of the ancestor it's supposed to scale with. */
+    button,
+    select,
+    input,
+    textarea,
+    optgroup,
+    option {
+      font-family: inherit;
+      font-size: inherit;
+    }
+
+    html,
+    body {
+      height: 100%;
+    }
+
+    body {
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--page-bg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ---------- Top app bar ---------- */
+    .topbar {
+      position: relative;
+      flex: 0 0 auto;
+      height: 55px;
+      background: var(--amber) url("https://demo.heyhi.sg/images/bg-smartjen.png") repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .topbar__title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 20px;
+      letter-spacing: 0.2px;
+      color: #fff;
+      z-index: 1;
+    }
+
+    .btn-exit {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 15px;
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .btn-exit:hover {
+      transform: translateY(-50%) translateY(-1px);
+    }
+
+    /* ---------- Status pills sub-bar ---------- */
+    .subbar {
+      flex: 0 0 auto;
+      min-height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 14px;
+      padding: 0 24px 0 90px;
+      background: #fff url("https://demo.heyhi.sg/images/bg-smartjen-color.png") repeat;
+      box-shadow: rgba(18, 38, 63, 0.03) 0px 0.75rem 1.5rem;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 2px solid var(--green);
+      color: var(--green);
+      font-family: var(--font-mont);
+      font-weight: 700;
+      font-size: 15px;
+      padding: 9px 22px;
+      border-radius: var(--radius-pill);
+      white-space: nowrap;
+    }
+    .pill--info {
+      border-color: var(--blue);
+      color: var(--blue-ink);
+    }
+
+    /* ---------- Stage layout ---------- */
+    .stage {
+      flex: 1 1 auto;
+      display: flex;
+      min-height: 0;
+      padding: 0;
+    }
+
+    /* Left question rail */
+    .qrail {
+      flex: 0 0 72px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 18px 0;
+      gap: 0;
+      background: #fff;
+    }
+    .qnode {
+      /* Full browser-default button reset */
+      outline: none;
+      border: none;
+      -webkit-appearance: none;
+      appearance: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+
+      position: relative;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      background: #8a8a8a;
+      font-family: var(--font-body);
+      font-weight: 400;
+      font-size: 15px;
+      cursor: pointer;
+      z-index: 1;
+      transition: transform 0.12s ease;
+    }
+    .qnode:hover { transform: scale(1.06); }
+    /* Suppress focus ring only on nodes that are NOT active */
+    .qnode:not(.qnode--active):focus,
+    .qnode:not(.qnode--active):focus-visible,
+    .qnode:not(.qnode--active):active { outline: none; box-shadow: none; }
+    .qnode + .qnode { margin-top: 36px; }
+    .qnode + .qnode::before { content: none; }
+    .qnode--wrong { background: var(--red); }
+    .qnode--active {
+      outline: 3px solid rgba(15, 176, 248, 0.5);
+      outline-offset: 2px;
+    }
+
+    /* ---------- Main content card ---------- */
+    .main {
+      flex: 1 1 auto;
+      min-width: 0;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 48px;
+      padding: 16px 24px 16px 24px;
+      overflow-y: auto;
+    }
+
+    .tabs {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-end;
+      gap: 0;
+      width: 100%;
+      background: #e8e8e8;
+      border-radius: 16px 16px 0 0;
+      padding: 8px 16px 0;
+    }
+    .tab {
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: 16px;
+      color: var(--muted);
+      background: transparent;
+      border: none;
+      padding: 12px 22px;
+      cursor: pointer;
+      border-radius: 12px 12px 0 0;
+    }
+    .tab--active {
+      color: var(--blue);
+      background: var(--card);
+    }
+
+    .card {
+      flex: 1 1 auto;
+      background: var(--card) url("https://elb-onlinequiz.smartjen.com/images/main/bg_quiz.jpg") repeat;
+      border-radius: 0 0 16px 16px;
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card__scroll {
+      padding: 26px 34px 90px;
+    }
+
+    .stat-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--ink-soft);
+      font-size: 14px;
+      padding-bottom: 18px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 22px;
+      cursor: pointer;
+      width: 100%;
+    }
+    .stat-link svg {
+      flex: 0 0 auto;
+    }
+
+    .eyebrow {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1em;
+      letter-spacing: 0.4px;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .task-text {
+      font-size: 1.36em;
+      line-height: 1.6;
+      color: var(--ink);
+      margin-bottom: 26px;
+    }
+
+    .answer-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .answer-row b {
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: 1.21em;
+    }
+    .wordcount {
+      background: var(--chip-bg);
+      color: var(--ink-soft);
+      font-size: 1em;
+      padding: 7px 14px;
+      border-radius: 8px;
+    }
+
+    .ai-banner {
+      display: flex;
+      align-items: stretch;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .ai-banner__note {
+      flex: 1 1 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--amber-soft);
+      border: 1px solid #ffe6c2;
+      border-radius: var(--radius-md);
+      color: #f5a623;
+      font-family: var(--font-body);
+      font-weight: 800;
+      font-size: 1.14em;
+      padding: 12px;
+    }
+    .btn-see-result {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 16px;
+      padding: 0 26px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    .essay p {
+      font-size: 1.21em;
+      line-height: 1.65;
+      color: var(--ink-soft);
+      margin-bottom: 14px;
+    }
+
+    /* Highlights linking the student's answer back to specific Writing
+       Feedback items — the feedback in the summary panel refers to these
+       exact spans, color-coded to match the category dot/badge colors. */
+    .annotate {
+      border-radius: 3px;
+      padding: 1px 3px;
+      cursor: help;
+    }
+    .annotate--grammar { background: rgba(254, 197, 60, 0.35); }
+    .annotate--clarity { background: rgba(15, 176, 248, 0.22); }
+    .annotate--spelling { background: rgba(255, 59, 82, 0.22); }
+    .annotate--general { background: rgba(138, 143, 176, 0.22); }
+
+    /* Floating Show Note button pinned to the card */
+    .card__footer {
+      position: relative;
+      flex: 0 0 auto;
+      border-top: 1px solid var(--line);
+      padding: 14px 24px;
+      display: flex;
+      justify-content: flex-end;
+      background: var(--card);
+    }
+    .btn-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #fff;
+      color: var(--blue);
+      border: 1.5px solid var(--blue);
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 16px;
+      padding: 11px 22px;
+      border-radius: var(--radius-md);
+      cursor: pointer;
+    }
+
+    /* ---------- Summary panel ---------- */
+    .summary-slot {
+      flex: 0 0 472px;
+      display: flex;
+      min-height: 0;
+      margin: 12px 8px 12px 0;
+    }
+    .summary-slot--closed {
+      display: none;
+    }
+    .summary {
+      flex: 1 1 auto;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card);
+      overflow: hidden;
+    }
+
+    /* Band 1 — fixed, shown once: who/what this feedback belongs to.
+       Solid slate background so it visually reads as its own block. */
+    .feedback-context {
+      flex: 0 0 auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 18px;
+      background: #708eb1;
+    }
+    .summary__tag {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.22);
+      color: #fff;
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: var(--radius-pill);
+    }
+    .feedback-context__title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+    }
+    .summary__close {
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 18px;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    /* Band 2 — fixed, plain white: settings that apply to every feedback
+       card below, instead of repeating Remark Style / Language / Font Size
+       inside each one. Different background from band 1 above it. */
+    .global-settings {
+      flex: 0 0 auto;
+      display: grid;
+      /* Remark Style carries the longest labels; Language and Font Size are
+         compact by design, so they don't need an equal third. */
+      grid-template-columns: 1.5fr 0.85fr 0.85fr;
+      gap: 8px;
+      padding: 8px 18px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+    .global-settings .field label {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--ink-soft);
+      margin-bottom: 3px;
+    }
+    /* Same track-with-pill base as the Overview/Details segmented control
+       (.segmented/.seg-btn below), scoped with its own class names so its
+       click handling doesn't collide with the global ".seg-btn" listeners.
+       Each of the three controls gets a shape tied to what it means,
+       instead of three identical text pills. */
+    .gset-seg {
+      position: relative;
+      display: flex;
+      height: 32px;
+      box-sizing: border-box;
+      background: #d7e1ec;
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .gset-seg__btn {
+      flex: 1 1 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      background: transparent;
+      border: none;
+      outline: none;
+      border-radius: 7px;
+      padding: 5px 4px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 12px;
+      color: var(--ink-soft);
+      cursor: pointer;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      transition: color 0.15s ease;
+    }
+    .gset-seg__btn--active {
+      background: #fff;
+      color: var(--ink);
+    }
+    /* Remark Style: label always visible on all three buttons. Slightly
+       tighter padding than the default .gset-seg__btn so the three labels
+       fit without truncating. */
+    #globalRemark .gset-seg__btn {
+      padding: 5px 2px;
+      font-size: 11px;
+    }
+    /* Font Size: the button glyph itself is small/medium/large, so sizing
+       is shown rather than described. Fixed row height keeps the three
+       buttons aligned despite their different font sizes. */
+    .gset-fontbtn {
+      height: 26px;
+      font-family: var(--font-body);
+      line-height: 1;
+    }
+    .gset-fontbtn[data-value="12"] { font-size: 12px; }
+    .gset-fontbtn[data-value="14"] { font-size: 15px; }
+    .gset-fontbtn[data-value="18"] { font-size: 20px; }
+    /* Language: a compact menu button instead of a text pill row — the
+       list of languages can grow (4-5+) without the control outgrowing its
+       column, which a fixed-width segmented row or 2-state switch can't do. */
+    .gset-menu {
+      position: relative;
+    }
+    .gset-menu__trigger {
+      width: 100%;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 5px;
+      background: #d7e1ec;
+      border: none;
+      outline: none;
+      border-radius: 10px;
+      padding: 0 8px;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 12px;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .gset-menu__trigger svg {
+      flex: 0 0 auto;
+      opacity: 0.7;
+    }
+    .gset-menu__chevron {
+      margin-left: auto;
+      transition: transform 0.15s ease;
+    }
+    .gset-menu--open .gset-menu__chevron {
+      transform: rotate(180deg);
+    }
+    .gset-menu__list {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      z-index: 50;
+      margin: 0;
+      padding: 4px;
+      list-style: none;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      box-shadow: 0 10px 24px rgba(24, 39, 57, 0.14);
+      max-height: 170px;
+      overflow-y: auto;
+    }
+    .gset-menu__list[hidden] {
+      display: none;
+    }
+    .gset-menu__item {
+      padding: 7px 9px;
+      border-radius: 7px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 12.5px;
+      color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .gset-menu__item:hover {
+      background: #f2f5f8;
+    }
+    .gset-menu__item--active {
+      background: var(--blue);
+      color: #fff;
+    }
+    /* Deliberate keyboard-focus ring, tight to each control's own shape,
+       instead of the browser's default outline (which ignores our
+       border-radius and looks like a mismatched glitch on this row). */
+    .gset-seg__btn:focus-visible,
+    .gset-menu__trigger:focus-visible {
+      outline: none;
+      box-shadow: 0 0 0 2px var(--blue);
+    }
+
+    /* Per-section label inside the scroll — a light divider, not a
+       duplicate banner (the far-right rail already provides navigation). */
+    .summary__head {
+      padding: 10px 18px 4px;
+    }
+    .summary__title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.86em;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+      color: var(--ink-soft);
+    }
+
+    .summary__scroll {
+      overflow-y: auto;
+      padding: 0;
+    }
+
+    /* Each section (Summary / Rubrics / Good Points) stacks in one continuous scroll */
+    .fb-section {
+      scroll-margin-top: 0;
+      background: #f7f9fb;
+    }
+    .fb-section + .fb-section {
+      border-top: 8px solid var(--page-bg);
+    }
+    .summary__body {
+      padding: 12px 18px 18px;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 14px;
+      margin-bottom: 8px;
+    }
+    .field label {
+      display: block;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 16px;
+      margin-bottom: 8px;
+    }
+    .select {
+      position: relative;
+    }
+    .select select {
+      width: 100%;
+      appearance: none;
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      padding: 13px 40px 13px 16px;
+      font-family: var(--font-body);
+      font-size: 16px;
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .select::after {
+      content: "";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      width: 9px;
+      height: 9px;
+      border-right: 2.5px solid var(--ink);
+      border-bottom: 2.5px solid var(--ink);
+      transform: translateY(-65%) rotate(45deg);
+      pointer-events: none;
+    }
+
+    .chips-row {
+      display: block;
+      margin: 0;
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      padding: 4px 8px;
+      font-size: 0.93em;
+      color: var(--ink);
+      cursor: pointer;
+      transition: border-color 0.12s ease;
+    }
+    .chip--active {
+      border-color: var(--blue);
+    }
+    .chip__count {
+      min-width: 22px;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: var(--radius-pill);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.86em;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    /* "All" is a summary chip, not a category — keep it visually lighter/smaller */
+    .c-all {
+      padding: 6px 10px;
+      font-size: 0.86em;
+    }
+    .c-all .chip__count {
+      min-width: 18px;
+      height: 18px;
+      padding: 0 5px;
+      font-size: 0.79em;
+      background: var(--slate);
+    }
+    .c-grammar .chip__count { background: var(--amber); }
+    .c-clarity .chip__count { background: var(--blue); }
+    .c-spelling .chip__count { background: var(--red); }
+    .c-general .chip__count { background: var(--purple); }
+
+    .expand-all {
+      float: right;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: var(--blue);
+      font-weight: 600;
+      font-size: 0.86em;
+      padding: 9px 2px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .expand-all svg {
+      transition: transform 0.18s ease;
+    }
+    .expand-all[data-state="collapse"] svg {
+      transform: rotate(180deg);
+    }
+
+    .fb-group {
+      clear: both;
+      margin-top: 16px;
+    }
+    .fb-group__title {
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 1.15em;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .fb-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      box-shadow: 0 1px 3px rgba(33, 43, 54, 0.04);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    /* Whole header is the click target — minimal, no text label, just a
+       chevron that flips. Bigger hit area than a small "Feedback" link. */
+    .fb-card__head {
+      width: 100%;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      text-align: left;
+      cursor: pointer;
+    }
+    .fb-dot {
+      flex: 0 0 auto;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      margin-top: 7px;
+    }
+    .dot-grammar { background: var(--amber); }
+    .dot-clarity { background: var(--blue); }
+    .dot-spelling { background: var(--red); }
+    .dot-general { background: var(--purple); }
+    .dot-good { background: var(--green); }
+
+    .fb-quote {
+      flex: 1 1 auto;
+      font-size: 1em;
+      line-height: 1.45;
+      color: var(--ink-soft);
+    }
+    .fb-chevron {
+      flex: 0 0 auto;
+      margin-top: 4px;
+      color: var(--muted);
+      transition: transform 0.18s ease;
+    }
+    .fb-card--open .fb-chevron {
+      transform: rotate(180deg);
+      color: var(--blue);
+    }
+
+    .fb-body {
+      display: none;
+      background: var(--amber-soft);
+      border-top: 1px solid #ffe9cf;
+      padding: 12px 12px 12px;
+    }
+    .fb-card--open .fb-body {
+      display: block;
+    }
+    .fb-body p {
+      font-size: 0.93em;
+      line-height: 1.55;
+      color: var(--ink);
+      margin-bottom: 16px;
+    }
+    .ai-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-pill);
+      padding: 4px 12px;
+      font-size: 0.86em;
+      color: var(--ink);
+    }
+
+    /* ---------- Rubrics view ---------- */
+    .rb-meta {
+      margin-bottom: 10px;
+    }
+    .rb-meta__label {
+      font-size: 0.79em;
+      color: var(--ink-soft);
+      margin-bottom: 4px;
+    }
+    .rb-meta__value {
+      font-weight: 700;
+      font-size: 0.93em;
+      color: var(--ink);
+    }
+
+    .segmented {
+      display: flex;
+      background: #d7e1ec;
+      border-radius: 12px;
+      padding: 4px;
+      gap: 4px;
+      margin-bottom: 10px;
+    }
+    .seg-btn {
+      flex: 1 1 0;
+      background: transparent;
+      border: none;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.93em;
+      color: var(--ink-soft);
+      padding: 7px 0;
+      border-radius: 9px;
+      cursor: pointer;
+    }
+    .seg-btn--active {
+      background: #fff;
+      color: var(--ink);
+    }
+
+    .score-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #d7e1ec;
+      border-radius: 12px;
+      padding: 12px;
+      font-weight: 700;
+      font-size: 1em;
+      color: var(--ink);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .score-bar img {
+      position: absolute;
+      right: 10px;
+      bottom: -4px;
+      height: 42px;
+      width: auto;
+      opacity: 0.95;
+    }
+
+    .rb-card {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      padding: 14px;
+    }
+    .rb-eyebrow {
+      font-size: 0.79em;
+      color: var(--ink-soft);
+      margin-bottom: 2px;
+    }
+    .rb-title {
+      font-weight: 700;
+      font-size: 1em;
+      color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .rb-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    .rb-row:last-of-type {
+      margin-bottom: 10px;
+    }
+    .rb-row__label {
+      flex: 0 0 150px;
+      font-size: 0.86em;
+      color: var(--ink-soft);
+      line-height: 1.3;
+    }
+    .rb-bar {
+      flex: 1 1 auto;
+      display: block;
+      height: 10px;
+      background: var(--chip-bg);
+      border-radius: var(--radius-pill);
+      overflow: hidden;
+    }
+    .rb-bar__fill {
+      display: block;
+      height: 100%;
+      background: var(--blue);
+      border-radius: var(--radius-pill);
+    }
+    .rb-row__score {
+      flex: 0 0 auto;
+      font-weight: 700;
+      font-size: 0.86em;
+      color: var(--ink);
+    }
+    .rb-seedetails {
+      text-align: center;
+    }
+    .rb-detail-link {
+      background: transparent;
+      border: none;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.93em;
+      color: var(--blue);
+      cursor: pointer;
+    }
+
+    .rb-fullrubrics {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 8px;
+    }
+    .rb-fullrubrics a {
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.86em;
+      color: var(--blue);
+      text-decoration: none;
+    }
+
+    .rb-acc {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius-md);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .rb-acc__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 16px;
+      background: transparent;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.93em;
+      color: var(--ink);
+      text-align: left;
+    }
+    .rb-acc__head svg {
+      flex: 0 0 auto;
+      transition: transform 0.18s ease;
+      color: var(--ink-soft);
+    }
+    .rb-acc--open .rb-acc__head svg {
+      transform: rotate(180deg);
+    }
+    .rb-acc__body {
+      display: none;
+      padding: 0 16px 14px;
+    }
+    .rb-acc--open .rb-acc__body {
+      display: block;
+    }
+    .rb-acc__obtained {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.86em;
+      color: var(--ink-soft);
+      margin-bottom: 8px;
+    }
+    .rb-acc__obtained b {
+      color: var(--ink);
+    }
+    .rb-acc__desc {
+      font-size: 0.86em;
+      line-height: 1.55;
+      color: var(--ink-soft);
+      margin-bottom: 10px;
+    }
+    /* Callout style instead of plain blue text — easier to read, and the
+       left accent uses the brand blue (#0fb0f8) instead of amber. */
+    .rb-feedback {
+      background: #eaf8ff;
+      border-left: 3px solid var(--blue);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.86em;
+      line-height: 1.6;
+      color: var(--ink-soft);
+      margin-top: 8px;
+    }
+
+
+    /* ---------- Far-right vertical rail ---------- */
+    .farrail {
+      flex: 0 0 88px;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 26px;
+      padding: 16px 0 16px 0;
+      margin-top: 12px;
+      background: #fff;
+      border-radius: 16px;
+    }
+    .rnav {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 600;
+      width: 88px;
+      text-align: center;
+    }
+    .rnav__icon {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #97a3b0;
+    }
+    .rnav--active .rnav__icon {
+      background: var(--blue);
+      color: #fff;
+    }
+    .rnav--active {
+      color: var(--blue);
+    }
+
+    /* Scrollbars — hidden across all scroll containers */
+    .main,
+    .card__scroll,
+    .summary__scroll { scrollbar-width: none; }
+    .main::-webkit-scrollbar,
+    .card__scroll::-webkit-scrollbar,
+    .summary__scroll::-webkit-scrollbar {
+      display: none;
+    }
+    .card__scroll::-webkit-scrollbar-thumb,
+    .summary__scroll::-webkit-scrollbar-thumb {
+      background: #d7dde3;
+      border-radius: 8px;
+    }
+
+    /* Placeholder shown for non-Question tabs / non-Summary rails */
+    .placeholder {
+      padding: 60px 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    /* --- Question blocks (spacing handled by .main gap) --- */
+    .qblock { margin-bottom: 0; }
+
+    /* --- Feedback-context: question navigator prev/next --- */
+    .fc-qnav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex: 1 1 auto;
+    }
+    .fc-qbtn {
+      background: rgba(255, 255, 255, 0.22);
+      border: none;
+      color: #fff;
+      width: 26px;
+      height: 26px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 18px;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-family: var(--font-body);
+      transition: background 0.12s;
+    }
+    .fc-qbtn:hover { background: rgba(255, 255, 255, 0.38); }
+    .fc-qbtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+    /* --- Question list toggle (mobile only) --- */
+    .qrail-toggle {
+      display: none;
+    }
+    .qrail-backdrop {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.32);
+      z-index: 9;
+    }
+    .qrail-backdrop--open { display: block; }
+
+    /* ===== Mobile Responsive ===== */
+    @media (max-width: 768px) {
+
+      /* Body: padding for fixed bottom nav, keep overflow hidden */
+      body { padding-bottom: 64px; }
+
+      /* --- Topbar --- */
+      .topbar { height: 48px; }
+      .topbar__title { font-size: 16px; }
+      .btn-exit { font-size: 12px; padding: 5px 11px; gap: 5px; }
+      .btn-exit svg { width: 14px; height: 14px; }
+
+      /* --- Subbar --- */
+      .subbar {
+        min-height: auto;
+        padding: 8px 16px;
+        gap: 8px;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+      .pill { font-size: 11px; padding: 6px 14px; gap: 4px; }
+      .pill svg { width: 14px; height: 14px; }
+
+      /* --- Stage: vertical stack --- */
+      .stage { flex-direction: column; }
+
+      /* --- Stage: relative so qrail/backdrop can absolute-position inside --- */
+      .stage { position: relative; }
+
+      /* --- Q-rail: hidden left sidebar, slides in on toggle --- */
+      .qrail {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        flex: none;
+        width: 72px;
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: visible;
+        padding: 18px 0;
+        align-items: center;
+        gap: 0;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        z-index: 10;
+        scrollbar-width: none;
+      }
+      .qrail::-webkit-scrollbar { display: none; }
+      .qrail--open { transform: translateX(0); }
+      /* Restore vertical connector */
+      .qnode + .qnode { margin-top: 36px; margin-left: 0; }
+      .qnode + .qnode::before {
+        top: -36px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 2px;
+        height: 36px;
+      }
+
+      /* --- Toggle button --- */
+      .qrail-toggle {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        background: transparent;
+        border: none;
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 700;
+        font-family: var(--font-body);
+        cursor: pointer;
+        padding: 6px 0 2px;
+        position: sticky;
+        top: 0;
+        z-index: 5;
+        background: var(--page-bg);
+        width: 100%;
+      }
+      .qrail-toggle svg { transition: transform 0.25s; }
+      .qrail-toggle--open svg { transform: scaleX(-1); }
+
+      /* --- AI banner: compact on mobile --- */
+      .ai-banner { gap: 8px; margin-bottom: 16px; }
+      .ai-banner__note {
+        font-size: 10px;
+        padding: 8px 10px;
+        gap: 4px;
+        font-weight: 700;
+      }
+      .ai-banner__note svg { width: 14px; height: 14px; flex-shrink: 0; }
+      .btn-see-result { font-size: 12px; padding: 8px 12px; gap: 6px; }
+      .btn-see-result svg { width: 14px; height: 14px; }
+
+      /* --- Main card --- */
+      .main {
+        flex: 1 1 auto;
+        min-height: 0;
+        padding: 10px;
+      }
+      .tab { font-size: 13px; padding: 9px 13px; }
+      .card__scroll { padding: 16px 14px 80px; }
+
+      /* --- Summary slot: fixed bottom sheet --- */
+      .summary-slot {
+        position: fixed;
+        inset: auto 0 64px 0;
+        max-height: 74vh;
+        height: 74vh;
+        flex: none;
+        margin: 0;
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.2);
+        z-index: 200;
+      }
+      /* Drag handle above feedback-context */
+      .summary::before {
+        content: "";
+        display: block;
+        flex-shrink: 0;
+        width: 36px;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.45);
+        border-radius: 4px;
+        margin: 8px auto 4px;
+      }
+
+      /* --- Far rail: fixed bottom tab bar --- */
+      .farrail {
+        position: fixed;
+        inset: auto 0 0 0;
+        flex-direction: row;
+        height: 64px;
+        border-radius: 0;
+        margin: 0;
+        padding: 0;
+        gap: 0;
+        justify-content: space-around;
+        align-items: center;
+        border-top: 1px solid var(--line);
+        z-index: 300;
+      }
+      .rnav { flex: 1; width: auto; font-size: 9px; padding: 6px 0; }
+      .rnav__icon { width: 36px; height: 36px; border-radius: 10px; }
+      .rnav svg { width: 20px; height: 20px; }
+
+      /* --- Global settings: keep 3 columns, tighten padding --- */
+      .global-settings { grid-template-columns: 1fr 1fr 1fr; padding: 6px 10px; gap: 5px; }
+      .global-settings .field label { font-size: 10px; }
+      .gset-seg__btn { font-size: 11px; padding: 5px 3px; }
+      .gset-menu__trigger { font-size: 11px; padding: 0 5px; }
+
+      /* --- Good Points: no line break in bottom tab bar --- */
+      .farrail .rnav br { display: none; }
+
+      /* --- Chips --- */
+      .chip { font-size: 11px; }
+
+      /* --- Rubrics in summary panel --- */
+      .rb-row { flex-wrap: wrap; gap: 4px; }
+      .rb-row__label { flex: 0 0 100%; font-size: 12px; }
+      .rb-bar { flex: 1 1 auto; }
+      .rb-acc__head { font-size: 12px; }
+
+      /* --- Frscores grid: 2 columns on mobile --- */
+      .frscores { grid-template-columns: 1fr 1fr; }
+
+      /* --- Full rubrics modal: bottom sheet --- */
+      .frmodal-overlay { padding: 0; align-items: flex-end; }
+      .frmodal {
+        max-width: 100%;
+        width: 100%;
+        max-height: 92vh;
+        border-radius: 16px 16px 0 0;
+      }
+      .frmodal__body { padding: 16px; }
+      .frmodal__header { padding: 16px 16px 12px; }
+    }
+
+    /* ===== See Full Rubrics Modal ===== */
+    .frmodal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 900;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .frmodal-overlay--open { display: flex; }
+
+    .frmodal {
+      background: #fff;
+      border-radius: 16px;
+      width: 100%;
+      max-width: 860px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.18);
+    }
+    .frmodal__header {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+    .frmodal__title { font-weight: 700; font-size: 18px; color: var(--ink); }
+    .frmodal__score {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      color: var(--ink-soft);
+      margin-top: 4px;
+    }
+    .frmodal__close {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--ink-soft);
+      padding: 2px;
+      flex-shrink: 0;
+      line-height: 1;
+    }
+    .frmodal__close:hover { color: var(--ink); }
+
+    .frmodal__body {
+      flex: 1 1 auto;
+      overflow-y: auto;
+      padding: 20px 24px 24px;
+    }
+    .frmodal__rubric-title {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--ink);
+      margin-bottom: 20px;
+    }
+
+    .frsec { margin-bottom: 28px; }
+    .frsec__label {
+      font-weight: 700;
+      font-size: 13px;
+      color: var(--ink);
+      background: var(--chip-bg);
+      padding: 8px 14px;
+      border-radius: 8px;
+      margin-bottom: 12px;
+    }
+    .frremark {
+      border: 1px solid var(--line);
+      border-left: 4px solid var(--amber);
+      border-radius: 8px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
+      background: #fff;
+    }
+    .frremark__head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+    .frremark__lbl { font-weight: 700; font-size: 13px; color: var(--ink); }
+    .frremark__lang {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 12px;
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: #fff;
+    }
+    .frremark__text {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--ink);
+    }
+    .frremark__text b { display: block; margin-bottom: 6px; }
+
+    .frscores {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+    .frscore-card {
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 12px 13px 14px;
+      display: flex;
+      flex-direction: column;
+    }
+    .frscore-card--active { border: 2px solid var(--blue); }
+    .frscore-card__range {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      font-size: 11.5px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .frscore-card--active .frscore-card__range { color: var(--blue); }
+    .frscore-card__desc {
+      font-size: 12.5px;
+      line-height: 1.5;
+      color: var(--ink);
+      flex: 1 1 auto;
+    }
+    .frscore-card--active .frscore-card__desc { font-weight: 700; }
+    .frscore-card__score-row {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin-top: 12px;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+    .frscore-card--active .frscore-card__score-row { display: flex; }
+    .frscore-card__score-row svg { color: var(--muted); }
+    .frscore-card__input {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 3px 8px;
+      width: 52px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      color: var(--ink);
+      font-family: var(--font-body);
+    }
+
+    /* ---------- Sections hidden for this case ----------
+       Rubrics / Good Points / the whole right-hand feedback panel and its
+       far-right section rail are specific to a different flow — hidden here
+       so the PDF export has a single, unambiguous source of AI feedback
+       (the inline annotations in the essay text). */
+    .farrail,
+    .summary-slot {
+      display: none !important;
+    }
+
+    /* ---------- Download PDF button ---------- */
+    .btn-download {
+      position: absolute;
+      right: 128px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green);
+      color: #fff;
+      border: none;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 15px;
+      padding: 7px 16px;
+      border-radius: var(--radius-pill);
+      cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+    .btn-download:hover { transform: translateY(-50%) translateY(-1px); }
+    .btn-download:disabled { opacity: 0.65; cursor: wait; }
+
+    @media (max-width: 768px) {
+      .btn-download {
+        right: auto;
+        left: 12px;
+        font-size: 12px;
+        padding: 5px 11px;
+        gap: 5px;
+      }
+      .btn-download svg { width: 14px; height: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Top app bar -->
+  <header class="topbar">
+    <span class="topbar__title">Composition Writing</span>
+    <button class="btn-download" type="button" id="downloadPdfBtn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 3v13" />
+        <path d="M7 12l5 5 5-5" />
+        <path d="M5 20h14" />
+      </svg>
+      <span id="downloadPdfLabel">Download PDF</span>
+    </button>
+    <button class="btn-exit" type="button" onclick="exitQuiz()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round">
+        <path d="M6 6l12 12M18 6L6 18" />
+      </svg>
+      Exit
+    </button>
+  </header>
+
+  <!-- Status pills -->
+  <div class="subbar">
+    <span class="pill">All Questions Marked</span>
+    <span class="pill pill--info">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v5M12 7.5v.5" stroke-linecap="round" />
+      </svg>
+      10/20 Marks (50%)
+    </span>
+  </div>
+
+  <!-- Stage -->
+  <div class="stage">
+    <!-- Left question rail -->
+    <nav class="qrail" aria-label="Questions">
+      <button class="qnode qnode--active" data-q="1">1</button>
+      <button class="qnode" data-q="2">2</button>
+      <button class="qnode qnode--wrong" data-q="3">3</button>
+      <button class="qnode qnode--wrong" data-q="4">4</button>
+      <button class="qnode qnode--wrong" data-q="5">5</button>
+    </nav>
+
+    <!-- Backdrop for mobile qrail -->
+    <div class="qrail-backdrop" id="qrailBackdrop"></div>
+
+    <!-- Main content: continuous scroll through all questions -->
+    <section class="main" id="mainScroll">
+      <!-- Mobile-only toggle to show/hide question list -->
+      <button class="qrail-toggle" id="qrailToggle" type="button">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg>
+        Show question list
+      </button>
+
+      <div class="qblock" id="qblock-1" data-q="1">
+      <div class="tabs" role="tablist">
+        <button class="tab tab--active" data-tab="question">Question 1</button>
+        <button class="tab" data-tab="notes">Notes</button>
+        <button class="tab" data-tab="video">Video</button>
+        <button class="tab" data-tab="correction">Correction</button>
+      </div>
+
+      <div class="card">
+        <div class="card__scroll" style="font-size:14px;">
+          <!-- Question tab -->
+          <div data-panel="question">
+            <a class="stat-link">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 11v5M12 7.5v.5" stroke-linecap="round" />
+              </svg>
+              Question Statistics
+            </a>
+
+            <p class="eyebrow">Writing Task</p>
+            <p class="task-text">
+              Your friend in Japan plans to visit Singapore for a holiday, and you want to ensure
+              he/she has the best experience during their stay. Write an email to your friend,
+              explaining some planned activities and places.
+            </p>
+
+            <div class="answer-row">
+              <b>Answer:</b>
+              <span class="wordcount">205 Words</span>
+            </div>
+
+            <div class="ai-banner">
+              <div class="ai-banner__note">
+                This answer has been reviewed by AI
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z" />
+                  <path d="M19 13l.7 2.1L22 16l-2.3.9L19 19l-.7-2.1L16 16l2.3-.9z" />
+                </svg>
+              </div>
+              <button class="btn-see-result" type="button" data-q="1">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="4" width="18" height="16" rx="2" />
+                  <path d="M9 4v16" />
+                </svg>
+                See Result
+              </button>
+            </div>
+
+            <div class="essay">
+              <p>
+                The line graph compares the number of bicycles and cars sold in a small town between
+                2010 and 2017. <mark class="annotate annotate--general" title="General Feedback: clear overview and structure">Overall, bicycle sales declined steadily, while car sales rose, and by
+                the end of the period cars had become more popular than bicycles.</mark>
+              </p>
+              <p>
+                In 2010, bicycles were clearly the more common purchase, with <mark class="annotate annotate--general" title="General Feedback: good use of data &amp; figures">sales at about 1,200
+                units, compared with only 300 cars</mark>. <mark class="annotate annotate--grammar" title="Grammar: subject–verb agreement — use “was”, and “decreased slightly”">The number of bicycle buyers were slightly decreased</mark> over the next few
+                years, dropping to roughly 1,000 in 2011 and then to around 900 and 850 in 2012
+                and 2013 respectively. By 2015, bicycle sales had <mark class="annotate annotate--spelling" title="Spelling: “decreesed” → “decreased”">decreesed</mark> further to about 750, and
+                <mark class="annotate annotate--clarity" title="Writing Clarity: tighten this phrasing so the trend is easy to follow">the number of bicycle buyers had slightly decreased to a level that was still higher than
+                some readers of the chart expected</mark> before reaching their lowest point of about 500 units in 2017.
+              </p>
+              <p>
+                Car sales followed the opposite pattern. Starting from 300 in 2010, they rose to
+                approximately 400 in 2011 and 450 in 2012. <mark class="annotate annotate--grammar" title="Grammar: use the past tense — “increased”">By 2015, the percentage of households owning a car increase to 60%</mark>. <mark class="annotate annotate--grammar" title="Grammar: avoid repeating ‘and it’ — split into two sentences">Car sales was increased gradually and it reached 700 units and it became
+                the dominant choice by 2016</mark>. By 2017, <mark class="annotate annotate--spelling" title="Spelling: “propotion” → “proportion”">the propotion</mark> of cars had increased to about
+                800, creating a significant gap in <mark class="annotate annotate--spelling" title="Spelling: “favuor” → “favour”">favuor</mark> of cars.
+              </p>
+              <p>
+                Overall, the data suggest that during this period residents gradually <mark class="annotate annotate--general" title="General Feedback: nice vocabulary range">shifted their
+                preference</mark> from bicycles to cars, leading to a reversal in sales dominance by 2016.
+              </p>
+            </div>
+          </div>
+
+          <!-- Other tabs -->
+          <div data-panel="notes" hidden>
+            <div class="placeholder">No notes added for this question yet.</div>
+          </div>
+          <div data-panel="video" hidden>
+            <div class="placeholder">No walkthrough video available for this question.</div>
+          </div>
+          <div data-panel="correction" hidden>
+            <div class="placeholder">Model correction will appear here.</div>
+          </div>
+        </div>
+
+      </div><!-- /card -->
+      </div><!-- /qblock-1 -->
+
+      <!-- Question 2 -->
+      <div class="qblock" id="qblock-2" data-q="2">
+        <div class="tabs" role="tablist">
+          <button class="tab tab--active" data-tab="question">Question 2</button>
+          <button class="tab" data-tab="notes">Notes</button>
+          <button class="tab" data-tab="video">Video</button>
+          <button class="tab" data-tab="correction">Correction</button>
+        </div>
+        <div class="card">
+          <div class="card__scroll" style="font-size:14px;">
+            <div data-panel="question">
+              <a class="stat-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5" stroke-linecap="round"/></svg>
+                Question Statistics
+              </a>
+              <p class="eyebrow">Writing Task</p>
+              <p class="task-text">You are a student at Greenfield Secondary School. Write a letter to your school principal suggesting two improvements that could be made to the school canteen. Your letter should be between 120 and 150 words.</p>
+              <div class="answer-row">
+                <b>Answer:</b>
+                <span class="wordcount">148 Words</span>
+              </div>
+              <div class="ai-banner">
+                <div class="ai-banner__note">
+                  This answer has been reviewed by AI
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/><path d="M19 13l.7 2.1L22 16l-2.3.9L19 19l-.7-2.1L16 16l2.3-.9z"/></svg>
+                </div>
+                <button class="btn-see-result" type="button" data-q="2">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+                  See Result
+                </button>
+              </div>
+              <div class="essay">
+                <p>Dear Principal, I am writing to suggest two <mark class="annotate annotate--grammar" title="Grammar: 'improvements' (plural)">improvement</mark> to our school canteen that I believe would greatly <mark class="annotate annotate--spelling" title="Spelling: 'benefit'">benfit</mark> the student body. Firstly, the canteen should offer more variety in healthy food options such as salads, fresh fruits, and wholemeal sandwiches. Currently, most stalls only sell fried food, which is not ideal for students&rsquo; health.</p>
+                <p>Secondly, I propose that the seating area be <mark class="annotate annotate--grammar" title="Grammar: 'expanded' (past participle needed)">expand</mark> to accommodate more students. During lunch breaks, many students are forced to stand because there are not enough seats. Adding more tables and chairs would ensure everyone has a comfortable dining experience.</p>
+                <p>I hope you will consider my suggestions. Thank you for your time. Yours sincerely, Wei Ling.</p>
+              </div>
+            </div>
+            <div data-panel="notes" hidden><div class="placeholder">No notes added for this question yet.</div></div>
+            <div data-panel="video" hidden><div class="placeholder">No walkthrough video available for this question.</div></div>
+            <div data-panel="correction" hidden><div class="placeholder">Model correction will appear here.</div></div>
+          </div>
+        </div>
+      </div><!-- /qblock-2 -->
+
+      <!-- Question 3 -->
+      <div class="qblock" id="qblock-3" data-q="3">
+        <div class="tabs" role="tablist">
+          <button class="tab tab--active" data-tab="question">Question 3</button>
+          <button class="tab" data-tab="notes">Notes</button>
+          <button class="tab" data-tab="video">Video</button>
+          <button class="tab" data-tab="correction">Correction</button>
+        </div>
+        <div class="card">
+          <div class="card__scroll" style="font-size:14px;">
+            <div data-panel="question">
+              <a class="stat-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5" stroke-linecap="round"/></svg>
+                Question Statistics
+              </a>
+              <p class="eyebrow">Writing Task</p>
+              <p class="task-text">A neighbour living above your flat has been making excessive noise every night. Write an email to your town council to report the problem and suggest two possible solutions.</p>
+              <div class="answer-row">
+                <b>Answer:</b>
+                <span class="wordcount">132 Words</span>
+              </div>
+              <div class="ai-banner">
+                <div class="ai-banner__note">
+                  This answer has been reviewed by AI
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/><path d="M19 13l.7 2.1L22 16l-2.3.9L19 19l-.7-2.1L16 16l2.3-.9z"/></svg>
+                </div>
+                <button class="btn-see-result" type="button" data-q="3">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+                  See Result
+                </button>
+              </div>
+              <div class="essay">
+                <p>Dear Town Council, I am <mark class="annotate annotate--spelling" title="Spelling: 'writing'">writting</mark> to report a noise disturbance caused by my upstairs neighbour at Block 72, Unit 08-22, who plays loud music between 11 pm and 2 am every night. This has seriously <mark class="annotate annotate--grammar" title="Grammar: 'affected' — 'effect' is a noun, 'affect' is the verb">effect</mark> my family&rsquo;s sleep and our overall wellbeing.</p>
+                <p>I would like to suggest two solutions. First, could the council send an <mark class="annotate annotate--spelling" title="Spelling: 'official'">oficial</mark> warning letter to the resident? Secondly, a reminder notice about quiet hours could be posted in the common areas of the block.</p>
+                <p>I look forward to your prompt response. Yours faithfully, Ahmad Rashid.</p>
+              </div>
+            </div>
+            <div data-panel="notes" hidden><div class="placeholder">No notes added for this question yet.</div></div>
+            <div data-panel="video" hidden><div class="placeholder">No walkthrough video available for this question.</div></div>
+            <div data-panel="correction" hidden><div class="placeholder">Model correction will appear here.</div></div>
+          </div>
+        </div>
+      </div><!-- /qblock-3 -->
+
+      <!-- Question 4 -->
+      <div class="qblock" id="qblock-4" data-q="4">
+        <div class="tabs" role="tablist">
+          <button class="tab tab--active" data-tab="question">Question 4</button>
+          <button class="tab" data-tab="notes">Notes</button>
+          <button class="tab" data-tab="video">Video</button>
+          <button class="tab" data-tab="correction">Correction</button>
+        </div>
+        <div class="card">
+          <div class="card__scroll" style="font-size:14px;">
+            <div data-panel="question">
+              <a class="stat-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5" stroke-linecap="round"/></svg>
+                Question Statistics
+              </a>
+              <p class="eyebrow">Writing Task</p>
+              <p class="task-text">You attended a career fair organised by your school last week. Write an email to your friend who could not attend, telling them what happened and what you found most useful.</p>
+              <div class="answer-row">
+                <b>Answer:</b>
+                <span class="wordcount">156 Words</span>
+              </div>
+              <div class="ai-banner">
+                <div class="ai-banner__note">
+                  This answer has been reviewed by AI
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/><path d="M19 13l.7 2.1L22 16l-2.3.9L19 19l-.7-2.1L16 16l2.3-.9z"/></svg>
+                </div>
+                <button class="btn-see-result" type="button" data-q="4">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+                  See Result
+                </button>
+              </div>
+              <div class="essay">
+                <p>Hi Marcus, I wanted to tell you about the career fair that took place in our school last <mark class="annotate annotate--spelling" title="Spelling: 'Thursday'">Thurdsay</mark>. It was a really impressive event with representatives from more than 25 companies, covering fields such as engineering, banking, healthcare, and creative arts.</p>
+                <p>The most useful part for me was a one-on-one session with a recruiter from a local tech company. She advised me to build a portfolio early and to join relevant clubs. I also attended a short talk on resume writing, which <mark class="annotate annotate--grammar" title="Grammar: 'gave' (past tense)">give</mark> me a lot of valuable tips I had never considered before.</p>
+                <p>I think you would have really enjoyed it. Hope you can make it next year! Best, Kai.</p>
+              </div>
+            </div>
+            <div data-panel="notes" hidden><div class="placeholder">No notes added for this question yet.</div></div>
+            <div data-panel="video" hidden><div class="placeholder">No walkthrough video available for this question.</div></div>
+            <div data-panel="correction" hidden><div class="placeholder">Model correction will appear here.</div></div>
+          </div>
+        </div>
+      </div><!-- /qblock-4 -->
+
+      <!-- Question 5 -->
+      <div class="qblock" id="qblock-5" data-q="5">
+        <div class="tabs" role="tablist">
+          <button class="tab tab--active" data-tab="question">Question 5</button>
+          <button class="tab" data-tab="notes">Notes</button>
+          <button class="tab" data-tab="video">Video</button>
+          <button class="tab" data-tab="correction">Correction</button>
+        </div>
+        <div class="card">
+          <div class="card__scroll" style="font-size:14px;">
+            <div data-panel="question">
+              <a class="stat-link">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 7.5v.5" stroke-linecap="round"/></svg>
+                Question Statistics
+              </a>
+              <p class="eyebrow">Writing Task</p>
+              <p class="task-text">You and your family recently returned from a holiday abroad. Write a letter to your friend describing the holiday and giving your recommendation about the destination.</p>
+              <div class="answer-row">
+                <b>Answer:</b>
+                <span class="wordcount">162 Words</span>
+              </div>
+              <div class="ai-banner">
+                <div class="ai-banner__note">
+                  This answer has been reviewed by AI
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/><path d="M19 13l.7 2.1L22 16l-2.3.9L19 19l-.7-2.1L16 16l2.3-.9z"/></svg>
+                </div>
+                <button class="btn-see-result" type="button" data-q="5">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/></svg>
+                  See Result
+                </button>
+              </div>
+              <div class="essay">
+                <p>Dear Priya, I am <mark class="annotate annotate--grammar" title="Grammar: 'writing' (present participle, not base form)">write</mark> to tell you about my recent family holiday to Bali, Indonesia, which we returned from last week. We stayed in a resort near Seminyak and spent five days exploring the island.</p>
+                <p>We visited many beautiful temples and rice terraces. My favourite activity was the cooking class where we learned to make traditional Balinese <mark class="annotate annotate--grammar" title="Grammar: 'dishes' (plural)">dish</mark>. The food was absolutely delicious and the locals were very welcoming.</p>
+                <p>Overall, Bali is a wonderful destination that I would <mark class="annotate annotate--spelling" title="Spelling: 'definitely'">definately</mark> recommend to anyone who enjoys nature and culture. I hope you can plan a trip there soon! With love, Siti.</p>
+              </div>
+            </div>
+            <div data-panel="notes" hidden><div class="placeholder">No notes added for this question yet.</div></div>
+            <div data-panel="video" hidden><div class="placeholder">No walkthrough video available for this question.</div></div>
+            <div data-panel="correction" hidden><div class="placeholder">Model correction will appear here.</div></div>
+          </div>
+        </div>
+      </div><!-- /qblock-5 -->
+
+    </section>
+
+    <!-- Right-hand feedback panel: Summary → Rubrics → Good Points (one continuous scroll) -->
+    <div class="summary-slot" id="summarySlot">
+    <aside class="summary" id="feedbackPanel">
+      <!-- Band 1: who/what this feedback is for — fixed, shown once (not
+           repeated per section). Different background from band 2 below. -->
+      <div class="feedback-context">
+        <span class="summary__tag">Writing Feedback</span>
+        <div class="fc-qnav">
+          <button class="fc-qbtn" id="fcPrev" type="button" aria-label="Previous question">&#8249;</button>
+          <div class="feedback-context__title" id="fcTitle">Question 1</div>
+          <button class="fc-qbtn" id="fcNext" type="button" aria-label="Next question">&#8250;</button>
+        </div>
+        <button class="summary__close" type="button" aria-label="Close feedback panel">✕</button>
+      </div>
+
+      <!-- Band 2: one global setting that applies to every feedback card
+           below, instead of repeating Remark Style / Language / Font Size
+           inside each one. -->
+      <div class="global-settings">
+        <div class="field">
+          <label id="globalRemarkLabel">Remark Style</label>
+          <div class="gset-seg" id="globalRemark" role="group" aria-labelledby="globalRemarkLabel">
+            <button type="button" class="gset-seg__btn gset-seg__btn--active" data-value="Detailed" title="Detailed">
+              <span>Detailed</span>
+            </button>
+            <button type="button" class="gset-seg__btn" data-value="Simplified" title="Simplified">
+              <span>Simplified</span>
+            </button>
+            <button type="button" class="gset-seg__btn" data-value="Concise" title="Concise">
+              <span>Concise</span>
+            </button>
+          </div>
+        </div>
+        <div class="field">
+          <label id="globalLangLabel">Language</label>
+          <div class="gset-menu" id="globalLang">
+            <button type="button" class="gset-menu__trigger" id="globalLangTrigger" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="globalLangLabel">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18 14 14 0 0 1 0-18z"/></svg>
+              <span class="gset-menu__value" id="globalLangValue">EN</span>
+              <svg class="gset-menu__chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <ul class="gset-menu__list" id="globalLangList" role="listbox" aria-labelledby="globalLangLabel" hidden>
+              <li class="gset-menu__item gset-menu__item--active" role="option" aria-selected="true" data-value="English" data-short="EN">English</li>
+              <li class="gset-menu__item" role="option" aria-selected="false" data-value="Bahasa Indonesia" data-short="ID">Bahasa Indonesia</li>
+              <li class="gset-menu__item" role="option" aria-selected="false" data-value="Mandarin" data-short="ZH">Mandarin</li>
+              <li class="gset-menu__item" role="option" aria-selected="false" data-value="Malay" data-short="MS">Malay</li>
+              <li class="gset-menu__item" role="option" aria-selected="false" data-value="Tamil" data-short="TA">Tamil</li>
+            </ul>
+          </div>
+        </div>
+        <div class="field">
+          <label id="globalFontSizeLabel">Font Size</label>
+          <div class="gset-seg" id="globalFontSize" role="group" aria-labelledby="globalFontSizeLabel">
+            <button type="button" class="gset-seg__btn gset-fontbtn" data-value="12" title="Small">A</button>
+            <button type="button" class="gset-seg__btn gset-fontbtn gset-seg__btn--active" data-value="14" title="Medium">A</button>
+            <button type="button" class="gset-seg__btn gset-fontbtn" data-value="18" title="Large">A</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="summary__scroll" id="feedbackScroll" style="font-size:14px;">
+
+      <section class="fb-section" id="sec-summary" data-section="summary">
+        <div class="summary__head">
+          <div class="summary__title">Summary</div>
+        </div>
+
+        <div class="summary__body">
+        <div class="chips-row">
+          <button class="expand-all" id="expandAllBtn" type="button" data-state="expand">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            Expand All
+          </button>
+          <div class="chips" id="chips">
+            <button class="chip c-all chip--active" data-filter="all">All <span class="chip__count">7</span></button>
+            <button class="chip c-grammar" data-filter="grammar">Grammar <span class="chip__count">3</span></button>
+            <button class="chip c-clarity" data-filter="clarity">Writing Clarity <span class="chip__count">1</span></button>
+            <button class="chip c-spelling" data-filter="spelling">Spelling <span class="chip__count">3</span></button>
+            <button class="chip c-general" data-filter="general">General Feedback <span class="chip__count">3</span></button>
+          </div>
+        </div>
+
+        <!-- Grammar -->
+        <div class="fb-group" data-group="grammar">
+          <h3 class="fb-group__title">Grammar</h3>
+
+          <article class="fb-card">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-grammar"></span>
+              <p class="fb-quote">&ldquo;The number of bicycle buyers were slightly decreased&hellip;&rdquo;</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Subject–verb agreement: “the number” is singular, so use “was”. Also prefer “decreased slightly” over “were slightly decreased”." data-simplified="Use “was”, not “were” — “the number” is singular. Also say “decreased slightly” instead of “were slightly decreased”." data-concise="Fix: “was”, not “were”.">Subject&ndash;verb agreement: &ldquo;the number&rdquo; is singular, so use &ldquo;was&rdquo;. Also prefer &ldquo;decreased slightly&rdquo; over &ldquo;were slightly decreased&rdquo;.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+
+          <article class="fb-card">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-grammar"></span>
+              <p class="fb-quote">&ldquo;By 2015, the percentage of households owning a car increase to 60%.&rdquo;</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Use the past tense to match the rest of the description: “the percentage of households owning a car increased to 60%”." data-simplified="This should be past tense too: “increased”, not “increase”." data-concise="Use “increased”, not “increase”.">Use the past tense to match the rest of the description: &ldquo;the percentage of households owning a car increased to 60%&rdquo;.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+
+          <article class="fb-card fb-card--open">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-grammar"></span>
+              <p class="fb-quote">&ldquo;Car sales was increased gradually and it reached 700 units and it be&hellip;&rdquo;</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Avoid repeating ‘and it’; split this into two sentences or use one clear clause, for example by using only one ‘and’." data-simplified="Don’t repeat “and it” twice. Split it into two sentences, or use just one “and”." data-concise="Don’t repeat “and it” — split the sentence.">Avoid repeating &lsquo;and it&rsquo;; split this into two sentences or use one clear clause, for example by using only one &lsquo;and&rsquo;.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+        </div>
+
+        <!-- Writing Clarity -->
+        <div class="fb-group" data-group="clarity">
+          <h3 class="fb-group__title">Writing Clarity</h3>
+
+          <article class="fb-card">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-clarity"></span>
+              <p class="fb-quote">&ldquo;the number of bicycle buyers had slightly decreased to a level that was still higher than&hellip;&rdquo;</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Tighten the phrasing so the reader follows the trend easily, e.g. “bicycle sales decreased slightly to around 500 units by 2017”." data-simplified="Make this shorter and clearer, like: “bicycle sales decreased slightly to around 500 units by 2017”." data-concise="Shorten this sentence for clarity.">Tighten the phrasing so the reader follows the trend easily, e.g. &ldquo;bicycle sales decreased slightly to around 500 units by 2017&rdquo;.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+        </div>
+
+        <!-- Spelling -->
+        <div class="fb-group" data-group="spelling">
+          <h3 class="fb-group__title">Spelling</h3>
+
+          <article class="fb-card">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-spelling"></span>
+              <p class="fb-quote">&ldquo;By 2017, the propotion of cars had increased to about 800&hellip;&rdquo;</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Spelling: “propotion” → “proportion”." data-simplified="Spelling: “propotion” should be “proportion”." data-concise="“propotion” → “proportion”">Spelling: &ldquo;propotion&rdquo; &rarr; &ldquo;proportion&rdquo;.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+
+          <article class="fb-card">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-spelling"></span>
+              <p class="fb-quote">&ldquo;By 2015, bicycle sales had decreesed further to about 750&hellip;&rdquo;</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Spelling: “decreesed” → “decreased”." data-simplified="Spelling: “decreesed” should be “decreased”." data-concise="“decreesed” → “decreased”">Spelling: &ldquo;decreesed&rdquo; &rarr; &ldquo;decreased&rdquo;.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+
+          <article class="fb-card">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-spelling"></span>
+              <p class="fb-quote">&ldquo;a significant gap in favuor of cars&hellip;&rdquo;</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Spelling: “favuor” → “favour”." data-simplified="Spelling: “favuor” should be “favour”." data-concise="“favuor” → “favour”">Spelling: &ldquo;favuor&rdquo; &rarr; &ldquo;favour&rdquo;.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+        </div>
+
+        <!-- General Feedback -->
+        <div class="fb-group" data-group="general">
+          <h3 class="fb-group__title">General Feedback</h3>
+
+          <article class="fb-card">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-general"></span>
+              <p class="fb-quote">Overall structure &amp; task response</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Clear overview and logical paragraphing. The response covers both trends well and ends with a strong summary." data-simplified="Good structure. You covered both trends and finished with a strong summary." data-concise="Clear structure, strong summary.">Clear overview and logical paragraphing. The response covers both trends well and ends with a strong summary.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+
+          <article class="fb-card">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-general"></span>
+              <p class="fb-quote">Use of data &amp; figures</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Good use of specific figures to support each point. Vary the verbs you use to describe change to avoid repetition." data-simplified="You used good figures to support your points. Try using different verbs for change instead of repeating the same ones." data-concise="Good figures. Vary your verbs.">Good use of specific figures to support each point. Vary the verbs you use to describe change to avoid repetition.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+
+          <article class="fb-card">
+            <button class="fb-card__head" type="button">
+              <span class="fb-dot dot-general"></span>
+              <p class="fb-quote">Vocabulary range</p>
+              <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="fb-body">
+              <p data-detailed="Solid range of linking phrases. Try introducing a few higher-level synonyms such as “surpassed” or “plummeted” where appropriate." data-simplified="Good linking phrases. Try adding stronger words like “surpassed” or “plummeted” sometimes." data-concise="Good linking words. Add stronger synonyms.">Solid range of linking phrases. Try introducing a few higher-level synonyms such as &ldquo;surpassed&rdquo; or &ldquo;plummeted&rdquo; where appropriate.</p>
+              <span class="ai-tag">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+                AI Generated
+              </span>
+            </div>
+          </article>
+        </div>
+        </div>
+      </section>
+
+      <section class="fb-section" id="sec-rubrics" data-section="rubrics">
+        <div class="summary__head">
+          <div class="summary__title">Rubrics</div>
+        </div>
+
+        <div class="summary__body">
+        <div class="rb-meta">
+          <div class="rb-meta__label">Rubrics Name</div>
+          <div class="rb-meta__value">Situational Writing</div>
+        </div>
+
+        <div class="segmented" id="rbSegmented">
+          <button class="seg-btn seg-btn--active" data-rbtab="overview">Overview</button>
+          <button class="seg-btn" data-rbtab="details">Details</button>
+        </div>
+
+        <!-- Overview -->
+        <div data-rbpanel="overview">
+          <div class="score-bar">
+            Score : 19 / 20 Marks
+            <img src="https://demo.heyhi.sg/images/png/notebook2.png" alt="" />
+          </div>
+
+          <div class="rb-card">
+            <div class="rb-eyebrow">COMPONENT 1</div>
+            <div class="rb-title">Situational Writing Rubric</div>
+
+            <div class="rb-row">
+              <span class="rb-row__label">Content (Key Points to the Task &ndash; 50%)</span>
+              <span class="rb-bar"><span class="rb-bar__fill" style="width:100%"></span></span>
+              <span class="rb-row__score">10/10</span>
+            </div>
+            <div class="rb-row">
+              <span class="rb-row__label">Language &amp; Organization (50%)</span>
+              <span class="rb-bar"><span class="rb-bar__fill" style="width:90%"></span></span>
+              <span class="rb-row__score">9/10</span>
+            </div>
+
+            <div class="rb-seedetails">
+              <button class="rb-detail-link" type="button" data-goto-details>See Details</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Details -->
+        <div data-rbpanel="details" hidden>
+          <div class="rb-fullrubrics">
+            <a href="#" id="openFrModal" onclick="return false;">See Full Rubrics ↗</a>
+          </div>
+
+          <article class="rb-acc rb-acc--open">
+            <button class="rb-acc__head" type="button">
+              Content (Key Points to the Task - 50%)
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="rb-acc__body">
+              <div class="rb-acc__obtained">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                <em>Obtained:</em> <b>10 Marks</b>
+              </div>
+              <p class="rb-acc__desc">
+                Ideas are very clear, logical, and fully relevant to the task. All key points to the task are
+                effectively addressed with engaging, well-developed, and meaningful details.
+              </p>
+
+              <p class="rb-feedback">
+                You have addressed all the key points required by the task very effectively. Your
+                introduction clearly states who you are writing for and provides the purchase details:
+                &lsquo;I am writing on behalf of my mother, Anna, who recently purchased a rose gold tripod
+                camera from your online store (Order No: [Order Number], placed on [Order Date]).&rsquo; You
+                describe the issue with the product: &lsquo;the product we received is not in the color we
+                ordered. Instead of the rose gold camera, we received a different color.&rsquo; You also
+                request that you arrange for the correct rose gold tripod camera to be sent to us at the
+                earliest convenience. Please let us know the process for returning the incorrect item, and
+                whether any additional details are required from our side.&rsquo; Finally, you close the
+                email with appreciation for prompt attention: &lsquo;We appreciate your prompt attention to
+                this matter and look forward to a quick resolution. Thank you for your assistance.&rsquo;
+              </p>
+              <p class="rb-feedback">
+                To further improve, you could add a bit more detail to make your complaint more engaging
+                and specific, such as mentioning the color you actually received or how the incorrect item
+                has affected your plans. However, your response is already very clear, logical, and fully
+                relevant to the task.
+              </p>
+            </div>
+          </article>
+
+          <article class="rb-acc rb-acc--open">
+            <button class="rb-acc__head" type="button">
+              Language &amp; Organization (50%)
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="rb-acc__body">
+              <div class="rb-acc__obtained">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                <em>Obtained:</em> <b>9 Marks</b>
+              </div>
+              <p class="rb-acc__desc">
+                Minor or no grammar, punctuation, or spelling errors. Vocabulary is rich and precise, and
+                organization is excellent, with logical sequencing and seamless transitions.
+              </p>
+
+              <p class="rb-feedback">
+                Your sentences are well-constructed with only a couple of very minor slips, and your word
+                choice is varied and appropriate for a formal complaint email. Paragraphing follows a clear,
+                logical order from greeting to closing, making the email easy to follow.
+              </p>
+            </div>
+          </article>
+        </div>
+        </div>
+      </section>
+
+      <section class="fb-section" id="sec-good" data-section="good">
+        <div class="summary__head">
+          <div class="summary__title">Good Points</div>
+        </div>
+
+        <div class="summary__body">
+        <article class="fb-card">
+          <button class="fb-card__head" type="button">
+            <span class="fb-dot dot-good"></span>
+            <p class="fb-quote">&ldquo;Overall, bicycle sales declined steadily, while car sales rose&hellip;&rdquo;</p>
+            <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="fb-body">
+            <p>Strong opening sentence that previews both trends right away, giving the reader a clear overview before the details.</p>
+            <span class="ai-tag">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+              AI Generated
+            </span>
+          </div>
+        </article>
+
+        <article class="fb-card">
+          <button class="fb-card__head" type="button">
+            <span class="fb-dot dot-good"></span>
+            <p class="fb-quote">&ldquo;Car sales followed the opposite pattern&hellip;&rdquo;</p>
+            <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="fb-body">
+            <p>Good use of a linking phrase to contrast the two data series, making the structure easy for the reader to follow.</p>
+            <span class="ai-tag">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+              AI Generated
+            </span>
+          </div>
+        </article>
+
+        <article class="fb-card">
+          <button class="fb-card__head" type="button">
+            <span class="fb-dot dot-good"></span>
+            <p class="fb-quote">&ldquo;Overall, the data suggest that during this period residents gradually shifted their preference&hellip;&rdquo;</p>
+            <svg class="fb-chevron" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+          </button>
+          <div class="fb-body">
+            <p>Well-rounded concluding sentence that summarizes the overall trend instead of just repeating numbers.</p>
+            <span class="ai-tag">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fec53c"><path d="M12 2l1.6 4.8L18 8.4l-4.4 1.6L12 15l-1.6-5L6 8.4l4.4-1.6z"/></svg>
+              AI Generated
+            </span>
+          </div>
+        </article>
+        </div>
+      </section>
+
+      </div>
+    </aside>
+    </div>
+
+    <!-- Far-right vertical rail -->
+    <nav class="farrail" aria-label="Feedback views">
+      <button class="rnav rnav--active" data-target="sec-summary">
+        <span class="rnav__icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h4v6H8l-1 4V7zm6 0h4v6h-3l-1 4V7z"/></svg>
+        </span>
+        Summary
+      </button>
+      <button class="rnav" data-target="sec-rubrics">
+        <span class="rnav__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5" stroke-linecap="round"/></svg>
+        </span>
+        Rubrics
+      </button>
+      <button class="rnav" data-target="sec-good">
+        <span class="rnav__icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4l6 6-8 8H6v-6z" stroke-linejoin="round"/><path d="M4 20h16" stroke-linecap="round"/></svg>
+        </span>
+        Good<br />Points
+      </button>
+    </nav>
+  </div>
+
+  <!-- See Full Rubrics Modal -->
+  <div class="frmodal-overlay" id="frmodalOverlay" role="dialog" aria-modal="true" aria-label="See Full Rubrics">
+    <div class="frmodal">
+      <div class="frmodal__header">
+        <div>
+          <div class="frmodal__title">Situational Writing</div>
+          <div class="frmodal__score">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+            Score : 19 / 20 Marks
+          </div>
+        </div>
+        <button class="frmodal__close" id="frmodalClose" type="button" aria-label="Close">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <div class="frmodal__body">
+        <div class="frmodal__rubric-title">Situational Writing Rubric</div>
+
+        <!-- Section 1 -->
+        <div class="frsec">
+          <div class="frsec__label">Content (Key Points to the Task &ndash; 50%) (10 Marks)</div>
+          <div class="frremark">
+            <div class="frremark__head">
+              <span class="frremark__lbl">Remark</span>
+              <select class="frremark__lang"><option>English</option><option>Malay</option><option>Chinese</option></select>
+            </div>
+            <div class="frremark__text">
+              <b>You have addressed all the key points required by the task very effectively.</b>
+              Your introduction clearly states who you are writing for and provides the purchase details: &lsquo;I am writing on behalf of my mother, Anna, who recently purchased a rose gold tripod camera from your online store (Order No: [Order Number], placed on [Order Date]).&rsquo; You describe the issue with the product: &lsquo;the product we received is not in the color we ordered. Instead of the rose gold version, we received a different color.&rsquo; You also make a clear request for a solution: &lsquo;We kindly request that you arrange for the correct rose gold tripod camera to be sent to us at the earliest convenience.&rsquo; Finally, you close the email with appreciation for prompt attention: &lsquo;We appreciate your prompt attention to this matter and look forward to a quick resolution. Thank you for your assistance.&rsquo;
+              <br/><br/>
+              To further improve, you could add a bit more detail to make your complaint more engaging and specific, such as mentioning the color you actually received or how the incorrect item has affected your plans. However, your response is already very clear, logical, and fully relevant to the task.
+            </div>
+          </div>
+          <div class="frscores">
+            <div class="frscore-card frscore-card--active">
+              <div class="frscore-card__range">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                9 - 10 Marks
+              </div>
+              <div class="frscore-card__desc">Ideas are very clear, logical, and fully relevant to the task. All key points to the task are effectively addressed with engaging, well-developed, and meaningful details.</div>
+              <div class="frscore-card__score-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                Score: <input class="frscore-card__input" type="text" value="10" readonly /> /10 Marks
+              </div>
+            </div>
+            <div class="frscore-card">
+              <div class="frscore-card__range">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                7 - 8 Marks
+              </div>
+              <div class="frscore-card__desc">Ideas are mostly clear, logical, and relevant to the task. Most key points to the task are addressed with sufficient detail and aligned to the purpose and audience.</div>
+            </div>
+            <div class="frscore-card">
+              <div class="frscore-card__range">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                4 - 6 Marks
+              </div>
+              <div class="frscore-card__desc">Ideas are somewhat unclear, with only partial relevance to the task. Some key points to the task are addressed but lack sufficient detail or connection to the purpose.</div>
+            </div>
+            <div class="frscore-card">
+              <div class="frscore-card__range">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                1 - 3 Marks
+              </div>
+              <div class="frscore-card__desc">Ideas are confusing, incomplete, or irrelevant to the situational writing task. Few key points to the task are addressed, with minimal or no development.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Section 2 -->
+        <div class="frsec">
+          <div class="frsec__label">Language &amp; Organization (50%) (10 Marks)</div>
+          <div class="frremark">
+            <div class="frremark__head">
+              <span class="frremark__lbl">Remark</span>
+              <select class="frremark__lang"><option>English</option><option>Malay</option><option>Chinese</option></select>
+            </div>
+            <div class="frremark__text">
+              <b>Your email is very well-organized and follows a logical sequence.</b>
+              Starting with an introduction and purchase details, followed by a clear description of the issue, a polite request for a solution, and a courteous closing. The transitions between each section are smooth, making the message easy to follow. Your vocabulary is appropriate and precise for a formal complaint email (e.g., &lsquo;arrange for the correct rose gold tripod camera to be sent to us at the earliest convenience&rsquo;). There are only minor issues, such as the phrase &lsquo;tripod camera&rsquo; which could be clarified as &lsquo;tripod for a camera&rsquo; or &lsquo;camera tripod&rsquo; for greater precision, but this does not significantly affect understanding. Grammar, punctuation, and spelling are all accurate, with no distracting errors. Overall, your language use and organization are excellent.
+            </div>
+          </div>
+          <div class="frscores">
+            <div class="frscore-card frscore-card--active">
+              <div class="frscore-card__range">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                9 - 10 Marks
+              </div>
+              <div class="frscore-card__desc">Minor or no grammar, punctuation, or spelling errors. Vocabulary is rich and precise, and organization is excellent, with logical sequencing and seamless transitions.</div>
+              <div class="frscore-card__score-row">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                Score: <input class="frscore-card__input" type="text" value="9" readonly /> /10 Marks
+              </div>
+            </div>
+            <div class="frscore-card">
+              <div class="frscore-card__range">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                7 - 8 Marks
+              </div>
+              <div class="frscore-card__desc">Few grammar, punctuation, or spelling errors that do not distract from meaning. Vocabulary is varied, and organization is clear and logical, with smooth transitions.</div>
+            </div>
+            <div class="frscore-card">
+              <div class="frscore-card__range">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                4 - 6 Marks
+              </div>
+              <div class="frscore-card__desc">A number of grammar, punctuation, or spelling errors distract from meaning. Vocabulary is basic, and organization is average, with some lapses in flow or clarity.</div>
+            </div>
+            <div class="frscore-card">
+              <div class="frscore-card__range">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.6 12l-8.6 8.6L3 11.6V3h8.6z"/><circle cx="7.5" cy="7.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+                1 - 3 Marks
+              </div>
+              <div class="frscore-card__desc">Numerous grammar, punctuation, or spelling errors significantly affect understanding. Vocabulary is very limited, and organization is poor, with no clear flow of ideas.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---- Feedback expand / collapse (whole card header is clickable) ----
+    document.querySelectorAll(".fb-card__head").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        btn.closest(".fb-card").classList.toggle("fb-card--open");
+      });
+    });
+
+    // ---- Expand All / Collapse All (Summary feedback cards) ----
+    var expandAllBtn = document.getElementById("expandAllBtn");
+    if (expandAllBtn) {
+      expandAllBtn.addEventListener("click", function () {
+        var willExpand = expandAllBtn.dataset.state === "expand";
+        document.querySelectorAll("#sec-summary .fb-card").forEach(function (card) {
+          card.classList.toggle("fb-card--open", willExpand);
+        });
+        expandAllBtn.dataset.state = willExpand ? "collapse" : "expand";
+        expandAllBtn.lastChild.textContent = willExpand ? " Collapse All" : " Expand All";
+      });
+    }
+
+    // ---- Category chip filtering ----
+    var chips = document.querySelectorAll(".chip");
+    var groups = document.querySelectorAll(".fb-group");
+    chips.forEach(function (chip) {
+      chip.addEventListener("click", function () {
+        chips.forEach(function (c) { c.classList.remove("chip--active"); });
+        chip.classList.add("chip--active");
+        var filter = chip.dataset.filter;
+        groups.forEach(function (g) {
+          // "all" shows everything; otherwise show only the matching group
+          g.hidden = filter !== "all" && g.dataset.group !== filter;
+        });
+      });
+    });
+
+    // ---- Tab switching (scoped per qblock so Q1–Q5 don't interfere) ----
+    document.querySelectorAll(".tab").forEach(function (tab) {
+      tab.addEventListener("click", function () {
+        var block = tab.closest(".qblock");
+        if (!block) return;
+        block.querySelectorAll(".tab").forEach(function (t) { t.classList.remove("tab--active"); });
+        tab.classList.add("tab--active");
+        block.querySelectorAll("[data-panel]").forEach(function (p) {
+          p.hidden = p.dataset.panel !== tab.dataset.tab;
+        });
+      });
+    });
+
+    // ---- Question rail: click → scroll to qblock + sync feedback title ----
+    document.querySelectorAll(".qnode").forEach(function (node) {
+      node.addEventListener("click", function () {
+        document.querySelectorAll(".qnode").forEach(function (n) { n.classList.remove("qnode--active"); });
+        node.classList.add("qnode--active");
+        var q = node.dataset.q;
+        var target = document.getElementById("qblock-" + q);
+        if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+        setFcQ(parseInt(q, 10) - 1);
+      });
+    });
+
+    // ---- Far-right rail: scroll to section (Summary → Rubrics → Good Points) ----
+    var rnavs = document.querySelectorAll(".rnav");
+    var feedbackScroll = document.getElementById("feedbackScroll");
+    var fbSections = document.querySelectorAll(".fb-section");
+    var summarySlot = document.getElementById("summarySlot");
+
+    function openFeedbackSection(targetId) {
+      if (summarySlot) summarySlot.classList.remove("summary-slot--closed");
+      var target = document.getElementById(targetId);
+      if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    // ---- Feedback-context: question navigator ----
+    var fcTitles = ["Question 1", "Question 2", "Question 3", "Question 4", "Question 5"];
+    var fcIndex = 0;
+    var fcTitleEl = document.getElementById("fcTitle");
+    var fcPrevBtn = document.getElementById("fcPrev");
+    var fcNextBtn = document.getElementById("fcNext");
+
+    function setFcQ(idx) {
+      fcIndex = Math.max(0, Math.min(idx, fcTitles.length - 1));
+      if (fcTitleEl) fcTitleEl.textContent = fcTitles[fcIndex];
+      if (fcPrevBtn) fcPrevBtn.disabled = fcIndex === 0;
+      if (fcNextBtn) fcNextBtn.disabled = fcIndex === fcTitles.length - 1;
+    }
+    setFcQ(0);
+
+    if (fcPrevBtn) fcPrevBtn.addEventListener("click", function () { setFcQ(fcIndex - 1); });
+    if (fcNextBtn) fcNextBtn.addEventListener("click", function () { setFcQ(fcIndex + 1); });
+
+    // ---- Auto-sync active qnode + feedback title while scrolling main ----
+    var mainScroll = document.getElementById("mainScroll");
+    if ("IntersectionObserver" in window && mainScroll) {
+      var qblockObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            var q = parseInt(entry.target.dataset.q, 10);
+            document.querySelectorAll(".qnode").forEach(function (n) { n.classList.remove("qnode--active"); });
+            var activeNode = document.querySelector(".qnode[data-q='" + q + "']");
+            if (activeNode) activeNode.classList.add("qnode--active");
+            setFcQ(q - 1);
+          }
+        });
+      }, { root: mainScroll, threshold: 0.35 });
+      document.querySelectorAll(".qblock").forEach(function (b) { qblockObserver.observe(b); });
+    }
+
+    rnavs.forEach(function (nav) {
+      nav.addEventListener("click", function () {
+        openFeedbackSection(nav.dataset.target);
+      });
+    });
+
+    // ---- "See Result" opens the Summary feedback ----
+    // ---- "See Result" (any question) opens Summary + syncs feedback title ----
+    document.querySelectorAll(".btn-see-result").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        var q = parseInt(btn.dataset.q || "1", 10);
+        setFcQ(q - 1);
+        openFeedbackSection("sec-summary");
+      });
+    });
+
+    // ---- Global settings segmented controls (Remark Style / Font Size):
+    // one active button per group, click to switch ----
+    document.querySelectorAll(".gset-seg").forEach(function (seg) {
+      seg.querySelectorAll(".gset-seg__btn").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+          seg.querySelectorAll(".gset-seg__btn").forEach(function (b) {
+            b.classList.remove("gset-seg__btn--active");
+          });
+          btn.classList.add("gset-seg__btn--active");
+          seg.dispatchEvent(new CustomEvent("seg-change", { detail: { value: btn.dataset.value } }));
+        });
+      });
+    });
+
+    // ---- Language menu: button opens a short list, click outside or Esc
+    // closes it. Scales to any number of languages, unlike a 2-state switch. ----
+    (function () {
+      var menu = document.getElementById("globalLang");
+      var trigger = document.getElementById("globalLangTrigger");
+      var valueEl = document.getElementById("globalLangValue");
+      var list = document.getElementById("globalLangList");
+      if (!menu || !trigger || !list) return;
+
+      function closeMenu() {
+        menu.classList.remove("gset-menu--open");
+        trigger.setAttribute("aria-expanded", "false");
+        list.hidden = true;
+      }
+      function openMenu() {
+        menu.classList.add("gset-menu--open");
+        trigger.setAttribute("aria-expanded", "true");
+        list.hidden = false;
+      }
+
+      trigger.addEventListener("click", function (e) {
+        e.stopPropagation();
+        if (list.hidden) openMenu(); else closeMenu();
+      });
+      list.querySelectorAll(".gset-menu__item").forEach(function (item) {
+        item.addEventListener("click", function () {
+          list.querySelectorAll(".gset-menu__item").forEach(function (i) {
+            i.classList.remove("gset-menu__item--active");
+            i.setAttribute("aria-selected", "false");
+          });
+          item.classList.add("gset-menu__item--active");
+          item.setAttribute("aria-selected", "true");
+          valueEl.textContent = item.dataset.short;
+          closeMenu();
+          menu.dispatchEvent(new CustomEvent("seg-change", { detail: { value: item.dataset.value } }));
+        });
+      });
+      document.addEventListener("click", function (e) {
+        if (!menu.contains(e.target)) closeMenu();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closeMenu();
+      });
+    })();
+
+    // ---- Remark Style: rewrites every feedback remark to match the
+    // selected verbosity (Detailed/Simplified/Concise), like a real AI
+    // regeneration rather than a cosmetic toggle ----
+    var remarkSeg = document.getElementById("globalRemark");
+    if (remarkSeg) {
+      remarkSeg.addEventListener("seg-change", function (e) {
+        var attr = "data-" + e.detail.value.toLowerCase();
+        document.querySelectorAll(".fb-body p[data-detailed]").forEach(function (p) {
+          var text = p.getAttribute(attr);
+          if (text) p.textContent = text;
+        });
+      });
+    }
+
+    // ---- Font size: scales all card scrolls + feedback panel ----
+    var fontSizeSeg = document.getElementById("globalFontSize");
+    if (fontSizeSeg) {
+      fontSizeSeg.addEventListener("seg-change", function (e) {
+        var px = e.detail.value + "px";
+        if (feedbackScroll) feedbackScroll.style.fontSize = px;
+        document.querySelectorAll(".card__scroll").forEach(function (el) {
+          el.style.fontSize = px;
+        });
+      });
+    }
+
+    // Highlight the rail item matching whichever section is currently in view
+    if ("IntersectionObserver" in window && feedbackScroll) {
+      var navByTarget = {};
+      rnavs.forEach(function (nav) { navByTarget[nav.dataset.target] = nav; });
+
+      var sectionObserver = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              var nav = navByTarget[entry.target.id];
+              if (nav) {
+                rnavs.forEach(function (n) { n.classList.remove("rnav--active"); });
+                nav.classList.add("rnav--active");
+              }
+            }
+          });
+        },
+        { root: feedbackScroll, threshold: 0.35 }
+      );
+      fbSections.forEach(function (s) { sectionObserver.observe(s); });
+    }
+
+    // ---- Close any feedback panel (reopen via the far-right rail) ----
+    document.querySelectorAll(".summary__close").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        document.getElementById("summarySlot").classList.add("summary-slot--closed");
+      });
+    });
+
+    // ---- Rubrics: Overview / Details segmented control ----
+    var rbSegBtns = document.querySelectorAll(".seg-btn");
+    var rbPanels = document.querySelectorAll("[data-rbpanel]");
+    function showRbTab(tab) {
+      rbSegBtns.forEach(function (b) {
+        b.classList.toggle("seg-btn--active", b.dataset.rbtab === tab);
+      });
+      rbPanels.forEach(function (p) {
+        p.hidden = p.dataset.rbpanel !== tab;
+      });
+    }
+    rbSegBtns.forEach(function (b) {
+      b.addEventListener("click", function () { showRbTab(b.dataset.rbtab); });
+    });
+    document.querySelectorAll("[data-goto-details]").forEach(function (b) {
+      b.addEventListener("click", function () { showRbTab("details"); });
+    });
+
+    // ---- Rubrics: accordion expand/collapse ----
+    document.querySelectorAll(".rb-acc__head").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        btn.closest(".rb-acc").classList.toggle("rb-acc--open");
+      });
+    });
+
+    function exitQuiz() {
+      // Prototype stub — wire this to your router / dashboard route.
+      alert("Exit quiz (prototype)");
+    }
+
+    // ---- Mobile: question list toggle ----
+    var qrailToggle = document.getElementById("qrailToggle");
+    var qrailBackdrop = document.getElementById("qrailBackdrop");
+    var qrailEl = document.querySelector(".qrail");
+
+    function setQrailOpen(open) {
+      if (!qrailEl) return;
+      qrailEl.classList.toggle("qrail--open", open);
+      if (qrailBackdrop) qrailBackdrop.classList.toggle("qrail-backdrop--open", open);
+      if (qrailToggle) {
+        qrailToggle.classList.toggle("qrail-toggle--open", open);
+        var label = qrailToggle.querySelector("span") || qrailToggle.lastChild;
+        if (label && label.nodeType === 3) label.textContent = open ? " Hide question list" : " Show question list";
+      }
+    }
+
+    if (qrailToggle) qrailToggle.addEventListener("click", function () {
+      setQrailOpen(!qrailEl.classList.contains("qrail--open"));
+    });
+    if (qrailBackdrop) qrailBackdrop.addEventListener("click", function () { setQrailOpen(false); });
+
+    // Close qrail after tapping a question node on mobile
+    document.querySelectorAll(".qnode").forEach(function (node) {
+      node.addEventListener("click", function () {
+        if (window.innerWidth <= 768) setQrailOpen(false);
+      });
+    });
+
+    // ---- Mobile: start with summary panel closed ----
+    if (window.innerWidth <= 768 && summarySlot) {
+      summarySlot.classList.add("summary-slot--closed");
+    }
+
+    // ---- See Full Rubrics modal ----
+    var frOverlay = document.getElementById("frmodalOverlay");
+    var frClose   = document.getElementById("frmodalClose");
+    var frOpen    = document.getElementById("openFrModal");
+
+    function openFrModal() { frOverlay.classList.add("frmodal-overlay--open"); }
+    function closeFrModal() { frOverlay.classList.remove("frmodal-overlay--open"); }
+
+    if (frOpen)  frOpen.addEventListener("click", openFrModal);
+    if (frClose) frClose.addEventListener("click", closeFrModal);
+    if (frOverlay) {
+      frOverlay.addEventListener("click", function (e) {
+        if (e.target === frOverlay) closeFrModal();
+      });
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeFrModal();
+    });
+  </script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="pdf-generator.js"></script>
+</body>
+</html>
