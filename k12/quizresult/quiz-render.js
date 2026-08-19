@@ -99,7 +99,8 @@ function fillblankParagraphHtml(text, blanks) {
   return escapeHtml(text).replace(/\[\[(\w+)\]\]/g, (_, key) => {
     const b = blanks[key];
     if (!b) return key;
-    const cls = b.marks > 0 ? "correct" : "incorrect";
+    const isCorrect = b.marks > 0;
+    const cls = isCorrect ? "correct" : "incorrect";
     const note = `Correct answer: ${b.correct}`;
     return `<span class="blank-label">(${key})</span><span class="answer-annotation answer-annotation--${cls}" title="${escapeHtml(note)}">${escapeHtml(b.given || "—")}</span>`;
   });
@@ -138,9 +139,14 @@ function renderMcq(q) {
           const isWrongSelection = isSelected && !opt.correct;
           const cls = opt.correct ? " mcq-option--correct" : isWrongSelection ? " mcq-option--wrong" : "";
           const tag = opt.correct ? " (Correct Answer)" : isWrongSelection ? " (Your Answer)" : "";
+          const icon = opt.correct
+            ? `<span class="mcq-option__tick mcq-option__tick--correct">&#10003;</span>`
+            : isWrongSelection
+            ? `<span class="mcq-option__tick mcq-option__tick--wrong">&#10007;</span>`
+            : "";
           return `
         <li class="mcq-option${cls}">
-          ${opt.correct ? `<span class="mcq-option__tick">&#10003;</span>` : ""}
+          ${icon}
           ${escapeHtml(opt.text)}${tag}
         </li>`;
         })

@@ -88,11 +88,13 @@
       border-radius: var(--radius-pill);
       cursor: pointer;
     }
-    .btn-download {
+    .download-menu {
       position: absolute;
       right: 128px;
       top: 50%;
       transform: translateY(-50%);
+    }
+    .btn-download {
       display: inline-flex;
       align-items: center;
       gap: 8px;
@@ -107,8 +109,40 @@
       cursor: pointer;
       transition: transform 0.12s ease, opacity 0.12s ease;
     }
-    .btn-download:hover { transform: translateY(-50%) translateY(-1px); }
+    .btn-download:hover { transform: translateY(-1px); }
     .btn-download:disabled { opacity: 0.65; cursor: wait; }
+    .download-menu__chevron { transition: transform 0.15s ease; margin-left: -2px; }
+    .download-menu--open .download-menu__chevron { transform: rotate(180deg); }
+
+    .download-menu__list {
+      position: fixed;
+      z-index: 500;
+      width: 280px;
+      margin: 0;
+      padding: 6px;
+      list-style: none;
+      background: #fff;
+      border-radius: var(--radius-md);
+      box-shadow: 0 12px 32px rgba(24, 39, 57, 0.18);
+    }
+    .download-menu__list[hidden] { display: none; }
+    .download-menu__list button {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+      width: 100%;
+      background: transparent;
+      border: none;
+      border-radius: 8px;
+      padding: 9px 12px;
+      text-align: left;
+      cursor: pointer;
+      font-family: var(--font-body);
+    }
+    .download-menu__list button:hover { background: var(--page-bg); }
+    .download-menu__item-title { font-weight: 700; font-size: 14px; color: var(--ink); }
+    .download-menu__item-desc { font-weight: 400; font-size: 12px; color: var(--ink-soft); }
 
     /* ---------- Sub bar: student info + status pills ---------- */
     .subbar {
@@ -335,11 +369,13 @@
       flex: 0 0 auto;
       width: 18px; height: 18px;
       border-radius: 50%;
-      background: var(--green);
       color: #fff;
       display: flex; align-items: center; justify-content: center;
       font-size: 12px;
+      font-weight: 700;
     }
+    .mcq-option__tick--correct { background: var(--green); }
+    .mcq-option__tick--wrong { background: var(--red); }
 
     /* Not-answered note (plain, matches "The Student has not answered this question") */
     .answer-block--empty { color: var(--muted); font-style: italic; margin-bottom: 14px; }
@@ -408,26 +444,54 @@
       .pill-row { flex-wrap: wrap; }
     }
     @media (max-width: 768px) {
-      .btn-download { right: auto; left: 12px; font-size: 12px; padding: 5px 11px; gap: 5px; }
+      .download-menu { right: auto; left: 12px; }
+      .btn-download { font-size: 12px; padding: 5px 11px; gap: 5px; }
       .btn-download svg { width: 14px; height: 14px; }
+      .download-menu__list { width: 240px; }
       .btn-exit { font-size: 12px; padding: 5px 11px; }
     }
   </style>
 </head>
 <body>
   <header class="topbar">
-    <span class="topbar__title" id="quizTitle">Pending Marking Check</span>
-    <button class="btn-download" type="button" id="downloadPdfBtn">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 3v13" /><path d="M7 12l5 5 5-5" /><path d="M5 20h14" />
-      </svg>
-      <span id="downloadPdfLabel">Download PDF</span>
-    </button>
+    <span class="topbar__title" id="quizTitle">Grammar &amp; Comprehension Practice</span>
+    <div class="download-menu" id="downloadMenu">
+      <button class="btn-download" type="button" id="downloadPdfBtn" aria-haspopup="true" aria-expanded="false">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3v13" /><path d="M7 12l5 5 5-5" /><path d="M5 20h14" />
+        </svg>
+        <span id="downloadPdfLabel">Download PDF</span>
+        <svg class="download-menu__chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+    </div>
     <button class="btn-exit" type="button">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
       Exit
     </button>
   </header>
+
+  <!-- Rendered outside .topbar (which clips overflow for its background
+       pattern) and positioned via JS, so the dropdown isn't cut off. -->
+  <ul class="download-menu__list" id="downloadMenuList" hidden>
+    <li>
+      <button type="button" data-level="results">
+        <span class="download-menu__item-title">Results Only</span>
+        <span class="download-menu__item-desc">Answers &amp; marks, no answer key</span>
+      </button>
+    </li>
+    <li>
+      <button type="button" data-level="withAnswers">
+        <span class="download-menu__item-title">Results + Correct Answers</span>
+        <span class="download-menu__item-desc">Adds the correct/model answer for each question</span>
+      </button>
+    </li>
+    <li>
+      <button type="button" data-level="full">
+        <span class="download-menu__item-title">Full Feedback</span>
+        <span class="download-menu__item-desc">Everything, including AI remarks</span>
+      </button>
+    </li>
+  </ul>
 
   <div class="subbar">
     <div class="student-meta">
@@ -454,11 +518,11 @@
     <section class="main" id="mainScroll"></section>
   </div>
 
-  <script src="quiz-data.js?v=1787035175"></script>
-  <script src="quiz-render.js?v=1787035175"></script>
+  <script src="quiz-data.js?v=1787142171"></script>
+  <script src="quiz-render.js?v=1787142171"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="heyhi-logo.js?v=1787035175"></script>
-  <script src="question-images.js?v=1787035175"></script>
-  <script src="quiz-pdf-generator.js?v=1787035175"></script>
+  <script src="heyhi-logo.js?v=1787142171"></script>
+  <script src="question-images.js?v=1787142171"></script>
+  <script src="quiz-pdf-generator.js?v=1787142171"></script>
 </body>
 </html>

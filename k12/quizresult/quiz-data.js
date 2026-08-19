@@ -12,7 +12,9 @@ const LEAFLET_IMAGE_URLS = [
 ];
 
 const quizResult = {
-  title: "Pending Marking Check",
+  title: "Grammar & Comprehension Practice",
+  subject: "Primary English",
+  level: "Primary 6",
   studentName: "Samantha Wardhana",
   attempts: "6/6",
   statusLabel: "All Questions Marked",
@@ -72,7 +74,6 @@ const quizResult = {
       number: "2B",
       type: "mcq",
       prompt: "Look at the visual text and answer the following questions.",
-      images: LEAFLET_IMAGE_URLS,
       question: "Which statement best describes the main purpose of the Festival of Books?",
       options: [
         { text: "For authors to autograph books", correct: false },
@@ -89,7 +90,6 @@ const quizResult = {
       number: "2C",
       type: "mcq",
       prompt: "Look at the visual text and answer the following questions.",
-      images: LEAFLET_IMAGE_URLS,
       question: "If someone has a question about the Festival of Books, he should _________.",
       options: [
         { text: "buy a festival pass", correct: false },
@@ -106,7 +106,6 @@ const quizResult = {
       number: "2D",
       type: "mcq",
       prompt: "Look at the visual text and answer the following questions.",
-      images: LEAFLET_IMAGE_URLS,
       question:
         "Mary is a budding writer and dreams of publishing her work. She ought to purchase a festival pass for the ____________ Booth.",
       options: [
@@ -124,7 +123,6 @@ const quizResult = {
       number: "2E",
       type: "mcq",
       prompt: "Look at the visual text and answer the following questions.",
-      images: LEAFLET_IMAGE_URLS,
       question: "Based on the information given in the brochure which of the following statements is false?",
       options: [
         { text: "Everyone visiting the festival must pre-register prior the event", correct: true },
@@ -141,7 +139,6 @@ const quizResult = {
       number: "2F",
       type: "mcq",
       prompt: "Look at the visual text and answer the following questions.",
-      images: LEAFLET_IMAGE_URLS,
       question: "Which statement best describes the past attendees of the festival?",
       options: [
         { text: "They participated in the cooking demonstration", correct: false },
@@ -158,7 +155,6 @@ const quizResult = {
       number: "2G",
       type: "mcq",
       prompt: "Look at the visual text and answer the following questions.",
-      images: LEAFLET_IMAGE_URLS,
       question: "What is the main purpose of the leaflet?",
       options: [
         { text: "to promote awareness of the Festival of Books", correct: true },
@@ -175,7 +171,6 @@ const quizResult = {
       number: "2H",
       type: "mcq",
       prompt: "Look at the visual text and answer the following questions.",
-      images: LEAFLET_IMAGE_URLS,
       question: "Why are the titles of the specialist booths printed in bold?",
       options: [
         { text: "to beautify the leaflet", correct: false },
