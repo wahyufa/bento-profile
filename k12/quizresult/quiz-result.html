@@ -439,16 +439,94 @@
     /* Placeholder for inert Notes/Video/Correction/Attachment tabs */
     .placeholder { padding: 50px 24px; text-align: center; color: var(--muted); font-size: 15px; }
 
+    /* ==========================================================
+       Tablet & mobile
+       The question rail can't stay a fixed side column on a phone,
+       so the stage stacks: questions become a horizontal scrolling
+       strip above the card, and the card runs full width.
+       ========================================================== */
     @media (max-width: 900px) {
-      .subbar { flex-direction: column; align-items: flex-start; gap: 10px; padding: 12px 16px; min-height: auto; }
+      .stage { flex-direction: column; }
+
+      /* Questions: horizontal scrolling strip instead of a side rail */
+      .qrail {
+        flex: 0 0 auto;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 14px;
+        padding: 10px 16px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-bottom: 1px solid var(--line);
+      }
+      .qnode {
+        flex: 0 0 auto;
+        width: 32px; height: 32px; font-size: 14px;
+        box-shadow: none;
+      }
+
+      .main { gap: 26px; padding: 12px; }
+      .card__scroll { padding: 18px 16px 24px; }
+
+      /* 5 tabs won't fit a phone width — let the row scroll sideways */
+      .tabs { overflow-x: auto; padding: 6px 8px 0; scrollbar-width: none; }
+      .tabs::-webkit-scrollbar { display: none; }
+      .tab { flex: 0 0 auto; font-size: 13px; padding: 10px 14px; }
+
+      .subbar {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 16px;
+        min-height: auto;
+      }
       .pill-row { flex-wrap: wrap; }
     }
-    @media (max-width: 768px) {
-      .download-menu { right: auto; left: 12px; }
-      .btn-download { font-size: 12px; padding: 5px 11px; gap: 5px; }
-      .btn-download svg { width: 14px; height: 14px; }
-      .download-menu__list { width: 240px; }
-      .btn-exit { font-size: 12px; padding: 5px 11px; }
+
+    @media (max-width: 600px) {
+      /* Topbar: title left-aligned and truncating, so it can never run
+         under the action buttons pinned to the right. */
+      .topbar { height: 48px; justify-content: flex-start; padding: 0 12px; }
+      .topbar__title {
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        /* Clears both pinned buttons (~74px exit + ~54px download + gaps) */
+        max-width: calc(100% - 152px);
+      }
+      .btn-exit { right: 12px; font-size: 12px; padding: 6px 11px; gap: 5px; }
+      .btn-exit svg { width: 14px; height: 14px; }
+      .download-menu { right: 82px; }
+      .btn-download { font-size: 12px; padding: 6px 10px; gap: 5px; }
+      /* Icon-only download: the label is the first thing to go when the
+         bar gets tight; the arrow icon still reads as "download". */
+      #downloadPdfLabel { display: none; }
+      .download-menu__list { width: min(280px, calc(100vw - 24px)); }
+
+      .student-meta { gap: 18px; }
+      .student-meta__field .value { font-size: 14px; }
+      /* The two pills don't fit one phone-width row; let them wrap rather
+         than letting the marks pill run off the right edge. */
+      .pill-row { width: 100%; gap: 8px; }
+      .pill { font-size: 11.5px; padding: 6px 12px; gap: 5px; border-width: 1.5px; }
+      .pill svg { width: 13px; height: 13px; }
+
+      /* Stat row: the two links and the annotations toggle stack rather
+         than squeezing onto one line. */
+      .stat-row { gap: 10px; }
+      .stat-links { gap: 14px; }
+      .stat-link, .show-annotations { font-size: 12px; }
+
+      .card__scroll { font-size: 13.5px; }
+      .mcq-option { padding: 10px 12px; gap: 8px; align-items: flex-start; }
+      .mcq-option__tick { margin-top: 1px; }
+      /* The leaflet images are dense with small print; at phone width the
+         260px desktop cap makes them unreadable, so let them fill the card. */
+      .question-images { gap: 10px; }
+      .question-images img { max-width: 100%; }
+      .fb-passage { line-height: 1.95; }
+      .placeholder { padding: 40px 16px; font-size: 14px; }
     }
   </style>
 </head>
@@ -518,11 +596,11 @@
     <section class="main" id="mainScroll"></section>
   </div>
 
-  <script src="quiz-data.js?v=1787142171"></script>
-  <script src="quiz-render.js?v=1787142171"></script>
+  <script src="quiz-data.js?v=1787734425"></script>
+  <script src="quiz-render.js?v=1787734425"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="heyhi-logo.js?v=1787142171"></script>
-  <script src="question-images.js?v=1787142171"></script>
-  <script src="quiz-pdf-generator.js?v=1787142171"></script>
+  <script src="heyhi-logo.js?v=1787734425"></script>
+  <script src="question-images.js?v=1787734425"></script>
+  <script src="quiz-pdf-generator.js?v=1787734425"></script>
 </body>
 </html>

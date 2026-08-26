@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HeyHi — Essay Result</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Nunito:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --amber: #fec53c;
+      --amber-soft: #fff7ee;
+      --blue: #0fb0f8;
+      --blue-ink: #0a93d4;
+      --green: #16d8a7;
+      --red: #ff1744;
+      --slate: #708eb1;
+
+      /* Feedback category accents — sampled from the live app's stylesheet */
+      --cat-grammar: #f6920a;
+      --cat-grammar-tint: #fff7ee;
+      --cat-clarity: #0ea5e9;
+      --cat-clarity-tint: #edf9ff;
+      --cat-spelling: #ff5660;
+      --cat-spelling-tint: #ffedee;
+      --cat-general: #7884b9;
+      --cat-general-tint: #dce4f0;
+
+      --ink: #303b49;
+      --ink-soft: #5c6672;
+      --muted: #98a2ad;
+      --line: #e7ebef;
+      --page-bg: #f6f8fa;
+      --card: #ffffff;
+      --chip-bg: #f3f4f6;
+
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --radius-pill: 16px;
+      --shadow-card: 0 1px 3px rgba(33, 43, 54, 0.06), 0 8px 24px rgba(33, 43, 54, 0.05);
+
+      --font-display: "Nunito", system-ui, sans-serif;
+      --font-body: "Poppins", system-ui, sans-serif;
+      --font-mont: "Montserrat", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    button, select, input, textarea { font-family: inherit; font-size: inherit; }
+    html, body { height: 100%; }
+    body {
+      font-family: var(--font-body);
+      color: var(--ink);
+      background: var(--page-bg);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ---------- Top app bar ---------- */
+    .topbar {
+      position: relative;
+      flex: 0 0 auto;
+      height: 55px;
+      background: var(--amber) url("https://demo.heyhi.sg/images/bg-smartjen.png") repeat;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+    .topbar__title { font-weight: 700; font-size: 20px; color: #fff; z-index: 1; }
+    .btn-exit {
+      position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--blue); color: #fff; border: none;
+      font-weight: 600; font-size: 15px; padding: 7px 16px;
+      border-radius: var(--radius-pill); cursor: pointer;
+    }
+    .download-menu { position: absolute; right: 128px; top: 50%; transform: translateY(-50%); }
+    .btn-download {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green); color: #fff; border: none;
+      font-weight: 600; font-size: 15px; padding: 7px 16px;
+      border-radius: var(--radius-pill); cursor: pointer;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+    .btn-download:hover { transform: translateY(-1px); }
+    .btn-download:disabled { opacity: 0.65; cursor: wait; }
+    .download-menu__chevron { transition: transform 0.15s ease; margin-left: -2px; }
+    .download-menu--open .download-menu__chevron { transform: rotate(180deg); }
+
+    /* Rendered outside .topbar (which clips overflow for its background
+       pattern) and positioned via JS, so the dropdown isn't cut off. */
+    .download-menu__list {
+      position: fixed; z-index: 500; width: 290px;
+      margin: 0; padding: 6px; list-style: none;
+      background: #fff; border-radius: var(--radius-md);
+      box-shadow: 0 12px 32px rgba(24, 39, 57, 0.18);
+    }
+    .download-menu__list[hidden] { display: none; }
+    .download-menu__list button {
+      display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+      width: 100%; background: transparent; border: none; border-radius: 8px;
+      padding: 9px 12px; text-align: left; cursor: pointer;
+    }
+    .download-menu__list button:hover { background: var(--page-bg); }
+    .download-menu__item-title { font-weight: 700; font-size: 14px; color: var(--ink); }
+    .download-menu__item-desc { font-weight: 400; font-size: 12px; color: var(--ink-soft); }
+
+    /* ---------- Sub bar ---------- */
+    .subbar {
+      flex: 0 0 auto; min-height: 84px;
+      display: flex; align-items: center; justify-content: space-between; gap: 14px;
+      padding: 0 24px;
+      background: #fff url("https://demo.heyhi.sg/images/bg-smartjen-color.png") repeat;
+      box-shadow: rgba(18, 38, 63, 0.03) 0px 0.75rem 1.5rem;
+    }
+    .student-meta { display: flex; align-items: center; gap: 28px; }
+    .student-meta__field label {
+      display: block; font-family: var(--font-mont); font-weight: 700; font-size: 10px;
+      letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px;
+    }
+    .student-meta__field .value { font-weight: 700; font-size: 15px; color: var(--ink); }
+
+    .pill-row { display: flex; align-items: center; gap: 14px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #fff; border: 2px solid var(--green); color: var(--green);
+      font-family: var(--font-mont); font-weight: 700; font-size: 15px;
+      padding: 9px 22px; border-radius: var(--radius-pill); white-space: nowrap;
+    }
+    .pill--info { border-color: var(--blue); color: var(--blue-ink); }
+
+    /* ---------- Stage ---------- */
+    .stage { flex: 1 1 auto; display: flex; min-height: 0; }
+
+    .qrail {
+      flex: 0 0 72px;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 18px 0; gap: 20px; background: #fff;
+      overflow-y: auto; scrollbar-width: none;
+    }
+    .qrail::-webkit-scrollbar { display: none; }
+    .qnode {
+      outline: none; appearance: none;
+      width: 37px; height: 37px; border-radius: 100%;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; background: #8a8a8a; border: 2px solid #8a8a8a;
+      box-shadow: 0 0 0 3px #fff;
+      font-weight: 400; font-size: 16px; cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .qnode:hover { transform: scale(1.08); }
+    .qnode--active { outline: 3px solid rgba(15, 176, 248, 0.5); outline-offset: 2px; }
+
+    .main {
+      flex: 1 1 auto; min-width: 0; min-height: 0;
+      display: flex; flex-direction: column; gap: 40px;
+      padding: 16px 24px; overflow-y: auto; scrollbar-width: none;
+    }
+    .main::-webkit-scrollbar { display: none; }
+
+    .tabs {
+      flex: 0 0 auto; display: flex; width: 100%;
+      background: #e8e8e8; border-radius: 16px 16px 0 0; padding: 8px 16px 0;
+    }
+    .tab {
+      font-weight: 800; font-size: 16px; color: var(--muted);
+      background: transparent; border: none; padding: 12px 22px;
+      cursor: pointer; border-radius: 12px 12px 0 0;
+    }
+    .tab--active { color: var(--blue); background: var(--card); }
+
+    .card {
+      background: var(--card) url("https://elb-onlinequiz.smartjen.com/images/main/bg_quiz.jpg") repeat;
+      border-radius: 0 0 16px 16px;
+      box-shadow: var(--shadow-card);
+    }
+    .card__scroll { padding: 26px 34px 40px; }
+
+    .stat-row {
+      display: flex; align-items: center; justify-content: flex-start;
+      padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 22px;
+    }
+    .stat-link { color: var(--ink-soft); font-size: 14px; cursor: pointer; }
+
+    .eyebrow {
+      font-family: var(--font-display); font-weight: 800; font-size: 15px;
+      letter-spacing: 0.4px; color: var(--ink-soft); margin-bottom: 12px;
+    }
+    .prompt-list { margin: 0 0 24px 20px; }
+    .prompt-list li { font-size: 17px; line-height: 1.6; color: var(--ink); margin-bottom: 6px; }
+    /* A single-prompt essay reads as a statement, not a numbered list */
+    .prompt-list li:only-child { list-style: none; margin-left: -20px; }
+
+    .ai-banner { display: flex; align-items: stretch; gap: 14px; margin-bottom: 20px; }
+    .ai-banner__note {
+      flex: 1 1 auto; display: flex; align-items: center; justify-content: center;
+      background: var(--amber-soft); border: 1px solid #ffe6c2; border-radius: var(--radius-md);
+      color: #f5a623; font-weight: 800; font-size: 15px; padding: 12px;
+    }
+    .btn-see-result {
+      flex: 0 0 auto; background: var(--blue); color: #fff; border: none;
+      font-weight: 600; font-size: 15px; padding: 0 26px;
+      border-radius: var(--radius-md); cursor: pointer;
+    }
+
+    .essay-body { font-size: 17px; line-height: 1.85; color: var(--ink-soft); margin-bottom: 16px; }
+    .wordcount {
+      display: inline-block; background: var(--chip-bg); color: var(--ink-soft);
+      font-size: 14px; padding: 7px 14px; border-radius: 8px;
+    }
+
+    /* Inline annotation highlights inside the essay body. Each carries a
+       superscript number that matches its card in the feedback panel. */
+    .anno {
+      border-radius: 3px; padding: 1px 2px; cursor: help;
+      border-bottom: 2px solid transparent;
+    }
+    .anno:focus { outline: 2px solid var(--blue); outline-offset: 1px; }
+    .anno__ref {
+      font-size: 0.62em; font-weight: 700; vertical-align: super;
+      margin-left: 1px; color: var(--ink);
+    }
+    .anno--grammar { background: var(--cat-grammar-tint); border-bottom-color: var(--cat-grammar); }
+    .anno--writing_clarity { background: var(--cat-clarity-tint); border-bottom-color: var(--cat-clarity); }
+    .anno--spelling { background: var(--cat-spelling-tint); border-bottom-color: var(--cat-spelling); }
+    .anno--general_feedback { background: var(--cat-general-tint); border-bottom-color: var(--cat-general); }
+
+    .placeholder { padding: 60px 24px; text-align: center; color: var(--muted); font-size: 16px; }
+
+    /* ---------- Feedback panel ---------- */
+    .panel-slot { flex: 0 0 456px; display: flex; min-height: 0; margin: 12px 8px 12px 0; }
+    .panel-slot--closed { display: none; }
+    .panel {
+      flex: 1 1 auto; display: flex; flex-direction: column;
+      background: var(--card); border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-card); overflow: hidden;
+    }
+    .panel__head {
+      flex: 0 0 auto; position: relative;
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 18px; background: var(--slate);
+    }
+    .panel__tag {
+      background: rgba(255, 255, 255, 0.22); color: #fff;
+      font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: var(--radius-pill);
+    }
+    .panel__context { font-weight: 700; font-size: 14px; color: #fff; }
+    .panel__close {
+      position: absolute; top: 50%; right: 16px; transform: translateY(-50%);
+      background: transparent; border: none; color: rgba(255, 255, 255, 0.85);
+      font-size: 18px; cursor: pointer; line-height: 1;
+    }
+    .panel__scroll { flex: 1 1 auto; overflow-y: auto; padding: 14px 18px 22px; scrollbar-width: none; }
+    .panel__scroll::-webkit-scrollbar { display: none; }
+
+    /* Category filter chips */
+    .anno-filter { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+    .filter-item {
+      display: inline-flex; align-items: center; gap: 7px;
+      background: #fff; border: 1.5px solid var(--line); border-radius: 12px;
+      padding: 5px 10px; font-size: 12.5px; color: var(--ink); cursor: pointer;
+      transition: border-color 0.12s ease;
+    }
+    .filter-item--active { border-color: var(--blue); }
+    .filter-item b {
+      min-width: 20px; height: 20px; padding: 0 6px; border-radius: var(--radius-pill);
+      color: #fff; font-weight: 700; font-size: 11px;
+      display: inline-flex; align-items: center; justify-content: center;
+      background: var(--slate);
+    }
+    .filter-item--grammar b { background: var(--cat-grammar); }
+    .filter-item--writing_clarity b { background: var(--cat-clarity); }
+    .filter-item--spelling b { background: var(--cat-spelling); }
+    .filter-item--general_feedback b { background: var(--cat-general); }
+
+    .fb-group { margin-bottom: 18px; }
+    .fb-group[hidden] { display: none; }
+    .fb-group__title {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 8px;
+    }
+    .fb-dot { width: 11px; height: 11px; border-radius: 50%; flex: 0 0 auto; }
+    .fb-dot--grammar { background: var(--cat-grammar); }
+    .fb-dot--writing_clarity { background: var(--cat-clarity); }
+    .fb-dot--spelling { background: var(--cat-spelling); }
+    .fb-dot--general_feedback { background: var(--cat-general); }
+    .fb-dot--good { background: var(--green); }
+    .fb-empty { font-size: 13px; color: var(--muted); padding: 4px 2px 8px; }
+
+    .fb-card {
+      background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md);
+      margin-bottom: 8px; overflow: hidden;
+    }
+    .fb-card__head {
+      width: 100%; display: flex; align-items: flex-start; gap: 10px;
+      padding: 11px 14px; background: transparent; border: none;
+      text-align: left; cursor: pointer;
+    }
+    .fb-card__head--static { cursor: default; }
+    .fb-num {
+      flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--chip-bg); color: var(--ink-soft);
+      font-size: 11px; font-weight: 700;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .fb-quote { flex: 1 1 auto; font-size: 14px; line-height: 1.45; color: var(--ink-soft); }
+    .fb-chevron { flex: 0 0 auto; margin-top: 3px; color: var(--muted); transition: transform 0.18s ease; }
+    .fb-card--open .fb-chevron { transform: rotate(180deg); color: var(--blue); }
+
+    .fb-body { display: none; border-top: 1px solid var(--line); padding: 12px 14px; }
+    .fb-card--open .fb-body { display: block; }
+    .fb-card--grammar .fb-body { background: var(--cat-grammar-tint); }
+    .fb-card--writing_clarity .fb-body { background: var(--cat-clarity-tint); }
+    .fb-card--spelling .fb-body { background: var(--cat-spelling-tint); }
+    .fb-card--general_feedback .fb-body { background: var(--cat-general-tint); }
+    .fb-body p { font-size: 13px; line-height: 1.6; color: var(--ink); margin-bottom: 12px; }
+    .ai-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #fff; border: 1px solid var(--line); border-radius: var(--radius-pill);
+      padding: 3px 11px; font-size: 12px; color: var(--ink);
+    }
+
+    /* Rubrics view */
+    .rb-switch { display: flex; background: #d7e1ec; border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 14px; }
+    .rb-switch__btn {
+      flex: 1 1 0; background: transparent; border: none;
+      font-weight: 700; font-size: 13px; color: var(--ink-soft);
+      padding: 7px 0; border-radius: 9px; cursor: pointer;
+    }
+    .rb-switch__btn--active { background: #fff; color: var(--ink); }
+
+    .rb-meta__label { font-size: 12px; color: var(--ink-soft); margin-bottom: 3px; }
+    .rb-meta__value { font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 12px; }
+    .score-bar {
+      display: flex; align-items: center; justify-content: center;
+      background: #d7e1ec; border-radius: 12px; padding: 12px;
+      font-weight: 700; font-size: 15px; color: var(--ink); margin-bottom: 12px;
+    }
+    .rb-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 14px; }
+    .rb-eyebrow { font-size: 12px; color: var(--ink-soft); margin-bottom: 2px; }
+    .rb-title { font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 14px; }
+    .rb-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .rb-row__label { flex: 0 0 148px; font-size: 13px; color: var(--ink-soft); line-height: 1.3; }
+    .rb-bar { flex: 1 1 auto; height: 10px; background: var(--chip-bg); border-radius: var(--radius-pill); overflow: hidden; }
+    .rb-bar__fill { display: block; height: 100%; background: var(--blue); border-radius: var(--radius-pill); }
+    .rb-row__score { flex: 0 0 auto; font-weight: 700; font-size: 13px; color: var(--ink); }
+
+    .rb-acc { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); margin-bottom: 8px; overflow: hidden; }
+    .rb-acc__head {
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+      padding: 12px 14px; background: transparent; border: none; width: 100%;
+      cursor: pointer; font-weight: 700; font-size: 13.5px; color: var(--ink); text-align: left;
+    }
+    .rb-acc__head svg { flex: 0 0 auto; color: var(--ink-soft); transition: transform 0.18s ease; }
+    .rb-acc--open .rb-acc__head svg { transform: rotate(180deg); }
+    .rb-acc__body { display: none; padding: 0 14px 14px; }
+    .rb-acc--open .rb-acc__body { display: block; }
+    .rb-acc__obtained { font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; }
+    .rb-acc__obtained b { color: var(--ink); }
+    .rb-acc__desc { margin: 0 0 10px 16px; }
+    .rb-acc__desc li { font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); margin-bottom: 5px; }
+    .rb-feedback {
+      background: #eaf8ff; border-left: 3px solid var(--blue); border-radius: 8px;
+      padding: 10px 12px; font-size: 12.5px; line-height: 1.6; color: var(--ink-soft);
+    }
+
+    /* Right rail switching the panel between its three views */
+    .panel-rail {
+      flex: 0 0 88px; display: flex; flex-direction: column; align-items: center;
+      gap: 20px; padding: 16px 0; margin: 12px 8px 12px 0;
+      background: #fff; border-radius: 16px;
+    }
+    .rnav {
+      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      background: transparent; border: none; cursor: pointer;
+      color: var(--muted); font-size: 10px; font-weight: 600; width: 88px; text-align: center;
+    }
+    .rnav__icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center; color: #97a3b0;
+    }
+    .rnav--active .rnav__icon { background: var(--blue); color: #fff; }
+    .rnav--active { color: var(--blue); }
+
+    /* ==========================================================
+       Tablet & mobile
+       The three-column desktop stage (questions rail | essay |
+       feedback panel | view rail) has no room to sit side by side
+       on a phone, so it re-forms into a single scrolling column:
+       questions become a horizontal strip at the top, the feedback
+       panel becomes a bottom sheet, and the view rail becomes the
+       bottom tab bar that summons it.
+       ========================================================== */
+    @media (max-width: 900px) {
+      body { padding-bottom: 62px; }
+
+      .stage { flex-direction: column; }
+
+      /* Questions: horizontal scrolling strip instead of a side rail */
+      .qrail {
+        flex: 0 0 auto;
+        flex-direction: row;
+        justify-content: flex-start;
+        gap: 14px;
+        padding: 10px 16px;
+        overflow-x: auto;
+        overflow-y: hidden;
+        border-bottom: 1px solid var(--line);
+      }
+      .qnode {
+        flex: 0 0 auto;
+        width: 32px; height: 32px; font-size: 14px;
+        box-shadow: none;
+      }
+
+      .main { gap: 26px; padding: 12px; }
+      .card__scroll { padding: 18px 16px 26px; }
+
+      /* 5 tabs won't fit a phone width — let the row scroll sideways */
+      .tabs { overflow-x: auto; padding: 6px 8px 0; scrollbar-width: none; }
+      .tabs::-webkit-scrollbar { display: none; }
+      .tab { flex: 0 0 auto; font-size: 13px; padding: 10px 14px; }
+
+      .prompt-list li { font-size: 15px; }
+      .essay-body { font-size: 15px; line-height: 1.9; }
+      .ai-banner { flex-direction: column; gap: 10px; }
+      .ai-banner__note { font-size: 13px; padding: 10px; }
+      .btn-see-result { padding: 11px 20px; font-size: 14px; }
+
+      /* Feedback panel: bottom sheet, sitting above the tab bar */
+      .panel-slot {
+        position: fixed;
+        inset: auto 0 62px 0;
+        height: 72vh;
+        flex: none;
+        margin: 0;
+        z-index: 200;
+      }
+      .panel {
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.22);
+      }
+      /* Grab handle, so the sheet reads as a sheet */
+      .panel::before {
+        content: "";
+        flex: 0 0 auto;
+        width: 36px; height: 4px;
+        margin: 8px auto 2px;
+        background: rgba(255, 255, 255, 0.45);
+        border-radius: 4px;
+      }
+      .panel__close { right: 12px; font-size: 22px; padding: 4px 8px; }
+      .panel__scroll { padding: 14px 14px 26px; }
+
+      /* View rail: fixed bottom tab bar */
+      .panel-rail {
+        position: fixed;
+        inset: auto 0 0 0;
+        flex: none;
+        flex-direction: row;
+        justify-content: space-around;
+        height: 62px;
+        gap: 0;
+        padding: 0;
+        margin: 0;
+        border-radius: 0;
+        border-top: 1px solid var(--line);
+        z-index: 210;
+      }
+      .rnav { flex: 1 1 0; width: auto; gap: 3px; }
+      .rnav__icon { width: 32px; height: 32px; border-radius: 10px; }
+      .rnav__icon svg { width: 20px; height: 20px; }
+    }
+
+    @media (max-width: 600px) {
+      /* Topbar: title left-aligned and truncating, so it can never run
+         under the action buttons pinned to the right. */
+      .topbar { height: 48px; justify-content: flex-start; padding: 0 12px; }
+      .topbar__title {
+        font-size: 15px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        /* Clears both pinned buttons (~74px exit + ~54px download + gaps) */
+        max-width: calc(100% - 152px);
+      }
+      .btn-exit { right: 12px; font-size: 12px; padding: 6px 11px; gap: 5px; }
+      .btn-exit svg { width: 14px; height: 14px; }
+      .download-menu { right: 82px; }
+      .btn-download { font-size: 12px; padding: 6px 10px; gap: 5px; }
+      /* Icon-only download: the label is the first thing to go when the
+         bar gets tight; the arrow icon still reads as "download". */
+      #downloadPdfLabel { display: none; }
+      .download-menu__list { width: min(290px, calc(100vw - 24px)); }
+
+      .subbar {
+        min-height: 0;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 16px;
+      }
+      .student-meta { gap: 18px; }
+      .student-meta__field .value { font-size: 14px; }
+      /* The two pills don't fit one phone-width row; let them wrap rather
+         than letting the marks pill run off the right edge. */
+      .pill-row { width: 100%; gap: 8px; flex-wrap: wrap; }
+      .pill { font-size: 11.5px; padding: 6px 12px; gap: 5px; border-width: 1.5px; }
+      .pill svg { width: 13px; height: 13px; }
+
+      .panel-slot { height: 78vh; }
+      .anno-filter { gap: 5px; }
+      .filter-item { font-size: 11.5px; padding: 4px 8px; }
+      .rb-row__label { flex: 0 0 108px; font-size: 12px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="topbar__title" id="quizTitle">Composition Writing</h1>
+    <div class="download-menu" id="downloadMenu">
+      <button class="btn-download" id="downloadPdfBtn" aria-haspopup="true" aria-expanded="false">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12M12 15l-4.5-4.5M12 15l4.5-4.5M4 19h16" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        <span id="downloadPdfLabel">Download PDF</span>
+        <svg class="download-menu__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      </button>
+    </div>
+    <button class="btn-exit">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5H6a2 2 0 00-2 2v10a2 2 0 002 2h9M18 15l3-3-3-3M21 12H10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      Exit
+    </button>
+  </header>
+
+  <!-- Rendered outside .topbar (which clips overflow for its background
+       pattern) and positioned via JS, so the dropdown isn't cut off. -->
+  <ul class="download-menu__list" id="downloadMenuList" hidden>
+    <li>
+      <button data-level="results">
+        <span class="download-menu__item-title">Results only</span>
+        <span class="download-menu__item-desc">Essay, marks and rubric scores</span>
+      </button>
+    </li>
+    <li>
+      <button data-level="withAnswers">
+        <span class="download-menu__item-title">Results + rubrics detail</span>
+        <span class="download-menu__item-desc">Adds band descriptors per criterion</span>
+      </button>
+    </li>
+    <li>
+      <button data-level="full">
+        <span class="download-menu__item-title">Full feedback with AI remarks</span>
+        <span class="download-menu__item-desc">Everything, including inline writing feedback</span>
+      </button>
+    </li>
+  </ul>
+
+  <div class="subbar">
+    <div class="student-meta">
+      <div class="student-meta__field">
+        <label>Student Name</label>
+        <div class="value" id="studentName">—</div>
+      </div>
+      <div class="student-meta__field">
+        <label>Attempts</label>
+        <div class="value" id="attempts">—</div>
+      </div>
+    </div>
+    <div class="pill-row">
+      <span class="pill" id="statusPill">—</span>
+      <span class="pill pill--info" id="marksPill">—</span>
+    </div>
+  </div>
+
+  <div class="stage">
+    <nav class="qrail" id="qrail"></nav>
+    <main class="main" id="mainScroll"></main>
+
+    <div class="panel-slot" id="panelSlot">
+      <aside class="panel">
+        <div class="panel__head">
+          <span class="panel__tag">Writing Feedback</span>
+          <span class="panel__context" id="panelContext">—</span>
+          <button class="panel__close" id="panelClose" aria-label="Close feedback panel">&times;</button>
+        </div>
+        <div class="panel__scroll" id="panelScroll"></div>
+      </aside>
+    </div>
+
+    <nav class="panel-rail" id="panelRail">
+      <button class="rnav rnav--active" data-view="summary">
+        <span class="rnav__icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10" stroke-linecap="round" /></svg>
+        </span>
+        Summary
+      </button>
+      <button class="rnav" data-view="rubrics">
+        <span class="rnav__icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" /><path d="M8 9h8M8 13h5" stroke-linecap="round" /></svg>
+        </span>
+        Rubrics
+      </button>
+      <button class="rnav" data-view="good">
+        <span class="rnav__icon">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 11v8H4v-8zM7 11l4-7a2 2 0 013 2l-1 5h4.5a2 2 0 012 2.5l-1.5 6a2 2 0 01-2 1.5H7" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </span>
+        Good Points
+      </button>
+    </nav>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="essay-data.js?v=1787733931"></script>
+  <script src="essay-render.js?v=1787733931"></script>
+  <script src="heyhi-logo.js?v=1787733931"></script>
+  <script src="essay-pdf-generator.js?v=1787733931"></script>
+</body>
+</html>
