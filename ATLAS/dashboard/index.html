@@ -134,6 +134,21 @@
     .opt:hover .open { background: #000; }
     .note { font-size: 12px; color: var(--mute); }
 
+    /* ---------- same-IA variants ---------- */
+    .variants { padding: 16px 0 8px; }
+    .variants__head {
+      padding-top: 28px;
+      border-top: 1px solid var(--line);
+      margin-bottom: 20px;
+    }
+    .variants__title {
+      font-size: 20px; font-weight: 600; letter-spacing: -0.3px;
+      color: var(--ink); margin-bottom: 6px;
+    }
+    .variants__lede { max-width: 68ch; font-size: 14px; }
+    .grid--pair { grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 0 0 24px; }
+    @media (max-width: 620px) { .grid--pair { grid-template-columns: minmax(0, 1fr); } }
+
     /* ---------- caveats ---------- */
     .notes { padding: 8px 0 64px; }
     .notes__card {
@@ -410,6 +425,214 @@
       </a>
 
     </div>
+
+    <section class="variants">
+      <div class="variants__head">
+        <h2 class="variants__title">Same-IA reskins</h2>
+        <p class="variants__lede">
+          A stricter test. All eight keep the live dashboard's structure exactly — same section
+          order, same components, same copy, same empty-state numbers (0/0, 1 Day, 0/1). Only the
+          design tokens change. Verified: every file below shares an identical 25-block skeleton
+          and identical 1,590-character copy, so any difference you see is purely visual language.
+        </p>
+      </div>
+      <div class="grid">
+
+        <a class="opt" href="01b-notion-same-ia.html">
+          <div class="swatch" aria-hidden="true">
+            <span class="wide" style="background:#0a1530"></span>
+            <span style="background:#5645d4"></span>
+            <span style="background:#e6e0f5"></span>
+            <span style="background:#ffe8d4"></span>
+            <span style="background:#f9e79f"></span>
+          </div>
+          <div class="opt__body">
+            <p class="opt__num">Option 01b</p>
+            <h2 class="opt__name">Notion — existing IA</h2>
+            <p class="opt__desc">Same structure as live, Notion's colour and shape language.</p>
+            <ul class="opt__list">
+              <li>Navy hero band kept; stock photo slot filled with sticky-note dots</li>
+              <li>Get started cards become pastel-tinted, not grey-on-white</li>
+              <li>Learning Hub keeps its 2-column grid — six different tints</li>
+              <li>Jen bar restyled as the bold-yellow assistant banner</li>
+            </ul>
+            <div class="opt__foot">
+              <span class="open">Open option</span>
+              <span class="note">Reskin only</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="opt" href="02b-stripe-same-ia.html">
+          <div class="swatch" aria-hidden="true">
+            <span class="wide" style="background:linear-gradient(120deg,#f5e9d4,#f96bee 45%,#533afd 78%,#ea2261)"></span>
+            <span style="background:#0d253d"></span>
+            <span style="background:#533afd"></span>
+            <span style="background:#f5e9d4"></span>
+          </div>
+          <div class="opt__body">
+            <p class="opt__num">Option 02b</p>
+            <h2 class="opt__name">Stripe — existing IA</h2>
+            <p class="opt__desc">Same structure as live, Stripe's atmosphere and type.</p>
+            <ul class="opt__list">
+              <li>Navy hero band swapped for the gradient mesh, same height</li>
+              <li>Headings drop to weight 300 with negative tracking</li>
+              <li>Progress figures use tabular numerals</li>
+              <li>Jen bar becomes a dark navy pill</li>
+            </ul>
+            <div class="opt__foot">
+              <span class="open">Open option</span>
+              <span class="note">Reskin only</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="opt" href="03b-apple-same-ia.html">
+          <div class="swatch" aria-hidden="true">
+            <span class="wide" style="background:#272729"></span>
+            <span style="background:#f5f5f7"></span>
+            <span style="background:#0066cc"></span>
+            <span style="background:#ffffff; box-shadow: inset -1px 0 0 #eef0f3"></span>
+          </div>
+          <div class="opt__body">
+            <p class="opt__num">Option 03b</p>
+            <h2 class="opt__name">Apple — existing IA</h2>
+            <p class="opt__desc">Same structure as live, Apple's restraint and single accent.</p>
+            <ul class="opt__list">
+              <li>Hero band becomes a near-black tile — no gradient, no decoration</li>
+              <li>Every card held by a 1px hairline; the system's one shadow is for photos only</li>
+              <li>Action Blue is the only interactive colour on the page</li>
+              <li>Body runs 17px, and weight 500 never appears</li>
+            </ul>
+            <div class="opt__foot">
+              <span class="open">Open option</span>
+              <span class="note">Reskin only</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="opt" href="07b-elevenlabs-same-ia.html">
+          <div class="swatch" aria-hidden="true">
+            <span class="wide" style="background:#f5f5f5"></span>
+            <span style="background:#a7e5d3"></span>
+            <span style="background:#f4c5a8"></span>
+            <span style="background:#c8b8e0"></span>
+            <span style="background:#292524"></span>
+          </div>
+          <div class="opt__body">
+            <p class="opt__num">Option 07b</p>
+            <h2 class="opt__name">ElevenLabs — existing IA</h2>
+            <p class="opt__desc">Same structure as live, editorial serif and pastel atmosphere.</p>
+            <ul class="opt__list">
+              <li>Navy band swapped for off-white with pastel orbs behind the greeting</li>
+              <li>Headings set in a light serif at 300 — the only serif in the set</li>
+              <li>Ink pill CTAs; no saturated accent colour exists</li>
+              <li>Progress figures also set in the serif</li>
+            </ul>
+            <div class="opt__foot">
+              <span class="open">Open option</span>
+              <span class="note">Reskin only</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="opt" href="05b-openai-same-ia.html">
+          <div class="swatch" aria-hidden="true">
+            <span class="wide" style="background:#ffffff; box-shadow: inset -1px 0 0 #eef0f3"></span>
+            <span style="background:#f7f7f8"></span>
+            <span style="background:#8e8ea0"></span>
+            <span style="background:#000000"></span>
+          </div>
+          <div class="opt__body">
+            <p class="opt__num">Option 05b</p>
+            <h2 class="opt__name">OpenAI — existing IA</h2>
+            <p class="opt__desc">Same structure as live, stripped to typography alone.</p>
+            <ul class="opt__list">
+              <li>Hero band becomes a quiet grey surface, not a dark block</li>
+              <li>No shadows anywhere; one 5px radius on every element</li>
+              <li>A single muted accent carries all the icons</li>
+              <li>The most conservative of the eight — closest to a pure cleanup</li>
+            </ul>
+            <div class="opt__foot">
+              <span class="open">Open option</span>
+              <span class="note">Reskin only</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="opt" href="04b-vercel-same-ia.html">
+          <div class="swatch" aria-hidden="true">
+            <span class="wide" style="background:linear-gradient(120deg,#00dfd8,#007cf0 32%,#7928ca 58%,#ff0080 80%,#f9cb28)"></span>
+            <span style="background:#171717"></span>
+            <span style="background:#fafafa; box-shadow: inset -1px 0 0 #eef0f3"></span>
+          </div>
+          <div class="opt__body">
+            <p class="opt__num">Option 04b</p>
+            <h2 class="opt__name">Vercel — existing IA</h2>
+            <p class="opt__desc">Same structure as live, stark surfaces and mono labels.</p>
+            <ul class="opt__list">
+              <li>Navy band swapped for the mesh gradient on near-white</li>
+              <li>Buttons take the 6px in-app square, not the marketing pill</li>
+              <li>Monospace carries every small label and unlock note</li>
+              <li>Cards sit on stacked hairline shadows, never floating</li>
+            </ul>
+            <div class="opt__foot">
+              <span class="open">Open option</span>
+              <span class="note">Reskin only</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="opt" href="06b-anthropic-same-ia.html">
+          <div class="swatch" aria-hidden="true">
+            <span class="wide" style="background:#faf9f5"></span>
+            <span class="wide" style="background:#141413"></span>
+            <span style="background:#faf9f5"></span>
+          </div>
+          <div class="opt__body">
+            <p class="opt__num">Option 06b</p>
+            <h2 class="opt__name">Anthropic — existing IA</h2>
+            <p class="opt__desc">Same structure as live, warm cream and hard rules.</p>
+            <ul class="opt__list">
+              <li>Canvas is warm off-white, not grey — the single biggest shift</li>
+              <li>Cards drawn with hard 1px near-black borders, not soft hairlines</li>
+              <li>Hero band becomes a solid near-black block</li>
+              <li>Unlock notes set in uppercase mono instead of italics</li>
+            </ul>
+            <div class="opt__foot">
+              <span class="open">Open option</span>
+              <span class="note">Reskin only</span>
+            </div>
+          </div>
+        </a>
+
+        <a class="opt" href="08b-cohere-same-ia.html">
+          <div class="swatch" aria-hidden="true">
+            <span style="background:#ffffff; box-shadow: inset -1px 0 0 #eef0f3"></span>
+            <span class="wide" style="background:#003c33"></span>
+            <span style="background:#071829"></span>
+            <span style="background:#eeece7"></span>
+            <span style="background:#ff7759"></span>
+          </div>
+          <div class="opt__body">
+            <p class="opt__num">Option 08b</p>
+            <h2 class="opt__name">Cohere — existing IA</h2>
+            <p class="opt__desc">Same structure as live, deep-green band and a type split.</p>
+            <ul class="opt__list">
+              <li>Hero band becomes deep green — the brand's product surface</li>
+              <li>Greeting set in the mono-spirited face; everything else grotesque</li>
+              <li>Completely flat — depth comes from surface change, never shadow</li>
+              <li>Coral appears only on the notification badge, never as a CTA</li>
+            </ul>
+            <div class="opt__foot">
+              <span class="open">Open option</span>
+              <span class="note">Reskin only</span>
+            </div>
+          </div>
+        </a>
+
+      </div>
+    </section>
 
     <section class="notes">
       <div class="notes__card">

@@ -13,7 +13,15 @@ Static HTML, desktop-first, self-contained, dummy data (returning-learner state)
 - [x] 06 — Anthropic (`06-anthropic.html`)
 - [x] 07 — ElevenLabs (`07-elevenlabs.html`)
 - [x] 08 — Cohere (`08-cohere.html`)
-- [x] Review index linking all eight (`index.html`)
+- [x] 01b — Notion, existing IA (`01b-notion-same-ia.html`)
+- [x] 02b — Stripe, existing IA (`02b-stripe-same-ia.html`)
+- [x] 03b — Apple, existing IA (`03b-apple-same-ia.html`)
+- [x] 05b — OpenAI, existing IA (`05b-openai-same-ia.html`)
+- [x] 04b — Vercel, existing IA (`04b-vercel-same-ia.html`)
+- [x] 06b — Anthropic, existing IA (`06b-anthropic-same-ia.html`)
+- [x] 07b — ElevenLabs, existing IA (`07b-elevenlabs-same-ia.html`)
+- [x] 08b — Cohere, existing IA (`08b-cohere-same-ia.html`)
+- [x] Review index linking all options (`index.html`)
 
 ## Decisions
 
@@ -68,3 +76,53 @@ Phosphor mark and the text wordmark, since the file is a full lockup (mark + ATL
 - Option 03 (Apple) reverses the logo to white (`filter: brightness(0) invert(1)`) because its
   global nav is true black and the supplied wordmark is black. This flattens the mark's orange,
   amber and teal to white. Replace with an official reversed lockup when one exists.
+
+## Same-IA reskins (all eight)
+
+A stricter comparison requested after the Discord thread: keep the live dashboard's information
+architecture exactly, change only the design tokens.
+
+Held constant across all eight files (verified programmatically — identical element skeleton and
+identical visible copy, 1590 chars):
+
+- Section order: hero band → Get started → What happens next + Your progress (2-col) → Learning Hub
+- Nav order matches live: Dashboard, Courses, Assessments, CBL, Performance, PALS
+- Copy is the live page verbatim, including the empty-state numbers (0/0, 1 Day, 0/1) and the
+  italic unlock notes
+- Learning Hub stays a 2-column grid of six cards with Explore
+- Floating Jen bar retained
+
+Only deviation: the live hero has a stock photograph on the right. Each option fills that slot
+with its own system's decoration instead (Notion sticky-note dots, Stripe gradient mesh, Apple
+nothing at all). Confirmed acceptable — the photo is not needed.
+
+03b through 08b were all generated from the 02b body so structure and copy could not drift.
+Parity re-verified after every generation run: all eight share the same 25-block skeleton and
+the same 1,590-character copy. Static validation passes on all eight (CSS variables resolve,
+tags balance, one style block, logo data URI and Phosphor icons present).
+
+### Visual verification status
+
+All eight rendered and checked at 1440px. Confirmed per file:
+
+| File | Confirmed |
+|---|---|
+| 01b Notion    | pastel tints, navy band, sticky-note dots |
+| 02b Stripe    | gradient mesh, weight 300, tabular figures |
+| 03b Apple     | near-black tile, hairline cards, no shadow |
+| 04b Vercel    | Geist + Geist Mono live, mesh gradient, mono notes |
+| 05b OpenAI    | 5px radius, box-shadow: none, quiet grey band |
+| 06b Anthropic | cream #faf9f5 canvas, #141413 hero, hard rules |
+| 07b ElevenLabs| serif at weight 300, 4 pastel orbs |
+| 08b Cohere    | mono h1 / grotesque h2 split, #003c33 hero |
+
+Every file: 24 Phosphor icons, zero unresolved glyphs, logo data URI loads.
+
+### Resolved
+
+- Help treatment aligned across all eight (plain nav text link). 01b previously used a ghost
+  button with an icon, left over from being hand-written before the generator existed.
+- The design the boss reviewed is the live dashboard itself, not a separate file. No missing
+  reference to chase.
+- The hero stock photograph is not required. Each option fills that slot with its own system's
+  decoration, and that is accepted.
