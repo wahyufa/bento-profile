@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATLAS Learner Dashboard — Anthropic design system</title>
+  <style>
+    /* ============================================================
+       DESIGN TOKENS — sourced from designmd.co/d/anthropic
+
+       NOTE: Anthropic's catalogue entry is a measured extraction.
+       It supplies a two-colour system (near-black #141413 on warm
+       off-white #faf9f5), a 58px/700/1.1 display tier, a 2px
+       spacing base, three radii, one layered card shadow, and a
+       cubic-bezier(0.16, 1, 0.3, 1) motion curve.
+
+       One deliberate deviation: the extraction records body type at
+       12px, which is its caption scale. 12px is used here for labels
+       and captions; reading body sits at 16px with the same -0.24px
+       tracking and 1.4 leading, so a dashboard stays readable.
+       ============================================================ */
+    :root {
+      --primary: #141413;      /* near-black — text, borders, dark surfaces */
+      --on-primary: #ffffff;
+      --background: #faf9f5;   /* warm off-white */
+      --surface-dark: #141413;
+      --border: #141413;
+      --text: #141413;
+      --on-dark: #faf9f5;
+
+      /* Derived tints — the extraction gives no neutral ramp, so these
+         are alpha steps of the single ink colour. */
+      --ink-70: rgba(20, 20, 19, 0.70);
+      --ink-52: rgba(20, 20, 19, 0.52);
+      --ink-30: rgba(20, 20, 19, 0.30);
+      --ink-12: rgba(20, 20, 19, 0.12);
+      --ink-06: rgba(20, 20, 19, 0.06);
+      --cream-70: rgba(250, 249, 245, 0.70);
+      --cream-45: rgba(250, 249, 245, 0.45);
+      --cream-16: rgba(250, 249, 245, 0.16);
+
+      /* Spacing — 2px base, scale [2, 4, 8, 12, 16, 22, 58, 68] */
+      --s-1: 2px;
+      --s-2: 4px;
+      --s-3: 8px;
+      --s-4: 12px;
+      --s-5: 16px;
+      --s-6: 22px;
+      --s-7: 58px;
+      --s-8: 68px;
+
+      --r-sm: 8px;
+      --r-md: 16px;
+      --r-lg: 24px;
+
+      --sh-card: rgba(0,0,0,0.01) 0px 2px 2px 0px,
+                 rgba(0,0,0,0.02) 0px 4px 4px 0px,
+                 rgba(0,0,0,0.04) 0px 16px 24px 0px;
+
+      --d-fast: 100ms;
+      --d-base: 200ms;
+      --d-slow: 800ms;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+
+      --font: "Anthropic Sans", "Styrene A", "Helvetica Neue", Arial, sans-serif;
+      --mono: "Anthropic Mono", ui-monospace, "SF Mono", Menlo, monospace;
+      --page: 1200px;
+    }
+
+    /* ============================================================
+       BASE
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 400;
+      line-height: 1.4;
+      letter-spacing: -0.24px;
+      color: var(--text);
+      background: var(--background);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, h4, p, ul, ol { margin: 0; }
+    ul { padding: 0; list-style: none; }
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; cursor: pointer; border: none; background: none; }
+
+    .page { max-width: var(--page); margin-inline: auto; padding-inline: var(--s-6); }
+
+    .t-display { font-size: 58px; font-weight: 700; line-height: 1.1; letter-spacing: -1.4px; }
+    .t-h2      { font-size: 34px; font-weight: 700; line-height: 1.1; letter-spacing: -0.9px; }
+    .t-h3      { font-size: 22px; font-weight: 700; line-height: 1.2; letter-spacing: -0.5px; }
+    .t-lead    { font-size: 20px; font-weight: 400; line-height: 1.4; letter-spacing: -0.3px; }
+    .t-body    { font-size: 16px; line-height: 1.4; letter-spacing: -0.24px; }
+    .t-cap     { font-size: 12px; line-height: 1.4; letter-spacing: -0.24px; }
+    .t-label {
+      font-family: var(--mono);
+      font-size: 12px; line-height: 1.4;
+      letter-spacing: 0.4px;
+      text-transform: uppercase;
+    }
+    .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+    .muted { color: var(--ink-52); }
+
+    /* ============================================================
+       BUTTONS
+       ============================================================ */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center;
+      gap: var(--s-3);
+      padding: 12px 22px;
+      font-size: 16px; font-weight: 400; line-height: 1.4;
+      letter-spacing: -0.24px;
+      border-radius: var(--r-sm);
+      transition: background-color var(--d-base) var(--ease),
+                  color var(--d-base) var(--ease),
+                  transform var(--d-fast) var(--ease);
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn--solid { background: var(--primary); color: var(--on-primary); }
+    .btn--solid:hover { background: #2e2e2b; }
+    .btn--outline { border: 1px solid var(--border); color: var(--text); }
+    .btn--outline:hover { background: var(--ink-06); }
+    .btn--on-dark { background: var(--background); color: var(--text); }
+    .btn--on-dark:hover { background: #ffffff; }
+    .btn--outline-dark { border: 1px solid var(--cream-45); color: var(--on-dark); }
+    .btn--outline-dark:hover { background: var(--cream-16); }
+    .btn--sm { padding: 7px 14px; font-size: 14px; }
+
+    /* ============================================================
+       NAV — hard 1px rule, no blur, no shadow
+       ============================================================ */
+    .nav { border-bottom: 1px solid var(--border); background: var(--background); }
+    .nav__inner { display: flex; align-items: center; gap: var(--s-6); height: 68px; }
+    .brand { display: flex; align-items: center; gap: var(--s-3); font-size: 19px; font-weight: 700; letter-spacing: -0.5px; }
+    .nav__links { display: flex; align-items: center; gap: var(--s-6); margin-left: var(--s-6); }
+    .nav__link { font-size: 16px; color: var(--ink-70); transition: color var(--d-base) var(--ease); }
+    .nav__link:hover { color: var(--text); }
+    .nav__link.is-active { color: var(--text); text-decoration: underline; text-underline-offset: 6px; }
+    .nav__right { margin-left: auto; display: flex; align-items: center; gap: var(--s-4); }
+    .avatar {
+      width: 34px; height: 34px;
+      display: grid; place-items: center;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      font-size: 13px; font-weight: 700;
+    }
+
+    /* ============================================================
+       HERO — editorial, left aligned, no decoration
+       ============================================================ */
+    .hero { padding: var(--s-8) 0 var(--s-7); }
+    .hero__grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: var(--s-8);
+      align-items: end;
+    }
+    .hero__label { margin-bottom: var(--s-5); color: var(--ink-52); }
+    .hero__title { margin-bottom: var(--s-6); }
+    .hero__lead { color: var(--ink-70); max-width: 30em; margin-bottom: var(--s-6); }
+    .hero__actions { display: flex; gap: var(--s-4); flex-wrap: wrap; }
+
+    /* Resume panel — hard border, no shadow */
+    .resume {
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: var(--s-6);
+      background: var(--background);
+    }
+    .resume__label { color: var(--ink-52); margin-bottom: var(--s-4); }
+    .resume__title { margin-bottom: var(--s-2); }
+    .resume__meta { color: var(--ink-52); }
+    .track {
+      position: relative; height: 6px;
+      background: var(--ink-12);
+      border-radius: 999px;
+      overflow: hidden;
+      margin: var(--s-6) 0 var(--s-3);
+    }
+    .track > i { position: absolute; inset: 0 auto 0 0; background: var(--primary); border-radius: 999px; }
+    .resume__foot { display: flex; align-items: center; justify-content: space-between; color: var(--ink-52); }
+    .resume__cta { margin-top: var(--s-6); display: flex; align-items: center; gap: var(--s-4); }
+
+    /* ============================================================
+       SECTIONS
+       ============================================================ */
+    .section { padding: var(--s-7) 0; }
+    .section--ruled { border-top: 1px solid var(--border); }
+    .section__head {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      gap: var(--s-5);
+      margin-bottom: var(--s-6);
+    }
+    .section__title { margin-bottom: var(--s-2); }
+    .section__sub { color: var(--ink-52); }
+    .section__link { border-bottom: 1px solid var(--border); padding-bottom: 2px; }
+
+    /* ============================================================
+       DARK BLOCK — the system's high-contrast moment
+       ============================================================ */
+    .dark {
+      background: var(--surface-dark);
+      color: var(--on-dark);
+      border-radius: var(--r-lg);
+      padding: var(--s-8) var(--s-7);
+    }
+    .dark .section__sub { color: var(--cream-70); }
+    .dark .t-label { color: var(--cream-45); }
+
+    .today {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0;
+      margin-top: var(--s-7);
+      border-top: 1px solid var(--cream-16);
+    }
+    .today__item {
+      padding: var(--s-6) var(--s-6) var(--s-6) 0;
+      border-right: 1px solid var(--cream-16);
+      display: flex; flex-direction: column;
+      transition: background-color var(--d-base) var(--ease);
+    }
+    .today__item:last-child { border-right: none; }
+    .today__item + .today__item { padding-left: var(--s-6); }
+    .today__num { color: var(--cream-45); margin-bottom: var(--s-5); }
+    .today__title { margin-bottom: var(--s-4); }
+    .today__desc { color: var(--cream-70); margin-bottom: var(--s-6); }
+    .today__cta { margin-top: auto; }
+    .today__time { color: var(--cream-45); margin-left: var(--s-4); }
+
+    /* ============================================================
+       FIGURES — editorial numbers on rules
+       ============================================================ */
+    .figures {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .figure { padding: var(--s-6) var(--s-6) var(--s-6) 0; border-right: 1px solid var(--ink-12); }
+    .figure:last-child { border-right: none; }
+    .figure + .figure { padding-left: var(--s-6); }
+    .figure__v { font-size: 44px; font-weight: 700; line-height: 1.1; letter-spacing: -1.2px; font-variant-numeric: tabular-nums; }
+    .figure__v small { font-size: 18px; font-weight: 400; color: var(--ink-52); letter-spacing: -0.3px; }
+    .figure__k { color: var(--ink-52); margin-top: var(--s-2); }
+    .figure__d { margin-top: var(--s-3); }
+
+    /* Mastery rows */
+    .mastery { margin-top: var(--s-7); }
+    .mastery__row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 220px 64px;
+      align-items: center;
+      gap: var(--s-5);
+      padding: var(--s-4) 0;
+      border-bottom: 1px solid var(--ink-12);
+    }
+    .mastery__bar { position: relative; height: 4px; background: var(--ink-12); border-radius: 999px; overflow: hidden; }
+    .mastery__bar > i { position: absolute; inset: 0 auto 0 0; background: var(--primary); border-radius: 999px; }
+    .mastery__n { text-align: right; }
+
+    /* ============================================================
+       JEN — bordered transcript panel
+       ============================================================ */
+    .jen-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+      gap: var(--s-8);
+      align-items: center;
+    }
+    .transcript {
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      background: var(--background);
+      box-shadow: var(--sh-card);
+    }
+    .transcript__head {
+      padding: var(--s-4) var(--s-6);
+      border-bottom: 1px solid var(--border);
+      color: var(--ink-52);
+    }
+    .transcript__body { padding: var(--s-6); display: grid; gap: var(--s-5); }
+    .turn { display: grid; gap: var(--s-2); }
+    .turn__who { color: var(--ink-52); }
+    .turn__what { line-height: 1.5; }
+    .turn--ai .turn__what { padding-left: var(--s-4); border-left: 2px solid var(--border); }
+    .prompts { display: grid; gap: var(--s-4); margin-top: var(--s-6); }
+    .prompt {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: var(--s-5);
+      padding: var(--s-4) var(--s-5);
+      border: 1px solid var(--ink-30);
+      border-radius: var(--r-sm);
+      transition: border-color var(--d-base) var(--ease), background-color var(--d-base) var(--ease);
+    }
+    .prompt:hover { border-color: var(--border); background: var(--ink-06); }
+
+    /* ============================================================
+       TOOLS — bordered cards, soft layered shadow
+       ============================================================ */
+    .tools {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--s-5);
+    }
+    .tool {
+      display: flex; flex-direction: column;
+      padding: var(--s-6);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      background: var(--background);
+      transition: box-shadow var(--d-base) var(--ease), transform var(--d-base) var(--ease);
+    }
+    .tool:hover { box-shadow: var(--sh-card); transform: translateY(-2px); }
+    .tool__top { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--s-6); }
+    .tool__name { margin-bottom: var(--s-2); }
+    .tool__expand { color: var(--ink-52); margin-bottom: var(--s-4); }
+    .tool__desc { color: var(--ink-70); margin-bottom: var(--s-6); }
+    .tool__foot { margin-top: auto; display: flex; align-items: center; justify-content: space-between; }
+    .pill {
+      padding: 3px 10px;
+      border: 1px solid var(--ink-30);
+      border-radius: 999px;
+      color: var(--ink-70);
+    }
+
+    /* Footer */
+    .foot { border-top: 1px solid var(--border); padding: var(--s-6) 0; }
+    .foot__inner { display: flex; align-items: center; justify-content: space-between; gap: var(--s-5); color: var(--ink-52); }
+    .foot__links { display: flex; gap: var(--s-6); }
+    .foot__links a:hover { color: var(--text); }
+
+    /* ============================================================
+       RESPONSIVE — one breakpoint, per the extraction
+       ============================================================ */
+    @media (max-width: 768px) {
+      .nav__links { display: none; }
+      .hero__grid, .jen-grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-7); }
+      .t-display { font-size: 38px; letter-spacing: -0.9px; }
+      .today, .figures, .tools { grid-template-columns: minmax(0, 1fr); }
+      .today__item, .figure { border-right: none; padding: var(--s-6) 0; }
+      .today__item { border-bottom: 1px solid var(--cream-16); }
+      .today__item + .today__item { padding-left: 0; }
+      .figure { border-bottom: 1px solid var(--ink-12); }
+      .figure + .figure { padding-left: 0; }
+      .mastery__row { grid-template-columns: minmax(0, 1fr) 64px; }
+      .mastery__bar { display: none; }
+      .dark { padding: var(--s-7) var(--s-6); }
+    }
+
+    /* Phosphor icons render as font glyphs */
+    i[class*="ph-"] { line-height: 1; display: inline-block; vertical-align: middle; }
+
+    /* Brand lockup — the real ATLAS logo replaces the placeholder mark */
+    .brand__logo { display: block; height: 30px; width: auto; flex: none; }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
+</head>
+<body>
+
+  <!-- ============================== NAV ============================== -->
+  <header class="nav">
+    <div class="page nav__inner">
+      <a class="brand" href="#">
+        <img class="brand__logo" src="data:image/png;base64,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" alt="ATLAS by HeyHi">
+      </a>
+
+      <nav class="nav__links" aria-label="Primary">
+        <a class="nav__link is-active" href="#">Dashboard</a>
+        <a class="nav__link" href="#">Courses</a>
+        <a class="nav__link" href="#">Assessments</a>
+        <a class="nav__link" href="#">PALS</a>
+        <a class="nav__link" href="#">CBL</a>
+        <a class="nav__link" href="#">Performance</a>
+      </nav>
+
+      <div class="nav__right">
+        <a class="nav__link" href="#">Help</a>
+        <a class="btn btn--outline btn--sm" href="#">Ask Jen</a>
+        <span class="avatar">V</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================== HERO ============================== -->
+  <section class="hero">
+    <div class="page hero__grid">
+      <div>
+        <p class="t-label hero__label">Tuesday, 27 August · Day 12</p>
+        <h1 class="t-display hero__title">Good morning, Vin.</h1>
+        <p class="t-lead hero__lead">
+          One module left in Time Management Essentials — roughly twenty minutes. Your daily
+          practice is queued, and one topic from last week's assessment is worth a second look.
+        </p>
+        <div class="hero__actions">
+          <a class="btn btn--solid" href="#">Resume module 4</a>
+          <a class="btn btn--outline" href="#">See today's plan</a>
+        </div>
+      </div>
+
+      <div class="resume">
+        <p class="t-label resume__label">Continue</p>
+        <h2 class="t-h3 resume__title">Time Management Essentials</h2>
+        <p class="t-cap resume__meta">Module 4 of 5 — Prioritisation under pressure</p>
+        <div class="track"><i style="width:80%"></i></div>
+        <div class="t-cap resume__foot">
+          <span class="num">80% complete</span>
+          <span class="num">20 min remaining</span>
+        </div>
+        <div class="resume__cta">
+          <a class="btn btn--solid btn--sm" href="#">Open module</a>
+          <a class="t-cap section__link" href="#">Course outline</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== TODAY — dark block ============================== -->
+  <section class="section" style="padding-top:0">
+    <div class="page">
+      <div class="dark">
+        <p class="t-label" style="margin-bottom:var(--s-5)">Today</p>
+        <h2 class="t-h2 section__title">Three things. Fourteen minutes.</h2>
+        <p class="t-lead section__sub" style="max-width:36em">
+          Each item is scheduled from your own results — what you got wrong, and how long ago you
+          last recalled it correctly.
+        </p>
+
+        <div class="today">
+          <article class="today__item">
+            <p class="t-label today__num">01 · Practice</p>
+            <h3 class="t-h3 today__title">Daily practice</h3>
+            <p class="t-body today__desc">
+              Five questions across this week's topics, spaced to how well you remember each one.
+            </p>
+            <p class="today__cta">
+              <a class="btn btn--on-dark btn--sm" href="#">Start</a>
+              <span class="t-cap today__time num">4 min</span>
+            </p>
+          </article>
+
+          <article class="today__item">
+            <p class="t-label today__num">02 · Review</p>
+            <h3 class="t-h3 today__title">Delegation</h3>
+            <p class="t-body today__desc">
+              You scored 2 of 5 here last time. The same idea, explained shorter, on exactly that point.
+            </p>
+            <p class="today__cta">
+              <a class="btn btn--outline-dark btn--sm" href="#">Open</a>
+              <span class="t-cap today__time num">5 min</span>
+            </p>
+          </article>
+
+          <article class="today__item">
+            <p class="t-label today__num">03 · Role-play</p>
+            <h3 class="t-h3 today__title">The deadline has moved</h3>
+            <p class="t-body today__desc">
+              Break the news to a stakeholder. Live AI partner, scored against the communication rubric.
+            </p>
+            <p class="today__cta">
+              <a class="btn btn--outline-dark btn--sm" href="#">Enter</a>
+              <span class="t-cap today__time num">5 min</span>
+            </p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== PROGRESS ============================== -->
+  <section class="section section--ruled">
+    <div class="page">
+      <div class="section__head">
+        <div>
+          <p class="t-label" style="color:var(--ink-52); margin-bottom:var(--s-4)">Four weeks in</p>
+          <h2 class="t-h2 section__title">Your progress</h2>
+          <p class="t-body section__sub">Recalculated after every practice session and assessment.</p>
+        </div>
+        <a class="t-body section__link" href="#">Open Performance</a>
+      </div>
+
+      <div class="figures">
+        <div class="figure">
+          <p class="figure__v">34<small> / 48</small></p>
+          <p class="t-cap figure__k">Knowledge points learned</p>
+          <p class="t-cap figure__d num">+6 this week</p>
+        </div>
+        <div class="figure">
+          <p class="figure__v">12<small> days</small></p>
+          <p class="t-cap figure__k">Current streak</p>
+          <p class="t-cap figure__d">Personal best</p>
+        </div>
+        <div class="figure">
+          <p class="figure__v">1,240<small> XP</small></p>
+          <p class="t-cap figure__k">Total experience</p>
+          <p class="t-cap figure__d num">+340 this week</p>
+        </div>
+        <div class="figure">
+          <p class="figure__v">78<small>%</small></p>
+          <p class="t-cap figure__k">Average assessment</p>
+          <p class="t-cap figure__d num">+4 pts vs last month</p>
+        </div>
+      </div>
+
+      <div class="mastery">
+        <div class="mastery__row">
+          <span class="t-body">Prioritisation frameworks</span>
+          <span class="mastery__bar"><i style="width:92%"></i></span>
+          <span class="t-cap mastery__n num">92%</span>
+        </div>
+        <div class="mastery__row">
+          <span class="t-body">Planning and estimation</span>
+          <span class="mastery__bar"><i style="width:81%"></i></span>
+          <span class="t-cap mastery__n num">81%</span>
+        </div>
+        <div class="mastery__row">
+          <span class="t-body">Focus and interruption control</span>
+          <span class="mastery__bar"><i style="width:74%"></i></span>
+          <span class="t-cap mastery__n num">74%</span>
+        </div>
+        <div class="mastery__row">
+          <span class="t-body">Delegation</span>
+          <span class="mastery__bar"><i style="width:41%"></i></span>
+          <span class="t-cap mastery__n num">41%</span>
+        </div>
+        <div class="mastery__row">
+          <span class="t-body muted">Saying no to low-value work</span>
+          <span class="mastery__bar"><i style="width:0"></i></span>
+          <span class="t-cap mastery__n muted">—</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== JEN ============================== -->
+  <section class="section section--ruled">
+    <div class="page jen-grid">
+      <div>
+        <p class="t-label" style="color:var(--ink-52); margin-bottom:var(--s-4)">AI companion</p>
+        <h2 class="t-h2 section__title">Jen has read your whole record.</h2>
+        <p class="t-lead section__sub" style="margin-bottom:var(--s-6)">
+          Every module you've opened, every question you've missed, every rubric you've been scored
+          against. Ask in plain language; the answer is grounded in your own work.
+        </p>
+        <div class="prompts">
+          <a class="prompt t-body" href="#"><span>Why did I lose marks on the delegation question?</span><span class="t-cap muted">Ask</span></a>
+          <a class="prompt t-body" href="#"><span>Explain the Eisenhower matrix in one paragraph</span><span class="t-cap muted">Ask</span></a>
+          <a class="prompt t-body" href="#"><span>Quiz me on module 4 before I start it</span><span class="t-cap muted">Ask</span></a>
+        </div>
+      </div>
+
+      <div class="transcript">
+        <p class="t-label transcript__head">Transcript · today</p>
+        <div class="transcript__body">
+          <div class="turn">
+            <p class="t-label turn__who">Vin</p>
+            <p class="t-body turn__what">Why did I lose marks on the delegation question?</p>
+          </div>
+          <div class="turn turn--ai">
+            <p class="t-label turn__who">Jen</p>
+            <p class="t-body turn__what">
+              You picked the right task to delegate, but didn't set a follow-up. The rubric awards
+              2 of 5 marks for agreeing a check-in point — that's the whole gap.
+            </p>
+          </div>
+          <div class="turn">
+            <p class="t-label turn__who">Vin</p>
+            <p class="t-body turn__what">Give me three questions on that.</p>
+          </div>
+          <div class="turn turn--ai">
+            <p class="t-label turn__who">Jen</p>
+            <p class="t-body turn__what">Queued for today's practice. The first one is ready when you are.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== TOOLS ============================== -->
+  <section class="section section--ruled">
+    <div class="page">
+      <div class="section__head">
+        <div>
+          <p class="t-label" style="color:var(--ink-52); margin-bottom:var(--s-4)">Workspace</p>
+          <h2 class="t-h2 section__title">Six ways to learn</h2>
+        </div>
+      </div>
+
+      <div class="tools">
+        <a class="tool" href="#">
+          <span class="tool__top">
+            <i class="ph ph-book-open" style="font-size:22px" aria-hidden="true"></i>
+            <span class="t-cap pill">1 in progress</span>
+          </span>
+          <h3 class="t-h3 tool__name">Courses</h3>
+          <p class="t-body tool__desc">Structured modules you work through at your own pace.</p>
+          <span class="t-cap tool__foot"><span class="section__link">Open</span></span>
+        </a>
+
+        <a class="tool" href="#">
+          <span class="tool__top">
+            <i class="ph ph-exam" style="font-size:22px" aria-hidden="true"></i>
+            <span class="t-cap pill">Due Friday</span>
+          </span>
+          <h3 class="t-h3 tool__name">Assessments</h3>
+          <p class="t-body tool__desc">Graded tests that feed your permanent performance record.</p>
+          <span class="t-cap tool__foot"><span class="section__link">Open</span></span>
+        </a>
+
+        <a class="tool" href="#">
+          <span class="tool__top">
+            <i class="ph ph-target" style="font-size:22px" aria-hidden="true"></i>
+            <span class="t-cap pill">6 days ago</span>
+          </span>
+          <h3 class="t-h3 tool__name">Evaluate My Skills</h3>
+          <p class="t-body tool__desc">Self-checks that map mastery across every topic you've touched.</p>
+          <span class="t-cap tool__foot"><span class="section__link">Open</span></span>
+        </a>
+
+        <a class="tool" href="#">
+          <span class="tool__top">
+            <i class="ph ph-path" style="font-size:22px" aria-hidden="true"></i>
+            <span class="t-cap pill">3 new steps</span>
+          </span>
+          <h3 class="t-h3 tool__name">PALS</h3>
+          <p class="t-cap tool__expand">Personalised Adaptive Learning System</p>
+          <p class="t-body tool__desc">A path that rebuilds itself around what you get right and wrong.</p>
+          <span class="t-cap tool__foot"><span class="section__link">Open</span></span>
+        </a>
+
+        <a class="tool" href="#">
+          <span class="tool__top">
+            <i class="ph ph-chats-circle" style="font-size:22px" aria-hidden="true"></i>
+            <span class="t-cap pill">1 waiting</span>
+          </span>
+          <h3 class="t-h3 tool__name">CBL</h3>
+          <p class="t-cap tool__expand">Conversation-Based Learning</p>
+          <p class="t-body tool__desc">Real workplace conversations with an AI partner, scored on a rubric.</p>
+          <span class="t-cap tool__foot"><span class="section__link">Open</span></span>
+        </a>
+
+        <a class="tool" href="#">
+          <span class="tool__top">
+            <i class="ph ph-brain" style="font-size:22px" aria-hidden="true"></i>
+            <span class="t-cap pill">Not taken</span>
+          </span>
+          <h3 class="t-h3 tool__name">Psychometric</h3>
+          <p class="t-cap tool__expand">Learning-style assessment</p>
+          <p class="t-body tool__desc">Ten minutes, once. ATLAS then adapts its tone and pacing to you.</p>
+          <span class="t-cap tool__foot"><span class="section__link">Open</span></span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================== FOOTER ============================== -->
+  <footer class="foot">
+    <div class="page foot__inner t-cap">
+      <span>ATLAS by HeyHi — learner workspace</span>
+      <nav class="foot__links" aria-label="Footer">
+        <a href="#">Help centre</a>
+        <a href="#">Accessibility</a>
+        <a href="#">Privacy</a>
+      </nav>
+    </div>
+  </footer>
+
+</body>
+</html>

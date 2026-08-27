@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ATLAS Learner Dashboard — eight design directions</title>
+  <style>
+    /* Deliberately neutral chrome. This page frames the six options
+       without borrowing the visual language of any one of them. */
+    :root {
+      --ink: #16181d;
+      --body: #565a63;
+      --mute: #8b8f98;
+      --line: #e2e4e8;
+      --line-soft: #eef0f3;
+      --canvas: #ffffff;
+      --surface: #f7f8fa;
+      --accent: #16181d;
+      --r: 10px;
+      --page: 1120px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: var(--font);
+      font-size: 15px;
+      line-height: 1.55;
+      color: var(--body);
+      background: var(--surface);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    h1, h2, h3, p, ul, ol { margin: 0; }
+    ul { padding: 0; list-style: none; }
+    a { color: inherit; text-decoration: none; }
+
+    .page { max-width: var(--page); margin-inline: auto; padding-inline: 24px; }
+
+    /* ---------- header ---------- */
+    .head { background: var(--canvas); border-bottom: 1px solid var(--line); padding: 48px 0 40px; }
+    .kicker {
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--mute);
+      margin-bottom: 12px;
+    }
+    .title {
+      font-size: 34px; font-weight: 700; line-height: 1.15;
+      letter-spacing: -0.8px; color: var(--ink);
+      margin-bottom: 12px;
+    }
+    .lede { max-width: 62ch; font-size: 16px; }
+    .meta {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-top: 20px;
+    }
+    .tag {
+      padding: 4px 10px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 12px;
+      color: var(--body);
+    }
+
+    /* ---------- grid ---------- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 20px;
+      padding: 40px 0 24px;
+    }
+    .opt {
+      display: flex; flex-direction: column;
+      background: var(--canvas);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      overflow: hidden;
+      transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+    }
+    .opt:hover {
+      border-color: #c9ccd2;
+      transform: translateY(-2px);
+      box-shadow: rgba(22, 24, 29, 0.06) 0 8px 20px -6px;
+    }
+
+    /* Swatch strip — each option's actual palette, as its own preview */
+    .swatch { display: flex; height: 84px; }
+    .swatch span { flex: 1; }
+    .swatch span.wide { flex: 2.2; }
+
+    .opt__body { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+    .opt__num {
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--mute);
+      margin-bottom: 6px;
+    }
+    .opt__name {
+      font-size: 20px; font-weight: 600; letter-spacing: -0.3px;
+      color: var(--ink); margin-bottom: 8px;
+    }
+    .opt__desc { font-size: 14px; margin-bottom: 14px; }
+    .opt__list { margin-bottom: 18px; }
+    .opt__list li {
+      position: relative;
+      padding-left: 14px;
+      font-size: 13px;
+      color: var(--body);
+    }
+    .opt__list li + li { margin-top: 4px; }
+    .opt__list li::before {
+      content: "";
+      position: absolute; left: 0; top: 8px;
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--mute);
+    }
+    .opt__foot {
+      margin-top: auto;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 12px;
+      padding-top: 14px;
+      border-top: 1px solid var(--line-soft);
+    }
+    .open {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 8px 14px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 6px;
+      font-size: 13px; font-weight: 600;
+    }
+    .opt:hover .open { background: #000; }
+    .note { font-size: 12px; color: var(--mute); }
+
+    /* ---------- caveats ---------- */
+    .notes { padding: 8px 0 64px; }
+    .notes__card {
+      background: var(--canvas);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 24px;
+    }
+    .notes__title { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 12px; }
+    .notes__list li {
+      position: relative;
+      padding-left: 18px;
+      font-size: 14px;
+    }
+    .notes__list li + li { margin-top: 10px; }
+    .notes__list li::before {
+      content: "";
+      position: absolute; left: 0; top: 9px;
+      width: 5px; height: 5px; border-radius: 50%;
+      background: var(--mute);
+    }
+    .notes__list strong { color: var(--ink); font-weight: 600; }
+
+    @media (max-width: 960px) {
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 620px) {
+      .grid { grid-template-columns: minmax(0, 1fr); }
+      .title { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="head">
+    <div class="page">
+      <p class="kicker">ATLAS by HeyHi</p>
+      <h1 class="title">Learner dashboard — eight design directions</h1>
+      <p class="lede">
+        Eight redesigns of <code>demo.atlaslearn.ai/dashboard</code>, each built against a different
+        design system from designmd.co. Same content and the same six destinations in every option;
+        the layout is free to follow whatever that system's logic demands.
+      </p>
+      <div class="meta">
+        <span class="tag">Desktop-first — view at 1280px or wider</span>
+        <span class="tag">Returning-learner state</span>
+        <span class="tag">Static HTML, dummy data</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <div class="grid">
+
+      <!-- 01 Notion -->
+      <a class="opt" href="01-notion.html">
+        <div class="swatch" aria-hidden="true">
+          <span class="wide" style="background:#0a1530"></span>
+          <span style="background:#5645d4"></span>
+          <span style="background:#f9e79f"></span>
+          <span style="background:#ffe8d4"></span>
+          <span style="background:#d9f3e1"></span>
+          <span style="background:#dcecfa"></span>
+        </div>
+        <div class="opt__body">
+          <p class="opt__num">Option 01</p>
+          <h2 class="opt__name">Notion</h2>
+          <p class="opt__desc">
+            Colourful and warm. The strongest answer to “the greyish is dull”.
+          </p>
+          <ul class="opt__list">
+            <li>Navy hero band with sticky-note dot decoration</li>
+            <li>White card breaks out of the band — Notion's signature move</li>
+            <li>Six pastel-tinted tool cards instead of six identical white ones</li>
+            <li>Bold-yellow Jen banner with a chat mockup</li>
+          </ul>
+          <div class="opt__foot">
+            <span class="open">Open option</span>
+            <span class="note">Curated system</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 02 Stripe -->
+      <a class="opt" href="02-stripe.html">
+        <div class="swatch" aria-hidden="true">
+          <span class="wide" style="background:linear-gradient(120deg,#f5e9d4,#f96bee 45%,#533afd 78%,#ea2261)"></span>
+          <span style="background:#0d253d"></span>
+          <span style="background:#533afd"></span>
+          <span style="background:#f6f9fc"></span>
+        </div>
+        <div class="opt__body">
+          <p class="opt__num">Option 02</p>
+          <h2 class="opt__name">Stripe</h2>
+          <p class="opt__desc">
+            Serious and premium. Colour comes from atmosphere, not from cards.
+          </p>
+          <ul class="opt__list">
+            <li>Gradient mesh washed across the upper third</li>
+            <li>Thin 300-weight display type with tight negative tracking</li>
+            <li>Tabular figures on every number — the financial-data signal</li>
+            <li>Practice question shown as a dark-navy product mockup</li>
+          </ul>
+          <div class="opt__foot">
+            <span class="open">Open option</span>
+            <span class="note">Curated system</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 03 Apple -->
+      <a class="opt" href="03-apple.html">
+        <div class="swatch" aria-hidden="true">
+          <span style="background:#ffffff; box-shadow: inset -1px 0 0 #eef0f3"></span>
+          <span class="wide" style="background:#272729"></span>
+          <span style="background:#f5f5f7"></span>
+          <span style="background:#0066cc"></span>
+          <span style="background:#000000"></span>
+        </div>
+        <div class="opt__body">
+          <p class="opt__num">Option 03</p>
+          <h2 class="opt__name">Apple</h2>
+          <p class="opt__desc">
+            Slow, spacious, one thing at a time. Reads like a product launch page.
+          </p>
+          <ul class="opt__list">
+            <li>Full-bleed tiles alternate light → near-black → parchment → dark</li>
+            <li>The colour change is the only section divider — no borders</li>
+            <li>Exactly one accent blue and exactly one shadow on the page</li>
+            <li>Frosted sticky sub-nav with a persistent Resume button</li>
+          </ul>
+          <div class="opt__foot">
+            <span class="open">Open option</span>
+            <span class="note">Curated system</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 04 Vercel -->
+      <a class="opt" href="04-vercel.html">
+        <div class="swatch" aria-hidden="true">
+          <span class="wide" style="background:linear-gradient(120deg,#00dfd8,#007cf0 32%,#7928ca 58%,#ff0080 80%,#f9cb28)"></span>
+          <span style="background:#171717"></span>
+          <span style="background:#fafafa; box-shadow: inset -1px 0 0 #eef0f3"></span>
+          <span style="background:#0070f3"></span>
+        </div>
+        <div class="opt__body">
+          <p class="opt__num">Option 04</p>
+          <h2 class="opt__name">Vercel</h2>
+          <p class="opt__desc">
+            Stark and modern. Directly attacks the “quiz is too boring” note.
+          </p>
+          <ul class="opt__list">
+            <li>Mesh gradient plus gradient headline text</li>
+            <li>Monospace carries every label and every number</li>
+            <li>Practice question rendered as a dev console on a black band</li>
+            <li>Stacked hairline shadows — cards sit, never float</li>
+          </ul>
+          <div class="opt__foot">
+            <span class="open">Open option</span>
+            <span class="note">Curated system</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 05 OpenAI -->
+      <a class="opt" href="05-openai.html">
+        <div class="swatch" aria-hidden="true">
+          <span class="wide" style="background:#ffffff; box-shadow: inset -1px 0 0 #eef0f3"></span>
+          <span style="background:#f7f7f8"></span>
+          <span style="background:#8e8ea0"></span>
+          <span style="background:#000000"></span>
+        </div>
+        <div class="opt__body">
+          <p class="opt__num">Option 05</p>
+          <h2 class="opt__name">OpenAI</h2>
+          <p class="opt__desc">
+            The quietest of the six. Typography does all the work.
+          </p>
+          <ul class="opt__list">
+            <li>Persistent sidebar plus a single centred reading column</li>
+            <li>An “ask Jen” composer sits where the hero normally would</li>
+            <li>No shadows, one 5px radius, one muted accent</li>
+            <li>Included as a deliberate contrast point, not a front-runner</li>
+          </ul>
+          <div class="opt__foot">
+            <span class="open">Open option</span>
+            <span class="note">Measured extraction</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 06 Anthropic -->
+      <a class="opt" href="06-anthropic.html">
+        <div class="swatch" aria-hidden="true">
+          <span class="wide" style="background:#faf9f5"></span>
+          <span class="wide" style="background:#141413"></span>
+          <span style="background:#faf9f5"></span>
+        </div>
+        <div class="opt__body">
+          <p class="opt__num">Option 06</p>
+          <h2 class="opt__name">Anthropic</h2>
+          <p class="opt__desc">
+            Warm, editorial, high contrast. Two colours doing a lot of work.
+          </p>
+          <ul class="opt__list">
+            <li>Warm cream canvas — not grey, not cold white</li>
+            <li>Hard 1px near-black rules instead of soft card borders</li>
+            <li>58px editorial display headline</li>
+            <li>One large near-black block carries the whole Today section</li>
+          </ul>
+          <div class="opt__foot">
+            <span class="open">Open option</span>
+            <span class="note">Measured extraction</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 07 ElevenLabs -->
+      <a class="opt" href="07-elevenlabs.html">
+        <div class="swatch" aria-hidden="true">
+          <span class="wide" style="background:#f5f5f5"></span>
+          <span style="background:#a7e5d3"></span>
+          <span style="background:#f4c5a8"></span>
+          <span style="background:#c8b8e0"></span>
+          <span style="background:#a8c8e8"></span>
+          <span style="background:#0c0a09"></span>
+        </div>
+        <div class="opt__body">
+          <p class="opt__num">Option 07</p>
+          <h2 class="opt__name">ElevenLabs</h2>
+          <p class="opt__desc">
+            Editorial and calm. The only option in the set that uses a serif.
+          </p>
+          <ul class="opt__list">
+            <li>Light serif display at weight 300 — print-magazine voice</li>
+            <li>Pastel gradient orbs drift behind the page as pure atmosphere</li>
+            <li>No saturated accent at all; the CTA is a plain ink pill</li>
+            <li>96px section rhythm, one soft shadow tier, nothing more</li>
+          </ul>
+          <div class="opt__foot">
+            <span class="open">Open option</span>
+            <span class="note">Curated system</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- 08 Cohere -->
+      <a class="opt" href="08-cohere.html">
+        <div class="swatch" aria-hidden="true">
+          <span style="background:#ffffff; box-shadow: inset -1px 0 0 #eef0f3"></span>
+          <span class="wide" style="background:#003c33"></span>
+          <span style="background:#071829"></span>
+          <span style="background:#eeece7"></span>
+          <span style="background:#ff7759"></span>
+        </div>
+        <div class="opt__body">
+          <p class="opt__num">Option 08</p>
+          <h2 class="opt__name">Cohere</h2>
+          <p class="opt__desc">
+            Enterprise command centre. Monumental type, deep product bands.
+          </p>
+          <ul class="opt__list">
+            <li>Huge mono-spirited headline over open white space</li>
+            <li>Hero is a two-card split: wide product card beside a stat card</li>
+            <li>Full-width deep-green and dark-navy bands carry the product</li>
+            <li>Rows and rules instead of cards; coral used only for tagging</li>
+          </ul>
+          <div class="opt__foot">
+            <span class="open">Open option</span>
+            <span class="note">Curated system</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+
+    <section class="notes">
+      <div class="notes__card">
+        <h2 class="notes__title">Read before reviewing</h2>
+        <ul class="notes__list">
+          <li>
+            <strong>Two of the eight are not curated systems.</strong> Notion, Stripe, Apple, Vercel,
+            ElevenLabs and Cohere have full DESIGN.md specs on designmd.co — tokens, component
+            definitions, do's and don'ts. OpenAI and Anthropic are automated extractions: OpenAI
+            supplies four colours, three type roles, one 5px radius and no shadows; Anthropic
+            supplies two colours and a single 58px display tier. Options 05 and 06 are built
+            faithfully to that, so they are quiet by construction, not by neglect.
+          </li>
+          <li>
+            <strong>Fonts are substitutes where the real face is proprietary.</strong> Sohne (Stripe),
+            SF Pro (Apple), Notion Sans, Anthropic Sans, Waldenburg (ElevenLabs), CohereText and
+            Unica77 cannot be licensed here — each option uses the fallback its own DESIGN.md names.
+            Geist and Geist Mono (Vercel) are open source and load for real. Option 03 will look
+            closest to the reference on a Mac.
+          </li>
+          <li>
+            <strong>Every option shows a returning learner</strong> — 80% through a course, a 12-day
+            streak, 1,240 XP, per-topic mastery. The live dashboard is a brand-new-account empty state
+            (0/0 knowledge points, 0/1 badges, three features described as “unlocks later”), which is
+            a large part of why it reads flat. If the new-user view is what needs redesigning, that is
+            a separate exercise.
+          </li>
+          <li>
+            <strong>PALS and CBL keep their existing names</strong> in all eight, with the expansion added
+            underneath as a plain-language line. Renaming them is still an open question.
+          </li>
+        </ul>
+      </div>
+    </section>
+  </main>
+
+</body>
+</html>
