@@ -397,17 +397,22 @@
       y += LINE_HEIGHT + 2.6;
     }
 
+    // Compact by design: five numbers out of 100 don't need five bar rows
+    // on paper — a headline figure plus one inline run says the same thing
+    // in two lines instead of eight, and the whole block stays scannable.
     function drawSpeechScore(q) {
       const s = q.speechScore;
       if (!s) return;
 
-      y += 2.5;
-      drawSectionLabel("Speech Practice Score");
-      drawParagraph(`Overall Score: ${s.overall} / 100`, { size: 10, style: "bold", gap: 4.5 });
-
       const metrics = typeof SPEECH_METRICS !== "undefined" ? SPEECH_METRICS : [];
-      metrics.forEach((m) => drawScoreBar(m.label, s[m.key], 100, { scoreText: `${s[m.key]}/100` }));
-      y += 3.5;
+
+      y += 2.5;
+      drawSectionLabel(`Speech Practice Score   —   Overall ${s.overall}/100`);
+      drawParagraph(metrics.map((m) => `${m.label} ${s[m.key]}`).join("      "), {
+        size: 9.5,
+        gap: 1,
+      });
+      drawParagraph("(each sub-score out of 100)", { size: 8, style: "italic", gap: 4 });
     }
 
     // ---------- rubrics ----------

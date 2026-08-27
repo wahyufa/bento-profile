@@ -75,37 +75,49 @@ function questionCardHtml(q) {
 function scoreSummaryHtml(q) {
   const s = q.speechScore;
   return `
-    <div class="score-block">
-      <p class="score-block__label">Speech Practice Score</p>
-      <div class="overall">
-        <span class="overall__label">Overall Score</span>
-        <span class="overall__value">${s.overall}</span>
+    <div class="score-card">
+      <div class="score-card__head">
+        <span class="score-card__title">Speech Practice Score</span>
       </div>
-      <div class="metrics">
-        ${SPEECH_METRICS.map(
-          (m) => `
-          <div class="metric">
-            <span class="metric__label">${escapeHtml(m.label)}</span>
-            <span class="metric__bar"><span class="metric__fill" style="width:${s[m.key]}%"></span></span>
-            <span class="metric__value">${s[m.key]}/100</span>
-          </div>`
-        ).join("")}
+      <div class="score-card__body">
+        <div class="big-score">
+          <p class="big-score__label">Overall Score</p>
+          <p class="big-score__value">${s.overall}</p>
+        </div>
+        <div class="metrics">
+          ${SPEECH_METRICS.map(
+            (m) => `
+            <div class="metric">
+              <span class="metric__label">${escapeHtml(m.label)}</span>
+              <span class="metric__bar"><span class="metric__fill" style="width:${s[m.key]}%"></span></span>
+              <span class="metric__value">${s[m.key]}/100</span>
+            </div>`
+          ).join("")}
+        </div>
       </div>
     </div>
 
-    <div class="score-block">
-      <p class="score-block__label">Rubric Score</p>
-      <div class="score-bar">Score : ${q.rubrics.obtained} / ${q.rubrics.max} Marks</div>
-      ${q.rubrics.criteria
-        .map(
-          (c) => `
-        <div class="rb-row">
-          <span class="rb-row__label">${escapeHtml(c.name)}</span>
-          <span class="rb-bar"><span class="rb-bar__fill" style="width:${(c.obtained / c.max) * 100}%"></span></span>
-          <span class="rb-row__score">${c.obtained}/${c.max}</span>
-        </div>`
-        )
-        .join("")}
+    <div class="score-card">
+      <div class="score-card__head">
+        <span class="score-card__title">Rubric Score</span>
+        <button class="score-card__link" data-goto-rubrics type="button">See more</button>
+      </div>
+      <div class="score-card__body">
+        <div class="big-score">
+          <p class="big-score__label">Score</p>
+          <p class="big-score__value">${q.rubrics.obtained} Marks</p>
+        </div>
+        ${q.rubrics.criteria
+          .map(
+            (c) => `
+          <div class="rb-row">
+            <span class="rb-row__label">${escapeHtml(c.name)}</span>
+            <span class="rb-bar"><span class="rb-bar__fill" style="width:${(c.obtained / c.max) * 100}%"></span></span>
+            <span class="rb-row__score">${c.obtained}/${c.max}</span>
+          </div>`
+          )
+          .join("")}
+      </div>
     </div>`;
 }
 
@@ -212,6 +224,15 @@ function wirePanelInteractions(scope) {
 
   scope.querySelectorAll(".rb-acc__head").forEach((head) => {
     head.addEventListener("click", () => head.closest(".rb-acc").classList.toggle("rb-acc--open"));
+  });
+
+  // "See more" on the summary's Rubric Score card opens the full Rubric
+  // Score view, the same jump the live app makes.
+  scope.querySelectorAll("[data-goto-rubrics]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      activeView = "rubrics";
+      renderPanel();
+    });
   });
 }
 
