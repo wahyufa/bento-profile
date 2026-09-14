@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Parent App — Wireframe</title>
+<style>
+  :root{
+    --bg:#F7F5F2;
+    --line:#B8B4AE;
+    --line-dark:#8A857D;
+    --text:#111111;
+    --text-sub:#6B6B6B;
+    --panel:#EDE9E4;
+    --accent:#111111;
+    --accent-soft:#D9D5CE;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    color:var(--text);
+    padding:40px;
+  }
+  h1{
+    font-size:22px;
+    font-weight:700;
+    margin:0 0 4px;
+  }
+  .subtitle{
+    color:var(--text-sub);
+    font-size:13px;
+    margin:0 0 32px;
+  }
+  .board{
+    display:flex;
+    gap:28px;
+    overflow-x:auto;
+    padding-bottom:24px;
+  }
+  .screen-wrap{
+    flex:0 0 auto;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .screen-label{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.03em;
+    text-transform:uppercase;
+    color:var(--text-sub);
+    margin-bottom:10px;
+  }
+  .phone{
+    width:260px;
+    height:540px;
+    border:2px solid var(--line-dark);
+    border-radius:28px;
+    background:#fff;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    position:relative;
+  }
+  .statusbar{
+    height:14px;
+    border-bottom:1px dashed var(--line);
+    margin-bottom:2px;
+  }
+  .topbar{
+    height:34px;
+    border:1px dashed var(--line);
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 10px;
+    font-size:10px;
+    color:var(--text-sub);
+    flex:0 0 auto;
+  }
+  .box{
+    border:1px dashed var(--line);
+    border-radius:8px;
+    background:var(--panel);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    color:var(--text-sub);
+    font-size:9.5px;
+    line-height:1.3;
+    padding:6px;
+  }
+  .content{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+    overflow:hidden;
+  }
+  .feed-card{
+    border:1px solid var(--line);
+    border-radius:10px;
+    background:#fff;
+    padding:8px;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    flex:0 0 auto;
+  }
+  .feed-card .tag{
+    font-size:8px;
+    font-weight:700;
+    text-transform:uppercase;
+    color:#fff;
+    background:var(--line-dark);
+    border-radius:999px;
+    padding:2px 7px;
+    width:fit-content;
+  }
+  .feed-card .tag.report{background:#5B7FDB;}
+  .feed-card .tag.reminder{background:#C97A3B;}
+  .feed-card .tag.announce{background:#4A9B6E;}
+  .feed-card .img-placeholder{
+    height:60px;
+    background:var(--accent-soft);
+    border-radius:6px;
+    font-size:8.5px;
+    color:var(--text-sub);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .feed-card .txt-line{
+    height:6px;
+    background:var(--accent-soft);
+    border-radius:3px;
+    width:100%;
+  }
+  .feed-card .txt-line.short{width:60%;}
+  .avatar-row{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:8.5px;
+    color:var(--text-sub);
+  }
+  .avatar{
+    width:18px;height:18px;border-radius:50%;
+    background:var(--line-dark);
+    flex:0 0 auto;
+  }
+  .child-switcher{
+    display:flex;
+    gap:6px;
+    padding:4px 0;
+  }
+  .child-chip{
+    border:1px solid var(--line);
+    border-radius:999px;
+    padding:3px 10px;
+    font-size:8.5px;
+    color:var(--text-sub);
+    background:#fff;
+  }
+  .child-chip.active{
+    background:var(--accent);
+    color:#fff;
+    border-color:var(--accent);
+  }
+  .bottomnav{
+    height:46px;
+    border-top:1px solid var(--line);
+    display:flex;
+    align-items:center;
+    justify-content:space-around;
+    flex:0 0 auto;
+  }
+  .navitem{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    font-size:8px;
+    color:var(--text-sub);
+  }
+  .navitem .dot{
+    width:16px;height:16px;
+    border:1.5px solid var(--line-dark);
+    border-radius:5px;
+  }
+  .navitem.active{color:var(--text);font-weight:700;}
+  .navitem.active .dot{background:var(--text);border-color:var(--text);}
+
+  .chatlist-item{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    border-bottom:1px solid var(--line);
+    padding:8px 2px;
+  }
+  .chatlist-item .avatar{width:30px;height:30px;}
+  .chatlist-meta{flex:1;display:flex;flex-direction:column;gap:4px;}
+  .chatlist-meta .txt-line{height:5px;background:var(--accent-soft);border-radius:3px;}
+  .chatlist-meta .txt-line.title{width:70%;background:var(--line-dark);}
+  .chatlist-meta .txt-line.preview{width:90%;}
+  .badge{
+    width:14px;height:14px;border-radius:50%;
+    background:#C0392B;
+    flex:0 0 auto;
+  }
+
+  .bubble{
+    max-width:75%;
+    border-radius:10px;
+    padding:6px 8px;
+    font-size:8.5px;
+    color:var(--text-sub);
+  }
+  .bubble.in{
+    background:var(--panel);
+    align-self:flex-start;
+    border-bottom-left-radius:2px;
+  }
+  .bubble.out{
+    background:var(--accent);
+    color:#fff;
+    align-self:flex-end;
+    border-bottom-right-radius:2px;
+  }
+  .bubble-photo{
+    width:90px;height:60px;
+    background:var(--accent-soft);
+    border-radius:6px;
+    font-size:7.5px;
+    display:flex;align-items:center;justify-content:center;
+    color:var(--text-sub);
+  }
+  .chat-input{
+    height:34px;
+    border:1px dashed var(--line);
+    border-radius:20px;
+    display:flex;
+    align-items:center;
+    padding:0 10px;
+    font-size:8.5px;
+    color:var(--text-sub);
+    gap:8px;
+    flex:0 0 auto;
+  }
+  .chat-input .send{
+    margin-left:auto;
+    width:20px;height:20px;
+    border-radius:50%;
+    background:var(--accent);
+  }
+
+  .annotation{
+    width:260px;
+    margin-top:14px;
+    font-size:10.5px;
+    color:var(--text-sub);
+    line-height:1.5;
+  }
+  .annotation b{color:var(--text);}
+  .flow-arrow{
+    align-self:center;
+    color:var(--line-dark);
+    font-size:20px;
+    padding:0 4px;
+  }
+
+  .notif-item{
+    display:flex;gap:8px;
+    border-bottom:1px solid var(--line);
+    padding:8px 2px;
+  }
+  .notif-icon{
+    width:26px;height:26px;border-radius:8px;
+    background:var(--accent-soft);
+    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;
+  }
+  .notif-text{flex:1;display:flex;flex-direction:column;gap:4px;}
+  .notif-text .txt-line{height:5px;background:var(--accent-soft);border-radius:3px;}
+  .notif-text .txt-line.title{width:80%;background:var(--line-dark);}
+  .notif-time{font-size:7px;color:var(--text-sub);white-space:nowrap;}
+
+  .profile-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid var(--line);
+    padding:9px 2px;
+    font-size:9px;
+    color:var(--text-sub);
+  }
+  .profile-header{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    padding:10px 0 4px;
+  }
+  .profile-header .avatar{width:44px;height:44px;}
+
+  .section-title{
+    font-size:9px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.03em;
+    color:var(--text-sub);
+    margin:6px 0 2px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Parent App — User Flow &amp; Wireframe</h1>
+<p class="subtitle">Structural layout only — no visual styling decisions yet.</p>
+
+<h2 style="font-size:15px;margin:0 0 4px;">User Flow</h2>
+<p class="subtitle" style="margin-bottom:16px;">Onboarding → Home → sub-flows (report, chat, notifications, profile).</p>
+<div class="mermaid" style="background:#fff;border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:40px;overflow-x:auto;">
+flowchart TD
+    Start([Parent opens app for the first time]) --> InviteCode[Enter invite code from school/teacher]
+    InviteCode --> Verify{Code valid?}
+    Verify -- No --> InviteCodeError[Show error, ask to contact teacher/school]
+    InviteCodeError --> InviteCode
+    Verify -- Yes --> LinkChild[Auto-link to child's profile + class]
+    LinkChild --> HasMoreChild{Has another child in a different school/class?}
+    HasMoreChild -- Yes --> AddAnotherCode[Enter additional invite code]
+    AddAnotherCode --> LinkChild
+    HasMoreChild -- No --> ProfileSetup[Quick profile setup: name, phone, language]
+    ProfileSetup --> NotifPermission[Allow push notifications]
+    NotifPermission --> Home
+
+    Home[["HOME — Unified Feed\n(Announcements + Report snapshots + Reminders)"]]
+    Home --> TapAnnouncement[Tap announcement/broadcast]
+    TapAnnouncement --> AnnouncementDetail[View detailed photo/video/text]
+    AnnouncementDetail --> MarkRead[Auto mark as read]
+    MarkRead --> Home
+
+    Home --> TapReport[Tap report snapshot]
+    TapReport --> ReportPreview[Preview summarized assessment result]
+    ReportPreview --> DeepLinkWeb[Deep link to Web ATLAS for full detail]
+
+    Home --> TapReminder[Tap reminder/deadline]
+    TapReminder --> ReminderDetail[View task/event detail + due date]
+
+    Home --> SwitchChild{Has more than 1 child?}
+    SwitchChild -- Yes --> ChildSwitcher[Switch child context via dropdown/avatar]
+    ChildSwitcher --> Home
+
+    Home --> TabChat[Tab: Chat]
+    TabChat --> ChatList[List of conversations per teacher/class]
+    ChatList --> ChatRoom[Open 1-on-1 chat with teacher]
+    ChatRoom --> SendMessage[Send message/photo]
+    SendMessage --> ChatRoom
+
+    Home --> TabNotifCenter[Tab: Notifications]
+    TabNotifCenter --> NotifList[All notifications centralized: new messages, broadcasts, reminders, reports]
+    NotifList --> Home
+
+    Home --> TabProfile[Tab: Profile]
+    TabProfile --> ManageChildren[Manage child list / add new invite code]
+    TabProfile --> Settings[Settings: language, notifications]
+
+    PushNotif([Push notification received]) --> DeepLinkTarget{Notification type}
+    DeepLinkTarget -- New message --> ChatRoom
+    DeepLinkTarget -- Broadcast --> AnnouncementDetail
+    DeepLinkTarget -- Report completed --> ReportPreview
+    DeepLinkTarget -- Reminder --> ReminderDetail
+</div>
+
+<h2 style="font-size:15px;margin:0 0 4px;">Wireframe Screens</h2>
+<p class="subtitle" style="margin-bottom:16px;">Scroll horizontally to follow the screen-by-screen flow.</p>
+<div class="board">
+
+  <!-- SCREEN 1: ONBOARDING -->
+  <div class="screen-wrap">
+    <div class="screen-label">1. Onboarding — Invite Code</div>
+    <div class="phone">
+      <div class="statusbar"></div>
+      <div class="content" style="justify-content:center;align-items:center;gap:16px;">
+        <div class="box" style="width:70px;height:70px;border-radius:16px;">LOGO</div>
+        <div class="box" style="width:100%;height:18px;">Welcome — enter your invite code</div>
+        <div class="box" style="width:100%;height:38px;">[ INVITE CODE INPUT ]</div>
+        <div class="box" style="width:100%;height:34px;background:var(--accent);color:#fff;border-style:solid;">CONTINUE</div>
+        <div class="box" style="width:100%;height:14px;border:none;background:none;">Don't have a code? Contact your school</div>
+      </div>
+    </div>
+    <div class="annotation">Single input, single CTA. Error state reuses this screen with inline message below the field.</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- SCREEN 2: PROFILE SETUP -->
+  <div class="screen-wrap">
+    <div class="screen-label">2. Profile Setup</div>
+    <div class="phone">
+      <div class="statusbar"></div>
+      <div class="content">
+        <div class="box" style="height:18px;">Child linked: Aisha — Grade 3B ✓</div>
+        <div class="box" style="height:60px;">Add another child? [ + Add invite code ]</div>
+        <div class="section-title">Your details</div>
+        <div class="box" style="height:30px;">Full name</div>
+        <div class="box" style="height:30px;">Phone number</div>
+        <div class="box" style="height:30px;">Preferred language ▾</div>
+        <div style="flex:1;"></div>
+        <div class="box" style="height:34px;background:var(--accent);color:#fff;border-style:solid;">ALLOW NOTIFICATIONS &amp; CONTINUE</div>
+      </div>
+    </div>
+    <div class="annotation">"Add another child" is secondary/optional — kept low-emphasis since it's a rare case.</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- SCREEN 3: HOME FEED -->
+  <div class="screen-wrap">
+    <div class="screen-label">3. Home — Unified Feed</div>
+    <div class="phone">
+      <div class="statusbar"></div>
+      <div class="topbar">
+        <span>☰ Menu</span>
+        <span>Good morning, Sarah</span>
+        <span>🔔</span>
+      </div>
+      <div class="child-switcher">
+        <div class="child-chip active">Aisha · 3B</div>
+        <div class="child-chip">Raka · 5A</div>
+      </div>
+      <div class="content">
+        <div class="feed-card">
+          <span class="tag report">Report</span>
+          <div class="txt-line"></div>
+          <div class="txt-line short"></div>
+          <div class="avatar-row"><div class="avatar"></div>Math Assessment — completed 2h ago</div>
+        </div>
+        <div class="feed-card">
+          <span class="tag announce">Announce</span>
+          <div class="img-placeholder">photo/video</div>
+          <div class="txt-line"></div>
+          <div class="avatar-row"><div class="avatar"></div>Ms. Dewi — Class 3B</div>
+        </div>
+        <div class="feed-card">
+          <span class="tag reminder">Reminder</span>
+          <div class="txt-line"></div>
+          <div class="txt-line short"></div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="navitem active"><div class="dot"></div>Home</div>
+        <div class="navitem"><div class="dot"></div>Chat</div>
+        <div class="navitem"><div class="dot"></div>Notif</div>
+        <div class="navitem"><div class="dot"></div>Profile</div>
+      </div>
+    </div>
+    <div class="annotation">Child switcher stays pinned at top when the parent has more than one child. Feed cards are color-tagged by type (report / announce / reminder) so the eye can scan quickly.</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- SCREEN 4: REPORT PREVIEW -->
+  <div class="screen-wrap">
+    <div class="screen-label">4. Report Preview</div>
+    <div class="phone">
+      <div class="statusbar"></div>
+      <div class="topbar"><span>← Back</span><span>Report</span><span></span></div>
+      <div class="content">
+        <div class="box" style="height:80px;">Score summary chart (pulled from Web ATLAS)</div>
+        <div class="box" style="height:20px;">Math Assessment — 85/100</div>
+        <div class="box" style="height:40px;">Short teacher note / highlight</div>
+        <div style="flex:1;"></div>
+        <div class="box" style="height:34px;background:var(--accent);color:#fff;border-style:solid;">VIEW FULL REPORT ON WEB ↗</div>
+      </div>
+    </div>
+    <div class="annotation">This screen is a <b>summary only</b> — full report/assessment stays on the web product, opened via deep link (in-app browser or external).</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- SCREEN 5: CHAT LIST -->
+  <div class="screen-wrap">
+    <div class="screen-label">5. Chat List</div>
+    <div class="phone">
+      <div class="statusbar"></div>
+      <div class="topbar"><span>Chat</span><span>🔍</span></div>
+      <div class="content" style="gap:0;">
+        <div class="chatlist-item">
+          <div class="avatar"></div>
+          <div class="chatlist-meta">
+            <div class="txt-line title"></div>
+            <div class="txt-line preview"></div>
+          </div>
+          <div class="badge"></div>
+        </div>
+        <div class="chatlist-item">
+          <div class="avatar"></div>
+          <div class="chatlist-meta">
+            <div class="txt-line title"></div>
+            <div class="txt-line preview"></div>
+          </div>
+        </div>
+        <div class="chatlist-item">
+          <div class="avatar"></div>
+          <div class="chatlist-meta">
+            <div class="txt-line title"></div>
+            <div class="txt-line preview"></div>
+          </div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="navitem"><div class="dot"></div>Home</div>
+        <div class="navitem active"><div class="dot"></div>Chat</div>
+        <div class="navitem"><div class="dot"></div>Notif</div>
+        <div class="navitem"><div class="dot"></div>Profile</div>
+      </div>
+    </div>
+    <div class="annotation">One conversation thread per teacher/class. Unread badge on top item.</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- SCREEN 6: CHAT ROOM -->
+  <div class="screen-wrap">
+    <div class="screen-label">6. Chat Room</div>
+    <div class="phone">
+      <div class="statusbar"></div>
+      <div class="topbar"><span>← Back</span><span>Ms. Dewi · 3B</span><span>ⓘ</span></div>
+      <div class="content" style="flex-direction:column;">
+        <div class="bubble in">Good afternoon, just a reminder about tomorrow's field trip.</div>
+        <div class="bubble-photo" style="align-self:flex-start;">photo</div>
+        <div class="bubble out">Noted, thank you!</div>
+        <div style="flex:1;"></div>
+      </div>
+      <div class="chat-input">Type a message… <span>📷</span><div class="send"></div></div>
+    </div>
+    <div class="annotation">1-on-1 with teacher, supports text + photo. No group chat on parent side — kept simple.</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- SCREEN 7: NOTIFICATION CENTER -->
+  <div class="screen-wrap">
+    <div class="screen-label">7. Notification Center</div>
+    <div class="phone">
+      <div class="statusbar"></div>
+      <div class="topbar"><span>Notifications</span><span>Mark all read</span></div>
+      <div class="content" style="gap:0;">
+        <div class="notif-item">
+          <div class="notif-icon">💬</div>
+          <div class="notif-text"><div class="txt-line title"></div><div class="txt-line"></div></div>
+          <div class="notif-time">2m</div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon">📊</div>
+          <div class="notif-text"><div class="txt-line title"></div><div class="txt-line"></div></div>
+          <div class="notif-time">1h</div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon">📅</div>
+          <div class="notif-text"><div class="txt-line title"></div><div class="txt-line"></div></div>
+          <div class="notif-time">3h</div>
+        </div>
+        <div class="notif-item">
+          <div class="notif-icon">📣</div>
+          <div class="notif-text"><div class="txt-line title"></div><div class="txt-line"></div></div>
+          <div class="notif-time">1d</div>
+        </div>
+      </div>
+      <div class="bottomnav">
+        <div class="navitem"><div class="dot"></div>Home</div>
+        <div class="navitem"><div class="dot"></div>Chat</div>
+        <div class="navitem active"><div class="dot"></div>Notif</div>
+        <div class="navitem"><div class="dot"></div>Profile</div>
+      </div>
+    </div>
+    <div class="annotation">Chronological, all-types-mixed list — each row deep-links to its source (chat / report / reminder / announcement).</div>
+  </div>
+
+  <div class="flow-arrow">→</div>
+
+  <!-- SCREEN 8: PROFILE -->
+  <div class="screen-wrap">
+    <div class="screen-label">8. Profile</div>
+    <div class="phone">
+      <div class="statusbar"></div>
+      <div class="profile-header">
+        <div class="avatar"></div>
+        <div class="box" style="border:none;background:none;height:12px;">Sarah Putri</div>
+      </div>
+      <div class="content" style="gap:0;">
+        <div class="section-title">My Children</div>
+        <div class="profile-row"><span>Aisha — Grade 3B</span><span>›</span></div>
+        <div class="profile-row"><span>Raka — Grade 5A</span><span>›</span></div>
+        <div class="profile-row"><span>+ Add child (invite code)</span><span>›</span></div>
+        <div class="section-title">Settings</div>
+        <div class="profile-row"><span>Language</span><span>English ›</span></div>
+        <div class="profile-row"><span>Notifications</span><span>›</span></div>
+        <div class="profile-row"><span>Log out</span><span></span></div>
+      </div>
+      <div class="bottomnav">
+        <div class="navitem"><div class="dot"></div>Home</div>
+        <div class="navitem"><div class="dot"></div>Chat</div>
+        <div class="navitem"><div class="dot"></div>Notif</div>
+        <div class="navitem active"><div class="dot"></div>Profile</div>
+      </div>
+    </div>
+    <div class="annotation">Multi-child management lives here, not in onboarding — keeps first-run flow short for the common single-child case.</div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+</body>
+</html>
