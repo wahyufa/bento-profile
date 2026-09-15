@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Student Bar Comparison</title>
+  <!-- TEMP: side-by-side check of the phone student bar options for
+       essay-result-v2.html. Delete once a layout is chosen. -->
+  <style>
+    :root {
+      --page-bg: #f7f5f2;
+      --ink: #111111;
+      --ink-soft: #6b6b6b;
+      --bezel: #161616;
+      --frame-width: 375px;
+      --frame-height: 667px;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--page-bg);
+      padding: 40px 16px 64px;
+    }
+
+    .intro { max-width: 1240px; margin: 0 auto 36px; }
+    .intro h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 8px; }
+    .intro p { font-size: 15px; line-height: 1.6; color: var(--ink-soft); max-width: 640px; }
+
+    .options {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 48px 40px;
+    }
+
+    .option { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+    .option__label { text-align: center; }
+    .option__name { display: block; font-size: 15px; font-weight: 700; }
+    .option__metric { display: block; font-size: 13px; color: var(--ink-soft); margin-top: 2px; }
+
+    /* Phone-sized frame; the ring stands in for a bezel */
+    .phone {
+      width: var(--frame-width);
+      max-width: calc(100vw - 48px);
+      height: var(--frame-height);
+      border-radius: 28px;
+      overflow: hidden;
+      background: #ffffff;
+      box-shadow: 0 0 0 8px var(--bezel), 0 24px 48px rgba(0, 0, 0, 0.18);
+    }
+    .phone iframe { display: block; width: 100%; height: 100%; border: 0; }
+  </style>
+</head>
+<body>
+  <header class="intro">
+    <h1>Student bar on phones</h1>
+    <p>Each frame is the live essay-result-v2.html at 375 × 667, the size in your screenshot. Scroll and tap inside a frame to try it.</p>
+  </header>
+
+  <main class="options">
+    <figure class="option">
+      <figcaption class="option__label">
+        <span class="option__name">Now</span>
+        <span class="option__metric">Question starts at 248px</span>
+      </figcaption>
+      <div class="phone"><iframe src="essay-result-v2.html#compare-current" title="Current student bar"></iframe></div>
+    </figure>
+
+    <figure class="option">
+      <figcaption class="option__label">
+        <span class="option__name">Option 1 — Pills in one row + dots up</span>
+        <span class="option__metric">Question starts at 151px</span>
+      </figcaption>
+      <div class="phone"><iframe src="essay-result-v2.html#compare-dots" title="Option 1: pills in one row and question dots in the student row"></iframe></div>
+    </figure>
+
+    <figure class="option">
+      <figcaption class="option__label">
+        <span class="option__name">Option 2 — Pills in one row only</span>
+        <span class="option__metric">Question starts at 204px</span>
+      </figcaption>
+      <div class="phone"><iframe src="essay-result-v2.html#compare-pills" title="Option 2: pills in one row"></iframe></div>
+    </figure>
+  </main>
+</body>
+</html>
