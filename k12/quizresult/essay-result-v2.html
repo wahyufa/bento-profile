@@ -64,25 +64,43 @@
     }
 
     /* ---------- Top app bar ---------- */
+    /* Three columns keep the title centered across the whole bar, with the
+       actions pinned right. When a centered title would run into the
+       actions, fitTopbarTitle() (essay-render-v2.js) switches the bar to
+       .topbar--title-start. */
     .topbar {
       position: relative;
       flex: 0 0 auto;
       height: 55px;
       background: var(--amber) url("https://demo.heyhi.sg/images/bg-smartjen.png") repeat;
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: center;
+      column-gap: 16px;
+      padding: 0 20px;
       overflow: hidden;
     }
-    .topbar__title { font-weight: 700; font-size: 20px; color: #fff; z-index: 1; }
+    .topbar__title {
+      grid-column: 2;
+      min-width: 0;
+      font-weight: 700; font-size: 20px; color: #fff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .topbar__actions {
+      grid-column: 3; justify-self: end;
+      display: flex; align-items: center; gap: 26px;
+    }
+    /* Title starts from the left and truncates: set by fitTopbarTitle()
+       when a centered title wouldn't fit, and always on phones (≤600px) */
+    .topbar--title-start { grid-template-columns: minmax(0, 1fr) auto; }
+    .topbar--title-start .topbar__title { grid-column: 1; }
+    .topbar--title-start .topbar__actions { grid-column: 2; }
     .btn-exit {
-      position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
       display: inline-flex; align-items: center; gap: 8px;
       background: var(--blue); color: #fff; border: none;
       font-weight: 600; font-size: 15px; padding: 7px 16px;
       border-radius: var(--radius-pill); cursor: pointer;
     }
-    .download-menu { position: absolute; right: 128px; top: 50%; transform: translateY(-50%); }
     .btn-download {
       display: inline-flex; align-items: center; gap: 8px;
       background: var(--green); color: #fff; border: none;
@@ -498,9 +516,11 @@
         padding-bottom: calc(62px + env(safe-area-inset-bottom));
       }
 
-      .topbar { position: sticky; top: 0; z-index: 100; }
-      .btn-exit { right: calc(20px + env(safe-area-inset-right)); }
-      .download-menu { right: calc(128px + env(safe-area-inset-right)); }
+      .topbar {
+        position: sticky; top: 0; z-index: 100;
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+      }
 
       .subbar {
         padding-left: max(24px, env(safe-area-inset-left));
@@ -615,20 +635,19 @@
     }
 
     @media (max-width: 600px) {
-      /* Topbar: title left-aligned and truncating, so it can never run
-         under the action buttons pinned to the right. */
-      .topbar { height: 48px; justify-content: flex-start; padding: 0 12px; }
-      .topbar__title {
-        font-size: 15px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        /* Clears both pinned buttons (~74px exit + ~54px download + gaps) */
-        max-width: calc(100% - 152px);
+      /* Topbar: the title always starts from the left and truncates, so it
+         can never run under the action buttons. */
+      .topbar {
+        height: 48px;
+        grid-template-columns: minmax(0, 1fr) auto;
+        column-gap: 12px;
+        padding-left: 12px;
+        padding-right: 12px;
       }
-      .btn-exit { right: 12px; font-size: 12px; padding: 6px 11px; gap: 5px; }
+      .topbar__title { grid-column: 1; font-size: 15px; }
+      .topbar__actions { grid-column: 2; gap: 8px; }
+      .btn-exit { font-size: 12px; padding: 6px 11px; gap: 5px; }
       .btn-exit svg { width: 14px; height: 14px; }
-      .download-menu { right: 82px; }
       .btn-download { font-size: 12px; padding: 6px 10px; gap: 5px; }
       /* Icon-only download: the label is the first thing to go when the
          bar gets tight; the arrow icon still reads as "download". The
@@ -678,8 +697,8 @@
        small where two controls sit close together.
        ========================================================== */
     @media (pointer: coarse) {
-      /* .btn-exit and .panel__close are already absolutely positioned */
-      .btn-download, .qnode, .attempt-switch__btn { position: relative; }
+      /* .panel__close is already absolutely positioned */
+      .btn-download, .btn-exit, .qnode, .attempt-switch__btn { position: relative; }
       .btn-download::after, .btn-exit::after, .qnode::after,
       .panel__close::after, .attempt-switch__btn::after {
         content: "";
@@ -695,17 +714,19 @@
 <body>
   <header class="topbar">
     <h1 class="topbar__title" id="quizTitle">Composition Writing</h1>
-    <div class="download-menu" id="downloadMenu">
-      <button class="btn-download" id="downloadPdfBtn" aria-haspopup="true" aria-expanded="false">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12M12 15l-4.5-4.5M12 15l4.5-4.5M4 19h16" stroke-linecap="round" stroke-linejoin="round" /></svg>
-        <span id="downloadPdfLabel">Download PDF</span>
-        <svg class="download-menu__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+    <div class="topbar__actions">
+      <div class="download-menu" id="downloadMenu">
+        <button class="btn-download" id="downloadPdfBtn" aria-haspopup="true" aria-expanded="false">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12M12 15l-4.5-4.5M12 15l4.5-4.5M4 19h16" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          <span id="downloadPdfLabel">Download PDF</span>
+          <svg class="download-menu__chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        </button>
+      </div>
+      <button class="btn-exit">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5H6a2 2 0 00-2 2v10a2 2 0 002 2h9M18 15l3-3-3-3M21 12H10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+        Exit
       </button>
     </div>
-    <button class="btn-exit">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5H6a2 2 0 00-2 2v10a2 2 0 002 2h9M18 15l3-3-3-3M21 12H10" stroke-linecap="round" stroke-linejoin="round" /></svg>
-      Exit
-    </button>
   </header>
 
   <!-- Rendered outside .topbar (which clips overflow for its background

@@ -473,8 +473,32 @@ function renderQuestions() {
   });
 }
 
+// ---------- Top bar title ----------
+
+// The worksheet title sits centered in the top bar unless centering would
+// run it into the action buttons (a long title, or a narrow or landscape
+// screen); then it starts from the left and truncates instead. Phones
+// (≤600px) always use the left-aligned layout (CSS).
+function fitTopbarTitle() {
+  const topbar = document.querySelector(".topbar");
+  const title = document.getElementById("quizTitle");
+  const bar = topbar.getBoundingClientRect();
+  const actionsLeft = topbar.querySelector(".topbar__actions").getBoundingClientRect().left;
+  // Keep the same breathing room as the bar's column gap
+  const clearance = parseFloat(getComputedStyle(topbar).columnGap) || 0;
+  // scrollWidth is the title's full text width, even while it's truncated
+  const centeredTitleRight = bar.left + bar.width / 2 + title.scrollWidth / 2;
+  topbar.classList.toggle("topbar--title-start", centeredTitleRight + clearance > actionsLeft);
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   renderShell();
+  fitTopbarTitle();
+  // Re-check whenever the bar resizes (rotation, window resize) and once the
+  // web fonts load, since both change whether a centered title fits.
+  new ResizeObserver(fitTopbarTitle).observe(document.querySelector(".topbar"));
+  document.fonts?.ready.then(fitTopbarTitle);
+
   renderRail();
   renderQuestions();
 
