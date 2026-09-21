@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0fb0f8" />
+  <title>Speech for Teens — HeyHi Quiz</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Nunito+Sans:wght@400;700&family=Poppins:ital,wght@0,400;0,500;0,600;0,700;1,700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="qt-speech.css" />
+</head>
+<body>
+  <!-- Icon sprite (Feather icons, MIT). Referenced with <use href="#i-..."> -->
+  <svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="position:absolute;width:0;height:0;overflow:hidden">
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" /></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" /></symbol>
+    <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z" /><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" /></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 16l4-4-4-4M8 12h8" /></symbol>
+  </svg>
+
+  <!-- ============ Start screen ============ -->
+  <main class="start" id="startView">
+    <header class="start__hero">
+      <img class="start__logo" src="https://elb-onlinequiz.smartjen.com/images/main/icon-jangkar.png" alt="" width="68" height="68" />
+    </header>
+
+    <section class="start-card" aria-labelledby="quizTitle">
+      <p class="eyebrow" id="quizSubject"></p>
+      <h1 class="start-card__title" id="quizTitle"></h1>
+
+      <dl class="meta">
+        <div class="meta__item"><dt>Max no of attempts</dt><dd id="metaAttempts"></dd></div>
+        <div class="meta__item"><dt>No of questions</dt><dd id="metaQuestions"></dd></div>
+        <div class="meta__item"><dt>Quiz time</dt><dd id="metaTime"></dd></div>
+      </dl>
+
+      <div class="start-actions">
+        <button class="btn btn--outline btn--block btn--lg" type="button" id="startGuest">Start Quiz as guest</button>
+        <button class="btn btn--primary btn--block btn--lg" type="button" id="startAccount">Start Quiz with my account</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ Question screen ============ -->
+  <div class="quiz" id="quizView" hidden>
+    <header class="qheader">
+      <div class="qbar">
+        <h1 class="qbar__title" id="barTitle"></h1>
+        <div class="qbar__actions">
+          <button class="btn btn--primary btn--sm" type="button" data-dialog-open="exitDialog">Save &amp; Exit</button>
+          <button class="btn btn--primary btn--sm" type="button" data-dialog-open="submitDialog">Submit Quiz</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="qnav">
+      <div class="qnav__inner">
+        <button class="qnav__list-btn" type="button" data-dialog-open="questionListDialog" aria-label="Show question list" aria-haspopup="dialog">
+          <svg class="icon" aria-hidden="true"><use href="#i-list" /></svg>
+        </button>
+        <div class="qnav__info">
+          <span class="qnav__label">Progress</span>
+          <span class="qnav__count" id="progressText"></span>
+        </div>
+        <div class="progress" id="progressTrack" role="progressbar" aria-label="Quiz progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="progress__fill" id="progressFill"></div>
+        </div>
+        <div class="timer" role="timer" aria-label="Quiz time: unlimited">
+          <span class="timer__icon"><svg class="icon" aria-hidden="true"><use href="#i-clock" /></svg></span>
+          <span class="timer__value" id="timerValue">-</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="qlayout">
+      <!-- Desktop only: numbered circles down the left edge -->
+      <nav class="qrail" id="qrail" aria-label="Questions"></nav>
+
+      <main class="qmain">
+        <article class="qcard">
+          <header class="qcard__head">
+            <h2 class="qcard__title" id="questionTitle" tabindex="-1"></h2>
+            <div class="qcard__tools">
+              <!-- Phones show only the (i) icon; the label appears from 768px -->
+              <button class="link-btn link-btn--icon" type="button" data-dialog-open="instructionDialog">
+                <svg class="icon" aria-hidden="true"><use href="#i-info" /></svg>
+                <span class="link-btn__label">See Instruction</span>
+              </button>
+              <button class="btn btn--primary btn--next" type="button" id="nextBtn">Next Question</button>
+            </div>
+          </header>
+
+          <div class="qcard__body">
+            <section class="prompt-card" aria-label="Phrase to pronounce">
+              <div class="prompt-card__row">
+                <img class="prompt-card__avatar" src="https://elb-onlinequiz.smartjen.com/images/jen-head.png" alt="Jen" width="64" height="64" />
+                <button class="btn btn--outline btn--hear" type="button" id="hearBtn">
+                  Hear
+                  <svg class="icon" aria-hidden="true"><use href="#i-volume" /></svg>
+                </button>
+              </div>
+              <p class="prompt-card__word" id="promptWord"></p>
+            </section>
+
+            <section class="record-card" aria-label="Your recording">
+              <button class="btn btn--primary btn--record" type="button" id="recordBtn">Record</button>
+              <p class="record-card__status" id="recordStatus" role="status"></p>
+            </section>
+          </div>
+        </article>
+
+        <div class="feedback-row">
+          <button class="link-btn" type="button" data-dialog-open="feedbackDialog">Send Feedback</button>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- ============ Question list (bottom sheet on phones) ============ -->
+  <dialog class="sheet" id="questionListDialog" aria-labelledby="qlistTitle">
+    <div class="sheet__panel">
+      <header class="sheet__head">
+        <h2 class="sheet__title" id="qlistTitle"></h2>
+        <button class="sheet__close" type="button" data-dialog-close aria-label="Close question list">
+          <svg class="icon" aria-hidden="true"><use href="#i-x" /></svg>
+        </button>
+      </header>
+
+      <dl class="sheet__stats">
+        <div class="sheet__stat"><dt>Quiz time</dt><dd id="qlistTime">-</dd></div>
+        <div class="sheet__stat"><dt>Progress</dt><dd id="qlistProgressText"></dd></div>
+      </dl>
+      <div class="progress" aria-hidden="true"><div class="progress__fill" id="qlistProgressFill"></div></div>
+
+      <ol class="qlist" id="qlist"></ol>
+    </div>
+  </dialog>
+
+  <!-- ============ Instruction ("Speech Practice") ============ -->
+  <dialog class="modal instruction" id="instructionDialog" aria-labelledby="instructionTitle">
+    <div class="modal__panel">
+      <header class="instruction__head">
+        <h2 class="instruction__title" id="instructionTitle">Speech Practice</h2>
+        <img class="instruction__art" src="https://demo.heyhi.sg/images/svg/icon-instruction.svg" alt="" width="88" height="56" />
+      </header>
+      <div class="instruction__body">
+        <p class="instruction__text">
+          In this session, you will practice to pronounce phrases. Listen and repeat what Jen says.
+          You will get detailed feedback for the underline sounds for each phrase
+        </p>
+        <button class="btn btn--primary btn--block btn--lg" type="button" data-dialog-close>Ready</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============ Save & Exit ============ -->
+  <dialog class="modal" id="exitDialog" aria-labelledby="exitTitle" data-static>
+    <div class="modal__panel">
+      <button class="modal__close" type="button" data-dialog-close aria-label="Close">
+        <svg class="icon" aria-hidden="true"><use href="#i-x" /></svg>
+      </button>
+      <div class="modal__body">
+        <h2 class="modal__title" id="exitTitle">Exit Quiz</h2>
+        <img class="modal__art" src="https://elb-onlinequiz.smartjen.com/images/svg/icon-thanks.svg" alt="" width="104" height="105" />
+        <p class="modal__text">Are you sure want to exit your quiz?</p>
+        <div class="modal__actions">
+          <button class="btn btn--primary" type="button" id="exitConfirm">Yes</button>
+          <button class="btn btn--outline" type="button" data-dialog-close>No</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============ Submit Quiz ============ -->
+  <dialog class="modal" id="submitDialog" aria-labelledby="submitTitle" data-static>
+    <div class="modal__panel">
+      <button class="modal__close" type="button" data-dialog-close aria-label="Close">
+        <svg class="icon" aria-hidden="true"><use href="#i-x" /></svg>
+      </button>
+      <div class="modal__body">
+        <h2 class="modal__title" id="submitTitle">Submit Quiz</h2>
+        <img class="modal__art" src="https://elb-onlinequiz.smartjen.com/images/svg/icon-thanks.svg" alt="" width="104" height="105" />
+        <p class="modal__text" id="submitMessage"></p>
+        <p class="modal__text">Are you sure to submit your Quiz?</p>
+        <div class="modal__actions">
+          <button class="btn btn--primary" type="button" id="submitConfirm">Yes, I am</button>
+          <button class="btn btn--outline" type="button" data-dialog-close>Close</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ============ Send Feedback ============ -->
+  <dialog class="modal" id="feedbackDialog" aria-labelledby="feedbackTitle">
+    <form class="modal__panel" id="feedbackForm" novalidate>
+      <button class="modal__close" type="button" data-dialog-close aria-label="Close">
+        <svg class="icon" aria-hidden="true"><use href="#i-x" /></svg>
+      </button>
+      <div class="modal__body modal__body--left">
+        <h2 class="modal__title" id="feedbackTitle">Send Feedback</h2>
+
+        <div class="field">
+          <label for="fbCategory">Categories</label>
+          <select id="fbCategory" name="category">
+            <option value="content">1. Content error</option>
+            <option value="technical">2. Technical error</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="fbDescription">Describe the problem</label>
+          <input id="fbDescription" name="description" type="text" placeholder="Describe the problem" autocomplete="off" aria-describedby="fbDescriptionError" />
+          <p class="field__error" id="fbDescriptionError" hidden>Description is required (at least 2 words)</p>
+        </div>
+
+        <div class="field">
+          <label for="fbFile">Add attachment (screenshot/recording of errors)</label>
+          <input id="fbFile" name="attachment" type="file" accept="image/*,video/*" />
+        </div>
+
+        <div class="field">
+          <label for="fbEmail">Can we reach out to you about the question - enter your email address</label>
+          <input id="fbEmail" name="email" type="email" placeholder="Please enter your email" autocomplete="email" />
+        </div>
+
+        <button class="btn btn--primary btn--block btn--lg" type="submit" id="fbSubmit" disabled>Send Feedback</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="modal" id="thanksDialog" aria-labelledby="thanksTitle">
+    <div class="modal__panel">
+      <button class="modal__close" type="button" data-dialog-close aria-label="Close">
+        <svg class="icon" aria-hidden="true"><use href="#i-x" /></svg>
+      </button>
+      <div class="modal__body">
+        <h2 class="modal__title" id="thanksTitle">Thank you!</h2>
+        <img class="modal__art" src="https://elb-onlinequiz.smartjen.com/images/svg/icon-thanks.svg" alt="" width="104" height="105" />
+        <p class="modal__text">Your feedback is valuable to us!<br />We will try to get back to you as soon as possible.</p>
+        <div class="modal__actions modal__actions--single">
+          <button class="btn btn--primary" type="button" data-dialog-close>Close</button>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <script src="qt-speech.js"></script>
+</body>
+</html>
