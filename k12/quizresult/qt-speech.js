@@ -5,6 +5,8 @@
    Prototype notes:
    - "Hear" uses the browser's speech synthesis instead of Jen's audio.
    - "Record" simulates a recording; it does not use the microphone.
+   - The device lists are sample names and "Test Microphone" shows simulated
+     sound waves; no audio device is touched.
    - Both "Start Quiz" buttons open the quiz, because sign-in is out of scope.
    - Confirming Exit or Submit returns to the start screen. */
 
@@ -15,6 +17,18 @@ const QUIZ = {
   maxAttempts: "Unlimited",
   timeLimit: "Unlimited",
   timerLabel: "-",
+  devices: {
+    microphones: [
+      "Microphone Array (AMD Audio Device)",
+      "Headset Microphone (USB Audio Device)",
+      "Default - Built-in Microphone",
+    ],
+    speakers: [
+      "Communications - Speakers (Realtek(R) Audio)",
+      "Speakers (Realtek(R) Audio)",
+      "Headphones (USB Audio Device)",
+    ],
+  },
   questions: [
     { id: "1A", text: "Technology" },
     { id: "1B", text: "Environment" },
@@ -65,6 +79,7 @@ function renderStart() {
   byId("metaTime").textContent = QUIZ.timeLimit;
   byId("barTitle").textContent = QUIZ.title;
   byId("timerValue").textContent = QUIZ.timerLabel;
+  renderDevices();
 }
 
 function renderProgress() {
@@ -271,6 +286,7 @@ function resetQuiz() {
 }
 
 function startQuiz() {
+  stopMicTest();
   resetQuiz();
   showView("quiz");
   renderQuiz();
@@ -280,6 +296,7 @@ function startQuiz() {
 function leaveQuiz() {
   document.querySelectorAll("dialog[open]").forEach((dialog) => dialog.close());
   resetQuiz();
+  resetSetup();
   showView("start");
 }
 
@@ -368,12 +385,114 @@ function wireFeedbackForm() {
   });
 }
 
+// ---------- Device setup (start screen) ----------
+
+const MIC_TEST_MS = 5000;
+const WAVE_BAR_COUNT = 32;
+const WAVE_TICK_MS = 80;
+
+const micTest = {
+  active: false,
+  levels: new Array(WAVE_BAR_COUNT).fill(0),  // 0..1, one per bar, newest last
+  startedAt: 0,
+  tickId: null,
+  stopId: null,
+};
+
+function fillSelect(select, names) {
+  select.replaceChildren(...names.map((name) => new Option(name, name)));
+}
+
+function renderDevices() {
+  fillSelect(byId("micSelect"), QUIZ.devices.microphones);
+  fillSelect(byId("speakerSelect"), QUIZ.devices.speakers);
+  byId("waveBars").innerHTML = '<span class="wave__bar"></span>'.repeat(WAVE_BAR_COUNT);
+}
+
+function paintWave() {
+  byId("waveBars").childNodes.forEach((bar, index) => {
+    bar.style.setProperty("--level", micTest.levels[index].toFixed(2));
+  });
+}
+
+// A simulated voice: bursts of speech with short pauses, scrolling left
+function nextWaveLevel(elapsedMs) {
+  const isSpeaking = Math.sin(elapsedMs / 450) > -0.35;
+  const target = isSpeaking ? 0.25 + Math.random() * 0.75 : Math.random() * 0.1;
+  const previous = micTest.levels[micTest.levels.length - 1];
+  return previous * 0.55 + target * 0.45;
+}
+
+function startMicTest() {
+  const button = byId("testMicBtn");
+  micTest.active = true;
+  micTest.startedAt = performance.now();
+  micTest.levels.fill(0);
+
+  button.textContent = "Stop Test";
+  button.classList.add("is-testing");
+  byId("wave").hidden = false;
+  byId("waveStatus").textContent = "Listening… speak now.";
+
+  micTest.tickId = window.setInterval(() => {
+    micTest.levels.push(nextWaveLevel(performance.now() - micTest.startedAt));
+    micTest.levels.shift();
+    paintWave();
+  }, prefersReducedMotion() ? WAVE_TICK_MS * 3 : WAVE_TICK_MS);
+
+  micTest.stopId = window.setTimeout(() => stopMicTest("Test finished."), MIC_TEST_MS);
+}
+
+function stopMicTest(message = "") {
+  window.clearInterval(micTest.tickId);
+  window.clearTimeout(micTest.stopId);
+  if (!micTest.active) return;
+
+  const button = byId("testMicBtn");
+  micTest.active = false;
+  micTest.levels.fill(0);
+  paintWave();
+
+  button.textContent = "Test Microphone";
+  button.classList.remove("is-testing");
+  byId("waveStatus").textContent = message;
+}
+
+function toggleMicTest() {
+  if (micTest.active) stopMicTest("Test stopped.");
+  else startMicTest();
+}
+
+// The start buttons stay disabled until every item is confirmed
+function updateStartGate() {
+  const boxes = byId("confirmList").querySelectorAll('input[type="checkbox"]');
+  const isConfirmed = [...boxes].every((box) => box.checked);
+  byId("startGuest").disabled = !isConfirmed;
+  byId("startAccount").disabled = !isConfirmed;
+}
+
+function resetSetup() {
+  stopMicTest();
+  byId("wave").hidden = true;
+  byId("confirmList").querySelectorAll('input[type="checkbox"]').forEach((box) => {
+    box.checked = false;
+  });
+  updateStartGate();
+}
+
+function wireSetup() {
+  byId("testMicBtn").addEventListener("click", toggleMicTest);
+  byId("confirmList").addEventListener("change", updateStartGate);
+}
+
 // ---------- Boot ----------
 
 function init() {
   renderStart();
   wireDialogs();
   wireFeedbackForm();
+  wireSetup();
+  resetSetup();
 
   // Sign-in is out of scope for this prototype, so both buttons start the quiz
   byId("startGuest").addEventListener("click", startQuiz);

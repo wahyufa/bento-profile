@@ -21,6 +21,7 @@
     <symbol id="i-volume" viewBox="0 0 24 24"><path d="M11 5L6 9H2v6h4l5 4V5z" /><path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" /></symbol>
     <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" /></symbol>
+    <symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z" /><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8" /></symbol>
     <symbol id="i-arrow" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 16l4-4-4-4M8 12h8" /></symbol>
   </svg>
 
@@ -40,9 +41,52 @@
         <div class="meta__item"><dt>Quiz time</dt><dd id="metaTime"></dd></div>
       </dl>
 
+      <section class="setup" aria-labelledby="setupDevicesTitle">
+        <h2 class="setup__heading" id="setupDevicesTitle">Setup Your Devices</h2>
+
+        <div class="device-test">
+          <div class="device-test__head">
+            <span class="device-test__icon"><svg class="icon" aria-hidden="true"><use href="#i-mic" /></svg></span>
+            <div>
+              <h3 class="device-test__title">Microphone &amp; Speaker Test</h3>
+              <p class="device-test__hint">Select and test your microphone &amp; speaker</p>
+            </div>
+          </div>
+
+          <div class="device-test__fields">
+            <div class="device-field">
+              <label for="micSelect">Choose Microphone (Input Device)</label>
+              <select id="micSelect"></select>
+            </div>
+            <div class="device-field">
+              <label for="speakerSelect">Choose Speaker (Output Device)</label>
+              <select id="speakerSelect"></select>
+            </div>
+          </div>
+
+          <div class="wave" id="wave" hidden>
+            <div class="wave__bars" id="waveBars" aria-hidden="true"></div>
+            <p class="wave__status" id="waveStatus" role="status"></p>
+          </div>
+
+          <button class="btn btn--outline btn--block" type="button" id="testMicBtn">Test Microphone</button>
+        </div>
+      </section>
+
+      <section class="setup" role="group" aria-labelledby="confirmTitle" aria-describedby="confirmHint">
+        <h2 class="setup__heading" id="confirmTitle">Confirm Your Setup</h2>
+        <p class="setup__hint" id="confirmHint">Please confirm all items below before you can start the quiz.</p>
+
+        <div class="confirm-list" id="confirmList">
+          <label class="check"><input type="checkbox" /><span>I can see the sound waves move when I speak</span></label>
+          <label class="check"><input type="checkbox" /><span>I can hear my own voice when I play back the recording. If can&rsquo;t, please try recording again</span></label>
+          <label class="check"><input type="checkbox" /><span>I&rsquo;m ready and in a good environment for the test</span></label>
+        </div>
+      </section>
+
       <div class="start-actions">
-        <button class="btn btn--outline btn--block btn--lg" type="button" id="startGuest">Start Quiz as guest</button>
-        <button class="btn btn--primary btn--block btn--lg" type="button" id="startAccount">Start Quiz with my account</button>
+        <button class="btn btn--outline btn--block btn--lg" type="button" id="startGuest" aria-describedby="confirmHint" disabled>Start Quiz as guest</button>
+        <button class="btn btn--primary btn--block btn--lg" type="button" id="startAccount" aria-describedby="confirmHint" disabled>Start Quiz with my account</button>
       </div>
     </section>
   </main>
