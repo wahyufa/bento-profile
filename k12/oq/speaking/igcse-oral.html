@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGCSE Oral: Speaking test</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Enhancement prototype for the IGCSE oral (speaking) format described in
+     "igcse oral platform requirements.docx". Same tokens and assets as
+     index.html / split.html. Part 2 is the only stage with a card the candidate
+     keeps until the end of the talk, so the card lives in the split layout and
+     the layout collapses to one column everywhere else. */
+  :root{
+    --brand:#0fb0f8;
+    --brand-dark:#0c94d1;
+    --brand-light:#53caff;
+    --topbar-bg:#fec53c;
+    --topbar-bg-dark:#f2ab16;
+    --examiner-bg:#effaff;
+    --student-bg:#f6f8fa;
+    --bubble-border:#e0e0e0;
+    --progress-track:#edf2f9;
+    --heading:#302574;
+    --text:#12263f;
+    --text-muted:#5c6a7e;
+    --text-faint:#8a94a6;
+    --end-red:#f0645c;
+    --success:#1f9d6b;
+    --success-soft:#e5f7ef;
+    --page-bg:#f6f8fa;
+    --card-bg:#ffffff;
+    --shadow-soft: 0 1px 2px rgba(20,30,60,.06), 0 8px 24px -12px rgba(20,30,60,.12);
+    --shadow-modal: 0 20px 60px -12px rgba(10,15,30,.45);
+    color-scheme: light;
+  }
+
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--page-bg);
+    color:var(--text);
+    font-family:'Montserrat',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--brand); outline-offset:2px; border-radius:4px;}
+  h1,h2,h3{font-family:'Poppins',sans-serif;}
+
+  .shell{display:flex; flex-direction:column; min-height:100vh;}
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px 20px;
+    padding:10px 24px;
+    background:
+      url('assets/topbar-pattern.png') repeat,
+      linear-gradient(135deg, var(--topbar-bg), var(--topbar-bg-dark));
+    background-size: auto, cover;
+    color:#fff;
+    flex:0 0 auto;
+  }
+  .topbar h1{
+    margin:0;
+    flex:1 1 auto;
+    min-width:200px;
+    text-align:center;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:-.4px;
+  }
+  .topbar-actions{flex:0 0 auto; display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px;}
+  .btn{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    font-family:'Poppins',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:8px 16px;
+    border-radius:16px;
+    transition:transform .12s ease, opacity .12s ease, background .15s ease;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-ghost{background:#fff; color:var(--topbar-bg-dark);}
+  .btn-primary{background:var(--brand); color:#fff;}
+  .btn-primary:hover{background:var(--brand-dark);}
+  .btn-light{background:var(--brand-light); color:#fff;}
+  .btn-outline{background:var(--card-bg); color:var(--text-muted); border:1px solid var(--bubble-border);}
+  .btn-red{background:var(--end-red); color:#fff; display:inline-flex; align-items:center; gap:6px;}
+  .btn-red svg{width:14px;height:14px;}
+  .btn-skip{display:none; font-size:13px; padding:6px 14px; margin-top:4px;}
+
+  /* ---------- Progress row: one labelled segment per stage ---------- */
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:7px 24px;
+    background:var(--card-bg);
+    border-bottom:1px solid var(--bubble-border);
+    flex:0 0 auto;
+  }
+  .progress-row .label{font-weight:700; color:var(--text-muted); font-size:13px; flex:0 0 auto;}
+  .stages{flex:1 1 auto; min-width:0; display:flex; gap:10px;}
+  .stage{flex:1 1 0; min-width:0;}
+  .stage-name{
+    display:block; margin-bottom:3px;
+    font:600 11px/1.2 'Poppins',sans-serif; color:var(--text-faint);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .stage.is-current .stage-name{color:var(--heading);}
+  .segment{height:8px; background:var(--progress-track); border-radius:999px; overflow:hidden;}
+  .segment-fill{height:100%; width:0%; background:var(--brand-light); border-radius:999px; transition:width .4s ease;}
+
+  .timer-chip{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    cursor:pointer;
+    border:none;
+    padding:0;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:var(--shadow-soft);
+  }
+  .timer-chip .icon{display:inline-flex; align-items:center; justify-content:center; width:32px; height:30px; background:var(--brand); color:#fff;}
+  .timer-chip .icon svg{width:15px;height:15px;}
+  .timer-chip .value{
+    padding:0 10px; height:30px; display:inline-flex; align-items:center;
+    background:#fff; color:var(--text); font-weight:700; font-size:13px; font-variant-numeric:tabular-nums;
+  }
+
+  /* ---------- Body card ---------- */
+  .quiz-body{flex:1 1 auto; max-width:1320px; width:100%; margin:0 auto; padding:clamp(10px,2vh,20px) 24px;}
+  .card{
+    background:var(--card-bg);
+    border-radius:18px;
+    box-shadow:var(--shadow-soft);
+    padding:clamp(12px,2.2vh,22px) 28px;
+  }
+  .section-head{display:flex; align-items:center; gap:8px 14px; margin-bottom:clamp(6px,1.4vh,14px); flex-wrap:wrap;}
+  .section-head h2{margin:0; font-size:clamp(20px,3.4vh,30px); font-weight:700; color:var(--heading);}
+  .stage-meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex:1 1 auto;}
+  .chip{
+    display:inline-flex; align-items:center; padding:2px 10px; border-radius:999px;
+    font:600 12px/1.6 'Poppins',sans-serif; white-space:nowrap;
+    background:var(--progress-track); color:var(--text-muted);
+  }
+  .chip.assessed{background:var(--success-soft); color:var(--success);}
+  .chip.time{background:var(--examiner-bg); color:var(--brand-dark);}
+  .chip.topic{background:#f1edff; color:var(--heading);}
+  .instructions-link{
+    display:inline-flex; align-items:center; gap:6px; margin-left:auto;
+    background:none; border:none; color:var(--brand); font-weight:700; font-size:14px; cursor:pointer;
+    font-family:'Poppins',sans-serif;
+  }
+  .instructions-link svg{width:16px;height:16px;}
+
+  /* ---------- Split layout (card column only exists during Part 2) ---------- */
+  .split-layout{
+    display:grid;
+    grid-template-columns:minmax(220px,36%) 1fr;
+    gap:clamp(14px,2.4vw,26px);
+    align-items:stretch;
+  }
+  .split-layout.no-card{grid-template-columns:1fr;}
+  .split-layout.no-card .card-pane{display:none;}
+
+  .card-pane{
+    display:flex; flex-direction:column;
+    background:var(--student-bg);
+    border:1px solid var(--bubble-border);
+    border-radius:16px;
+    overflow:hidden;
+    min-height:clamp(200px,46vh,420px);
+  }
+  .pane-label{flex:0 0 auto; padding:8px 14px; font:700 12.5px 'Poppins',sans-serif; color:var(--text-muted);}
+  .card-paper{
+    flex:1 1 auto; min-height:0; overflow:auto;
+    margin:0 12px 12px; padding:clamp(12px,2vh,18px);
+    background:#fff; border:1px solid var(--bubble-border); border-radius:12px;
+    transition:filter .7s ease;
+  }
+  .card-pane.is-locked .card-paper{filter:blur(7px); user-select:none; pointer-events:none;}
+  .card-paper h3{margin:0 0 8px; font-size:clamp(15px,2.2vh,18px); font-weight:700; color:var(--heading);}
+  .card-paper p, .card-paper li{font-size:clamp(12.5px,1.8vh,14.5px); line-height:1.5;}
+  .card-paper p{margin:0 0 8px;}
+  .card-paper ul{margin:0 0 8px; padding-left:18px;}
+  .card-paper .task{font-weight:700;}
+
+  .main-pane{min-width:0; display:flex; flex-direction:column;}
+
+  /* ---------- Conversation ---------- */
+  .conversation{display:flex; flex-direction:column; gap:clamp(10px,2vh,20px); flex:1 1 auto; justify-content:center;}
+  .bubble{
+    position:relative;
+    display:flex;
+    align-items:center;
+    min-height:clamp(96px,17vh,190px);
+    background:var(--student-bg);
+    border:1px solid var(--bubble-border);
+    border-radius:140px;
+    transition:background .3s ease, border-radius .35s ease;
+    padding:clamp(6px,1.2vh,14px) clamp(18px,3vw,40px);
+  }
+  .examiner-bubble{background:var(--examiner-bg); justify-content:flex-start;}
+  .examiner-bubble.is-long{border-radius:64px;}
+  .student-bubble{justify-content:flex-end;}
+
+  .avatar{
+    flex:0 0 auto;
+    width:clamp(60px,12vh,130px); height:clamp(60px,12vh,130px);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    transition:box-shadow .3s ease;
+  }
+  .avatar svg{width:55%;height:55%;}
+  .examiner-bubble .avatar{background:none; order:1; position:relative;}
+  .examiner-bubble .avatar img{
+    position:absolute; inset:0; width:100%; height:100%; border-radius:50%;
+    object-fit:cover; opacity:0; transition:opacity .25s ease;
+  }
+  .examiner-bubble .avatar img.idle{opacity:1;}
+  .examiner-bubble .avatar.is-active img.idle{opacity:0;}
+  .examiner-bubble .avatar.is-active img.active{opacity:1;}
+  .student-bubble .avatar{background:#eae6fb; order:2;}
+  .student-bubble .avatar svg{color:var(--heading);}
+  .student-bubble[data-phase="recording"] .avatar{animation:pulse-ring 1.4s ease-out infinite;}
+  @keyframes pulse-ring{
+    0%{box-shadow:0 0 0 0 rgba(240,100,92,.35);}
+    100%{box-shadow:0 0 0 16px rgba(240,100,92,0);}
+  }
+
+  .bubble-copy{flex:1 1 auto; min-width:0; text-align:center; padding:0 clamp(12px,2.2vw,26px); font-family:'Poppins',sans-serif;}
+  .examiner-bubble .bubble-copy{order:2;}
+  .student-bubble .bubble-copy{order:1;}
+
+  .examiner-line{margin:0; font-size:clamp(14px,2vh,19px); font-weight:600; color:var(--text);}
+  .examiner-line.is-loading{font-size:clamp(15px,2.2vh,22px); font-weight:700;}
+  .examiner-line.is-long{text-align:left; font-size:clamp(13px,1.9vh,16.5px); line-height:1.55;}
+  .said{animation:say-in .35s ease both;}
+  @keyframes say-in{from{opacity:0; transform:translateY(3px);} to{opacity:1; transform:none;}}
+  .bars{display:none; align-items:flex-end; gap:3px; height:16px; margin-left:6px; vertical-align:middle;}
+  .examiner-bubble.is-speaking .bars{display:inline-flex;}
+  .bars span{width:3px; background:var(--brand-dark); border-radius:2px; animation:bounce 1s ease-in-out infinite;}
+  .bars span:nth-child(1){height:6px; animation-delay:0s;}
+  .bars span:nth-child(2){height:14px; animation-delay:.12s;}
+  .bars span:nth-child(3){height:9px; animation-delay:.24s;}
+  .bars span:nth-child(4){height:16px; animation-delay:.36s;}
+  .bars span:nth-child(5){height:7px; animation-delay:.48s;}
+  @keyframes bounce{0%,100%{transform:scaleY(.4);} 50%{transform:scaleY(1);}}
+
+  .student-line{margin:0 0 clamp(4px,1vh,12px); font-size:clamp(13px,1.8vh,16px); font-weight:600; color:var(--text-muted);}
+  .student-bubble[data-phase="recording"] .student-line{color:var(--end-red);}
+  .student-bubble[data-phase="captured"] .student-line{color:var(--success);}
+
+  /* one student-side widget per phase */
+  .countdown-number, .prep-timer, .prep-note, .record-row{display:none;}
+  .student-bubble[data-phase="countdown"] .countdown-number{display:block;}
+  .student-bubble[data-phase="prep"] .prep-timer, .student-bubble[data-phase="prep"] .prep-note{display:block;}
+  .student-bubble[data-phase="prep"] .btn-skip{display:inline-flex;}
+  .student-bubble[data-phase="recording"] .record-row{display:flex;}
+  .countdown-number, .prep-timer{font-size:clamp(24px,4.5vh,38px); font-weight:700; color:var(--heading); line-height:1; font-variant-numeric:tabular-nums;}
+  .prep-note{margin:6px 0 4px; font-size:12.5px; color:var(--text-muted);}
+  .record-row{align-items:center; justify-content:center; gap:12px;}
+  .record-time{font-variant-numeric:tabular-nums; font-weight:700; color:var(--end-red); font-size:14px;}
+
+  .hint-note{text-align:center; margin:clamp(6px,1.4vh,16px) 0 0; font-size:12.5px; font-weight:700; color:var(--topbar-bg-dark); text-decoration:underline; text-underline-offset:3px;}
+  .card-footer{display:flex; align-items:center; justify-content:flex-end; gap:18px; margin-top:clamp(6px,1.4vh,16px);}
+  .feedback-link{background:none; border:none; color:var(--brand); font-weight:700; font-size:14px; cursor:pointer; font-family:'Poppins',sans-serif;}
+
+  /* ---------- Completion ---------- */
+  .completion{display:none; flex-direction:column; align-items:center; text-align:center; gap:10px; padding:48px 20px;}
+  .completion.show{display:flex;}
+  .completion .check{width:56px;height:56px;border-radius:50%; background:var(--success-soft); color:var(--success); display:flex;align-items:center;justify-content:center; margin-bottom:6px;}
+  .completion .check svg{width:28px;height:28px;}
+  .completion h2{margin:0; font-size:22px; color:var(--text);}
+  .completion p{margin:0 0 6px; color:var(--text-muted); max-width:380px;}
+
+  /* ---------- Result ---------- */
+  .result-head{display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap; margin-bottom:clamp(8px,1.6vh,14px);}
+  .result-head h2{margin:0; font-size:clamp(20px,3.4vh,30px); color:var(--heading);}
+  .result-sub{flex:1 1 220px; margin:0; font-size:12.5px; color:var(--text-muted);}
+  .total{display:inline-flex; align-items:baseline; gap:6px; padding:6px 16px; border-radius:16px; background:var(--examiner-bg);}
+  .total b{font:700 clamp(22px,3.6vh,30px) 'Poppins',sans-serif; color:var(--brand-dark);}
+  .total span{font-weight:600; font-size:13px; color:var(--text-muted);}
+  .result-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(8px,1.6vh,14px);}
+  .criterion{border:1px solid var(--bubble-border); border-radius:16px; padding:clamp(10px,1.8vh,16px) 16px; background:#fff;}
+  .criterion-head{display:flex; align-items:center; gap:10px;}
+  .criterion-head h3{margin:0; font-size:16px; flex:1 1 auto;}
+  .level-pill{font:700 12px/1.6 'Poppins',sans-serif; padding:1px 10px; border-radius:999px; background:var(--examiner-bg); color:var(--brand-dark);}
+  .mark{font:700 16px 'Poppins',sans-serif; color:var(--text);}
+  .mark small{font-size:12px; font-weight:600; color:var(--text-faint);}
+  .meter{display:grid; grid-template-columns:repeat(10,1fr); gap:3px; margin:8px 0 10px;}
+  .meter span{height:6px; border-radius:3px; background:var(--progress-track);}
+  .meter span.on{background:var(--brand-light);}
+  .criterion ul{margin:0; padding-left:16px; font-size:12.5px; line-height:1.5; color:var(--text-muted);}
+  .result-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:clamp(8px,1.6vh,14px);}
+  .result-foot p{margin:0; font-size:12px; color:var(--text-faint);}
+
+  /* ---------- Modals ---------- */
+  .overlay{position:fixed; inset:0; background:rgba(18,38,63,.55); display:none; align-items:center; justify-content:center; z-index:20; padding:20px;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--card-bg); border-radius:18px; box-shadow:var(--shadow-modal); width:100%; overflow:hidden; display:flex; flex-direction:column; max-height:92vh;}
+  .modal-sm{max-width:340px; padding:26px 28px; text-align:center;}
+  .modal-sm h3{margin:0 0 8px; font-size:17px; color:var(--text);}
+  .modal-sm p{margin:0 0 20px; font-size:13px; color:var(--text-muted);}
+  .modal-actions{display:flex; gap:10px;}
+  .modal-actions .btn{flex:1 1 0;}
+
+  .modal-instruction{max-width:620px;}
+  .modal-head{flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--examiner-bg); padding:18px 28px; font-family:'Poppins',sans-serif; font-size:22px; font-weight:700; color:var(--text);}
+  .modal-body{padding:20px 28px 26px; overflow:auto;}
+  .modal-body ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px;}
+  .modal-body li{font-size:14.5px; color:var(--text);}
+  .tag{display:inline-flex; align-items:center; background:var(--brand); color:#fff; font:700 13px 'Poppins',sans-serif; padding:4px 12px; border-radius:16px;}
+  .tag.red{background:var(--end-red);}
+  .structure{list-style:none; margin:10px 0 0; padding:0; display:grid; gap:6px;}
+  .structure li{display:flex; align-items:center; gap:10px; padding:7px 12px; background:var(--student-bg); border-radius:12px; font-size:13.5px;}
+  .structure .name{flex:1 1 auto; font-weight:700;}
+  .structure .dur{color:var(--text-muted); white-space:nowrap;}
+  .modal-body .note{margin:12px 0 0; font-size:13px; color:var(--text-muted);}
+  .modal-body .btn-block{width:100%; margin-top:18px; font-size:16px; padding:12px;}
+
+  .modal-rubric{max-width:1040px;}
+  .icon-close{appearance:none; border:none; background:none; cursor:pointer; font-size:26px; line-height:1; color:var(--text-muted); padding:0 4px;}
+  .rubric-wrap{overflow:auto;}
+  .rubric-table{width:100%; border-collapse:separate; border-spacing:0; min-width:780px;}
+  .rubric-table th, .rubric-table td{border-bottom:1px solid var(--bubble-border); border-right:1px solid var(--bubble-border); padding:8px 10px; vertical-align:top; font-size:12px; line-height:1.45; text-align:left;}
+  .rubric-table th{position:sticky; top:0; background:var(--student-bg); font:700 12.5px 'Poppins',sans-serif; z-index:1;}
+  .rubric-table tr > *:last-child{border-right:none;}
+  .rubric-table .lvl{font:700 16px 'Poppins',sans-serif; text-align:center; width:56px;}
+  .rubric-table .mk{font:700 12.5px 'Poppins',sans-serif; text-align:center; width:64px; white-space:nowrap;}
+  .rubric-table ul{margin:0; padding-left:15px;}
+  .rubric-table td.is-awarded{background:var(--examiner-bg); box-shadow:inset 0 0 0 2px var(--brand);}
+  .rubric-legend{margin:0; padding:10px 28px; font-size:12px; color:var(--text-muted); border-top:1px solid var(--bubble-border);}
+
+  /* ---------- Prototype-only tools (not part of the product UI) ---------- */
+  .proto{position:fixed; left:16px; bottom:16px; z-index:15; font-family:'Montserrat',sans-serif;}
+  .proto-toggle{appearance:none; border:none; cursor:pointer; background:var(--text); color:#fff; font:600 12px 'Poppins',sans-serif; padding:7px 14px; border-radius:999px; opacity:.85;}
+  .proto-toggle:hover{opacity:1;}
+  .proto-panel{position:absolute; left:0; bottom:calc(100% + 8px); width:300px; background:#fff; border-radius:14px; box-shadow:var(--shadow-modal); padding:12px 14px 14px;}
+  .proto-title{margin:10px 0 6px; font:700 11px 'Poppins',sans-serif; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint);}
+  .proto-title:first-child{margin-top:0;}
+  .proto-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .proto-row button{appearance:none; cursor:pointer; border:1px solid var(--bubble-border); background:#fff; color:var(--text); font:600 12px 'Poppins',sans-serif; padding:4px 10px; border-radius:999px;}
+  .proto-row button:hover{border-color:var(--brand);}
+  .proto-row button.on{background:var(--brand); border-color:var(--brand); color:#fff;}
+  .proto-log{list-style:none; margin:0; padding:0; max-height:132px; overflow:auto; font-size:11.5px; line-height:1.4; color:var(--text-muted);}
+  .proto-log li{padding:3px 0; border-bottom:1px dashed var(--bubble-border);}
+  .proto-log li:empty{display:none;}
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translate(-50%, 12px);
+    background:var(--text); color:#fff; padding:10px 18px; border-radius:999px;
+    font-size:13px; font-weight:600; box-shadow:var(--shadow-modal);
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; z-index:30;
+  }
+  .toast.show{opacity:1; transform:translate(-50%, 0);}
+
+  @media (max-width:860px){
+    .split-layout{grid-template-columns:1fr;}
+    .card-pane{min-height:0; max-height:260px;}
+    .result-grid{grid-template-columns:1fr;}
+  }
+  @media (max-width:760px){
+    .bubble{flex-direction:column; padding:24px; text-align:center; border-radius:32px; min-height:0; gap:14px;}
+    .examiner-bubble.is-long{border-radius:32px;}
+    .bubble-copy{padding:0;}
+    .examiner-bubble .avatar, .student-bubble .avatar, .examiner-bubble .bubble-copy, .student-bubble .bubble-copy{order:0;}
+    .avatar{width:96px;height:96px;}
+  }
+  @media (max-width:640px){
+    .topbar{justify-content:center;}
+    .topbar h1{font-size:16px; min-width:100%; order:-1;}
+    .stage-name{font-size:10px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="topbar">
+    <h1>IGCSE Oral: Speaking test</h1>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" id="btnSetting" type="button">Setting</button>
+      <button class="btn btn-primary" id="btnSaveExit" type="button">Save &amp; Exit</button>
+      <button class="btn btn-primary" id="btnSubmit" type="button">Submit Quiz</button>
+    </div>
+  </header>
+
+  <div class="progress-row">
+    <span class="label">Progress</span>
+    <div class="stages" id="stages"></div>
+    <button class="timer-chip" id="timerChip" type="button" aria-label="Toggle timer">
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </span>
+      <span class="value" id="timerValue">-</span>
+    </button>
+  </div>
+
+  <main class="quiz-body">
+
+    <div class="card" id="testCard">
+      <div class="section-head">
+        <h2 id="stageTitle">Warm-up</h2>
+        <div class="stage-meta" id="stageMeta"></div>
+        <button class="instructions-link" id="btnInstructions" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>
+          See Instruction
+        </button>
+      </div>
+
+      <div class="split-layout no-card" id="splitLayout">
+        <aside class="card-pane is-locked" id="cardPane" aria-label="Speaking Assessment card">
+          <div class="pane-label">Card</div>
+          <div class="card-paper" id="cardPaper" aria-hidden="true"></div>
+        </aside>
+
+        <div class="main-pane">
+          <div class="conversation">
+            <div class="bubble examiner-bubble" id="examinerBubble">
+              <div class="avatar" id="examinerAvatar">
+                <img class="idle" src="assets/examiner-idle.png" alt="">
+                <img class="active" src="assets/examiner-active.png" alt="">
+              </div>
+              <div class="bubble-copy">
+                <p class="examiner-line is-loading" id="examinerLine" aria-live="polite"><span id="examinerText">Loading examiner audio&hellip;</span><span class="bars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></p>
+              </div>
+            </div>
+
+            <div class="bubble student-bubble" id="studentBubble" data-phase="waiting">
+              <div class="bubble-copy">
+                <p class="student-line" id="studentLine">Waiting for the examiner&hellip;</p>
+                <div class="countdown-number" id="countdownNumber">3</div>
+                <div class="prep-timer" id="prepTimer">1:00</div>
+                <p class="prep-note">Written notes are not allowed.</p>
+                <button class="btn btn-light btn-skip" id="btnSkipPrep" type="button">I&rsquo;m ready</button>
+                <div class="record-row">
+                  <span class="record-time" id="recordTime">0:00</span>
+                  <button class="btn btn-red" id="btnEnd" type="button">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+                    End
+                  </button>
+                </div>
+              </div>
+              <div class="avatar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <p class="hint-note" id="hintNote">Note: Your audio answer must not exceed 1 minute.</p>
+
+      <div class="completion" id="completion">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <h2 id="completionTitle">All parts complete</h2>
+        <p id="completionText">You&rsquo;ve finished all parts of the speaking test. Submit when you&rsquo;re ready.</p>
+        <button class="btn btn-primary" id="btnViewResult" type="button" hidden>View result</button>
+      </div>
+
+      <div class="card-footer">
+        <button class="feedback-link" id="btnFeedback" type="button">Send Feedback</button>
+      </div>
+    </div>
+
+    <section class="card" id="results" hidden aria-labelledby="resultTitle">
+      <div class="result-head">
+        <h2 id="resultTitle">Speaking result</h2>
+        <p class="result-sub">Based on Part 1, Part 2 and Part 3 together. The warm-up is not assessed.</p>
+        <div class="total"><b id="totalMark">0</b><span>/ 40</span></div>
+      </div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div class="result-foot">
+        <p>Sample scores for this prototype &mdash; no audio is analysed.</p>
+        <button class="btn btn-outline" id="btnRubric" type="button">View marking criteria</button>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<div class="overlay" id="instructionOverlay" role="dialog" aria-modal="true" aria-labelledby="instructionHead">
+  <div class="modal modal-instruction">
+    <div class="modal-head" id="instructionHead">Speaking test instruction</div>
+    <div class="modal-body">
+      <ol>
+        <li>Press <span class="tag">Ready</span> to begin your conversation with the examiner.
+          <ul class="structure" id="structureList"></ul>
+        </li>
+        <li>After each question, recording starts automatically after a short pause. Press <span class="tag red">End</span> once you&rsquo;ve finished your answer.</li>
+        <li>In Part 2 you are given a card and up to 1 minute to prepare. Written notes are not allowed.</li>
+      </ol>
+      <p class="note"><strong>Note:</strong> Your audio answer must not exceed 1 minute (2 minutes for the short talk).</p>
+      <button class="btn btn-primary btn-block" id="btnReady" type="button">Ready</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="submitOverlay" role="dialog" aria-modal="true" aria-labelledby="submitTitle">
+  <div class="modal modal-sm">
+    <h3 id="submitTitle">Submit quiz?</h3>
+    <p id="submitProgressText">You have completed 0 of 4 parts.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="btnCancelSubmit" type="button">Cancel</button>
+      <button class="btn btn-primary" id="btnConfirmSubmit" type="button">Submit</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="rubricOverlay" role="dialog" aria-modal="true" aria-labelledby="rubricHead">
+  <div class="modal modal-rubric">
+    <div class="modal-head"><span id="rubricHead">Marking criteria</span><button class="icon-close" id="btnCloseRubric" type="button" aria-label="Close">&times;</button></div>
+    <div class="rubric-wrap" id="rubricWrap"></div>
+    <p class="rubric-legend">Applied to all three assessed parts together, giving one overall mark for each criterion. Highlighted cells show the level awarded in the sample result.</p>
+  </div>
+</div>
+
+<div class="proto" id="proto">
+  <button class="proto-toggle" id="protoToggle" type="button" aria-expanded="false">Prototype</button>
+  <div class="proto-panel" id="protoPanel" hidden>
+    <div class="proto-title">Jump to</div>
+    <div class="proto-row" id="protoJump"></div>
+    <div class="proto-title">Simulated answer length</div>
+    <div class="proto-row" id="protoLength"></div>
+    <div class="proto-title">Examiner decisions</div>
+    <ol class="proto-log" id="protoLog"></ol>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Test content (scripts, questions and card from the requirements doc) ----------
+  const STAGES = [
+    {
+      id: 'warmup', label: 'Warm-up', title: 'Warm-up', assessed: false, duration: '1–2 min',
+      questions: [
+        { text: 'What kind of films do you enjoy watching?' },
+        { text: 'What did you do during your last holiday?' },
+        { text: 'What subject do you most enjoy at school?' },
+      ],
+    },
+    {
+      id: 'part1', label: 'Part 1', title: 'Part 1: Interview', assessed: true, duration: '2–3 min',
+      topic: 'Recycling and repairing',
+      intro: 'The first assessed part of the test is an interview. I am going to ask you some questions about recycling and repairing. Try to say as much as you can for each question. Before we start, do you have any questions?',
+      questions: [
+        { text: 'What things do people recycle, and why?',
+          focus: { more: 'what people recycle', why: 'people recycle those things', examples: 'things people recycle' } },
+        { text: 'Can you tell me about a time when you, or someone you know, repaired something?',
+          focus: { more: 'what was repaired', why: 'it was repaired instead of replaced', examples: 'things that people repair' } },
+        { text: 'Do you think that we should stop buying new things to protect the environment? Why? Why not?',
+          focus: { more: 'buying new things', why: 'you think that', examples: 'ways to protect the environment' } },
+      ],
+    },
+    {
+      id: 'part2', label: 'Part 2', title: 'Part 2: Short talk', assessed: true, duration: '3–4 min',
+      prepSeconds: 60, talkSeconds: 120,
+      script: 'The second assessed part of the test is a short talk. I will give you a card and you will have one minute to read it and think about what you want to say. You should talk about the points on the card. You can’t make any written notes, but you can ask me if there is anything you do not understand. You may keep the card until the end of the short talk. Here is your card.',
+      start: 'You now have up to two minutes to talk about the topic on the card. I will stop you after two minutes, but do not worry if you have not finished your talk. Would you like to start?',
+      card: {
+        title: 'Party food',
+        intro: 'You are having a party at your home and organising the food for it. You are considering the following options:',
+        options: ['asking your guests to bring their favourite food', 'ordering from a fast food restaurant.'],
+        task: 'Talk about the advantages and disadvantages of each option. Say which option you would prefer, and why.',
+      },
+    },
+    {
+      id: 'part3', label: 'Part 3', title: 'Part 3: Discussion', assessed: true, duration: '3–4 min',
+      intro: 'Now I am going to ask you a few questions related to the topic you have just talked about. This part of the test will last approximately three minutes. Before we start, do you have any questions?',
+      questions: [
+        { text: 'Do you think that young people enjoy cooking?',
+          focus: { more: 'young people and cooking', why: 'you think that', examples: 'foods young people like to cook' } },
+        { text: 'Some people say that healthy food is not very tasty. Do you agree?',
+          focus: { more: 'healthy food', why: 'you think that', examples: 'healthy food that tastes good' } },
+        { text: 'Is it easier to plan a party by yourself or with a group of people?',
+          focus: { more: 'planning a party', why: 'you think that', examples: 'things you would need to plan' } },
+        { text: 'Some people think that a party must have music. What do you think?',
+          focus: { more: 'music at parties', why: 'you think that', examples: 'music you would choose' } },
+      ],
+    },
+  ];
+
+  // Follow-up prompts for Parts 1 and 3 (lead-ins are the doc's; the blanks are filled per question)
+  const FOLLOW_UPS = [
+    (f) => `Can you tell me more about ${f.more}?`,
+    (f) => `Can you tell me why ${f.why}?`,
+    () => 'Can you explain what you mean by that?',
+    (f) => `Can you give me any examples of ${f.examples}?`,
+  ];
+
+  const CRITERIA = ['Grammar', 'Vocabulary', 'Development', 'Pronunciation'];
+  const LEVELS = [
+    { level: 5, marks: '9–10', text: {
+      Grammar: ['a range of simple and complex structures used', 'structures are used mostly accurately; errors are rare and do not impede understanding'],
+      Vocabulary: ['a wide range of vocabulary used precisely to discuss a variety of ideas, facts and opinions'],
+      Development: ['responses are relevant and consistently well developed', 'communication is maintained with ease'],
+      Pronunciation: ['pronunciation is clear', 'intonation is frequently used effectively to convey intended meaning'] } },
+    { level: 4, marks: '7–8', text: {
+      Grammar: ['a range of simple structures used; complex structures are attempted', 'simple structures used mostly accurately; errors often occur when attempting to use more complex structures but these do not impede understanding'],
+      Vocabulary: ['a sufficient range of vocabulary used appropriately to discuss a variety of ideas, facts and opinions'],
+      Development: ['responses are relevant and mostly developed', 'communication is maintained with occasional support'],
+      Pronunciation: ['pronunciation is mostly clear; inaccuracies do not impede communication', 'intonation is sometimes used effectively to convey intended meaning'] } },
+    { level: 3, marks: '5–6', text: {
+      Grammar: ['a range of simple structures used; complex structures occasionally attempted', 'simple structures may not be used accurately; errors may impede understanding'],
+      Vocabulary: ['a range of vocabulary used mostly appropriately to discuss simple ideas, facts and opinions'],
+      Development: ['responses are relevant with attempts at development', 'communication is maintained but with frequent support'],
+      Pronunciation: ['pronunciation is mostly clear; inaccuracies occasionally impede communication', 'intonation is rarely used effectively to convey intended meaning'] } },
+    { level: 2, marks: '3–4', text: {
+      Grammar: ['a limited range of only simple structures used', 'structures rarely used accurately; errors frequently impede understanding'],
+      Vocabulary: ['a limited range of vocabulary used to discuss basic facts and opinions'],
+      Development: ['responses are mostly relevant but limited', 'communication may not always be maintained even with frequent support'],
+      Pronunciation: ['pronunciation is frequently unclear; inaccuracies often impede communication', 'intonation is not used effectively to convey intended meaning'] } },
+    { level: 1, marks: '1–2', text: {
+      Grammar: ['response limited to widely spaced single words or short phrases'],
+      Vocabulary: ['insufficient vocabulary to convey the most basic facts and opinions'],
+      Development: ['responses are brief and infrequent', 'communication is not achieved even with frequent support'],
+      Pronunciation: ['pronunciation is unclear and impedes communication', 'intonation is not a feature'] } },
+    { level: 0, marks: '0', text: {
+      Grammar: ['No creditable response.'], Vocabulary: ['No creditable response.'],
+      Development: ['No creditable response.'], Pronunciation: ['No creditable response.'] } },
+  ];
+  const SAMPLE_RESULT = {
+    Grammar: { level: 4, mark: 7 },
+    Vocabulary: { level: 4, mark: 8 },
+    Development: { level: 3, mark: 6 },
+    Pronunciation: { level: 4, mark: 7 },
+  };
+
+  // ---------- Prototype timings ----------
+  const LOADING_MS = 600;
+  const PREP_SECONDS = 3;      // pause before recording starts automatically
+  const CAPTURED_MS = 700;
+  const ANSWER_LIMIT = 60;
+  const BRIEF_BELOW = 4;       // seconds: "very little to say"
+  const LONG_FROM = 15;        // seconds: "responds at length"
+
+  const $ = (id) => document.getElementById(id);
+  const els = {};
+  ['stages','timerChip','timerValue','stageTitle','stageMeta','splitLayout','cardPane','cardPaper',
+   'examinerBubble','examinerAvatar','examinerLine','examinerText','studentBubble','studentLine',
+   'countdownNumber','prepTimer','btnSkipPrep','recordTime','btnEnd','hintNote','completion',
+   'completionTitle','completionText','btnViewResult','testCard','results','resultGrid','totalMark',
+   'btnRubric','rubricOverlay','rubricWrap','btnCloseRubric','instructionOverlay','structureList','btnReady',
+   'btnInstructions','submitOverlay','submitProgressText','btnCancelSubmit','btnConfirmSubmit',
+   'btnSetting','btnSaveExit','btnSubmit','btnFeedback','proto','protoToggle','protoPanel',
+   'protoJump','protoLength','protoLog','toast'].forEach((id) => { els[id] = $(id); });
+
+  class Cancelled extends Error {}
+
+  let session = 0;             // bumped to cancel whatever the examiner flow is doing
+  const timers = new Set();
+  let endHandler = null;
+  let skipHandler = null;
+  let simulate = 'auto';
+  let followUpCursor = 0;
+  let completedParts = 0;
+  let currentStage = -1;
+  let testStarted = false;
+
+  // ---------- Small helpers ----------
+  const fmt = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+
+  function el(tag, cls, text) {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function showToast(msg) {
+    els.toast.textContent = msg;
+    els.toast.classList.add('show');
+    clearTimeout(showToast.t);
+    showToast.t = setTimeout(() => els.toast.classList.remove('show'), 2200);
+  }
+
+  function pause(token, ms) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => (token === session ? resolve() : reject(new Cancelled())), ms);
+    });
+  }
+
+  function cancelRun() {
+    session++;
+    timers.forEach(clearInterval);
+    timers.clear();
+    endHandler = null;
+    skipHandler = null;
+  }
+
+  function log(msg) {
+    const li = el('li', '', msg);
+    els.protoLog.appendChild(li);
+    els.protoLog.scrollTop = els.protoLog.scrollHeight;
+  }
+
+  // ---------- Progress stepper ----------
+  const stageFills = [];
+  const stageEls = [];
+  STAGES.forEach((stage) => {
+    const wrap = el('div', 'stage');
+    wrap.title = stage.label + (stage.assessed ? '' : ' (not assessed)');
+    wrap.appendChild(el('span', 'stage-name', stage.label));
+    const seg = el('div', 'segment');
+    const fill = el('div', 'segment-fill');
+    seg.appendChild(fill);
+    wrap.appendChild(seg);
+    els.stages.appendChild(wrap);
+    stageFills.push(fill);
+    stageEls.push(wrap);
+  });
+
+  function setStageProgress(i, fraction) {
+    stageFills[i].style.width = Math.round(Math.min(1, fraction) * 100) + '%';
+  }
+
+  function setCurrentStage(i) {
+    stageEls.forEach((node, k) => node.classList.toggle('is-current', k === i));
+  }
+
+  // ---------- Stage header ----------
+  function renderStageHeader(stage) {
+    els.stageMeta.textContent = '';
+    if (!stage) { els.stageTitle.textContent = 'Speaking test'; return; }
+    els.stageTitle.textContent = stage.title;
+    els.stageMeta.appendChild(el('span', 'chip' + (stage.assessed ? ' assessed' : ''), stage.assessed ? 'Assessed' : 'Not assessed'));
+    els.stageMeta.appendChild(el('span', 'chip time', stage.duration));
+    if (stage.topic) els.stageMeta.appendChild(el('span', 'chip topic', stage.topic));
+  }
+
+  // ---------- Card (Part 2) ----------
+  function buildCard(card) {
+    els.cardPaper.textContent = '';
+    els.cardPaper.appendChild(el('h3', '', card.title));
+    els.cardPaper.appendChild(el('p', '', card.intro));
+    const ul = el('ul');
+    card.options.forEach((o) => ul.appendChild(el('li', '', o)));
+    els.cardPaper.appendChild(ul);
+    els.cardPaper.appendChild(el('p', 'task', card.task));
+  }
+
+  function setCardVisible(visible) {
+    els.splitLayout.classList.toggle('no-card', !visible);
+  }
+
+  function setCardLocked(locked) {
+    els.cardPane.classList.toggle('is-locked', locked);
+    els.cardPaper.setAttribute('aria-hidden', String(locked));
+  }
+
+  // ---------- Conversation UI ----------
+  function setStudentPhase(phase, label) {
+    els.studentBubble.dataset.phase = phase;
+    els.studentLine.textContent = label;
+  }
+
+  const splitSentences = (text) => text.match(/[^.?!]+[.?!]+["”’']*\s*/g) || [text];
+
+  async function examinerSpeaks(token, text, { onLastSentence } = {}) {
+    const long = text.length > 150;
+    setStudentPhase('waiting', 'Waiting for the examiner…');
+    els.examinerBubble.classList.remove('is-speaking');
+    els.examinerBubble.classList.toggle('is-long', long);
+    els.examinerLine.classList.remove('is-long');
+    els.examinerLine.classList.add('is-loading');
+    els.examinerText.textContent = 'Loading examiner audio…';
+    await pause(token, LOADING_MS);
+
+    els.examinerLine.classList.remove('is-loading');
+    els.examinerLine.classList.toggle('is-long', long);
+    els.examinerText.textContent = '';
+    els.examinerBubble.classList.add('is-speaking');
+    els.examinerAvatar.classList.add('is-active');
+
+    const parts = long ? splitSentences(text) : [text];
+    for (let i = 0; i < parts.length; i++) {
+      if (i === parts.length - 1 && onLastSentence) onLastSentence();
+      const span = el('span', 'said', parts[i] + ' ');
+      els.examinerText.appendChild(span);
+      await pause(token, Math.min(3000, Math.max(1100, parts[i].length * 24)));
+    }
+    els.examinerBubble.classList.remove('is-speaking');
+    els.examinerAvatar.classList.remove('is-active');
+  }
+
+  async function countdown(token) {
+    setStudentPhase('countdown', 'Get ready — recording starts in');
+    for (let n = PREP_SECONDS; n > 0; n--) {
+      els.countdownNumber.textContent = n;
+      await pause(token, 1000);
+    }
+  }
+
+  function record(token, limit) {
+    return new Promise((resolve, reject) => {
+      setStudentPhase('recording', 'Recording your answer…');
+      let seconds = 0;
+      const paint = () => { els.recordTime.textContent = fmt(seconds) + (limit > ANSWER_LIMIT ? ' / ' + fmt(limit) : ''); };
+      paint();
+      const id = setInterval(() => { seconds++; paint(); if (seconds >= limit) done(); }, 1000);
+      timers.add(id);
+      function done() {
+        clearInterval(id);
+        timers.delete(id);
+        endHandler = null;
+        if (token === session) resolve(seconds); else reject(new Cancelled());
+      }
+      endHandler = done;
+    });
+  }
+
+  function prepare(token, seconds) {
+    return new Promise((resolve, reject) => {
+      setStudentPhase('prep', 'Preparation time');
+      let left = seconds;
+      els.prepTimer.textContent = fmt(left);
+      const id = setInterval(() => { left--; els.prepTimer.textContent = fmt(left); if (left <= 0) done(); }, 1000);
+      timers.add(id);
+      function done() {
+        clearInterval(id);
+        timers.delete(id);
+        skipHandler = null;
+        if (token === session) resolve(); else reject(new Cancelled());
+      }
+      skipHandler = done;
+    });
+  }
+
+  // One examiner turn: examiner speaks, short pause, candidate answers.
+  async function turn(token, text, limit = ANSWER_LIMIT) {
+    await examinerSpeaks(token, text);
+    await countdown(token);
+    const seconds = await record(token, limit);
+    setStudentPhase('captured', 'Answer captured ✓');
+    await pause(token, CAPTURED_MS);
+    return seconds;
+  }
+
+  // ---------- Examiner rules for Parts 1 and 3 ----------
+  function classify(seconds) {
+    if (simulate !== 'auto') return simulate;
+    if (seconds < BRIEF_BELOW) return 'brief';
+    return seconds >= LONG_FROM ? 'long' : 'adequate';
+  }
+
+  function nextFollowUp(question) {
+    const text = FOLLOW_UPS[followUpCursor % FOLLOW_UPS.length](question.focus);
+    followUpCursor++;
+    return text;
+  }
+
+  // Ask the question; unless the candidate already answered at length, use one
+  // follow-up prompt to draw out more, then move on either way.
+  async function askWithPrompt(token, question, tag) {
+    const first = await turn(token, question.text);
+    const kind = classify(first);
+    const measured = `${first}s${simulate !== 'auto' ? ', simulated' : ''}`;
+    if (kind === 'long') {
+      log(`${tag} · ${measured} · answered at length → no prompt needed`);
+      return { long: true };
+    }
+    log(`${tag} · ${measured} · ${kind === 'brief' ? 'very little to say' : 'could be developed'} → follow-up prompt`);
+    const second = await turn(token, nextFollowUp(question));
+    const after = classify(second);
+    log(`${tag} · after prompt · ${after === 'brief' ? 'very little again → moving on' : 'developed → moving on'}`);
+    return { long: false };
+  }
+
+  // ---------- Stage runners ----------
+  async function runWarmup(token, stage, i) {
+    for (let n = 0; n < stage.questions.length; n++) {
+      await turn(token, stage.questions[n].text);
+      setStageProgress(i, (n + 1) / stage.questions.length);
+    }
+  }
+
+  async function runInterview(token, stage, i) {
+    const total = stage.questions.length + 1;
+    await turn(token, stage.intro);
+    setStageProgress(i, 1 / total);
+    for (let n = 0; n < stage.questions.length; n++) {
+      await askWithPrompt(token, stage.questions[n], `${stage.label} · Q${n + 1}`);
+      setStageProgress(i, (n + 2) / total);
+    }
+  }
+
+  async function runShortTalk(token, stage, i) {
+    setCardVisible(true);
+    setCardLocked(true);
+    await examinerSpeaks(token, stage.script, { onLastSentence: () => setCardLocked(false) });
+    setStageProgress(i, 0.3);
+    log('Part 2 · card handed over → up to 1 min preparation, no written notes');
+    await prepare(token, stage.prepSeconds);
+    setStageProgress(i, 0.5);
+    await examinerSpeaks(token, stage.start);
+    await countdown(token);
+    const seconds = await record(token, stage.talkSeconds);
+    log(`Part 2 · talk ${fmt(seconds)} (stops at ${fmt(stage.talkSeconds)})`);
+    setStudentPhase('captured', 'Answer captured ✓');
+    await pause(token, CAPTURED_MS);
+  }
+
+  async function runDiscussion(token, stage, i) {
+    // "may not be necessary to use all the questions" if the candidate speaks at length:
+    // each long answer makes one remaining question unnecessary (at least two are asked).
+    let planned = stage.questions.length;
+    let longAnswers = 0;
+    await turn(token, stage.intro);
+    setStageProgress(i, 0.1);
+    for (let n = 0; n < planned; n++) {
+      const res = await askWithPrompt(token, stage.questions[n], `${stage.label} · Q${n + 1}`);
+      if (res.long) {
+        longAnswers++;
+        const reduced = Math.max(2, stage.questions.length - longAnswers);
+        if (reduced < planned) {
+          planned = reduced;
+          log('Part 3 · at length → one question no longer needed');
+        }
+      }
+      setStageProgress(i, 0.1 + 0.9 * ((n + 1) / planned));
+    }
+  }
+
+  const RUNNERS = { warmup: runWarmup, part1: runInterview, part2: runShortTalk, part3: runDiscussion };
+
+  function enterStage(i) {
+    const stage = STAGES[i];
+    currentStage = i;
+    setCurrentStage(i);
+    renderStageHeader(stage);
+    setCardVisible(false);
+    els.hintNote.textContent = stage.id === 'part2'
+      ? 'Note: Your audio answer must not exceed 2 minutes.'
+      : 'Note: Your audio answer must not exceed 1 minute.';
+    log(`${stage.label} — ${stage.assessed ? 'assessed' : 'not assessed'}`);
+  }
+
+  function resetConversation() {
+    els.examinerBubble.classList.remove('is-speaking', 'is-long');
+    els.examinerAvatar.classList.remove('is-active');
+    els.examinerLine.classList.remove('is-long');
+    els.examinerLine.classList.add('is-loading');
+    els.examinerText.textContent = 'Loading examiner audio…';
+    setStudentPhase('waiting', 'Waiting for the examiner…');
+    els.completion.classList.remove('show');
+    els.splitLayout.hidden = false;
+    els.hintNote.hidden = false;
+    els.testCard.hidden = false;
+    els.results.hidden = true;
+    setCardVisible(false);
+  }
+
+  async function runTest(startIndex) {
+    cancelRun();
+    const token = session;
+    resetConversation();
+    els.protoLog.textContent = '';
+    followUpCursor = 0;
+    completedParts = startIndex;
+    stageFills.forEach((f, k) => setStageProgress(k, k < startIndex ? 1 : 0));
+    testStarted = true;
+    try {
+      for (let i = startIndex; i < STAGES.length; i++) {
+        enterStage(i);
+        await RUNNERS[STAGES[i].id](token, STAGES[i], i);
+        setStageProgress(i, 1);
+        completedParts = i + 1;
+      }
+      showCompletion(false);
+    } catch (err) {
+      if (!(err instanceof Cancelled)) throw err;
+    }
+  }
+
+  function showCompletion(submitted) {
+    cancelRun();
+    setCurrentStage(-1);
+    renderStageHeader(null);
+    els.splitLayout.hidden = true;
+    els.hintNote.hidden = true;
+    els.completionTitle.textContent = submitted ? 'Quiz submitted' : 'All parts complete';
+    els.completionText.textContent = submitted
+      ? 'Thanks — your responses have been recorded.'
+      : 'You’ve finished all parts of the speaking test. Submit when you’re ready.';
+    els.btnViewResult.hidden = !submitted;
+    els.completion.classList.add('show');
+  }
+
+  // ---------- Result ----------
+  function renderResults() {
+    els.resultGrid.textContent = '';
+    let total = 0;
+    CRITERIA.forEach((name) => {
+      const r = SAMPLE_RESULT[name];
+      total += r.mark;
+      const card = el('div', 'criterion');
+      const head = el('div', 'criterion-head');
+      head.appendChild(el('h3', '', name));
+      head.appendChild(el('span', 'level-pill', 'Level ' + r.level));
+      const mark = el('span', 'mark', String(r.mark));
+      mark.appendChild(el('small', '', ' /10'));
+      head.appendChild(mark);
+      card.appendChild(head);
+      const meter = el('div', 'meter');
+      for (let n = 1; n <= 10; n++) meter.appendChild(el('span', n <= r.mark ? 'on' : ''));
+      card.appendChild(meter);
+      const ul = el('ul');
+      LEVELS.find((l) => l.level === r.level).text[name].forEach((t) => ul.appendChild(el('li', '', t)));
+      card.appendChild(ul);
+      els.resultGrid.appendChild(card);
+    });
+    els.totalMark.textContent = String(total);
+  }
+
+  function buildRubric() {
+    const table = el('table', 'rubric-table');
+    const head = el('tr');
+    ['Level', ...CRITERIA, 'Marks'].forEach((h) => head.appendChild(el('th', '', h)));
+    const thead = el('thead');
+    thead.appendChild(head);
+    table.appendChild(thead);
+    const tbody = el('tbody');
+    LEVELS.forEach((row) => {
+      const tr = el('tr');
+      tr.appendChild(el('td', 'lvl', String(row.level)));
+      CRITERIA.forEach((name) => {
+        const td = el('td', SAMPLE_RESULT[name].level === row.level ? 'is-awarded' : '');
+        const items = row.text[name];
+        if (items.length === 1 && row.level === 0) {
+          td.textContent = items[0];
+        } else {
+          const ul = el('ul');
+          items.forEach((t) => ul.appendChild(el('li', '', t)));
+          td.appendChild(ul);
+        }
+        tr.appendChild(td);
+      });
+      tr.appendChild(el('td', 'mk', row.marks));
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    els.rubricWrap.appendChild(table);
+  }
+
+  function showResults() {
+    cancelRun();
+    setCurrentStage(-1);
+    stageFills.forEach((_, k) => setStageProgress(k, 1));
+    els.testCard.hidden = true;
+    els.results.hidden = false;
+    renderResults();
+  }
+
+  // ---------- Overlays ----------
+  function openInstructions(atStart) {
+    els.btnReady.textContent = atStart ? 'Ready' : 'Close';
+    els.btnReady.dataset.start = atStart ? 'yes' : 'no';
+    els.instructionOverlay.classList.add('open');
+  }
+
+  els.btnReady.addEventListener('click', () => {
+    els.instructionOverlay.classList.remove('open');
+    if (els.btnReady.dataset.start === 'yes') runTest(0);
+  });
+  els.btnInstructions.addEventListener('click', () => openInstructions(!testStarted));
+
+  els.btnSubmit.addEventListener('click', () => {
+    els.submitProgressText.textContent = `You have completed ${completedParts} of ${STAGES.length} parts.`;
+    els.submitOverlay.classList.add('open');
+  });
+  els.btnCancelSubmit.addEventListener('click', () => els.submitOverlay.classList.remove('open'));
+  els.btnConfirmSubmit.addEventListener('click', () => {
+    els.submitOverlay.classList.remove('open');
+    els.results.hidden = true;
+    els.testCard.hidden = false;
+    showCompletion(true);
+    showToast('Quiz submitted');
+  });
+  els.btnViewResult.addEventListener('click', showResults);
+
+  els.btnRubric.addEventListener('click', () => els.rubricOverlay.classList.add('open'));
+  els.btnCloseRubric.addEventListener('click', () => els.rubricOverlay.classList.remove('open'));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      els.rubricOverlay.classList.remove('open');
+      els.submitOverlay.classList.remove('open');
+    }
+  });
+
+  // ---------- Candidate controls ----------
+  els.btnEnd.addEventListener('click', () => { if (endHandler) endHandler(); });
+  els.btnSkipPrep.addEventListener('click', () => { if (skipHandler) skipHandler(); });
+
+  els.timerChip.addEventListener('click', () => {
+    els.timerChip.dataset.on = els.timerChip.dataset.on === 'yes' ? 'no' : 'yes';
+    els.timerValue.textContent = els.timerChip.dataset.on === 'yes' ? fmt(elapsed) : '-';
+  });
+  let elapsed = 0;
+  setInterval(() => {
+    elapsed++;
+    if (els.timerChip.dataset.on === 'yes') els.timerValue.textContent = fmt(elapsed);
+  }, 1000);
+
+  els.btnSetting.addEventListener('click', () => showToast('Settings — demo placeholder'));
+  els.btnSaveExit.addEventListener('click', () => showToast('Progress saved'));
+  els.btnFeedback.addEventListener('click', () => showToast('Feedback form — demo placeholder'));
+
+  // ---------- Prototype tools ----------
+  els.protoToggle.addEventListener('click', () => {
+    const open = els.protoPanel.hidden;
+    els.protoPanel.hidden = !open;
+    els.protoToggle.setAttribute('aria-expanded', String(open));
+  });
+
+  STAGES.forEach((stage, i) => {
+    const b = el('button', '', stage.label);
+    b.type = 'button';
+    b.addEventListener('click', () => { runTest(i); });
+    els.protoJump.appendChild(b);
+  });
+  const resultBtn = el('button', '', 'Result');
+  resultBtn.type = 'button';
+  resultBtn.addEventListener('click', showResults);
+  els.protoJump.appendChild(resultBtn);
+
+  [['auto', 'Auto'], ['brief', 'Brief'], ['adequate', 'Adequate'], ['long', 'At length']].forEach(([value, label]) => {
+    const b = el('button', value === simulate ? 'on' : '', label);
+    b.type = 'button';
+    b.addEventListener('click', () => {
+      simulate = value;
+      [...els.protoLength.children].forEach((c) => c.classList.toggle('on', c === b));
+    });
+    els.protoLength.appendChild(b);
+  });
+
+  // ---------- Init ----------
+  STAGES.forEach((stage) => {
+    const li = el('li');
+    li.appendChild(el('span', 'name', stage.title));
+    li.appendChild(el('span', 'dur', stage.duration));
+    li.appendChild(el('span', 'chip' + (stage.assessed ? ' assessed' : ''), stage.assessed ? 'Assessed' : 'Not assessed'));
+    els.structureList.appendChild(li);
+  });
+  buildCard(STAGES[2].card);
+  buildRubric();
+  setCurrentStage(0);
+  renderStageHeader(STAGES[0]);
+  openInstructions(true);
+})();
+</script>
+
+</body>
+</html>
