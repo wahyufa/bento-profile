@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worksheet Insight · HeyHi</title>
+<link rel="shortcut icon" href="https://elb-onlinequiz.smartjen.com/images/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Same weights production loads: its 500/600 text renders with these faces too. -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="production.css">
+<link rel="stylesheet" href="production-insight.css">
+</head>
+<body>
+
+<!-- Top navbar and sidebar are rendered by shell.js (shared by every page). -->
+<nav class="topbar" id="topbar" aria-label="Top navigation"></nav>
+<nav class="sidebar" id="adminv3menu" aria-label="Main navigation"></nav>
+
+<main class="main-content">
+  <div class="page-container">
+
+    <div class="insight-topline">
+      <div class="insight-topline-back">
+        <a href="hq.html" class="insight-link" id="backLink">
+          <span class="insight-link-icon is-back" id="backIcon"></span>
+          <strong class="insight-link-text">Go Back</strong>
+        </a>
+      </div>
+      <div class="insight-topline-legend">
+        <div class="insight-legend-label">
+          <div class="insight-legend-trigger" id="legendTrigger">
+            <span class="insight-legend-text">Table legend</span>
+            <span class="insight-legend-icon" id="legendIcon"></span>
+          </div>
+        </div>
+        <div class="analytic-table-legend" id="legendPopover" hidden>
+          <div class="legend-arrow"></div>
+          <div class="atl-row">
+            <div class="atl-col"><div class="atl-color not-started"></div><div>Not Started</div></div>
+            <div class="atl-col"><div class="atl-color in-progress"></div><div>In Progress</div></div>
+            <div class="atl-col"><div class="atl-color completed"></div><div>Completed</div></div>
+          </div>
+          <div class="atl-row">
+            <div class="atl-col"><div class="atl-color to-improve"></div><div>To Improve: 0 - &lt; 50%</div></div>
+            <div class="atl-col"><div class="atl-color improving"></div><div>Improving: &gt;= 50% - &lt; 75%</div></div>
+            <div class="atl-col"><div class="atl-color improved"></div><div>Improved: &gt;= 75% - 100%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="insight-header" id="insightHeader">
+      <div class="insight-header-title">
+        <h5 class="title-analytics">WORKSHEET INSIGHT</h5>
+        <h1 class="title-admin" id="worksheetName"></h1>
+        <div class="insight-meta">
+          <div class="insight-meta-item"><span class="insight-meta-icon" id="creatorIcon"></span> <span id="creatorMeta"></span></div>
+          <div class="insight-meta-item"><span class="insight-meta-icon" id="assignedIcon"></span> <span id="assignedMeta"></span></div>
+        </div>
+      </div>
+      <div class="insight-header-filters">
+        <div class="insight-filter-row">
+          <div class="insight-filter-col">
+            <label class="filter-label">Class</label>
+            <div id="classFilter"></div>
+          </div>
+          <div class="insight-filter-col">
+            <label class="filter-label">Attempt Date</label>
+            <div id="dateFilter"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="worksheet-insight" id="insightBody">
+      <div class="insight-tabs-col">
+        <div class="insight-tab-list" role="tablist" aria-label="Insight">
+          <button type="button" class="insight-tab" role="tab" data-tab="completion"><span>Completion Rate</span><span class="insight-tab-icon"></span></button>
+          <button type="button" class="insight-tab" role="tab" data-tab="question"><span>Question Insight</span><span class="insight-tab-icon"></span></button>
+          <button type="button" class="insight-tab" role="tab" data-tab="topic"><span>Topic Insight</span><span class="insight-tab-icon"></span></button>
+        </div>
+      </div>
+      <div class="insight-content-col" id="insightContent" role="tabpanel"></div>
+    </div>
+
+    <div class="insight-not-found" id="notFound" hidden>
+      <h1 class="title-admin">Worksheet not found</h1>
+      <p>It may have been removed. <a href="hq.html" class="insight-inline-link" id="notFoundLink">Back to Worksheet Analytics</a></p>
+    </div>
+
+  </div>
+</main>
+
+<script>
+  // The list page passes the viewing account: ?id=10&scope=hq, or ?id=10&scope=branch&branch=tampines.
+  const PAGE_CONFIG = (() => {
+    const params = new URLSearchParams(window.location.search);
+    const branchId = params.get("branch");
+    return params.get("scope") === "branch" && branchId
+      ? { scope: "branch", branchId, page: "insight" }
+      : { scope: "hq", page: "insight" };
+  })();
+</script>
+<script src="data.js"></script>
+<script src="ui-helpers.js"></script>
+<script src="shell.js"></script>
+<script src="filter-widgets.js"></script>
+<!-- Chart.js 2.9.x draws production's pie and stacked bar charts; same library, same rendering. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js"></script>
+<script src="insight-v2.js"></script>
+</body>
+</html>

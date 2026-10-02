@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worksheet Insight — K12 Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+
+  <header class="navbar">
+    <div class="navbar-brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+      <span>HeyHi</span>
+    </div>
+    <button class="navbar-user" type="button">
+      <span class="navbar-avatar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </span>
+      <span>smartjen_admin</span>
+      <svg class="chevron-static" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    </button>
+  </header>
+
+  <div class="body-row">
+    <aside class="sidebar" id="sidebar">
+      <button class="sidebar-collapse-btn" id="collapseBtn" type="button" aria-label="Toggle sidebar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li>
+            <a href="#" class="nav-item" data-nav="dashboard">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+              <span>Dashboard</span>
+            </a>
+          </li>
+        </ul>
+
+        <hr class="nav-divider">
+
+        <div class="nav-group-label">
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>
+          <span>Analytic</span>
+        </div>
+        <ul class="nav-list nav-sublist">
+          <li>
+            <a href="#" class="nav-item" data-nav="analytic-lesson">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              <span>Lesson</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item active" data-nav="analytic-worksheet">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Worksheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-nav="analytic-topic">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+              <span>Topic</span>
+            </a>
+          </li>
+        </ul>
+
+        <hr class="nav-divider">
+
+        <ul class="nav-list">
+          <li>
+            <a href="#" class="nav-item" data-nav="class">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <span>Class</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-nav="users">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              <span>Users</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-nav="roles">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+              <span>Roles</span>
+            </a>
+          </li>
+        </ul>
+
+        <hr class="nav-divider">
+
+        <ul class="nav-list">
+          <li>
+            <a href="#" class="nav-item" data-nav="questions">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>Questions</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-nav="question-issue">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              <span>Question Issue</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-nav="worksheet">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              <span>Worksheet</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-nav="video-audio">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+              <span>Video &amp; Audio</span>
+            </a>
+          </li>
+          <li>
+            <a href="#" class="nav-item" data-nav="document">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              <span>Document</span>
+            </a>
+          </li>
+        </ul>
+
+        <hr class="nav-divider">
+
+        <ul class="nav-list">
+          <li>
+            <a href="#" class="nav-item" data-nav="settings">
+              <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              <span>Settings</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </aside>
+
+    <main class="main">
+      <a href="#" id="backLink" class="back-link">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Worksheet Analytics
+      </a>
+
+      <header class="page-header">
+        <div class="page-heading">
+          <p class="eyebrow">Analytics / Worksheet Insight</p>
+          <div class="heading-row">
+            <h1 id="wsName">Loading…</h1>
+          </div>
+          <p class="insight-subline" id="wsMeta"></p>
+        </div>
+      </header>
+
+      <div id="insightContent">
+        <div class="stats-row" id="summaryStats"></div>
+
+        <section class="table-card status-card">
+          <h2 class="section-title">Completion Status</h2>
+          <div class="status-bar" id="statusBar"></div>
+          <div class="status-legend" id="statusLegend"></div>
+        </section>
+
+        <section class="table-card table-plain" id="questionTableCard">
+          <h2 class="section-title">Question Breakdown</h2>
+          <table id="questionTable">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Question</th>
+                <th data-sort="correct">Correct Rate <span class="sort-arrow">↕</span></th>
+                <th>Attempts</th>
+              </tr>
+            </thead>
+            <tbody id="questionTableBody"></tbody>
+          </table>
+        </section>
+        <p class="empty-state hidden" id="noQuestions">No question-level data yet — no one has attempted this worksheet.</p>
+
+        <section class="table-card table-plain" id="studentTableCard">
+          <div class="section-title-row">
+            <h2 class="section-title">Student Results</h2>
+          </div>
+          <div class="insight-filters">
+            <div class="select-wrap insight-filter-select">
+              <select id="classFilter">
+                <option value="">All Classes</option>
+              </select>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="select-wrap insight-filter-select">
+              <select id="statusFilter">
+                <option value="">All Statuses</option>
+                <option value="Completed">Completed</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Not Started">Not Started</option>
+              </select>
+              <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div class="input-icon-wrap insight-search">
+              <input type="text" id="studentSearch" placeholder="Search student...">
+              <svg class="icon-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+          </div>
+          <table id="studentTable">
+            <thead>
+              <tr>
+                <th data-sort="name">Student <span class="sort-arrow">↕</span></th>
+                <th>Class</th>
+                <th data-sort="status">Status <span class="sort-arrow">↕</span></th>
+                <th data-sort="score">Score <span class="sort-arrow">↕</span></th>
+                <th>Time Spent</th>
+                <th>Submitted</th>
+              </tr>
+            </thead>
+            <tbody id="studentTableBody"></tbody>
+          </table>
+        </section>
+
+        <p class="empty-state hidden" id="noStudents">No students have been assigned to this worksheet yet.</p>
+        <p class="empty-state hidden" id="noMatches">No students match your search.</p>
+      </div>
+
+      <p class="empty-state hidden" id="notFound">Worksheet not found. It may have been removed.</p>
+    </main>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="insight.js"></script>
+</body>
+</html>

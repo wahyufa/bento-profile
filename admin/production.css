@@ -1,0 +1,1466 @@
+/*
+  Production-faithful styles for the HeyHi admin (mirrors demo-hq.heyhi.sg — Dashkit/Bootstrap 5
+  theme + vue-multiselect + vue2-datepicker). Values come from production's computed styles.
+  Some inconsistencies are intentional because production has them (three different placeholder
+  greys, 46px vs 50px filter heights, "Helvetica" inside the date picker) — keep them in sync with
+  production rather than tidying them up.
+*/
+
+:root {
+  --color-primary: #0fb0f8;
+  --color-primary-hover: #0d96d3;
+  --color-primary-hover-border: #0c8dc6;
+  --color-page-bg: #f6f8fa;
+  --color-body-text: #12263f;
+  --color-heading: #302574;
+  --color-eyebrow: #16d8a7;
+  --color-muted-icon: #8a8a8a;
+  --color-menu-text: #6e84a3;
+  --color-username: #53caff;
+  --color-sidebar-divider: #e3ebf6;
+  --color-menu-border: rgba(18, 38, 63, 0.1);
+
+  --color-input-border: #e0e0e0;
+  --color-input-text: #8a8a8a;
+  --color-placeholder-form: #b1c2d9;
+  --color-placeholder-multiselect: #adadad;
+  --color-placeholder-native: #757575;
+  --color-checkbox-border: #8a8a8a;
+
+  --color-danger: #eb6363;
+  --color-warning: #f6c343;
+  --color-success: #16d8a7;
+  --color-progress-track: #dedede;
+  --color-exam: #f15d22;
+  --color-tooltip-bg: #e3f6ff;
+  --color-tooltip-text: #7884b9;
+
+  --color-toggle-off-bg: #f5f5f5;
+  --color-toggle-off-text: #616161;
+  --color-pagination-text: #808080;
+  --color-pagination-active: #2c7be5;
+  --color-pagination-disabled: #95aac9;
+  --color-pagination-hover-bg: #f9fbfd;
+
+  --color-legend-border: #eeeeee;
+  --swatch-not-started: #d9d9d9;
+  --swatch-in-progress: #145876;
+  --swatch-completed: #1ec5f1;
+  --swatch-to-improve: #e73536;
+  --swatch-improving: #ffb400;
+  --swatch-improved: #13d8a7;
+
+  --color-multiselect-text: #35495e;
+  --color-multiselect-border: #e8e8e8;
+  --color-multiselect-highlight: #0eb0f8;
+  --color-multiselect-highlight-tail: #41b883;
+  --color-multiselect-selected-bg: #f3f3f3;
+  --color-multiselect-selected-highlight: #ff6a6a;
+
+  --color-datepicker-text: #73879c;
+  --color-datepicker-border: #e8e8e8;
+  --color-datepicker-active: #1284e7;
+  --color-datepicker-hover: #f3f9fe;
+  --color-datepicker-range: #dbedfb;
+  --color-datepicker-today: #2a90e9;
+  --color-datepicker-muted: #cccccc;
+
+  --font-body: "Montserrat", sans-serif;
+  --font-input: "Nunito Sans", sans-serif;
+  --font-datepicker: "Helvetica Neue", Helvetica, Arial, "Microsoft Yahei", sans-serif;
+
+  --topbar-height: 72px;
+  --sidebar-top: 63px;
+  --sidebar-collapsed-width: 95px;
+  --sidebar-expanded-width: 240px;
+  --radius-input: 12px;
+  --radius-row: 18px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-page-bg);
+  color: var(--color-body-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.feather-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex-shrink: 0;
+}
+
+/* ---------- Top navbar ---------- */
+
+.topbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1030;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: var(--topbar-height);
+  padding: 12px 0;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.topbar-brand img {
+  display: block;
+  height: auto;
+  max-height: 44px;
+  max-width: 150px;
+}
+
+.topbar-brand-name {
+  display: flex;
+  margin: 0 0 0 6px;
+  color: var(--color-body-text);
+  font-size: 17px;
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Inline layout on purpose: production aligns avatar, name and caret on one text line,
+   which puts the name ~2.5px above the bar's centre. Flexbox would re-centre it. */
+.topbar-user {
+  position: relative;
+  margin-right: 30px;
+}
+
+.topbar-user-toggle {
+  display: inline;
+  color: var(--color-username);
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22.5px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.topbar-avatar {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+  font-size: 13.3333px;
+  line-height: 20px;
+}
+
+.topbar-avatar img {
+  width: 32px;
+  height: 32px;
+  margin: -6px 0;
+  border-radius: 50%;
+  object-fit: cover;
+  vertical-align: middle;
+}
+
+/* 22.5px tall like the icon-font glyph's line box it replaces; the 15px chevron stays centred. */
+.topbar-caret {
+  display: inline-block;
+  width: 15px;
+  height: 22.5px;
+  margin-left: 3.1875px;
+  vertical-align: middle;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 2px);
+  right: 0;
+  z-index: 1000;
+  min-width: 160px;
+  padding: 8px 0 15px;
+  border: 1px solid var(--color-menu-border);
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.09);
+  color: var(--color-muted-icon);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  color: var(--color-menu-text);
+  line-height: 22.5px;
+  white-space: nowrap;
+}
+
+.dropdown-item:hover {
+  color: var(--color-body-text);
+}
+
+.dropdown-item .fa-icon {
+  width: 18.75px;
+  height: 15px;
+  fill: currentColor;
+}
+
+.dropdown-item .feather-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.dropdown-divider {
+  height: 0;
+  margin: 6px 0;
+  border-top: 1px solid var(--color-menu-border);
+}
+
+/* ---------- Sidebar (collapses to icons, expands on hover like production) ---------- */
+
+.sidebar {
+  position: fixed;
+  top: var(--sidebar-top);
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  width: 100%;
+  max-width: var(--sidebar-collapsed-width);
+  padding: 12px 24px;
+  overflow-y: auto;
+  background-color: var(--color-primary);
+  transition: 1s;
+}
+
+.sidebar.is-open {
+  max-width: var(--sidebar-expanded-width);
+}
+
+.sidebar-menu {
+  display: flex;
+  flex-direction: column;
+  margin-top: 24px;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  margin: 0 -24px;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar-subnav {
+  margin: 0 0 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  margin: 0 0 5px 10px;
+  padding: 15px 24px;
+  border-radius: 10px 0 0 10px;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22.5px;
+}
+
+.sidebar-link.active {
+  position: relative;
+  background-color: var(--color-page-bg);
+  color: var(--color-primary);
+}
+
+/* Icon box reproduces the icon-font metrics (24px glyph, 22.5px line + 0.125em padding). */
+.sidebar-icon {
+  display: flex;
+  align-items: flex-start;
+  flex-shrink: 0;
+  min-width: 28px;
+  height: 25.5px;
+  margin-right: 10px;
+}
+
+.sidebar-icon .feather-icon {
+  width: 24px;
+  height: 24px;
+  margin-top: -0.75px;
+}
+
+.sidebar-icon .fa-icon {
+  width: 27px;
+  height: 24px;
+  margin-top: -0.75px;
+  fill: currentColor;
+}
+
+.sidebar-label {
+  display: none;
+}
+
+.sidebar.is-open .sidebar-label {
+  display: block;
+}
+
+.sidebar-divider {
+  min-width: 47px;
+  margin: 12px 0;
+  border: 0;
+  border-top: 1px solid var(--color-sidebar-divider);
+  opacity: 1;
+}
+
+/* ---------- Page layout ---------- */
+
+.main-content {
+  margin-left: var(--sidebar-collapsed-width);
+  padding-top: var(--topbar-height);
+}
+
+.page-container {
+  padding: 36px 36px 0;
+}
+
+.analytics-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  margin: 0 -12px 24px;
+}
+
+.analytics-header-title,
+.analytics-header-actions {
+  flex: 0 0 100%;
+  padding: 0 12px;
+}
+
+.analytics-header-actions {
+  position: relative;
+  margin-top: 12px;
+}
+
+@media (min-width: 992px) {
+  .analytics-header-title {
+    flex-basis: 25%;
+  }
+
+  .analytics-header-actions {
+    flex-basis: 75%;
+    margin-top: 0;
+  }
+}
+
+.title-analytics {
+  margin: 0 0 3px;
+  color: var(--color-eyebrow);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.title-admin {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.header-controls {
+  display: flex;
+  justify-content: flex-end;
+  gap: 24px;
+}
+
+/* ---------- Table legend (opens on hover) ---------- */
+
+.legend-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.legend-label-row {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.legend-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 25.5px;
+  cursor: default;
+}
+
+/* Matches the icon-font line box: the 16px glyph sits 4px below the row top. */
+.legend-trigger > span {
+  display: flex;
+  height: 25.5px;
+  padding-top: 4px;
+}
+
+.legend-trigger h5,
+.view-display h5 {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 24px;
+  letter-spacing: -0.02em;
+}
+
+.legend-trigger .feather-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-muted-icon);
+}
+
+.analytic-table-legend {
+  position: absolute;
+  top: 40px;
+  left: 66px;
+  right: -66px;
+  z-index: 10;
+  padding: 12px;
+  border-radius: 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+.legend-arrow {
+  position: absolute;
+  top: -19px;
+  right: 62px;
+  width: 0;
+  height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 20px solid #fff;
+}
+
+.atl-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  padding: 12px;
+  border: 1px solid var(--color-legend-border);
+  border-radius: 12px;
+}
+
+.atl-row:last-child {
+  margin-bottom: 0;
+}
+
+.atl-col {
+  display: flex;
+  flex: 1 1 0;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+}
+
+.atl-color {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 100%;
+}
+
+.atl-color.not-started { background-color: var(--swatch-not-started); }
+.atl-color.in-progress { background-color: var(--swatch-in-progress); }
+.atl-color.completed { background-color: var(--swatch-completed); }
+.atl-color.to-improve { background-color: var(--swatch-to-improve); }
+.atl-color.improving { background-color: var(--swatch-improving); }
+.atl-color.improved { background-color: var(--swatch-improved); }
+
+/* ---------- View display by (List / Table) ---------- */
+
+.view-display {
+  flex-shrink: 0;
+  width: max-content;
+  color: var(--color-body-text);
+}
+
+.view-display h5 {
+  margin-bottom: 9px;
+}
+
+.view-display-buttons {
+  display: flex;
+}
+
+.view-display-button {
+  height: 48px;
+  padding: 12px 16px;
+  border: 0;
+  background-color: var(--color-toggle-off-bg);
+  color: var(--color-toggle-off-text);
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.view-display-button:first-child {
+  border-radius: 16px 0 0 16px;
+}
+
+.view-display-button:last-child {
+  border-radius: 0 16px 16px 0;
+}
+
+.view-display-button.is-active {
+  background-color: var(--color-primary);
+  color: #fff;
+}
+
+@media (max-width: 1200px) {
+  .view-display-button {
+    padding: 12px 10px;
+  }
+}
+
+/* ---------- Filters ---------- */
+
+.analytics-filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -12px;
+}
+
+.analytics-filter-col {
+  position: relative;
+  flex: 0 0 100%;
+  min-width: 0;
+  min-height: 72.5px;
+  margin-bottom: 12px;
+  padding: 0 12px;
+}
+
+@media (min-width: 768px) {
+  .analytics-filter-col {
+    flex: 1 0 0%;
+  }
+
+  /* Production's four-per-row widths; extra filters wrap onto the next row. */
+  .analytics-filter-row.is-quarters > .analytics-filter-col {
+    flex: 0 0 25%;
+  }
+}
+
+.filter-label {
+  display: inline-block;
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 22.5px;
+}
+
+.form-control {
+  display: block;
+  width: 100%;
+  height: 50px;
+  padding: 12px 24px 12px 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-input);
+  background-color: #fff;
+  color: var(--color-input-text);
+  font-family: var(--font-input);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.form-control::placeholder {
+  color: var(--color-placeholder-form);
+}
+
+.form-control:focus {
+  outline: 0;
+  box-shadow: none;
+  color: var(--color-body-text);
+}
+
+.search-field {
+  position: relative;
+}
+
+/* Production's icon-font glyph sits 3px down in a 23.5px line box; centring that box (not
+   the bare 15px glyph) puts the icon where production draws it. */
+.search-icon {
+  position: absolute;
+  top: 50%;
+  right: 7.5px;
+  display: flex;
+  align-items: flex-start;
+  height: 23.5px;
+  padding-top: 3px;
+  transform: translateY(-50%);
+  color: var(--color-body-text);
+  pointer-events: none;
+}
+
+.search-icon .feather-icon {
+  width: 15px;
+  height: 15px;
+}
+
+/* Subject & level checkbox tree */
+
+/* Always absolutely positioned under its label (as in production), so opening it overlays
+   the page instead of pushing the filter row down. */
+.subject-level-filter {
+  position: absolute;
+  top: 22.5px;
+  left: 12px;
+  right: 12px;
+  z-index: 9;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+  border-radius: 19.2px;
+  background-color: #fff;
+  box-shadow: 0 12px 24px rgba(18, 38, 63, 0.03);
+  color: var(--color-body-text);
+  font-size: 15px;
+}
+
+.subject-level-filter-field {
+  height: 46px;
+  padding: 10px 14px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.accordion-container {
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.subject-item,
+.level-item {
+  position: relative;
+  padding: 6px 12px 0;
+  cursor: pointer;
+}
+
+.subject-item > label,
+.level-item > label {
+  display: inline-block;
+  padding-left: 24px;
+  color: var(--color-heading);
+  cursor: pointer;
+}
+
+.subject-item > label {
+  font-size: 14px;
+  line-height: 21px;
+}
+
+.level-item > label {
+  font-size: 15px;
+  line-height: 22.5px;
+}
+
+.subject-level-checkbox {
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+}
+
+.subject-level-checkmark {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--color-checkbox-border);
+  border-radius: 4px;
+  background-color: #fff;
+}
+
+.subject-level-checkmark .feather-icon {
+  position: absolute;
+  top: -1.5px;
+  left: -1px;
+  display: none;
+  width: 18px;
+  height: 18px;
+  color: #fff;
+}
+
+.subject-level-checkbox:checked + .subject-level-checkmark {
+  border-color: var(--color-primary);
+  background-color: var(--color-primary);
+}
+
+.subject-level-checkbox:checked + .subject-level-checkmark .feather-icon {
+  display: block;
+}
+
+.subject-level-checkbox:focus-visible + .subject-level-checkmark {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+.subject-item-toggle {
+  float: right;
+  display: flex;
+  width: 15px;
+  padding-top: 3px;
+  color: var(--color-body-text);
+  cursor: pointer;
+}
+
+.subject-item-toggle .feather-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.level-list {
+  padding-left: 12px;
+}
+
+/* Searchable single select (mirrors vue-multiselect) */
+
+.multiselect {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-height: 40px;
+  color: var(--color-multiselect-text);
+  font-size: 16px;
+  text-align: left;
+  outline: none;
+}
+
+.multiselect__tags {
+  display: block;
+  min-height: 40px;
+  padding: 12px 50px 12px 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-input);
+  background: #fff;
+  color: var(--color-input-text);
+  font-family: var(--font-input);
+  font-size: 16px;
+  line-height: 24px;
+  cursor: pointer;
+}
+
+.multiselect--active .multiselect__tags {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.multiselect__select {
+  position: absolute;
+  top: 6px;
+  right: 1px;
+  display: block;
+  width: 40px;
+  height: 38px;
+  padding: 4px 8px;
+  line-height: 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.multiselect__select::before {
+  position: relative;
+  top: 65%;
+  right: 0;
+  border-style: solid;
+  border-width: 5px 5px 0;
+  border-color: #999 transparent transparent;
+  color: #999;
+  content: "";
+}
+
+.multiselect--active .multiselect__select {
+  transform: rotate(180deg);
+}
+
+.multiselect__placeholder {
+  display: inline-block;
+  color: var(--color-placeholder-multiselect);
+}
+
+.multiselect__single {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  padding-left: 5px;
+  color: var(--color-multiselect-text);
+  vertical-align: top;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.multiselect__input {
+  display: inline-block;
+  width: 100%;
+  padding: 0 0 0 5px;
+  border: none;
+  background: #fff;
+  color: #000;
+  font-family: var(--font-input);
+  font-size: 16px;
+  line-height: 20px;
+  vertical-align: top;
+  outline: none;
+}
+
+.multiselect__input::placeholder {
+  color: var(--color-multiselect-text);
+}
+
+/* Inactive: kept in the DOM but collapsed, exactly like production's inline style. */
+.multiselect:not(.multiselect--active) .multiselect__input {
+  position: absolute;
+  width: 0;
+  padding: 0;
+}
+
+.multiselect__content-wrapper {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 50;
+  display: block;
+  width: 100%;
+  max-height: 300px;
+  overflow: auto;
+  border: 1px solid var(--color-multiselect-border);
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  background: #fff;
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.multiselect__content {
+  display: inline-block;
+  min-width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  vertical-align: top;
+}
+
+.multiselect__option {
+  position: relative;
+  display: block;
+  min-height: 40px;
+  padding: 12px;
+  color: var(--color-multiselect-text);
+  font-size: 16px;
+  line-height: 16px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.multiselect__option--group {
+  color: var(--color-body-text);
+  font-weight: 700;
+  cursor: text;
+}
+
+.multiselect__option--selected {
+  background: var(--color-multiselect-selected-bg);
+  font-weight: 700;
+}
+
+.multiselect__option--highlight {
+  background: var(--color-multiselect-highlight);
+  color: #fff;
+}
+
+.multiselect__option--highlight.multiselect__option--selected {
+  background: var(--color-multiselect-selected-highlight);
+}
+
+/* vue-multiselect's hint tail; production blanks the text but keeps the coloured block. */
+.multiselect__option--highlight::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 12px 0 20px;
+  background: var(--color-multiselect-highlight-tail);
+  color: #fff;
+  font-size: 13px;
+  line-height: 40px;
+  content: "";
+}
+
+.multiselect__option--highlight.multiselect__option--selected::after {
+  background: var(--color-multiselect-selected-highlight);
+}
+
+.multiselect__option--empty {
+  cursor: default;
+}
+
+/* Options with a count (Created By filter): label left, count right, kept clear of the
+   32px highlight tail. Meta is the muted "· Branch" after a name. */
+.multiselect__option--with-count {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-right: 44px;
+}
+
+.multiselect__option-meta,
+.multiselect__option-count {
+  color: var(--color-input-text);
+}
+
+.multiselect__option--highlight .multiselect__option-meta,
+.multiselect__option--highlight .multiselect__option-count {
+  color: inherit;
+}
+
+/* Lets a dropdown grow past its field so "Name · Branch  3" isn't clipped. */
+.multiselect-wide-menu .multiselect__content-wrapper {
+  width: max-content;
+  min-width: 100%;
+  max-width: 360px;
+}
+
+/* Date range picker (mirrors vue2-datepicker) */
+
+.mx-datepicker {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.mx-input-wrapper {
+  position: relative;
+}
+
+.mx-input {
+  display: inline-block;
+  width: 100%;
+  height: auto;
+  padding: 12px 50px 12px 12px;
+  border: 1px solid var(--color-input-border);
+  border-radius: var(--radius-input);
+  background-color: #fff;
+  box-shadow: none;
+  color: var(--color-input-text);
+  font-family: var(--font-body);
+  font-size: 14px;
+  line-height: 24px;
+  outline: none;
+}
+
+.mx-input::placeholder {
+  color: var(--color-placeholder-native);
+}
+
+.mx-icon-calendar,
+.mx-icon-clear {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  display: flex;
+  transform: translateY(-50%);
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 16px;
+  line-height: 1;
+}
+
+.mx-icon-calendar svg,
+.mx-icon-clear svg {
+  width: 1em;
+  height: 1em;
+  fill: currentColor;
+}
+
+.mx-icon-calendar {
+  pointer-events: none;
+}
+
+.mx-icon-clear {
+  display: none;
+  cursor: pointer;
+}
+
+.mx-datepicker.has-value .mx-input-wrapper:hover .mx-icon-clear {
+  display: flex;
+}
+
+.mx-datepicker.has-value .mx-input-wrapper:hover .mx-icon-calendar {
+  display: none;
+}
+
+.mx-datepicker-main {
+  border: 1px solid var(--color-datepicker-border);
+  background-color: #fff;
+  color: var(--color-datepicker-text);
+  font: 14px / 1.5 var(--font-datepicker);
+}
+
+.mx-datepicker-popup {
+  position: absolute;
+  z-index: 2001;
+  margin-top: 5px;
+  padding: 8px 16px;
+  border-radius: 16px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
+}
+
+.mx-datepicker-sidebar {
+  float: left;
+  width: 100px;
+  padding: 6px;
+  overflow: auto;
+}
+
+.mx-datepicker-sidebar + .mx-datepicker-content {
+  margin-left: 100px;
+  border-left: 1px solid var(--color-datepicker-border);
+}
+
+.mx-btn {
+  margin: 0;
+  padding: 7px 15px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  background-color: transparent;
+  color: var(--color-datepicker-text);
+  font-family: var(--font-datepicker);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  outline: none;
+}
+
+.mx-btn:hover {
+  border-color: var(--color-datepicker-active);
+  color: var(--color-datepicker-active);
+}
+
+.mx-btn-text {
+  padding: 0 4px;
+  border: 0;
+  line-height: inherit;
+  text-align: left;
+}
+
+.mx-btn-shortcut {
+  display: block;
+  padding: 0 6px;
+  line-height: 24px;
+}
+
+.mx-range-wrapper {
+  display: flex;
+}
+
+.mx-calendar {
+  width: 248px;
+  padding: 6px 12px;
+}
+
+.mx-calendar + .mx-calendar {
+  border-left: 1px solid var(--color-datepicker-border);
+}
+
+.mx-calendar-header {
+  height: 34px;
+  overflow: hidden;
+  line-height: 34px;
+  text-align: center;
+}
+
+.mx-btn-icon-double-left,
+.mx-btn-icon-left {
+  float: left;
+}
+
+.mx-btn-icon-double-right,
+.mx-btn-icon-right {
+  float: right;
+}
+
+.mx-calendar-header-label {
+  font-size: 14px;
+}
+
+.mx-icon-double-left::before,
+.mx-icon-double-left::after,
+.mx-icon-double-right::before,
+.mx-icon-double-right::after,
+.mx-icon-left::before,
+.mx-icon-right::before {
+  position: relative;
+  top: -1px;
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-color: currentColor;
+  border-style: solid;
+  border-width: 2px 0 0 2px;
+  border-radius: 1px;
+  vertical-align: middle;
+  transform: rotate(-45deg) scale(0.7);
+  transform-origin: center;
+  content: "";
+}
+
+.mx-icon-double-left::after {
+  left: -4px;
+}
+
+.mx-icon-double-right::before {
+  left: 4px;
+}
+
+.mx-icon-double-right::before,
+.mx-icon-double-right::after,
+.mx-icon-right::before {
+  transform: rotate(135deg) scale(0.7);
+}
+
+.mx-calendar-content {
+  position: relative;
+  height: 224px;
+}
+
+.mx-table {
+  width: 100%;
+  height: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  text-align: center;
+}
+
+.mx-table th {
+  padding: 0;
+  font-size: 12px;
+  font-weight: 500;
+  height: 32px;
+  vertical-align: middle;
+}
+
+.mx-table td {
+  padding: 0;
+  font-size: 12px;
+  height: 32px;
+  vertical-align: middle;
+}
+
+/* Same selectors and order as vue2-datepicker, so adjacent-month days never show a range fill. */
+.mx-calendar-content .cell {
+  cursor: pointer;
+}
+
+.mx-calendar-content .cell:hover {
+  background-color: var(--color-datepicker-hover);
+  color: var(--color-datepicker-text);
+}
+
+.mx-calendar-content .cell.active {
+  background-color: var(--color-datepicker-active);
+  color: #fff;
+}
+
+.mx-calendar-content .cell.in-range,
+.mx-calendar-content .cell.hover-in-range {
+  background-color: var(--color-datepicker-range);
+  color: var(--color-datepicker-text);
+}
+
+.mx-table-date .today {
+  color: var(--color-datepicker-today);
+}
+
+.mx-table-date .cell.not-current-month {
+  background: none;
+  color: var(--color-datepicker-muted);
+}
+
+/* ---------- Worksheet table ---------- */
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.worksheet-table {
+  width: 100%;
+  margin-bottom: 0;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  color: var(--color-body-text);
+  font-size: 13px;
+  line-height: 1.5;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.worksheet-table th {
+  padding: 16px;
+  color: #000;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 21px;
+  letter-spacing: 0.08em;
+  text-align: left;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.worksheet-table tbody tr {
+  border-radius: var(--radius-row);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.03);
+}
+
+.worksheet-table td {
+  padding: 16px;
+  background-color: #fff;
+  font-size: 14px;
+  line-height: 21px;
+  vertical-align: middle;
+}
+
+.worksheet-table td:first-child {
+  border-radius: var(--radius-row) 0 0 var(--radius-row);
+}
+
+.worksheet-table td:last-child {
+  border-radius: 0 var(--radius-row) var(--radius-row) 0;
+}
+
+.worksheet-table strong {
+  font-weight: 600;
+}
+
+.worksheet-table .table-empty td {
+  border-radius: var(--radius-row);
+  color: var(--color-muted-icon);
+  text-align: center;
+}
+
+/* The gap sits on the wrapper (not the icon) so the tooltip centres on the icon itself. */
+.exam-ws-wrap {
+  position: relative;
+  margin-left: 6px;
+}
+
+/* 24px badge centred on the 21px text line without growing it, like production's
+   padded inline icon (rows stay 76px tall). */
+.exam-ws-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -2.5px 0 -0.5px;
+  border-radius: 6px;
+  background-color: var(--color-exam);
+  color: #fff;
+  vertical-align: top;
+}
+
+.exam-ws-icon .feather-icon {
+  width: 14px;
+  height: 14px;
+}
+
+.popper {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  z-index: 20;
+  display: none;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: var(--color-tooltip-bg);
+  color: var(--color-tooltip-text);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 21px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.exam-ws-wrap:hover .popper,
+.exam-ws-icon:focus-visible + .popper {
+  display: block;
+}
+
+.completion-rate {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.completion-rate-bar {
+  width: 50%;
+  height: 7px;
+  overflow: hidden;
+  border-radius: 10px;
+  background-color: var(--color-progress-track);
+}
+
+.completion-rate-progress {
+  height: 7px;
+  border-radius: 10px;
+}
+
+.bg-danger { background-color: var(--color-danger); }
+.bg-warning { background-color: var(--color-warning); }
+.bg-success { background-color: var(--color-success); }
+
+.badge {
+  display: inline-block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 4.5px;
+  height: 44px;
+  padding: 8px 16px;
+  border: 1px solid var(--color-primary);
+  border-radius: 16px;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 24px;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  border-color: var(--color-primary-hover-border);
+  background-color: var(--color-primary-hover);
+}
+
+.btn-primary .feather-icon {
+  width: 16px;
+  height: 16px;
+}
+
+/* ---------- Pagination ---------- */
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin: 24px 0 16px;
+  padding: 0;
+  list-style: none;
+}
+
+.page-link {
+  display: block;
+  margin-left: -1px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  background-color: #fff;
+  color: var(--color-pagination-text);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 18.75px;
+  cursor: pointer;
+}
+
+.page-item:first-child .page-link {
+  margin-left: 0;
+  border-radius: 2px 0 0 2px;
+}
+
+.page-item:last-child .page-link {
+  border-radius: 0 2px 2px 0;
+}
+
+.page-link:hover {
+  background-color: var(--color-pagination-hover-bg);
+  color: var(--color-body-text);
+}
+
+.page-item.active .page-link {
+  position: relative;
+  z-index: 3;
+  background-color: transparent;
+  color: var(--color-pagination-active);
+}
+
+.page-item.disabled .page-link {
+  background-color: #fff;
+  color: var(--color-pagination-disabled);
+  cursor: default;
+  pointer-events: none;
+}
+
+@media (max-width: 767.98px) {
+  .sidebar {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .topbar-brand-name {
+    display: none;
+  }
+}

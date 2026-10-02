@@ -94,17 +94,20 @@
       top: 50%;
       transform: translateY(-50%);
     }
+    /* Secondary style (white fill + blue outline, same recipe as .pill--info):
+       stays distinct from the primary Exit and legible on the amber bar.
+       Padding is 2px smaller than .btn-exit's so the border doesn't make it larger. */
     .btn-download {
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      background: var(--green);
-      color: #fff;
-      border: none;
+      background: #fff;
+      color: var(--blue-ink);
+      border: 2px solid var(--blue);
       font-family: var(--font-body);
       font-weight: 600;
       font-size: 15px;
-      padding: 7px 16px;
+      padding: 5px 14px;
       border-radius: var(--radius-pill);
       cursor: pointer;
       transition: transform 0.12s ease, opacity 0.12s ease;
@@ -498,7 +501,7 @@
       .btn-exit { right: 12px; font-size: 12px; padding: 6px 11px; gap: 5px; }
       .btn-exit svg { width: 14px; height: 14px; }
       .download-menu { right: 82px; }
-      .btn-download { font-size: 12px; padding: 6px 10px; gap: 5px; }
+      .btn-download { font-size: 12px; padding: 4px 8px; gap: 5px; }
       /* Icon-only download: the label is the first thing to go when the
          bar gets tight; the arrow icon still reads as "download". */
       #downloadPdfLabel { display: none; }
