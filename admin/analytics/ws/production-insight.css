@@ -1,0 +1,875 @@
+/*
+  Worksheet Insight page — mirrors production's /adminv2/worksheet-analytics/:id/insight
+  (demo-hq.heyhi.sg). Loaded after production.css and reuses its tokens and components
+  (filters, table rows, badges, pagination, legend). Values come from production's computed
+  styles at a 1440px viewport; production quirks are kept on purpose (e.g. the Average Score
+  is always yellow, "Didn't answer" uses the incorrect colour).
+*/
+
+:root {
+  --color-link: #53caff;
+  --color-detail-tab-border: #d9d9d9;
+  --color-proficiency-strong: #16d8a7;
+  --color-proficiency-improving: #f6c343;
+  --color-proficiency-to-improve: #e63757;
+  --color-question-head: #51559d;
+  --color-question-label: #7884b9;
+  --color-question-line: #e5eaee;
+  --color-question-text: #616161;
+  --color-switch-off: #e3ebf6;
+  --color-pill: #dedede;
+  --color-row-border: #dfdfdf;
+  --radius-card: 19.2px;
+  --shadow-card: 0 12px 24px rgba(18, 38, 63, 0.03);
+}
+
+/* ---------- Top line: Go Back + table legend ---------- */
+
+.insight-topline {
+  display: flex;
+  align-items: center;
+  margin: 0 -12px 24px;
+}
+
+.insight-topline-back {
+  flex: 0 0 16.6667%;
+  padding: 0 12px;
+}
+
+.insight-topline-legend {
+  position: relative;
+  flex: 0 0 83.3333%;
+  padding: 0 12px;
+}
+
+.insight-link {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--color-link);
+  cursor: pointer;
+}
+
+.insight-link strong {
+  font-weight: 600;
+}
+
+.insight-link-icon {
+  display: flex;
+  align-items: center;
+  height: 30px;
+}
+
+/* "View Detail ›" sits in a slightly taller line box than "‹ Go Back" in production. */
+.insight-link-icon.is-forward {
+  align-items: flex-start;
+  height: 32px;
+  padding-top: 5px;
+}
+
+.insight-link-icon .feather-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.insight-legend-label {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-right: 24px;
+  padding-right: 24px;
+}
+
+.insight-legend-trigger {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.insight-legend-text {
+  color: var(--color-heading);
+  font-weight: 700;
+}
+
+.insight-legend-icon {
+  display: flex;
+  align-items: center;
+  height: 42px;
+  color: var(--color-muted-icon);
+}
+
+.insight-legend-icon .feather-icon {
+  width: 28px;
+  height: 28px;
+}
+
+/* ---------- Header: title, meta line, Class + Attempt Date filters ---------- */
+
+.insight-header {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0 -12px;
+}
+
+.insight-header-title,
+.insight-header-filters {
+  flex: 0 0 50%;
+  min-width: 0;
+  margin-bottom: 24px;
+  padding: 0 12px;
+}
+
+.insight-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 24px;
+  margin-top: 12px;
+}
+
+.insight-meta-icon .feather-icon {
+  width: 15px;
+  height: 15px;
+  vertical-align: -2px;
+}
+
+.insight-filter-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 -12px;
+}
+
+.insight-filter-col {
+  position: relative;
+  flex: 0 0 33.3333%;
+  min-width: 0;
+  min-height: 72.5px;
+  margin-bottom: 12px;
+  padding: 0 12px;
+}
+
+@media (min-width: 992px) {
+  .insight-meta {
+    margin-top: 0;
+  }
+}
+
+/* ---------- Tabs + content card ---------- */
+
+.worksheet-insight {
+  display: flex;
+  align-items: flex-start;
+  margin: 0 -12px 24px;
+}
+
+.insight-tabs-col {
+  flex: 0 0 16.6667%;
+  padding: 0 12px;
+}
+
+.insight-content-col {
+  flex: 0 0 83.3333%;
+  min-width: 0;
+  padding: 0 12px;
+}
+
+.insight-tab-list {
+  padding: 8px 16px;
+  border-radius: var(--radius-card);
+  background-color: #fff;
+}
+
+.insight-tab {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 8px 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.insight-tab.is-active {
+  color: var(--color-link);
+  font-weight: 700;
+}
+
+.insight-tab-icon,
+.btn-proficiency-detail,
+.qi-arrow {
+  display: inline-flex;
+  align-items: flex-start;
+  height: 23.5px;
+  padding-top: 3px;
+}
+
+.insight-tab-icon .feather-icon,
+.btn-proficiency-detail .feather-icon,
+.qi-arrow .feather-icon,
+.completion-stat-label .feather-icon {
+  width: 15px;
+  height: 15px;
+}
+
+.insight-card {
+  margin-bottom: 15px;
+  border-radius: var(--radius-card);
+  background-color: #fff;
+  box-shadow: var(--shadow-card);
+}
+
+.insight-card.is-spaced {
+  margin-bottom: 24px;
+}
+
+.insight-card-body {
+  padding: 24px;
+}
+
+.insight-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.insight-card-title {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: -0.02em;
+}
+
+/* Production leaves an empty 12px row under the overview headers. flow-root keeps its margin
+   from collapsing into the header's, as production's flex .row does. */
+.insight-card-spacer {
+  display: flow-root;
+  margin-bottom: 12px;
+}
+
+/* ---------- Completion Rate overview ---------- */
+
+.completion-overview {
+  display: flex;
+  align-items: center;
+  margin: 0 -12px;
+}
+
+.completion-chart {
+  flex: 0 0 41.6667%;
+  min-width: 0;
+  padding: 0 12px;
+}
+
+.chart-canvas {
+  position: relative;
+  height: 400px;
+}
+
+.completion-legend {
+  flex: 0 0 25%;
+  padding: 0 12px;
+}
+
+.chart-label {
+  display: flex;
+  gap: 12px;
+}
+
+.chart-label p {
+  margin: 0 0 16px;
+}
+
+.chart-label strong {
+  font-weight: 600;
+}
+
+.chart-label-color {
+  flex-shrink: 0;
+  width: 30px;
+  height: 12px;
+  margin-top: 6px;
+  border-radius: 3px;
+}
+
+.chart-label-color.completed { background-color: var(--swatch-completed); }
+.chart-label-color.in-progress { background-color: var(--swatch-in-progress); }
+.chart-label-color.not-started { background-color: var(--swatch-not-started); }
+
+.completion-stats {
+  flex: 0 0 33.3333%;
+  padding: 0 12px;
+}
+
+.completion-stat {
+  margin-bottom: 24px;
+}
+
+/* Lines holding a Feather icon are 23.5px tall in production (the icon font's metrics). */
+.completion-stat-label,
+.insight-meta-item {
+  min-height: 23.5px;
+}
+
+.completion-stat-label {
+  margin: 0 0 6px;
+}
+
+.completion-stat-label .feather-icon {
+  vertical-align: -2px;
+}
+
+.completion-stat-value {
+  margin: 0;
+  color: var(--color-heading);
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 22px;
+  letter-spacing: -0.02em;
+}
+
+/* Production always shows the average score in this yellow, whatever the score. */
+.completion-stat-value.is-score {
+  color: var(--color-warning);
+}
+
+/* ---------- Detail views: "View by" tabs, Display, Search, table ---------- */
+
+.detail-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.detail-filter-title {
+  white-space: nowrap;
+}
+
+.detail-filter-list {
+  display: flex;
+  flex: 1 1 auto;
+  border-bottom: 1px solid var(--color-detail-tab-border);
+}
+
+.detail-filter-item {
+  padding: 5px 20px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.detail-filter-item.is-active {
+  border-bottom: 2px solid var(--color-success);
+  font-weight: 700;
+}
+
+.detail-controls {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 -12px;
+}
+
+.detail-controls-col {
+  flex: 0 0 25%;
+  min-width: 0;
+  padding: 0 12px;
+}
+
+.detail-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* Production's select.form-control: CSS-drawn chevron instead of the native arrow. */
+select.form-control {
+  padding-right: 0;
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, gray 0),
+    linear-gradient(135deg, gray 50%, transparent 0),
+    radial-gradient(#ddd 0, transparent 0);
+  background-position: calc(100% - 20px) center, calc(100% - 15px) center, calc(100% - 0.5em) center;
+  background-size: 5px 5px, 5px 5px, 1.5em 1.5em;
+  background-repeat: no-repeat;
+  cursor: default;
+}
+
+.detail-page-size {
+  width: 100px;
+}
+
+.insight-table {
+  border-spacing: 0 5px;
+}
+
+.insight-table th {
+  background-color: #fff;
+}
+
+/* Unlike the list page, detail rows are outlined: top/bottom on every cell, sides on the ends. */
+.insight-table td {
+  border-top: 1px solid var(--color-row-border);
+  border-bottom: 1px solid var(--color-row-border);
+}
+
+.insight-table td:first-child {
+  border-left: 1px solid var(--color-row-border);
+}
+
+.insight-table td:last-child {
+  border-right: 1px solid var(--color-row-border);
+}
+
+.insight-table .text-center {
+  text-align: center;
+}
+
+.insight-table.is-topic-detail th > div {
+  display: -webkit-box;
+  max-width: 150px;
+  overflow: hidden;
+  white-space: normal;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.insight-empty {
+  width: 41.6667%;
+  margin: 0 auto;
+  text-align: center;
+  white-space: normal;
+}
+
+.insight-empty img {
+  width: 50%;
+}
+
+.insight-empty p {
+  margin: 0 0 16px;
+}
+
+/* ---------- Question Insight ---------- */
+
+.question-chart {
+  margin-bottom: 24px;
+}
+
+.question-select-row {
+  display: flex;
+  margin: 0 -12px;
+}
+
+.question-select-col {
+  flex: 0 0 25%;
+  min-width: 0;
+  padding: 0 12px;
+}
+
+.question-analytic {
+  margin-bottom: 24px;
+}
+
+.qbox-head {
+  border-radius: 24px 24px 0 0;
+  background-color: var(--color-question-head);
+  color: #fff;
+}
+
+.qbox-head-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px;
+}
+
+.qbox-head-left {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.qnum {
+  padding-right: 24px;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 40px;
+}
+
+.qlabel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.qlabel span {
+  display: inline-block;
+  padding: 8px 16px;
+  border-radius: 16px;
+  background-color: var(--color-question-label);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.qbox-sub-head {
+  padding: 12px 24px;
+  background-color: var(--color-question-line);
+}
+
+.qbox-sub-head .qlabel span {
+  background-color: #fff;
+  color: var(--color-body-text);
+}
+
+/* Bootstrap-style switch (production's "Hide Question"). */
+.form-switch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.form-switch input {
+  flex-shrink: 0;
+  width: 48px;
+  height: 24px;
+  margin: 0;
+  border: 0;
+  border-radius: 48px;
+  background-color: var(--color-switch-off);
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3E%3Ccircle r='3' fill='%23FFF'/%3E%3C/svg%3E");
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  appearance: none;
+  cursor: pointer;
+  transition: background-position 0.15s ease-in-out;
+}
+
+.form-switch input:checked {
+  background-color: var(--color-link);
+  background-position: right center;
+}
+
+.form-switch input:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+.form-switch label {
+  cursor: pointer;
+}
+
+.qbox-body {
+  border: 1px solid var(--color-question-line);
+  border-radius: 0 0 24px 24px;
+  font-family: var(--font-input);
+}
+
+.qbox-content {
+  margin: 24px;
+}
+
+.quiz-instruction {
+  margin: 0 0 12px;
+  color: var(--color-question-text);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 24px;
+  text-align: justify;
+}
+
+.quiz-question {
+  line-height: 30px;
+}
+
+.quiz-options {
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  line-height: 30px;
+}
+
+.quiz-answer {
+  margin: 6px 0 0;
+  line-height: 30px;
+}
+
+.fitb-correct {
+  border-bottom: 2px solid var(--color-success);
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+.qi-statistic-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 20px 12px;
+  border-top: 1px solid var(--color-question-line);
+}
+
+.qi-statistic-item.qi-statistic-detail {
+  justify-content: flex-start;
+  padding: 12px;
+}
+
+.qi-title {
+  width: 15%;
+  font-weight: 700;
+  text-align: right;
+}
+
+.qi-bar {
+  position: relative;
+  width: 70%;
+  height: 8px;
+  border-radius: 0 20px 20px 0;
+  background-color: var(--color-question-line);
+}
+
+.qi-bar::before {
+  content: " ";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 36px;
+  border: 1px solid var(--color-question-line);
+  transform: translate(-50%, -50%);
+}
+
+.qi-progress-bar {
+  height: 8px;
+  border-radius: 0 20px 20px 0;
+}
+
+.qi-progress-bar.correct { background-color: var(--color-success); }
+.qi-progress-bar.pending { background-color: var(--color-warning); }
+.qi-progress-bar.incorrect { background-color: var(--color-proficiency-to-improve); }
+
+.qi-progress {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.qi-arrow {
+  padding: 3px 0 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  vertical-align: top;
+  cursor: pointer;
+}
+
+.qi-class span {
+  display: inline-block;
+  padding: 3px 12px;
+  border-radius: 15px;
+  background-color: var(--color-pill);
+  white-space: nowrap;
+}
+
+.qi-students {
+  width: 85%;
+  padding: 0 15px;
+  font-weight: 700;
+}
+
+/* ---------- Topic Insight ---------- */
+
+.topic-legend {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding: 6px 6px 0 0;
+}
+
+.topic-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topic-label-color {
+  width: 30px;
+  height: 12px;
+  border-radius: 4px;
+}
+
+.topic-row {
+  display: flex;
+  margin: 0 -12px 12px;
+}
+
+.topic-row > div {
+  flex: 0 0 50%;
+  min-width: 0;
+  padding: 0 12px;
+}
+
+.topic-row strong {
+  font-weight: 600;
+}
+
+.topic-bar-col {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.proficiency-bar {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border-radius: 20px;
+  background-color: var(--color-pill);
+}
+
+.proficiency-item {
+  height: 6px;
+}
+
+.strong { background-color: var(--color-proficiency-strong); }
+.improving { background-color: var(--color-proficiency-improving); }
+.to-improve { background-color: var(--color-proficiency-to-improve); }
+
+.btn-proficiency-detail {
+  padding: 3px 0 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+}
+
+.proficiency-detail-row {
+  margin-bottom: 12px;
+}
+
+.proficiency-detail-container {
+  padding: 12px;
+  border-radius: var(--radius-card);
+  background-color: var(--color-page-bg);
+}
+
+.proficiency-detail-item {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 12px;
+}
+
+.proficiency-detail-item:last-child {
+  margin-bottom: 0;
+}
+
+.proficiency-detail-label {
+  width: 160px;
+}
+
+.proficiency-label {
+  padding: 6px 24px;
+  border-radius: 20px;
+  color: #fff;
+  font-weight: 700;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.proficiency-detail-class {
+  display: flex;
+  flex-flow: column wrap;
+  gap: 6px;
+  width: 25%;
+}
+
+.proficiency-class {
+  display: flex;
+  align-items: center;
+  padding: 3px 12px;
+  border-radius: 15px;
+  background-color: var(--color-pill);
+  text-align: center;
+}
+
+.proficiency-detail-student {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  width: calc(75% - 160px);
+}
+
+/* ---------- Not found ---------- */
+
+.insight-not-found p {
+  margin: 12px 0 0;
+}
+
+.insight-inline-link {
+  color: var(--color-link);
+  font-weight: 600;
+}
+
+/* ---------- Narrow screens: stack like production's col-12 fallbacks ---------- */
+
+/* Production's .mob-remove: link labels give way to the bare chevrons. */
+@media (max-width: 990px) {
+  .insight-link-text {
+    display: none;
+  }
+}
+
+.chart-unavailable {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--color-muted-icon);
+}
+
+@media (max-width: 991.98px) {
+  .insight-header-title,
+  .insight-header-filters {
+    flex-basis: 100%;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .worksheet-insight,
+  .completion-overview,
+  .insight-filter-row,
+  .detail-controls,
+  .question-select-row {
+    flex-wrap: wrap;
+  }
+
+  .insight-tabs-col,
+  .insight-content-col,
+  .completion-chart,
+  .completion-legend,
+  .completion-stats,
+  .insight-filter-col,
+  .detail-controls-col,
+  .question-select-col {
+    flex-basis: 100%;
+  }
+
+  .insight-tabs-col {
+    margin-bottom: 24px;
+  }
+}

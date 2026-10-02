@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Worksheet Analytics · HeyHi</title>
+<link rel="shortcut icon" href="https://elb-onlinequiz.smartjen.com/images/icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<!-- Same weights production loads: its 500/600 text renders with these faces too. -->
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="production.css">
+</head>
+<body>
+
+<!-- Top navbar and sidebar are rendered by shell.js (shared by every page). -->
+<nav class="topbar" id="topbar" aria-label="Top navigation"></nav>
+<nav class="sidebar" id="adminv3menu" aria-label="Main navigation"></nav>
+
+<main class="main-content">
+  <div class="page-container">
+
+    <div class="analytics-header">
+      <div class="analytics-header-title">
+        <h5 class="title-analytics">ANALYTICS</h5>
+        <h1 class="title-admin">Worksheet</h1>
+      </div>
+      <div class="analytics-header-actions">
+        <div class="header-controls">
+          <div class="legend-wrapper">
+            <div class="legend-label-row">
+              <div class="legend-trigger" id="legendTrigger">
+                <h5>Table legend</h5>
+                <span><svg class="feather-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg></span>
+              </div>
+            </div>
+            <div class="analytic-table-legend" id="legendPopover" hidden>
+              <div class="legend-arrow"></div>
+              <div class="atl-row">
+                <div class="atl-col"><div class="atl-color not-started"></div><div>Not Started</div></div>
+                <div class="atl-col"><div class="atl-color in-progress"></div><div>In Progress</div></div>
+                <div class="atl-col"><div class="atl-color completed"></div><div>Completed</div></div>
+              </div>
+              <div class="atl-row">
+                <div class="atl-col"><div class="atl-color to-improve"></div><div>To Improve: 0 - &lt; 50%</div></div>
+                <div class="atl-col"><div class="atl-color improving"></div><div>Improving: &gt;= 50% - &lt; 75%</div></div>
+                <div class="atl-col"><div class="atl-color improved"></div><div>Improved: &gt;= 75% - 100%</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="view-display">
+            <h5>View display by</h5>
+            <!-- In production "Table" opens a separate Group Report page, which isn't part of this prototype. -->
+            <div class="view-display-buttons">
+              <button type="button" class="view-display-button is-active" aria-pressed="true">List</button>
+              <button type="button" class="view-display-button" aria-pressed="false">Table</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Production's four filters. No Branch filter: this account only sees its own branch. -->
+    <div class="analytics-filter-row">
+      <div class="analytics-filter-col">
+        <label class="filter-label">Subject</label>
+        <div id="subjectFilter"></div>
+      </div>
+      <div class="analytics-filter-col">
+        <label class="filter-label">Worksheet</label>
+        <div id="worksheetFilter"></div>
+      </div>
+      <div class="analytics-filter-col">
+        <label class="filter-label" for="searchInput">Search</label>
+        <div class="search-field">
+          <input type="text" id="searchInput" class="form-control" placeholder="Search worksheet...">
+          <span class="search-icon"><svg class="feather-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg></span>
+        </div>
+      </div>
+      <div class="analytics-filter-col">
+        <label class="filter-label">Attempt Date</label>
+        <div id="dateFilter"></div>
+      </div>
+    </div>
+
+    <!-- Production's columns plus "Created By", so admins can tell tutor-, admin- and HQ-made worksheets apart. -->
+    <div class="table-responsive">
+      <table class="worksheet-table">
+        <thead>
+          <tr>
+            <th><div>Worksheet</div></th>
+            <th><div>Created By</div></th>
+            <th><div>Completion Rate</div></th>
+            <th><div>Average Score</div></th>
+            <th><div>Assigned To</div></th>
+            <th><div>Action</div></th>
+          </tr>
+        </thead>
+        <tbody id="worksheetRows"></tbody>
+      </table>
+    </div>
+
+    <ul class="pagination" id="pagination" aria-label="Pagination"></ul>
+
+  </div>
+</main>
+
+<script>
+  const PAGE_CONFIG = { scope: "branch", branchId: "tampines" };
+</script>
+<script src="data.js"></script>
+<script src="ui-helpers.js"></script>
+<script src="shell.js"></script>
+<script src="filter-widgets.js"></script>
+<script src="production.js"></script>
+</body>
+</html>
