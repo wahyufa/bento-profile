@@ -192,6 +192,7 @@
     .modal .detail-desc, .modal .confirm-text { font-size: 15px; font-weight: 400; color: var(--hh-ink); margin-bottom: 12px; }
     .detail-meta { font-family: var(--hh-font-body); font-size: 14px; color: var(--hh-muted); }
     .detail-meta strong { color: var(--hh-ink); }
+    .remark-check { width: 16px; height: 16px; accent-color: var(--hh-primary); flex-shrink: 0; cursor: pointer; }
     .topic-chip.is-focus { background: var(--hh-red-soft); font-weight: 700; }
     .confirm-text { font-family: var(--hh-font-body); font-size: 15px; margin-bottom: 20px; }
 
@@ -281,8 +282,8 @@
                   <div data-v-70360e8c="" class="d-flex justify-content-between">
                     <div data-v-70360e8c="" id="legend"></div>
                     <div data-v-70360e8c="">
-                      <button data-v-70360e8c="" disabled class="btn btn-link"><span data-v-70360e8c="">Delete</span></button>
-                      <button data-v-70360e8c="" type="button" class="btn btn-link"> Check All </button>
+                      <button data-v-70360e8c="" type="button" disabled class="btn btn-link" id="delete-remarks"><span data-v-70360e8c="">Delete</span></button>
+                      <button data-v-70360e8c="" type="button" class="btn btn-link" id="check-all"> Check All </button>
                     </div>
                   </div>
                 </div></div></div>
@@ -453,6 +454,21 @@
   </div>
 </div>
 
+<!-- Confirm delete (own remarks only, selected via checkbox / Check All) -->
+<div id="confirm-delete" role="dialog" aria-modal="true" aria-labelledby="confirm-delete-title" class="modal fade show" style="display: none;">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <header class="modal-header">
+        <div class="d-flex justify-content-between align-items-start w-100">
+          <h2 class="m-0" id="confirm-delete-title">Delete Remarks?</h2>
+          <img aria-label="Close" role="button" data-close src="https://elb-onlinequiz.smartjen.com/images/svg/icon-close-gray.svg" class="pointer" alt="Close">
+        </div>
+      </header>
+      <div class="modal-body" id="confirm-delete-body"></div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop fade show" id="backdrop" style="display: none;"></div>
 <div class="proto-toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -518,6 +534,8 @@
   ];
 
   const selectedWeaknessKeys = new Set();
+  // Remark ids checked for deletion (only the current tutor's own remarks)
+  const checkedRemarkIds = new Set();
   let pickedTags = [];
 
   // ---------------------------------------------------------------------------
@@ -635,10 +653,7 @@
   }
 
   function renderRemarks() {
-    const statusFilter = document.getElementById('status-filter').value;
-    const onlyMine = document.getElementById('tutor-filter').value === 'mine';
-    const visible = remarks.filter((remark) =>
-      (!statusFilter || remark.status === statusFilter) && (!onlyMine || isMine(remark)));
+    const visible = visibleRemarks();
 
     const html = visible.map((remark) => {
       const color = STATUS[remark.status].color;
@@ -663,7 +678,10 @@
                     <div class="d-flex align-items-center space-x-2"><div>Remark by:</div><span class="bold pl-2"> ${tutorName(remark)} </span></div>
                   </div>
                 </div>
-                <div class="col-3"> ${escapeHtml(remark.date)} </div>
+                <div class="col-3 d-flex justify-content-between align-items-center" style="gap: 12px;">
+                  <span> ${escapeHtml(remark.date)} </span>
+                  ${isMine(remark) ? `<input type="checkbox" class="remark-check" data-remark-check="${remark.id}" ${checkedRemarkIds.has(remark.id) ? 'checked' : ''} aria-label="Select remark ${escapeHtml(remark.title)}">` : ''}
+                </div>
               </div>
               ${remark.attachment ? '<div class="d-flex justify-content-end"><button class="btn btn-trans"> See Attachment </button></div>' : ''}
             </div>
@@ -675,6 +693,26 @@
     // Tag chips use prototype classes, but the card itself must carry the
     // remark-card scope (data-v-2bb8a050) to pick up production styles.
     document.getElementById('remark-list').innerHTML = scoped(html, '2bb8a050');
+    renderBulkActions(visible);
+  }
+
+  // "Delete (n)" and "Check All / Uncheck All" act on the visible own remarks
+  function renderBulkActions(visible) {
+    const ownVisibleIds = visible.filter(isMine).map((remark) => remark.id);
+    const allChecked = ownVisibleIds.length > 0 && ownVisibleIds.every((id) => checkedRemarkIds.has(id));
+    const deleteButton = document.getElementById('delete-remarks');
+    deleteButton.disabled = checkedRemarkIds.size === 0;
+    deleteButton.firstElementChild.textContent = checkedRemarkIds.size ? `Delete (${checkedRemarkIds.size})` : 'Delete';
+    const checkAllButton = document.getElementById('check-all');
+    checkAllButton.textContent = allChecked ? 'Uncheck All' : 'Check All';
+    checkAllButton.disabled = ownVisibleIds.length === 0;
+  }
+
+  function visibleRemarks() {
+    const statusFilter = document.getElementById('status-filter').value;
+    const onlyMine = document.getElementById('tutor-filter').value === 'mine';
+    return remarks.filter((remark) =>
+      (!statusFilter || remark.status === statusFilter) && (!onlyMine || isMine(remark)));
   }
 
   function renderAll() {
@@ -869,6 +907,61 @@
 
   document.getElementById('status-filter').addEventListener('change', renderRemarks);
   document.getElementById('tutor-filter').addEventListener('change', renderRemarks);
+
+  // ---- Delete own remarks (checkbox / Check All / Delete) ----
+
+  document.getElementById('remark-list').addEventListener('change', (event) => {
+    const id = event.target.dataset.remarkCheck;
+    if (!id) return;
+    if (event.target.checked) checkedRemarkIds.add(Number(id));
+    else checkedRemarkIds.delete(Number(id));
+    renderBulkActions(visibleRemarks());
+  });
+
+  document.getElementById('check-all').addEventListener('click', () => {
+    const ownVisibleIds = visibleRemarks().filter(isMine).map((remark) => remark.id);
+    const allChecked = ownVisibleIds.every((id) => checkedRemarkIds.has(id));
+    ownVisibleIds.forEach((id) => (allChecked ? checkedRemarkIds.delete(id) : checkedRemarkIds.add(id)));
+    renderRemarks();
+  });
+
+  document.getElementById('delete-remarks').addEventListener('click', () => {
+    const toDelete = remarks.filter((remark) => checkedRemarkIds.has(remark.id));
+    const affectedTopics = getWeaknesses().filter(({ remark }) => checkedRemarkIds.has(remark.id));
+    const topicNote = affectedTopics.length ? `
+      <div class="proto-alert" role="alert">
+        ${ALERT_ICON}
+        <div>
+          ${affectedTopics.length === 1 ? 'This topic' : 'These topics'} will also be removed from the To Improve list:
+          <ul>${affectedTopics.map(({ tag }) => `<li><strong>${escapeHtml(tag.topic)}</strong></li>`).join('')}</ul>
+        </div>
+      </div>` : '';
+
+    document.getElementById('confirm-delete-body').innerHTML = `
+      ${topicNote}
+      <p class="confirm-text">
+        ${toDelete.length} remark${toDelete.length > 1 ? 's' : ''} will be deleted. This cannot be undone.
+      </p>
+      <div class="d-flex justify-content-end align-items-center" style="gap: 12px;">
+        <button type="button" class="btn btn-link" data-close-inline>Cancel</button>
+        <button type="button" class="btn btn-primary" data-confirm-delete> Delete </button>
+      </div>`;
+    openModal('confirm-delete');
+  });
+
+  document.getElementById('confirm-delete-body').addEventListener('click', (event) => {
+    if (event.target.closest('[data-close-inline]')) closeModals();
+    if (!event.target.closest('[data-confirm-delete]')) return;
+    const count = checkedRemarkIds.size;
+    // Mutate in place: `remarks` is a const array shared by every renderer
+    for (let index = remarks.length - 1; index >= 0; index -= 1) {
+      if (checkedRemarkIds.has(remarks[index].id)) remarks.splice(index, 1);
+    }
+    checkedRemarkIds.clear();
+    closeModals();
+    renderAll();
+    showToast(`${count} remark${count > 1 ? 's' : ''} deleted.`);
+  });
 
   // ---- Generate follow-up worksheet ----
 
