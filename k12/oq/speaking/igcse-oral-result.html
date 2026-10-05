@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeyHi — IGCSE Oral Result</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Nunito:wght@600;700;800&family=Poppins:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* Shell CSS (topbar/subbar/qrail/panel) ported from the bento-profile
+     project's speech-result-v2.html, which was itself built against the
+     real demo.heyhi.sg result page for this same quiz
+     (quiz-result-speech-interactive?attempt_id=990922) — so the shell
+     below is a direct port, not a re-guess. Content/sidebar adapted for
+     the IGCSE oral test: three scored parts sharing ONE overall rubric
+     (per the requirements doc), not one rubric per question. No
+     transcript/highlight text is shown, per instruction. Background
+     images are the real assets, downloaded into assets/. */
+  :root {
+    --amber: #fec53c;
+    --amber-soft: #fff7ee;
+    --blue: #0fb0f8;
+    --blue-ink: #0a93d4;
+    --green: #16d8a7;
+    --red: #ff1744;
+    --slate: #708eb1;
+
+    --ink: #303b49;
+    --ink-soft: #5c6672;
+    --muted: #98a2ad;
+    --line: #e7ebef;
+    --page-bg: #f6f8fa;
+    --card: #ffffff;
+    --chip-bg: #f3f4f6;
+
+    --radius-lg: 18px;
+    --radius-md: 14px;
+    --radius-pill: 16px;
+    --shadow-card: 0 1px 3px rgba(33, 43, 54, 0.06), 0 8px 24px rgba(33, 43, 54, 0.05);
+
+    --font-display: "Nunito", system-ui, sans-serif;
+    --font-body: "Poppins", system-ui, sans-serif;
+    --font-mont: "Montserrat", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  button, select, input, textarea { font-family: inherit; font-size: inherit; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font-body);
+    color: var(--ink);
+    background: var(--page-bg);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ---------- Top app bar ---------- */
+  .topbar {
+    position: relative;
+    flex: 0 0 auto;
+    height: 55px;
+    background: var(--amber) url("assets/topbar-pattern.png") repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .topbar__title { font-weight: 700; font-size: 20px; color: #fff; z-index: 1; }
+  .btn-exit {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--blue); color: #fff; border: none; text-decoration: none;
+    font-weight: 600; font-size: 15px; padding: 7px 16px;
+    border-radius: var(--radius-pill); cursor: pointer;
+  }
+  .btn-pdf {
+    position: absolute; right: 128px; top: 50%; transform: translateY(-50%);
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--green); color: #fff; border: none;
+    font-weight: 600; font-size: 15px; padding: 7px 16px;
+    border-radius: var(--radius-pill); cursor: pointer;
+  }
+
+  /* ---------- Sub bar ---------- */
+  .subbar {
+    flex: 0 0 auto; min-height: 84px;
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 0 24px;
+    background: #fff url("assets/result-subbar-pattern.png") repeat;
+    box-shadow: rgba(18, 38, 63, 0.03) 0px 0.75rem 1.5rem;
+  }
+  .student-meta { display: flex; align-items: center; gap: 28px; }
+  .student-meta__field label {
+    display: block; font-family: var(--font-mont); font-weight: 700; font-size: 10px;
+    letter-spacing: 0.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 3px;
+  }
+  .student-meta__field .value { font-weight: 700; font-size: 15px; color: var(--ink); }
+
+  .pill-row { display: flex; align-items: center; gap: 14px; }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #fff; border: 2px solid var(--green); color: var(--green);
+    font-family: var(--font-mont); font-weight: 700; font-size: 15px;
+    padding: 9px 22px; border-radius: var(--radius-pill); white-space: nowrap;
+  }
+  .pill--info { border-color: var(--blue); color: var(--blue-ink); }
+
+  /* ---------- Stage ---------- */
+  .stage { flex: 1 1 auto; display: flex; min-height: 0; }
+
+  .qrail {
+    flex: 0 0 72px;
+    display: flex; flex-direction: column; align-items: center;
+    padding: 18px 0; gap: 20px; background: #fff;
+    overflow-y: auto; scrollbar-width: none;
+  }
+  .qrail::-webkit-scrollbar { display: none; }
+  .qnode {
+    outline: none; appearance: none;
+    width: 37px; height: 37px; border-radius: 100%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; background: #8a8a8a; border: 2px solid #8a8a8a;
+    box-shadow: 0 0 0 3px #fff;
+    font-weight: 400; font-size: 16px; cursor: pointer;
+    transition: transform 0.12s ease;
+  }
+  .qnode:hover { transform: scale(1.08); }
+  .qnode--active { outline: 3px solid rgba(15, 176, 248, 0.5); outline-offset: 2px; }
+
+  .main {
+    flex: 1 1 auto; min-width: 0; min-height: 0;
+    display: flex; flex-direction: column; gap: 32px;
+    padding: 16px 24px; overflow-y: auto; scrollbar-width: none;
+  }
+  .main::-webkit-scrollbar { display: none; }
+
+  .tabs {
+    flex: 0 0 auto; display: flex; width: 100%;
+    background: #e8e8e8; border-radius: 16px 16px 0 0; padding: 8px 16px 0;
+  }
+  .tab {
+    font-weight: 800; font-size: 16px; color: var(--muted);
+    background: transparent; border: none; padding: 12px 22px;
+    cursor: pointer; border-radius: 12px 12px 0 0;
+  }
+  .tab--active { color: var(--blue); background: var(--card); }
+
+  .card {
+    background: var(--card) url("assets/result-card-texture.jpg") repeat;
+    border-radius: 0 0 16px 16px;
+    box-shadow: var(--shadow-card);
+  }
+  .card__scroll { padding: 26px 34px 34px; }
+
+  .eyebrow {
+    font-family: var(--font-display); font-weight: 800; font-size: 15px;
+    letter-spacing: 0.4px; color: var(--ink-soft); margin-bottom: 12px;
+  }
+  .eyebrow--tight { margin-top: 24px; }
+
+  .badge-interactive {
+    display: inline-block;
+    background: #eaf8ff; color: var(--blue-ink);
+    font-weight: 700; font-size: 12px;
+    padding: 4px 12px; border-radius: var(--radius-pill);
+    margin-bottom: 12px;
+  }
+  .part-topic {
+    display: inline-block; margin: 0 0 12px 10px;
+    background: #f1edff; color: #5b4ea6;
+    font-weight: 700; font-size: 12px;
+    padding: 4px 12px; border-radius: var(--radius-pill);
+  }
+  .prompt-list { list-style: none; margin: 0 0 24px; }
+  .prompt-list li {
+    position: relative;
+    font-size: 16.5px; line-height: 1.6; color: var(--ink);
+    padding-left: 18px; margin-bottom: 8px;
+  }
+  .prompt-list li::before {
+    content: ""; position: absolute; left: 0; top: 11px;
+    width: 6px; height: 6px; border-radius: 50%; background: var(--muted);
+  }
+  .prompt-script {
+    font-style: italic; color: var(--ink-soft);
+    font-size: 15px; line-height: 1.7; margin-bottom: 14px;
+  }
+  .prompt-card {
+    background: var(--page-bg); border: 1px solid var(--line); border-radius: var(--radius-md);
+    padding: 14px 16px; margin-bottom: 18px;
+  }
+  .prompt-card__title { font-weight: 700; font-size: 15px; margin-bottom: 6px; color: var(--ink); }
+  .prompt-card__task { font-weight: 700; margin-top: 8px; }
+
+  .ai-banner { display: flex; align-items: stretch; gap: 14px; margin-bottom: 20px; }
+  .ai-banner__note {
+    flex: 1 1 auto; display: flex; align-items: center; gap: 8px; justify-content: center;
+    background: var(--amber-soft); border: 1px solid #ffe6c2; border-radius: var(--radius-md);
+    color: #f5a623; font-weight: 800; font-size: 15px; padding: 12px;
+  }
+  .btn-see-result {
+    flex: 0 0 auto; background: var(--blue); color: #fff; border: none;
+    font-weight: 600; font-size: 15px; padding: 0 26px;
+    border-radius: var(--radius-md); cursor: pointer;
+  }
+
+  /* Recordings — a stand-in for the live audio player; this prototype has
+     no recording files, so the row shows the take and its length only. */
+  .recordings { display: flex; flex-direction: column; gap: 10px; }
+  .recording {
+    display: flex; align-items: center; gap: 12px;
+    background: #fff; border: 1px solid var(--line);
+    border-radius: var(--radius-md); padding: 10px 14px;
+  }
+  .recording__num {
+    flex: 0 0 auto; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--chip-bg); color: var(--ink-soft);
+    font-size: 12px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .recording__icon {
+    flex: 0 0 auto; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--blue); color: #fff;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .recording__track {
+    flex: 1 1 auto; height: 4px; border-radius: 4px;
+    background: var(--chip-bg); overflow: hidden;
+  }
+  .recording__wave { display: block; height: 100%; width: 0; background: var(--blue); }
+  .recording__time {
+    flex: 0 0 auto; font-size: 12px; color: var(--ink-soft);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- Panel ---------- */
+  .panel-slot { flex: 0 0 420px; display: flex; min-height: 0; margin: 12px 20px 12px 0; }
+  .panel-slot--closed { display: none; }
+  .panel {
+    flex: 1 1 auto; display: flex; flex-direction: column;
+    background: var(--card); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-card); overflow: hidden;
+  }
+  .panel__head {
+    flex: 0 0 auto; position: relative;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 18px; background: var(--slate);
+  }
+  .panel__tag {
+    background: rgba(255, 255, 255, 0.22); color: #fff;
+    font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: var(--radius-pill);
+  }
+  .panel__context { font-weight: 700; font-size: 14px; color: #fff; }
+  .panel__close {
+    position: absolute; top: 50%; right: 16px; transform: translateY(-50%);
+    background: transparent; border: none; color: rgba(255, 255, 255, 0.85);
+    font-size: 18px; cursor: pointer; line-height: 1; display: none;
+  }
+  .panel__scroll { flex: 1 1 auto; overflow-y: auto; padding: 16px 18px 24px; scrollbar-width: none; }
+  .panel__scroll::-webkit-scrollbar { display: none; }
+
+  /* Score banner — the real page's "Score X Marks" card, with its actual
+     decorative art (an ellipse + a pencil/notebook icon) bleeding off the
+     right edge. Purely decorative; same graphic the live app reuses across
+     quiz types regardless of subject. */
+  .score-banner {
+    position: relative; overflow: hidden;
+    background: var(--blue-ink); color: #fff;
+    border-radius: var(--radius-md); padding: 16px 18px; margin-bottom: 18px;
+  }
+  .score-banner__label { font-size: 12px; font-weight: 700; opacity: 0.85; text-transform: uppercase; letter-spacing: 0.4px; }
+  .score-banner__value { font-family: var(--font-display); font-weight: 800; font-size: 26px; margin-top: 2px; }
+  .score-banner__deco { position: absolute; right: 0; top: 0; width: 100px; height: 100%; pointer-events: none; }
+  .score-banner__deco img { position: absolute; right: 0; top: 0; height: 100%; width: auto; }
+  .score-banner__deco img:first-child { opacity: 0.55; }
+
+  .rb-meta__label { font-size: 12px; color: var(--ink-soft); margin-bottom: 3px; }
+  .rb-meta__value { font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 14px; }
+
+  /* ---------- Rubrics (Overview / Details) ---------- */
+  .rb-switch { display: flex; background: #d7e1ec; border-radius: 12px; padding: 4px; gap: 4px; margin-bottom: 14px; }
+  .rb-switch__btn {
+    flex: 1 1 0; background: transparent; border: none;
+    font-weight: 700; font-size: 13px; color: var(--ink-soft);
+    padding: 7px 0; border-radius: 9px; cursor: pointer;
+  }
+  .rb-switch__btn--active { background: #fff; color: var(--ink); }
+
+  .rb-card { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 14px; }
+  .rb-eyebrow { font-size: 12px; color: var(--ink-soft); margin-bottom: 2px; }
+  .rb-title { font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 14px; }
+  .rb-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .rb-row:last-child { margin-bottom: 0; }
+  .rb-row__label { flex: 0 0 150px; font-size: 13px; color: var(--ink-soft); line-height: 1.3; }
+  .rb-bar { flex: 1 1 auto; height: 10px; background: var(--chip-bg); border-radius: var(--radius-pill); overflow: hidden; }
+  .rb-bar__fill { display: block; height: 100%; background: var(--blue); border-radius: var(--radius-pill); }
+  .rb-row__score { flex: 0 0 auto; font-weight: 700; font-size: 13px; color: var(--ink); }
+
+  .rb-acc { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); margin-bottom: 8px; overflow: hidden; }
+  .rb-acc__head {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 12px 14px; background: transparent; border: none; width: 100%;
+    cursor: pointer; font-weight: 700; font-size: 13.5px; color: var(--ink); text-align: left;
+  }
+  .rb-acc__level { font-weight: 600; color: var(--blue-ink); margin-right: auto; margin-left: 10px; }
+  .rb-acc__head svg { flex: 0 0 auto; color: var(--ink-soft); transition: transform 0.18s ease; }
+  .rb-acc--open .rb-acc__head svg { transform: rotate(180deg); }
+  .rb-acc__body { display: none; padding: 0 14px 14px; }
+  .rb-acc--open .rb-acc__body { display: block; }
+  .rb-acc__obtained { font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; }
+  .rb-acc__obtained b { color: var(--ink); }
+  .rb-acc__desc { margin: 0 0 10px 16px; }
+  .rb-acc__desc li { font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); margin-bottom: 5px; }
+  .rb-feedback {
+    background: #eaf8ff; border-left: 3px solid var(--blue); border-radius: 8px;
+    padding: 10px 12px; font-size: 12.5px; line-height: 1.6; color: var(--ink-soft);
+  }
+
+  /* ==========================================================
+     Tablet & mobile — same treatment as the bento-profile result
+     pages: the stage stacks, questions become a horizontal strip,
+     the panel becomes a bottom sheet opened from "See result".
+     ========================================================== */
+  @media (max-width: 900px) {
+    body { padding-bottom: 0; }
+    .stage { flex-direction: column; }
+
+    .qrail {
+      flex: 0 0 auto; flex-direction: row; justify-content: flex-start;
+      gap: 14px; padding: 10px 16px;
+      overflow-x: auto; overflow-y: hidden;
+      border-bottom: 1px solid var(--line);
+    }
+    .qnode { flex: 0 0 auto; width: 32px; height: 32px; font-size: 14px; box-shadow: none; }
+
+    .main { gap: 24px; padding: 12px; }
+    .card__scroll { padding: 18px 16px 26px; }
+    .tabs { overflow-x: auto; padding: 6px 8px 0; scrollbar-width: none; }
+    .tabs::-webkit-scrollbar { display: none; }
+    .tab { flex: 0 0 auto; font-size: 13px; padding: 10px 14px; }
+
+    .prompt-list li { font-size: 15px; }
+    .ai-banner { flex-direction: column; gap: 10px; }
+    .ai-banner__note { font-size: 13px; padding: 10px; }
+    .btn-see-result { padding: 11px 20px; font-size: 14px; }
+
+    .panel-slot {
+      position: fixed; inset: auto 0 0 0;
+      height: 78vh; flex: none; margin: 0; z-index: 200;
+    }
+    .panel { border-radius: 16px 16px 0 0; box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.22); }
+    .panel::before {
+      content: ""; flex: 0 0 auto;
+      width: 36px; height: 4px; margin: 8px auto 2px;
+      background: rgba(255, 255, 255, 0.45); border-radius: 4px;
+    }
+    .panel__close { display: block; right: 12px; font-size: 22px; padding: 4px 8px; }
+    .panel__scroll { padding: 14px 14px 26px; }
+  }
+
+  @media (max-width: 600px) {
+    .topbar { height: 48px; justify-content: flex-start; padding: 0 12px; }
+    .topbar__title {
+      font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      max-width: calc(100% - 90px);
+    }
+    .btn-exit { right: 12px; font-size: 12px; padding: 6px 11px; gap: 5px; }
+    .btn-exit svg { width: 14px; height: 14px; }
+    .btn-pdf { display: none; }
+
+    .subbar { min-height: 0; flex-wrap: wrap; align-items: flex-start; gap: 10px; padding: 12px 16px; }
+    .student-meta { gap: 18px; }
+    .student-meta__field .value { font-size: 14px; }
+    .pill-row { width: 100%; gap: 8px; flex-wrap: wrap; }
+    .pill { font-size: 11.5px; padding: 6px 12px; gap: 5px; border-width: 1.5px; }
+    .pill svg { width: 13px; height: 13px; }
+
+    .rb-row__label { flex: 0 0 112px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="topbar__title" id="quizTitle">IGCSE Oral: Speaking test</h1>
+    <button class="btn-pdf" id="btnPdf" type="button">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 3v12M12 15l-4.5-4.5M12 15l4.5-4.5M4 19h16" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      Download PDF
+    </button>
+    <a class="btn-exit" href="igcse-oral.html">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 5H6a2 2 0 00-2 2v10a2 2 0 002 2h9M18 15l3-3-3-3M21 12H10" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      Exit
+    </a>
+  </header>
+
+  <div class="subbar">
+    <div class="student-meta">
+      <div class="student-meta__field">
+        <label>Student Name</label>
+        <div class="value" id="studentName">—</div>
+      </div>
+      <div class="student-meta__field">
+        <label>Attempts</label>
+        <div class="value" id="attempts">—</div>
+      </div>
+    </div>
+    <div class="pill-row">
+      <span class="pill" id="statusPill">—</span>
+      <span class="pill pill--info" id="marksPill">—</span>
+    </div>
+  </div>
+
+  <div class="stage">
+    <nav class="qrail" id="qrail"></nav>
+    <main class="main" id="mainScroll"></main>
+
+    <div class="panel-slot panel-slot--closed" id="panelSlot">
+      <aside class="panel">
+        <div class="panel__head">
+          <span class="panel__tag">Speaking Feedback</span>
+          <span class="panel__context">Rubric Score</span>
+          <button class="panel__close" id="panelClose" aria-label="Close feedback panel">&times;</button>
+        </div>
+        <div class="panel__scroll" id="panelScroll"></div>
+      </aside>
+    </div>
+  </div>
+
+<div class="toast" id="toast" style="position:fixed;left:50%;bottom:26px;transform:translate(-50%,12px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:999px;font-size:13px;font-weight:600;box-shadow:0 12px 32px rgba(24,39,57,.28);opacity:0;pointer-events:none;transition:opacity .2s ease, transform .2s ease;z-index:300;"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Result data ----------
+  // Prompts/scripts are the requirements doc's content (Part 1 "Recycling
+  // and repairing", Part 2 "Party food", Part 3 discussion). Rubric
+  // descriptors and the sample levels match igcse-oral.html's marking
+  // criteria modal, so the two prototypes agree with each other.
+  const result = {
+    title: 'IGCSE Oral: Speaking test',
+    studentName: 'Aqil Hidayat',
+    attempts: '1/1',
+    statusLabel: 'All Parts Marked',
+    totalMarks: 28,
+    maxMarks: 40,
+    percentage: 70,
+
+    parts: [
+      {
+        number: '1',
+        label: 'Part 1: Interview',
+        topic: 'Recycling and repairing',
+        script: 'The first assessed part of the test is an interview. I am going to ask you some questions about recycling and repairing. Try to say as much as you can for each question.',
+        prompts: [
+          'What things do people recycle, and why?',
+          'Can you tell me about a time when you, or someone you know, repaired something?',
+          'Do you think that we should stop buying new things to protect the environment? Why? Why not?',
+        ],
+        recordings: [
+          { duration: '00:17' },
+          { duration: '00:24' },
+          { duration: '00:21' },
+        ],
+      },
+      {
+        number: '2',
+        label: 'Part 2: Short talk',
+        topic: null,
+        script: 'The second assessed part of the test is a short talk, on the card below. The candidate has up to one minute to prepare, then talks for up to two minutes.',
+        card: {
+          title: 'Party food',
+          intro: 'You are having a party at your home and organising the food for it. You are considering the following options:',
+          options: ['asking your guests to bring their favourite food', 'ordering from a fast food restaurant.'],
+          task: 'Talk about the advantages and disadvantages of each option. Say which option you would prefer, and why.',
+        },
+        recordings: [{ duration: '01:42' }],
+      },
+      {
+        number: '3',
+        label: 'Part 3: Discussion',
+        topic: 'Party food',
+        script: 'Now I am going to ask you a few questions related to the topic you have just talked about.',
+        prompts: [
+          'Do you think that young people enjoy cooking?',
+          'Some people say that healthy food is not very tasty. Do you agree?',
+          'Is it easier to plan a party by yourself or with a group of people?',
+        ],
+        note: 'One question was not needed — the candidate had already answered it at length earlier in the discussion.',
+        recordings: [
+          { duration: '00:19' },
+          { duration: '00:28' },
+          { duration: '00:33' },
+        ],
+      },
+    ],
+
+    // ONE rubric shared across all three parts — per the requirements doc:
+    // "The marking criteria must be applied consistently to all three parts
+    // of the test, resulting in an overall mark for each of the four
+    // criteria." Unlike a per-question rubric, this does not change when a
+    // different part is selected in the left rail.
+    rubrics: {
+      name: 'IGCSE Speaking Assessment Criteria',
+      componentNote: 'Applied consistently to Part 1, Part 2 and Part 3 together — one overall mark per criterion, not a separate score per part.',
+      obtained: 28,
+      max: 40,
+      criteria: [
+        {
+          name: 'Grammar', obtained: 7, max: 10, level: 4,
+          descriptors: [
+            'A range of simple structures used; complex structures are attempted.',
+            'Simple structures used mostly accurately; errors often occur when attempting more complex structures but these do not impede understanding.',
+          ],
+          remark: 'Past tense slipped in Part 1 ("someone repair something" instead of "repaired"), but Part 2 and 3 held complex structures together well. Review irregular past tense forms before the next attempt.',
+        },
+        {
+          name: 'Vocabulary', obtained: 8, max: 10, level: 4,
+          descriptors: [
+            'A sufficient range of vocabulary used appropriately to discuss a variety of ideas, facts and opinions.',
+          ],
+          remark: 'Good range across all three parts — "over-consumption," "convenience" and "ordering in" all appeared naturally in Part 2. Strongest criterion this attempt.',
+        },
+        {
+          name: 'Development', obtained: 6, max: 10, level: 3,
+          descriptors: [
+            'Responses are relevant with attempts at development.',
+            'Communication is maintained but with frequent support from the examiner.',
+          ],
+          remark: 'Part 1 answers were on-topic but stayed short until prompted. In the short talk, both options were covered but the comparison between them could go further — say which you would choose and why, not just list pros and cons.',
+        },
+        {
+          name: 'Pronunciation', obtained: 7, max: 10, level: 4,
+          descriptors: [
+            'Pronunciation is mostly clear; inaccuracies do not impede communication.',
+            'Intonation is sometimes used effectively to convey intended meaning.',
+          ],
+          remark: 'Clear throughout, with word stress on multi-syllable words ("re-spon-si-ble", "en-vi-ron-ment") as the main thing to keep practising.',
+        },
+      ],
+    },
+  };
+
+  // ---------- helpers ----------
+  const $ = (id) => document.getElementById(id);
+  function escapeHtml(str) {
+    return (str || '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+  function showToast(msg) {
+    const t = $('toast');
+    t.textContent = msg;
+    t.style.opacity = '1';
+    t.style.transform = 'translate(-50%, 0)';
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => { t.style.opacity = '0'; t.style.transform = 'translate(-50%, 12px)'; }, 2200);
+  }
+
+  // A non-functional stand-in for the live audio player — this prototype
+  // has no recording files, so each row shows the take and its length only.
+  function recordingsHtml(part) {
+    return `
+      <div class="recordings">
+        ${part.recordings.map((r, i) => `
+          <div class="recording">
+            <span class="recording__num">${i + 1}</span>
+            <span class="recording__icon" aria-hidden="true">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8 5v14l11-7z" stroke-linejoin="round" /></svg>
+            </span>
+            <span class="recording__track"><span class="recording__wave"></span></span>
+            <span class="recording__time">00:00 / ${escapeHtml(r.duration)}</span>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  function questionTextHtml(part) {
+    if (part.card) {
+      return `
+        <p class="prompt-script">${escapeHtml(part.script)}</p>
+        <div class="prompt-card">
+          <p class="prompt-card__title">${escapeHtml(part.card.title)}</p>
+          <p>${escapeHtml(part.card.intro)}</p>
+          <ul class="prompt-list">${part.card.options.map((o) => `<li>${escapeHtml(o)}</li>`).join('')}</ul>
+          <p class="prompt-card__task">${escapeHtml(part.card.task)}</p>
+        </div>`;
+    }
+    return `
+      <p class="prompt-script">${escapeHtml(part.script)}</p>
+      <ul class="prompt-list">${part.prompts.map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul>
+      ${part.note ? `<p class="prompt-script">${escapeHtml(part.note)}</p>` : ''}`;
+  }
+
+  function partCardHtml(part) {
+    return `
+      <section class="qblock" id="qblock-${part.number}" data-q="${part.number}">
+        <div class="tabs" role="tablist">
+          <button class="tab tab--active" data-tab="question">${escapeHtml(part.label)}</button>
+          <button class="tab" data-tab="rubrics">Rubrics</button>
+        </div>
+        <div class="card">
+          <div class="card__scroll" data-panel="question">
+            <p class="eyebrow">Question Text:</p>
+            <span class="badge-interactive">Interactive</span>
+            ${part.topic ? `<span class="part-topic">${escapeHtml(part.topic)}</span>` : ''}
+            ${questionTextHtml(part)}
+
+            <p class="eyebrow eyebrow--tight">Answers:</p>
+            <div class="ai-banner">
+              <span class="ai-banner__note">This answer has been reviewed by AI! ✨</span>
+              <button class="btn-see-result" data-see-result="${part.number}">See result</button>
+            </div>
+            ${recordingsHtml(part)}
+          </div>
+          <div class="card__scroll" data-panel="rubrics" hidden>
+            ${rubricsViewHtml()}
+          </div>
+        </div>
+      </section>`;
+  }
+
+  // ---------- shared rubric view (panel + in-card "Rubrics" tab) ----------
+  function rubricsViewHtml() {
+    const r = result.rubrics;
+    const overview = `
+      <div class="rb-view" data-rb-view="overview">
+        <div class="score-banner">
+          <div class="score-banner__label">Score</div>
+          <div class="score-banner__value">${r.obtained} / ${r.max} Marks</div>
+          <div class="score-banner__deco" aria-hidden="true">
+            <img src="assets/result-score-ellipse.png" alt="">
+            <img src="assets/result-score-notebook.png" alt="">
+          </div>
+        </div>
+        <p class="rb-meta__label">Rubrics Name</p>
+        <p class="rb-meta__value">${escapeHtml(r.name)}</p>
+        <div class="rb-card">
+          <p class="rb-title">${escapeHtml(r.componentNote)}</p>
+          ${r.criteria.map((c) => `
+            <div class="rb-row">
+              <span class="rb-row__label">${escapeHtml(c.name)}</span>
+              <span class="rb-bar"><span class="rb-bar__fill" style="width:${(c.obtained / c.max) * 100}%"></span></span>
+              <span class="rb-row__score">${c.obtained}/${c.max}</span>
+            </div>`).join('')}
+        </div>
+      </div>`;
+
+    const details = `
+      <div class="rb-view" data-rb-view="detail" hidden>
+        ${r.criteria.map((c) => `
+          <div class="rb-acc">
+            <button class="rb-acc__head" type="button">
+              <span>${escapeHtml(c.name)}</span>
+              <span class="rb-acc__level">Level ${c.level}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+            <div class="rb-acc__body">
+              <p class="rb-acc__obtained">Obtained: <b>${c.obtained} / ${c.max} Marks</b></p>
+              <ul class="rb-acc__desc">${c.descriptors.map((d) => `<li>${escapeHtml(d)}</li>`).join('')}</ul>
+              <div class="rb-feedback">${escapeHtml(c.remark)}</div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+
+    return `
+      <div class="rb-switch">
+        <button class="rb-switch__btn rb-switch__btn--active" data-rb="overview">Overview</button>
+        <button class="rb-switch__btn" data-rb="detail">Details</button>
+      </div>
+      ${overview}${details}`;
+  }
+
+  function wireRubricInteractions(scope) {
+    scope.querySelectorAll('.rb-switch__btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        scope.querySelectorAll('.rb-switch__btn').forEach((b) => b.classList.remove('rb-switch__btn--active'));
+        btn.classList.add('rb-switch__btn--active');
+        scope.querySelectorAll('.rb-view').forEach((v) => { v.hidden = v.dataset.rbView !== btn.dataset.rb; });
+      });
+    });
+    scope.querySelectorAll('.rb-acc__head').forEach((head) => {
+      head.addEventListener('click', () => head.closest('.rb-acc').classList.toggle('rb-acc--open'));
+    });
+  }
+
+  // ---------- shell ----------
+  function renderShell() {
+    $('quizTitle').textContent = result.title;
+    $('studentName').textContent = result.studentName;
+    $('attempts').textContent = result.attempts;
+    $('statusPill').innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6 9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" /></svg>
+      ${escapeHtml(result.statusLabel)}`;
+    $('marksPill').innerHTML = `
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5v.5" stroke-linecap="round" /></svg>
+      Score: ${result.totalMarks}/${result.maxMarks} Marks (${result.percentage}%)`;
+  }
+
+  function renderRail() {
+    const rail = $('qrail');
+    rail.innerHTML = result.parts.map((p, i) => `<button class="qnode${i === 0 ? ' qnode--active' : ''}" data-q="${p.number}">${p.number}</button>`).join('');
+    rail.querySelectorAll('.qnode').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        rail.querySelectorAll('.qnode').forEach((n) => n.classList.remove('qnode--active'));
+        btn.classList.add('qnode--active');
+        $('qblock-' + btn.dataset.q)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+  }
+
+  function openPanel() { $('panelSlot').classList.remove('panel-slot--closed'); }
+
+  function renderParts() {
+    const main = $('mainScroll');
+    main.innerHTML = result.parts.map(partCardHtml).join('');
+
+    main.querySelectorAll('.tab').forEach((tab) => {
+      tab.addEventListener('click', () => {
+        const block = tab.closest('.qblock');
+        block.querySelectorAll('.tab').forEach((t) => t.classList.remove('tab--active'));
+        tab.classList.add('tab--active');
+        block.querySelectorAll('[data-panel]').forEach((p) => { p.hidden = p.dataset.panel !== tab.dataset.tab; });
+      });
+    });
+
+    main.querySelectorAll('[data-panel="rubrics"]').forEach(wireRubricInteractions);
+
+    main.querySelectorAll('[data-see-result]').forEach((btn) => {
+      btn.addEventListener('click', () => openPanel());
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    renderShell();
+    renderRail();
+    renderParts();
+
+    $('panelScroll').innerHTML = rubricsViewHtml();
+    wireRubricInteractions($('panelScroll'));
+    if (!window.matchMedia('(max-width: 900px)').matches) openPanel();
+
+    $('panelClose').addEventListener('click', () => $('panelSlot').classList.add('panel-slot--closed'));
+    $('btnPdf').addEventListener('click', () => showToast('PDF export — demo placeholder'));
+  });
+})();
+</script>
+</body>
+</html>

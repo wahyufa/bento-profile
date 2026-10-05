@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>IGCSE Oral: Speaking test</title>
+<title>IGCSE Oral: Speaking test (v1, inline result)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
@@ -288,6 +288,27 @@
   .completion h2{margin:0; font-size:22px; color:var(--text);}
   .completion p{margin:0 0 6px; color:var(--text-muted); max-width:380px;}
 
+  /* ---------- Result ---------- */
+  .result-head{display:flex; align-items:center; gap:10px 16px; flex-wrap:wrap; margin-bottom:clamp(8px,1.6vh,14px);}
+  .result-head h2{margin:0; font-size:clamp(20px,3.4vh,30px); color:var(--heading);}
+  .result-sub{flex:1 1 220px; margin:0; font-size:12.5px; color:var(--text-muted);}
+  .total{display:inline-flex; align-items:baseline; gap:6px; padding:6px 16px; border-radius:16px; background:var(--examiner-bg);}
+  .total b{font:700 clamp(22px,3.6vh,30px) 'Poppins',sans-serif; color:var(--brand-dark);}
+  .total span{font-weight:600; font-size:13px; color:var(--text-muted);}
+  .result-grid{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(8px,1.6vh,14px);}
+  .criterion{border:1px solid var(--bubble-border); border-radius:16px; padding:clamp(10px,1.8vh,16px) 16px; background:#fff;}
+  .criterion-head{display:flex; align-items:center; gap:10px;}
+  .criterion-head h3{margin:0; font-size:16px; flex:1 1 auto;}
+  .level-pill{font:700 12px/1.6 'Poppins',sans-serif; padding:1px 10px; border-radius:999px; background:var(--examiner-bg); color:var(--brand-dark);}
+  .mark{font:700 16px 'Poppins',sans-serif; color:var(--text);}
+  .mark small{font-size:12px; font-weight:600; color:var(--text-faint);}
+  .meter{display:grid; grid-template-columns:repeat(10,1fr); gap:3px; margin:8px 0 10px;}
+  .meter span{height:6px; border-radius:3px; background:var(--progress-track);}
+  .meter span.on{background:var(--brand-light);}
+  .criterion ul{margin:0; padding-left:16px; font-size:12.5px; line-height:1.5; color:var(--text-muted);}
+  .result-foot{display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:clamp(8px,1.6vh,14px);}
+  .result-foot p{margin:0; font-size:12px; color:var(--text-faint);}
+
   /* ---------- Modals ---------- */
   .overlay{position:fixed; inset:0; background:rgba(18,38,63,.55); display:none; align-items:center; justify-content:center; z-index:20; padding:20px;}
   .overlay.open{display:flex;}
@@ -311,6 +332,19 @@
   .structure .dur{color:var(--text-muted); white-space:nowrap;}
   .modal-body .note{margin:12px 0 0; font-size:13px; color:var(--text-muted);}
   .modal-body .btn-block{width:100%; margin-top:18px; font-size:16px; padding:12px;}
+
+  .modal-rubric{max-width:1040px;}
+  .icon-close{appearance:none; border:none; background:none; cursor:pointer; font-size:26px; line-height:1; color:var(--text-muted); padding:0 4px;}
+  .rubric-wrap{overflow:auto;}
+  .rubric-table{width:100%; border-collapse:separate; border-spacing:0; min-width:780px;}
+  .rubric-table th, .rubric-table td{border-bottom:1px solid var(--bubble-border); border-right:1px solid var(--bubble-border); padding:8px 10px; vertical-align:top; font-size:12px; line-height:1.45; text-align:left;}
+  .rubric-table th{position:sticky; top:0; background:var(--student-bg); font:700 12.5px 'Poppins',sans-serif; z-index:1;}
+  .rubric-table tr > *:last-child{border-right:none;}
+  .rubric-table .lvl{font:700 16px 'Poppins',sans-serif; text-align:center; width:56px;}
+  .rubric-table .mk{font:700 12.5px 'Poppins',sans-serif; text-align:center; width:64px; white-space:nowrap;}
+  .rubric-table ul{margin:0; padding-left:15px;}
+  .rubric-table td.is-awarded{background:var(--examiner-bg); box-shadow:inset 0 0 0 2px var(--brand);}
+  .rubric-legend{margin:0; padding:10px 28px; font-size:12px; color:var(--text-muted); border-top:1px solid var(--bubble-border);}
 
   /* ---------- Prototype-only tools (not part of the product UI) ---------- */
   .proto{position:fixed; left:16px; bottom:16px; z-index:15; font-family:'Montserrat',sans-serif;}
@@ -339,6 +373,7 @@
   @media (max-width:860px){
     .split-layout{grid-template-columns:1fr;}
     .card-pane{min-height:0; max-height:260px;}
+    .result-grid{grid-template-columns:1fr;}
   }
   @media (max-width:760px){
     .bubble{flex-direction:column; padding:24px; text-align:center; border-radius:32px; min-height:0; gap:14px;}
@@ -379,7 +414,7 @@
 
   <main class="quiz-body">
 
-    <div class="card">
+    <div class="card" id="testCard">
       <div class="section-head">
         <h2 id="stageTitle">Warm-up</h2>
         <div class="stage-meta" id="stageMeta"></div>
@@ -444,6 +479,19 @@
       </div>
     </div>
 
+    <section class="card" id="results" hidden aria-labelledby="resultTitle">
+      <div class="result-head">
+        <h2 id="resultTitle">Speaking result</h2>
+        <p class="result-sub">Based on Part 1, Part 2 and Part 3 together. The warm-up is not assessed.</p>
+        <div class="total"><b id="totalMark">0</b><span>/ 40</span></div>
+      </div>
+      <div class="result-grid" id="resultGrid"></div>
+      <div class="result-foot">
+        <p>Sample scores for this prototype &mdash; no audio is analysed.</p>
+        <button class="btn btn-outline" id="btnRubric" type="button">View marking criteria</button>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -472,6 +520,14 @@
       <button class="btn btn-outline" id="btnCancelSubmit" type="button">Cancel</button>
       <button class="btn btn-primary" id="btnConfirmSubmit" type="button">Submit</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="rubricOverlay" role="dialog" aria-modal="true" aria-labelledby="rubricHead">
+  <div class="modal modal-rubric">
+    <div class="modal-head"><span id="rubricHead">Marking criteria</span><button class="icon-close" id="btnCloseRubric" type="button" aria-label="Close">&times;</button></div>
+    <div class="rubric-wrap" id="rubricWrap"></div>
+    <p class="rubric-legend">Applied to all three assessed parts together, giving one overall mark for each criterion. Highlighted cells show the level awarded in the sample result.</p>
   </div>
 </div>
 
@@ -552,10 +608,43 @@
     (f) => `Can you give me any examples of ${f.examples}?`,
   ];
 
-  // The result is its own page (a clone of the live quiz result); the earlier
-  // inline version of the result is kept in igcse-oral-v1.html.
-  const RESULT_PAGE = 'igcse-oral-result.html';
-  const showResults = () => { window.location.href = RESULT_PAGE; };
+  const CRITERIA = ['Grammar', 'Vocabulary', 'Development', 'Pronunciation'];
+  const LEVELS = [
+    { level: 5, marks: '9–10', text: {
+      Grammar: ['a range of simple and complex structures used', 'structures are used mostly accurately; errors are rare and do not impede understanding'],
+      Vocabulary: ['a wide range of vocabulary used precisely to discuss a variety of ideas, facts and opinions'],
+      Development: ['responses are relevant and consistently well developed', 'communication is maintained with ease'],
+      Pronunciation: ['pronunciation is clear', 'intonation is frequently used effectively to convey intended meaning'] } },
+    { level: 4, marks: '7–8', text: {
+      Grammar: ['a range of simple structures used; complex structures are attempted', 'simple structures used mostly accurately; errors often occur when attempting to use more complex structures but these do not impede understanding'],
+      Vocabulary: ['a sufficient range of vocabulary used appropriately to discuss a variety of ideas, facts and opinions'],
+      Development: ['responses are relevant and mostly developed', 'communication is maintained with occasional support'],
+      Pronunciation: ['pronunciation is mostly clear; inaccuracies do not impede communication', 'intonation is sometimes used effectively to convey intended meaning'] } },
+    { level: 3, marks: '5–6', text: {
+      Grammar: ['a range of simple structures used; complex structures occasionally attempted', 'simple structures may not be used accurately; errors may impede understanding'],
+      Vocabulary: ['a range of vocabulary used mostly appropriately to discuss simple ideas, facts and opinions'],
+      Development: ['responses are relevant with attempts at development', 'communication is maintained but with frequent support'],
+      Pronunciation: ['pronunciation is mostly clear; inaccuracies occasionally impede communication', 'intonation is rarely used effectively to convey intended meaning'] } },
+    { level: 2, marks: '3–4', text: {
+      Grammar: ['a limited range of only simple structures used', 'structures rarely used accurately; errors frequently impede understanding'],
+      Vocabulary: ['a limited range of vocabulary used to discuss basic facts and opinions'],
+      Development: ['responses are mostly relevant but limited', 'communication may not always be maintained even with frequent support'],
+      Pronunciation: ['pronunciation is frequently unclear; inaccuracies often impede communication', 'intonation is not used effectively to convey intended meaning'] } },
+    { level: 1, marks: '1–2', text: {
+      Grammar: ['response limited to widely spaced single words or short phrases'],
+      Vocabulary: ['insufficient vocabulary to convey the most basic facts and opinions'],
+      Development: ['responses are brief and infrequent', 'communication is not achieved even with frequent support'],
+      Pronunciation: ['pronunciation is unclear and impedes communication', 'intonation is not a feature'] } },
+    { level: 0, marks: '0', text: {
+      Grammar: ['No creditable response.'], Vocabulary: ['No creditable response.'],
+      Development: ['No creditable response.'], Pronunciation: ['No creditable response.'] } },
+  ];
+  const SAMPLE_RESULT = {
+    Grammar: { level: 4, mark: 7 },
+    Vocabulary: { level: 4, mark: 8 },
+    Development: { level: 3, mark: 6 },
+    Pronunciation: { level: 4, mark: 7 },
+  };
 
   // ---------- Prototype timings ----------
   const LOADING_MS = 600;
@@ -570,7 +659,8 @@
   ['stages','timerChip','timerValue','stageTitle','stageMeta','splitLayout','cardPane','cardPaper',
    'conversation','examinerBubble','examinerAvatar','examinerLine','examinerText','studentBubble','studentLine',
    'countdownNumber','prepTimer','btnSkipPrep','recordTime','btnEnd','hintNote','completion',
-   'completionTitle','completionText','btnViewResult','instructionOverlay','structureList','btnReady',
+   'completionTitle','completionText','btnViewResult','testCard','results','resultGrid','totalMark',
+   'btnRubric','rubricOverlay','rubricWrap','btnCloseRubric','instructionOverlay','structureList','btnReady',
    'btnInstructions','submitOverlay','submitProgressText','btnCancelSubmit','btnConfirmSubmit',
    'btnSetting','btnSaveExit','btnSubmit','btnFeedback','proto','protoToggle','protoPanel',
    'protoJump','protoLength','protoLog','toast'].forEach((id) => { els[id] = $(id); });
@@ -873,6 +963,8 @@
     els.completion.classList.remove('show');
     els.splitLayout.hidden = false;
     els.hintNote.hidden = false;
+    els.testCard.hidden = false;
+    els.results.hidden = true;
     setCardVisible(false);
   }
 
@@ -912,6 +1004,71 @@
     els.completion.classList.add('show');
   }
 
+  // ---------- Result ----------
+  function renderResults() {
+    els.resultGrid.textContent = '';
+    let total = 0;
+    CRITERIA.forEach((name) => {
+      const r = SAMPLE_RESULT[name];
+      total += r.mark;
+      const card = el('div', 'criterion');
+      const head = el('div', 'criterion-head');
+      head.appendChild(el('h3', '', name));
+      head.appendChild(el('span', 'level-pill', 'Level ' + r.level));
+      const mark = el('span', 'mark', String(r.mark));
+      mark.appendChild(el('small', '', ' /10'));
+      head.appendChild(mark);
+      card.appendChild(head);
+      const meter = el('div', 'meter');
+      for (let n = 1; n <= 10; n++) meter.appendChild(el('span', n <= r.mark ? 'on' : ''));
+      card.appendChild(meter);
+      const ul = el('ul');
+      LEVELS.find((l) => l.level === r.level).text[name].forEach((t) => ul.appendChild(el('li', '', t)));
+      card.appendChild(ul);
+      els.resultGrid.appendChild(card);
+    });
+    els.totalMark.textContent = String(total);
+  }
+
+  function buildRubric() {
+    const table = el('table', 'rubric-table');
+    const head = el('tr');
+    ['Level', ...CRITERIA, 'Marks'].forEach((h) => head.appendChild(el('th', '', h)));
+    const thead = el('thead');
+    thead.appendChild(head);
+    table.appendChild(thead);
+    const tbody = el('tbody');
+    LEVELS.forEach((row) => {
+      const tr = el('tr');
+      tr.appendChild(el('td', 'lvl', String(row.level)));
+      CRITERIA.forEach((name) => {
+        const td = el('td', SAMPLE_RESULT[name].level === row.level ? 'is-awarded' : '');
+        const items = row.text[name];
+        if (items.length === 1 && row.level === 0) {
+          td.textContent = items[0];
+        } else {
+          const ul = el('ul');
+          items.forEach((t) => ul.appendChild(el('li', '', t)));
+          td.appendChild(ul);
+        }
+        tr.appendChild(td);
+      });
+      tr.appendChild(el('td', 'mk', row.marks));
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    els.rubricWrap.appendChild(table);
+  }
+
+  function showResults() {
+    cancelRun();
+    setCurrentStage(-1);
+    stageFills.forEach((_, k) => setStageProgress(k, 1));
+    els.testCard.hidden = true;
+    els.results.hidden = false;
+    renderResults();
+  }
+
   // ---------- Overlays ----------
   function openInstructions(atStart) {
     els.btnReady.textContent = atStart ? 'Ready' : 'Close';
@@ -932,13 +1089,20 @@
   els.btnCancelSubmit.addEventListener('click', () => els.submitOverlay.classList.remove('open'));
   els.btnConfirmSubmit.addEventListener('click', () => {
     els.submitOverlay.classList.remove('open');
+    els.results.hidden = true;
+    els.testCard.hidden = false;
     showCompletion(true);
     showToast('Quiz submitted');
   });
   els.btnViewResult.addEventListener('click', showResults);
 
+  els.btnRubric.addEventListener('click', () => els.rubricOverlay.classList.add('open'));
+  els.btnCloseRubric.addEventListener('click', () => els.rubricOverlay.classList.remove('open'));
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') els.submitOverlay.classList.remove('open');
+    if (e.key === 'Escape') {
+      els.rubricOverlay.classList.remove('open');
+      els.submitOverlay.classList.remove('open');
+    }
   });
 
   // ---------- Candidate controls ----------
@@ -996,6 +1160,7 @@
     els.structureList.appendChild(li);
   });
   buildCard(STAGES[2].card);
+  buildRubric();
   setCurrentStage(0);
   renderStageHeader(STAGES[0]);
   openInstructions(true);
