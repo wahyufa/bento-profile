@@ -1,0 +1,963 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Weakness Tagging · HeyHi Prototype</title>
+
+  <!-- Production stylesheets (same as demo.heyhi.sg) so the prototype matches 1:1 -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Nunito+Sans:wght@400;700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css">
+  <link rel="stylesheet" href="https://elb-onlinequiz.smartjen.com/dist/css/app.09e3a2.css">
+
+  <style>
+    /* Runtime-injected rules copied from production (not in app.css) */
+    @font-face { font-family: Feather; src: url("https://elb-onlinequiz.smartjen.com/images/fonts/feather/Feather.ttf?sdxovp") format("truetype"), url("https://elb-onlinequiz.smartjen.com/images/fonts/feather/Feather.woff?sdxovp") format("woff"); font-weight: 400; font-style: normal; }
+    .form-control { border-radius: 12px; font-family: "Nunito Sans", sans-serif; font-size: 16px; line-height: 24px; padding: 12px 50px 12px 12px; border: 1px solid rgb(224, 224, 224) !important; }
+    .mx-datepicker { width: 100%; }
+
+    /* ---- Prototype-only additions, tokens taken from production computed styles ---- */
+    :root {
+      --hh-ink: #12263f;
+      --hh-muted: #8a8a8a;
+      --hh-border: #e0e0e0;
+      --hh-bg: #f6f8fa;
+      --hh-primary: #0fb0f8;
+      --hh-primary-soft: #e7f7fe;
+      --hh-green: #00e676;
+      --hh-green-soft: #e3fcef;
+      --hh-yellow: #fdd835;
+      --hh-yellow-soft: #fffbe0;
+      --hh-red: #ff1744;
+      --hh-red-soft: #ffe8e7;
+      --hh-card-radius: 19.2px;
+      --hh-card-shadow: 0 12px 24px rgba(18, 38, 63, 0.03);
+      --hh-font-body: "Nunito Sans", sans-serif;
+    }
+
+    body { background: var(--hh-bg); }
+
+    /* "NEW" marker so reviewers can spot what this prototype adds */
+    .proto-new {
+      display: inline-block;
+      margin-left: 8px;
+      padding: 2px 8px;
+      border-radius: 16px;
+      background: var(--hh-primary-soft);
+      color: var(--hh-primary);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      vertical-align: middle;
+    }
+
+    /* To Improve sidebar (right column next to the remark list) */
+    .improve-sidebar { position: sticky; top: 24px; }
+    .improve-sidebar .card-body { padding: 20px; }
+    .improve-sidebar h3 { font-size: 17px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; }
+    .improve-sidebar .count {
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 22px; height: 22px; padding: 0 6px; border-radius: 11px;
+      background: var(--hh-red); color: #fff; font-size: 12px; font-weight: 700;
+    }
+    .improve-sidebar .panel-sub { font-family: var(--hh-font-body); font-size: 13px; color: var(--hh-muted); margin: 4px 0 0; }
+
+    .weakness-list { list-style: none; margin: 12px 0 0; padding: 0; }
+    .weakness-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .weakness-item:last-child { border-bottom: 0; }
+    .weakness-item input[type="checkbox"] { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--hh-primary); flex-shrink: 0; cursor: pointer; }
+    .weakness-item label { flex: 1; min-width: 0; cursor: pointer; margin: 0; }
+    .weakness-item .topic { font-weight: 700; font-size: 14px; line-height: 1.35; }
+    .weakness-item .meta { font-family: var(--hh-font-body); font-size: 12px; color: var(--hh-muted); line-height: 1.35; }
+    .weakness-item .resolve-btn {
+      border: 0; background: none; padding: 2px 4px; color: #c4c4c4; cursor: pointer; font-size: 15px; line-height: 1;
+    }
+    .weakness-item .resolve-btn:hover { color: var(--hh-green); }
+    .weakness-empty { font-family: var(--hh-font-body); font-size: 14px; color: var(--hh-muted); padding: 16px 0; text-align: center; }
+
+    .weakness-actions {
+      margin-top: 12px;
+      padding-top: 16px;
+      border-top: 1px solid #f0f0f0;
+    }
+    .weakness-actions .hint { display: block; font-family: var(--hh-font-body); font-size: 12px; color: var(--hh-muted); margin-bottom: 10px; }
+    .weakness-actions .btn-primary { width: 100%; font-size: 15px; }
+    .btn-primary:disabled { opacity: 0.45; }
+
+    /* Topic tag chips (on remark cards and in the create modal) */
+    .tag-row { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
+    .topic-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 16px;
+      background: var(--hh-primary-soft);
+      color: var(--hh-ink);
+      font-family: var(--hh-font-body);
+      font-size: 13px;
+      line-height: 1.3;
+    }
+    .topic-chip .strand { color: var(--hh-muted); }
+    .topic-chip.is-resolved { background: #f0f0f0; text-decoration: line-through; color: var(--hh-muted); }
+    .topic-chip button {
+      border: 0;
+      background: none;
+      padding: 0;
+      line-height: 1;
+      color: var(--hh-muted);
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    /* Strand/topic picker inside Create Remarks */
+    .topic-picker { display: grid; grid-template-columns: 1fr; gap: 12px; }
+    .topic-options { display: flex; flex-wrap: wrap; gap: 8px; }
+    .topic-option {
+      border: 1px solid var(--hh-border);
+      background: #fff;
+      border-radius: 16px;
+      padding: 6px 12px;
+      font-family: var(--hh-font-body);
+      font-size: 14px;
+      color: var(--hh-ink);
+      cursor: pointer;
+    }
+    .topic-option[aria-pressed="true"] { border-color: var(--hh-primary); background: var(--hh-primary-soft); color: var(--hh-primary); font-weight: 700; }
+
+    /* Simple modal shell (production uses bootstrap-vue; same classes, toggled by JS) */
+    .modal.proto-open { display: block; }
+    .modal-backdrop.proto-open { display: block; }
+    .modal-header hr { display: none; }
+    .modal-header h2 { font-size: 22px; font-weight: 700; }
+    .modal .label, .modal legend { font-weight: 700; font-size: 15px; color: var(--hh-ink); margin-bottom: 8px; }
+    .modal .not-required { margin-left: 6px; font-size: 14px; font-weight: 400; }
+    .modal .form-group { margin-bottom: 20px; }
+    .status-radios { display: flex; justify-content: space-around; font-family: var(--hh-font-body); font-size: 16px; }
+    .status-radios label { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+    .status-radios input { width: 18px; height: 18px; accent-color: var(--hh-primary); }
+
+    .summary-box {
+      background: var(--hh-bg);
+      border-radius: 12px;
+      padding: 16px;
+      font-family: var(--hh-font-body);
+      font-size: 14px;
+    }
+    .summary-box table { width: 100%; }
+    .summary-box td { padding: 4px 0; }
+    .summary-box td:last-child { text-align: right; font-weight: 700; }
+    .success-icon {
+      width: 56px; height: 56px; border-radius: 50%;
+      background: var(--hh-green-soft); color: var(--hh-green);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; margin: 0 auto 12px;
+    }
+
+    /* Sidebar topic opens the remark detail */
+    .topic-link {
+      border: 0; background: none; padding: 0; text-align: left;
+      font-weight: 700; font-size: 14px; line-height: 1.35; color: var(--hh-ink); cursor: pointer;
+    }
+    .topic-link:hover { color: var(--hh-primary); text-decoration: underline; }
+    .weakness-item .grow { flex: 1; min-width: 0; }
+    .weakness-item .other-tutor { color: #b38600; }
+
+    /* "You" marker next to the current tutor's name */
+    .you-badge {
+      display: inline-block; margin-left: 6px; padding: 1px 8px; border-radius: 10px;
+      background: var(--hh-primary-soft); color: var(--hh-primary);
+      font-size: 11px; font-weight: 700; vertical-align: middle;
+    }
+
+    /* Warning when acting on another tutor's remark */
+    .proto-alert {
+      display: flex; gap: 10px; align-items: flex-start;
+      background: var(--hh-yellow-soft); border: 1px solid #f3e08c; border-radius: 12px;
+      padding: 12px 14px; margin-bottom: 20px;
+      font-family: var(--hh-font-body); font-size: 14px; line-height: 1.45; color: var(--hh-ink);
+    }
+    .proto-alert i { color: #e0a800; margin-top: 3px; }
+    .proto-alert ul { margin: 6px 0 0; padding-left: 18px; }
+
+    /* Remark detail popup */
+    .detail-title { display: flex; align-items: center; gap: 4px; margin-bottom: 8px; }
+    .detail-title h3 { font-size: 18px; font-weight: 700; margin: 0; }
+    .modal .detail-desc, .modal .confirm-text { font-size: 15px; font-weight: 400; color: var(--hh-ink); margin-bottom: 12px; }
+    .detail-meta { font-family: var(--hh-font-body); font-size: 14px; color: var(--hh-muted); }
+    .detail-meta strong { color: var(--hh-ink); }
+    .topic-chip.is-focus { background: var(--hh-red-soft); font-weight: 700; }
+    .confirm-text { font-family: var(--hh-font-body); font-size: 15px; margin-bottom: 20px; }
+
+    /* Prototype toast */
+    .proto-toast {
+      position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+      background: var(--hh-ink); color: #fff; padding: 12px 20px; border-radius: 12px;
+      font-family: var(--hh-font-body); font-size: 14px; z-index: 2000;
+      opacity: 0; transition: opacity 0.2s; pointer-events: none;
+    }
+    .proto-toast.is-visible { opacity: 1; }
+  </style>
+</head>
+<body>
+<div id="app">
+  <div>
+    <div data-v-d451e5fe="">
+      <div data-v-d451e5fe="" class="container-fluid p-0">
+
+        <!-- Breadcrumb -->
+        <div data-v-d451e5fe="" class="breadcrumb2">
+          <div data-v-d451e5fe="" class="container"><div data-v-d451e5fe="" class="d-flex"><div data-v-d451e5fe="" class="col-12">
+            <a data-v-d451e5fe="" href="#">Go back</a>
+          </div></div></div>
+        </div>
+
+        <!-- Page title banner -->
+        <div data-v-d451e5fe="" class="head-title bg-memphis bg-green2">
+          <div data-v-d451e5fe="" class="container"><div data-v-d451e5fe="" class="d-flex">
+            <div data-v-d451e5fe="" class="col-12 d-flex justify-content-between align-items-end">
+              <h1 data-v-d451e5fe="" class="float-start"> Report: Anthony Test </h1>
+              <img data-v-d451e5fe="" src="https://elb-onlinequiz.smartjen.com/images/goal.png" class="first float-end" alt="">
+            </div>
+          </div></div>
+        </div>
+
+        <!-- Report filters -->
+        <div data-v-d451e5fe="" class="performance-filter">
+          <div data-v-d451e5fe="" class="container"><div data-v-d451e5fe="" class="d-flex flex-wrap">
+            <div data-v-d451e5fe="" class="col-lg-2 col-6 pe-3 pb-3 pb-sm-3 pb-md-3 pb-lg-0">
+              <select data-v-d451e5fe="" aria-label="Subject">
+                <option>Primary English</option><option>Primary Maths</option><option>Primary Science</option>
+              </select>
+            </div>
+            <div data-v-d451e5fe="" class="col-lg-3 col-6 d-flex align-items-center pe-3 pb-3 pb-sm-3 pb-md-3 pb-lg-0">
+              <select data-v-d451e5fe="" aria-label="Level">
+                <option>Primary 1</option><option>Primary 2</option><option>Primary 3</option>
+              </select>
+              <div data-v-d451e5fe="" class="legend-top"><span data-v-d451e5fe="" class="point"><img data-v-d451e5fe="" src="https://elb-onlinequiz.smartjen.com/images/svg/icon-information.svg" alt=""></span></div>
+            </div>
+            <div data-v-d451e5fe="" class="col-lg-3 col-6 pe-3 pb-3 pb-sm-3 pb-md-3 pb-lg-0">
+              <div data-v-d451e5fe="" class="mx-datepicker mx-datepicker-range"><div class="mx-input-wrapper">
+                <input name="date" type="text" autocomplete="off" value="2026-09-05 ~ 2026-10-05" class="mx-input" readonly>
+                <i class="mx-icon-calendar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1em" height="1em"><path d="M940.218182 107.054545h-209.454546V46.545455h-65.163636v60.50909H363.054545V46.545455H297.890909v60.50909H83.781818c-18.618182 0-32.581818 13.963636-32.581818 32.581819v805.236363c0 18.618182 13.963636 32.581818 32.581818 32.581818h861.090909c18.618182 0 32.581818-13.963636 32.581818-32.581818V139.636364c-4.654545-18.618182-18.618182-32.581818-37.236363-32.581819zM297.890909 172.218182V232.727273h65.163636V172.218182h307.2V232.727273h65.163637V172.218182h176.872727v204.8H116.363636V172.218182h181.527273zM116.363636 912.290909V442.181818h795.927273v470.109091H116.363636z"></path></svg></i>
+              </div></div>
+            </div>
+            <div data-v-d451e5fe="" class="col-lg-2 col-6 pe-3 pb-3 pb-sm-3 pb-md-3 pb-lg-0">
+              <select data-v-d451e5fe="" aria-label="Type"><option>All</option><option>Worksheet</option><option>Lesson</option></select>
+            </div>
+            <div data-v-4bff8f59="" data-v-d451e5fe="" class="col-lg-2 col-6 pe-3">
+              <button data-v-4bff8f59="" class="btn-gr"> All Worksheets &amp; All Lessons </button>
+            </div>
+          </div></div>
+        </div>
+
+        <!-- Report tabs (only Remarks is active in this prototype) -->
+        <div data-v-d451e5fe="" class="performance-tabs normal">
+          <div data-v-d451e5fe="" class="container"><div data-v-d451e5fe="" class="d-flex align-items-center justify-content-center">
+            <ul data-v-d451e5fe="" role="tablist" class="nav nav-tabs">
+              <li data-v-d451e5fe="" role="presentation" class="nav-item"><button data-v-d451e5fe="" type="button" role="tab" class="nav-link" tabindex="-1"> Quick Insights </button></li>
+              <li data-v-d451e5fe="" role="presentation" class="nav-item"><button data-v-d451e5fe="" type="button" role="tab" class="nav-link" tabindex="-1"> Full Analytics </button></li>
+              <li data-v-d451e5fe="" role="presentation" class="nav-item"><button data-v-d451e5fe="" type="button" role="tab" class="nav-link" tabindex="-1"> Statistics </button></li>
+              <li data-v-d451e5fe="" role="presentation" class="nav-item"><button data-v-d451e5fe="" type="button" role="tab" aria-selected="true" class="nav-link active"> Remarks </button></li>
+              <li data-v-d451e5fe="" role="presentation" class="nav-item"><button data-v-d451e5fe="" type="button" role="tab" class="nav-link" tabindex="-1"> Cohort Report </button></li>
+            </ul>
+          </div></div>
+        </div>
+
+        <!-- Remarks tab -->
+        <div data-v-d451e5fe="" class="container-fluid bg-gray main p-0 pb-4">
+          <div data-v-d451e5fe="" id="tutor-remarks-tab" role="tabpanel" class="tab-pane col fade show active">
+            <div data-v-70360e8c="" data-v-d451e5fe="">
+
+              <!-- Status legend -->
+              <div data-v-70360e8c="" class="report-legend d-flex justify-content-start col-12">
+                <div data-v-70360e8c="" class="container"><div data-v-70360e8c="" class="row"><div data-v-70360e8c="" class="col-12">
+                  <div data-v-70360e8c="" class="d-flex justify-content-between">
+                    <div data-v-70360e8c="" id="legend"></div>
+                    <div data-v-70360e8c="">
+                      <button data-v-70360e8c="" disabled class="btn btn-link"><span data-v-70360e8c="">Delete</span></button>
+                      <button data-v-70360e8c="" type="button" class="btn btn-link"> Check All </button>
+                    </div>
+                  </div>
+                </div></div></div>
+              </div>
+
+              <div data-v-70360e8c="" class="container mt-4">
+                <div data-v-70360e8c="" class="row"><div data-v-70360e8c="" class="col-12">
+
+                  <div data-v-70360e8c="" class="row"><div data-v-70360e8c="" class="col-12">
+                    <div data-v-70360e8c="" class="allremarks-select">
+                      <div data-v-70360e8c="" class="d-flex flex-wrap col-12 col-md-7 col-lg-7">
+                        <div data-v-70360e8c="" class="col-12 col-md-4 col-lg-4">
+                          <select data-v-70360e8c="" class="form-control" id="tutor-filter" aria-label="Tutor"><option value="">All Tutor</option><option value="mine">Remark by me</option></select>
+                        </div>
+                        <div data-v-70360e8c="" class="col-12 col-md-4 col-lg-4">
+                          <select data-v-70360e8c="" class="form-control" id="status-filter" aria-label="Status">
+                            <option value="">All Status</option>
+                            <option value="to improve">To Improve</option>
+                            <option value="improving">Improving</option>
+                            <option value="strong">Strong</option>
+                          </select>
+                        </div>
+                        <div data-v-70360e8c="" class="col-12 col-md-4 col-lg-4">
+                          <div data-v-70360e8c="" class="mx-datepicker mx-datepicker-range"><div class="mx-input-wrapper">
+                            <input name="date" type="text" autocomplete="off" placeholder="All Time" class="mx-input" readonly>
+                            <i class="mx-icon-calendar"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1em" height="1em"><path d="M940.218182 107.054545h-209.454546V46.545455h-65.163636v60.50909H363.054545V46.545455H297.890909v60.50909H83.781818c-18.618182 0-32.581818 13.963636-32.581818 32.581819v805.236363c0 18.618182 13.963636 32.581818 32.581818 32.581818h861.090909c18.618182 0 32.581818-13.963636 32.581818-32.581818V139.636364c-4.654545-18.618182-18.618182-32.581818-37.236363-32.581819zM297.890909 172.218182V232.727273h65.163636V172.218182h307.2V232.727273h65.163637V172.218182h176.872727v204.8H116.363636V172.218182h181.527273zM116.363636 912.290909V442.181818h795.927273v470.109091H116.363636z"></path></svg></i>
+                          </div></div>
+                        </div>
+                      </div>
+                      <div data-v-70360e8c="">
+                        <button data-v-70360e8c="" type="button" class="btn btn-primary" id="open-create"> Create Remarks </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div data-v-70360e8c="" class="col-12 py-5">
+                    <div class="row">
+                      <div class="col-12 col-lg-8" id="remark-list"></div>
+
+                      <!-- NEW: To Improve topics, built from "To Improve" remarks tagged with a strand/topic -->
+                      <aside class="col-12 col-lg-4">
+                        <section class="card improve-sidebar" aria-labelledby="improve-title">
+                          <div class="card-body">
+                            <h3 id="improve-title">To Improve <span class="count" id="improve-count">0</span> <span class="proto-new">NEW</span></h3>
+                            <p class="panel-sub">Topics tagged in "To Improve" remarks.</p>
+                            <ul class="weakness-list" id="weakness-list"></ul>
+                            <div class="weakness-actions">
+                              <span class="hint" id="selection-hint">Select topics to build a follow-up worksheet.</span>
+                              <button type="button" class="btn btn-primary" id="open-generate" disabled> Generate Worksheet </button>
+                            </div>
+                          </div>
+                        </section>
+                      </aside>
+                    </div>
+                  </div>
+                  </div>
+
+                </div></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Create Remarks modal (production markup + strand/topic picker filled in) -->
+<div id="create-remark" role="dialog" aria-modal="true" aria-labelledby="create-remark-title" class="modal fade show" style="display: none;">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <header class="modal-header">
+        <div data-v-70360e8c="" class="d-flex justify-content-between align-items-start w-100">
+          <h2 data-v-70360e8c="" class="m-0" id="create-remark-title">Create Remarks</h2>
+          <img data-v-70360e8c="" aria-label="Close" role="button" data-close src="https://elb-onlinequiz.smartjen.com/images/svg/icon-close-gray.svg" class="pointer" alt="Close">
+        </div>
+      </header>
+      <div class="modal-body">
+        <div data-v-657b9918="" class="create-remark-container">
+          <form data-v-657b9918="" id="create-remark-form" novalidate>
+            <div data-v-657b9918="" class="form-group">
+              <label data-v-657b9918="" for="mark-title" class="label">Add remark title</label>
+              <input data-v-657b9918="" id="mark-title" type="text" placeholder="Enter the title for the marks you want to add" required class="form-control">
+            </div>
+            <div data-v-657b9918="" class="form-group">
+              <label data-v-657b9918="" for="mark-description" class="label">Add remark description</label>
+              <textarea data-v-657b9918="" id="mark-description" rows="4" placeholder="Provide a brief summary of the marks you are adding" class="form-control"></textarea>
+            </div>
+            <fieldset data-v-657b9918="" class="form-group remarkinput label">
+              <legend>Select the remark status</legend>
+              <div class="status-radios" role="radiogroup">
+                <label><input type="radio" name="remark-status" value="to improve" checked> To Improve</label>
+                <label><input type="radio" name="remark-status" value="improving"> Improving</label>
+                <label><input type="radio" name="remark-status" value="strong"> Strong</label>
+              </div>
+            </fieldset>
+            <div data-v-657b9918="" class="form-group">
+              <label data-v-657b9918="" for="strand-select">
+                <span data-v-657b9918="" class="label">Select strand or topic</span>
+                <span data-v-657b9918="" class="text-muted not-required">(not required)</span>
+                <span class="proto-new">NEW</span>
+              </label>
+              <div class="topic-picker">
+                <select class="form-control" id="strand-select"></select>
+                <div class="topic-options" id="topic-options" aria-label="Topics"></div>
+                <div class="tag-row" id="picked-tags"></div>
+              </div>
+            </div>
+            <div data-v-657b9918="" class="dropdown">
+              <button data-v-657b9918="" type="button" class="btn btn-primary-line dropdown-toggle"> Add Attachment </button>
+            </div>
+            <div data-v-657b9918="" class="form-group" style="padding-top: 20px;">
+              <div data-v-657b9918="" class="d-flex justify-content-end align-items-center">
+                <button data-v-657b9918="" type="submit" class="btn btn-primary"> Create remark </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW: Generate follow-up worksheet modal -->
+<div id="generate-worksheet" role="dialog" aria-modal="true" aria-labelledby="generate-title" class="modal fade show" style="display: none;">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <header class="modal-header">
+        <div class="d-flex justify-content-between align-items-start w-100">
+          <h2 class="m-0" id="generate-title">Generate Follow-up Worksheet</h2>
+          <img aria-label="Close" role="button" data-close src="https://elb-onlinequiz.smartjen.com/images/svg/icon-close-gray.svg" class="pointer" alt="Close">
+        </div>
+      </header>
+      <div class="modal-body" id="generate-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW: Remark detail (opened from a To Improve topic) -->
+<div id="remark-detail" role="dialog" aria-modal="true" aria-labelledby="remark-detail-title" class="modal fade show" style="display: none;">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <header class="modal-header">
+        <div class="d-flex justify-content-between align-items-start w-100">
+          <h2 class="m-0" id="remark-detail-title">Remark Detail</h2>
+          <img aria-label="Close" role="button" data-close src="https://elb-onlinequiz.smartjen.com/images/svg/icon-close-gray.svg" class="pointer" alt="Close">
+        </div>
+      </header>
+      <div class="modal-body" id="remark-detail-body"></div>
+    </div>
+  </div>
+</div>
+
+<!-- NEW: Confirm resolve -->
+<div id="confirm-resolve" role="dialog" aria-modal="true" aria-labelledby="confirm-resolve-title" class="modal fade show" style="display: none;">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <header class="modal-header">
+        <div class="d-flex justify-content-between align-items-start w-100">
+          <h2 class="m-0" id="confirm-resolve-title">Mark as Resolved?</h2>
+          <img aria-label="Close" role="button" data-close src="https://elb-onlinequiz.smartjen.com/images/svg/icon-close-gray.svg" class="pointer" alt="Close">
+        </div>
+      </header>
+      <div class="modal-body" id="confirm-resolve-body"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade show" id="backdrop" style="display: none;"></div>
+<div class="proto-toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+  // ---------------------------------------------------------------------------
+  // Mock data. Strands match Primary English in production (Full Analytics tab);
+  // topics under each strand are placeholders until the real taxonomy is wired.
+  // ---------------------------------------------------------------------------
+  const STRANDS = {
+    'Cloze Passage': ['Grammar Cloze', 'Vocabulary Cloze'],
+    'Comprehension': ['Literal Questions', 'Inferential Questions', 'Sequencing Events'],
+    'Sentence - Level Grammar': ['Subject-Verb Agreement', 'Simple Past Tense', 'Prepositions'],
+    'Vocabulary': ['Word Meaning in Context', 'Synonyms & Antonyms'],
+    'Word - Level Grammar': ['Plural Nouns', 'Articles (a / an / the)', 'Pronouns'],
+    'Essay Writing': ['Picture Composition', 'Sentence Structure'],
+    'Speaking': ['Reading Aloud', 'Stimulus-based Conversation'],
+  };
+
+  const STATUS = {
+    'to improve': { color: 'red', label: 'To Improve', css: 'to-improve', score: 1 },
+    'improving': { color: 'yellow', label: 'Improving', css: 'improving', score: 2 },
+    'strong': { color: 'green', label: 'Strong', css: 'strong', score: 3 },
+  };
+
+  // The logged-in tutor. Remarks by anyone else trigger an awareness warning
+  // before resolving a topic or generating a worksheet from it.
+  const CURRENT_TUTOR = 'tutor_linh01';
+
+  // Newest first. Each tag: { strand, topic, resolved }
+  const remarks = [
+    {
+      id: 6, title: 'Composition lacks sequence', description: 'Picture composition jumps between scenes. Needs help ordering events with time connectors.',
+      status: 'to improve', tutor: 'tutor_amir03', date: 'Oct 4, 2026 11:20 AM', attachment: false,
+      tags: [{ strand: 'Essay Writing', topic: 'Picture Composition', resolved: false }],
+    },
+    {
+      id: 5, title: 'Tense errors in recent worksheet', description: 'Keeps using present tense when describing past events. Needs more practice before the next test.',
+      status: 'to improve', tutor: 'tutor_linh01', date: 'Oct 2, 2026 4:12 PM', attachment: false,
+      tags: [
+        { strand: 'Sentence - Level Grammar', topic: 'Simple Past Tense', resolved: false },
+        { strand: 'Sentence - Level Grammar', topic: 'Subject-Verb Agreement', resolved: false },
+      ],
+    },
+    {
+      id: 4, title: 'Inference questions', description: 'Answers literal questions well but struggles to infer feelings and reasons.',
+      status: 'to improve', tutor: 'tutor_sarah02', date: 'Sep 28, 2026 10:05 AM', attachment: true,
+      tags: [{ strand: 'Comprehension', topic: 'Inferential Questions', resolved: false }],
+    },
+    {
+      id: 3, title: 'Articles getting better', description: 'Fewer mistakes with a / an this week.',
+      status: 'improving', tutor: 'tutor_linh01', date: 'Sep 20, 2026 2:30 PM', attachment: false,
+      tags: [{ strand: 'Word - Level Grammar', topic: 'Articles (a / an / the)', resolved: false }],
+    },
+    {
+      id: 2, title: 'Confident reader', description: 'Reads aloud fluently with good expression.',
+      status: 'strong', tutor: 'tutor_sarah02', date: 'Sep 12, 2026 9:41 AM', attachment: false,
+      tags: [{ strand: 'Speaking', topic: 'Reading Aloud', resolved: false }],
+    },
+    {
+      id: 1, title: 'remark title', description: 'description',
+      status: 'strong', tutor: 'tutor_linh01', date: 'Dec 3, 2025 9:38 AM', attachment: true, tags: [],
+    },
+  ];
+
+  const selectedWeaknessKeys = new Set();
+  let pickedTags = [];
+
+  // ---------------------------------------------------------------------------
+  // Helpers
+  // ---------------------------------------------------------------------------
+
+  // Production uses Vue scoped CSS, so cloned markup needs the component's
+  // data-v-* attribute on every element for app.css rules to apply.
+  function scoped(html, scopeId) {
+    return html.replace(/<([a-z][a-z0-9]*)(?=[\s>\/])/g, `<$1 data-v-${scopeId}=""`);
+  }
+
+  function escapeHtml(text) {
+    return String(text).replace(/[&<>"']/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
+  }
+
+  const STAR_PATH = 'M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z';
+  const starSvg = (cls) => `<svg viewBox="0 0 16 16" width="1em" height="1em" focusable="false" role="img" aria-label="star fill" xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi-star-fill ${cls} b-icon bi"><g><path d="${STAR_PATH}"></path></g></svg>`;
+  const STARS = {
+    green: starSvg('three-a') + starSvg('three-b') + starSvg('three-c'),
+    yellow: starSvg('two-a') + starSvg('two-b'),
+    red: starSvg('one'),
+  };
+
+  const tagKey = (remarkId, tag) => `${remarkId}|${tag.strand}|${tag.topic}`;
+  const isMine = (remark) => remark.tutor === CURRENT_TUTOR;
+  const shortDate = (date) => date.replace(/,? \d{1,2}:\d{2}.*$/, '');
+  const tutorName = (remark) => isMine(remark)
+    ? `${escapeHtml(remark.tutor)}<span class="you-badge">You</span>`
+    : escapeHtml(remark.tutor);
+
+  // Looks up the remark + tag behind a sidebar key ("remarkId|strand|topic")
+  function findByKey(key) {
+    const [remarkId, strand, topic] = key.split('|');
+    const remark = remarks.find((item) => String(item.id) === remarkId);
+    const tag = remark.tags.find((item) => item.strand === strand && item.topic === topic);
+    return { remark, tag };
+  }
+
+  const ALERT_ICON = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>';
+
+  function showToast(message) {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.classList.add('is-visible');
+    clearTimeout(showToast.timer);
+    showToast.timer = setTimeout(() => toast.classList.remove('is-visible'), 2600);
+  }
+
+  // ---------------------------------------------------------------------------
+  // Derived data
+  // ---------------------------------------------------------------------------
+
+  // Weaknesses = unresolved topics tagged in "To Improve" remarks.
+  // Remarks are newest-first, so if a topic was tagged again later with a
+  // better status (Improving / Strong), the newer remark wins and it drops off.
+  function getWeaknesses() {
+    const seenTopics = new Set();
+    const list = [];
+    remarks.forEach((remark) => {
+      remark.tags.forEach((tag) => {
+        const topicId = `${tag.strand}|${tag.topic}`;
+        if (seenTopics.has(topicId)) return;
+        seenTopics.add(topicId);
+        if (tag.resolved || remark.status !== 'to improve') return;
+        list.push({ key: tagKey(remark.id, tag), remark, tag });
+      });
+    });
+    return list;
+  }
+
+  // ---------------------------------------------------------------------------
+  // Rendering
+  // ---------------------------------------------------------------------------
+
+  function renderLegend() {
+    const html = ['green', 'yellow', 'red'].map((color) => {
+      const label = { green: 'STRONG', yellow: 'IMPROVING', red: 'TO IMPROVE' }[color];
+      return `<div class="${color} auto-width float-start me-3"><div class="ball">${STARS[color]}</div><div class="label">${label}</div></div>`;
+    }).join('');
+    document.getElementById('legend').innerHTML = scoped(html, '70360e8c');
+  }
+
+  function renderWeaknessList() {
+    const weaknesses = getWeaknesses();
+    const list = document.getElementById('weakness-list');
+
+    // Drop selections that are no longer active (e.g. just resolved)
+    const activeKeys = new Set(weaknesses.map((item) => item.key));
+    [...selectedWeaknessKeys].forEach((key) => { if (!activeKeys.has(key)) selectedWeaknessKeys.delete(key); });
+
+    if (!weaknesses.length) {
+      list.innerHTML = '<li class="weakness-empty">No topics to improve. Create a "To Improve" remark with a strand or topic to add one.</li>';
+    } else {
+      list.innerHTML = weaknesses.map(({ key, remark, tag }) => `
+        <li class="weakness-item">
+          <input type="checkbox" data-select="${escapeHtml(key)}" ${selectedWeaknessKeys.has(key) ? 'checked' : ''} aria-label="Select ${escapeHtml(tag.topic)}">
+          <div class="grow">
+            <button type="button" class="topic-link" data-detail="${escapeHtml(key)}">${escapeHtml(tag.topic)}</button>
+            <div class="meta">
+              ${escapeHtml(tag.strand)} · ${shortDate(remark.date)}<br>
+              ${isMine(remark) ? 'by You' : `<span class="other-tutor">by ${escapeHtml(remark.tutor)}</span>`}
+            </div>
+          </div>
+          <button type="button" class="resolve-btn" data-resolve="${escapeHtml(key)}" title="Mark as resolved" aria-label="Mark ${escapeHtml(tag.topic)} as resolved"><i class="fa-regular fa-circle-check"></i></button>
+        </li>`).join('');
+    }
+
+    document.getElementById('improve-count').textContent = weaknesses.length;
+    const count = selectedWeaknessKeys.size;
+    document.getElementById('open-generate').disabled = count === 0;
+    document.getElementById('selection-hint').textContent = count
+      ? `${count} topic${count > 1 ? 's' : ''} selected.`
+      : 'Select topics to build a follow-up worksheet.';
+  }
+
+  function renderRemarks() {
+    const statusFilter = document.getElementById('status-filter').value;
+    const onlyMine = document.getElementById('tutor-filter').value === 'mine';
+    const visible = remarks.filter((remark) =>
+      (!statusFilter || remark.status === statusFilter) && (!onlyMine || isMine(remark)));
+
+    const html = visible.map((remark) => {
+      const color = STATUS[remark.status].color;
+      const tags = remark.tags.length
+        ? `<div class="tag-row">${remark.tags.map((tag) => `<span class="topic-chip${tag.resolved ? ' is-resolved' : ''}"><span class="strand">${escapeHtml(tag.strand)} ›</span> ${escapeHtml(tag.topic)}</span>`).join('')}</div>`
+        : '';
+      return `
+        <div>
+          <div class="card" style="margin-bottom: 0px;">
+            <div class="card-body">
+              <div class="row align-items-center">
+                <div class="col-9">
+                  <div>
+                    <div class="d-flex">
+                      <div class="${color} auto-width float-start me-3"><div class="ball">${STARS[color]}</div></div>
+                      <h3 class="bold">${escapeHtml(remark.title)}</h3>
+                    </div>
+                    <p> ${escapeHtml(remark.description)} </p>
+                  </div>
+                  ${tags}
+                  <div class="d-md-flex align-items-center space-x-4">
+                    <div class="d-flex align-items-center space-x-2"><div>Remark by:</div><span class="bold pl-2"> ${tutorName(remark)} </span></div>
+                  </div>
+                </div>
+                <div class="col-3"> ${escapeHtml(remark.date)} </div>
+              </div>
+              ${remark.attachment ? '<div class="d-flex justify-content-end"><button class="btn btn-trans"> See Attachment </button></div>' : ''}
+            </div>
+          </div>
+          <div style="padding-top: 15px;"></div>
+        </div>`;
+    }).join('');
+
+    // Tag chips use prototype classes, but the card itself must carry the
+    // remark-card scope (data-v-2bb8a050) to pick up production styles.
+    document.getElementById('remark-list').innerHTML = scoped(html, '2bb8a050');
+  }
+
+  function renderAll() {
+    renderWeaknessList();
+    renderRemarks();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Modals
+  // ---------------------------------------------------------------------------
+
+  function openModal(id) {
+    document.getElementById(id).style.display = 'block';
+    document.getElementById('backdrop').style.display = 'block';
+    document.body.classList.add('modal-open');
+  }
+
+  function closeModals() {
+    document.querySelectorAll('.modal').forEach((modal) => { modal.style.display = 'none'; });
+    document.getElementById('backdrop').style.display = 'none';
+    document.body.classList.remove('modal-open');
+  }
+
+  document.querySelectorAll('[data-close]').forEach((button) => button.addEventListener('click', closeModals));
+  document.querySelectorAll('.modal').forEach((modal) => {
+    modal.addEventListener('click', (event) => { if (event.target === modal) closeModals(); });
+  });
+  document.addEventListener('keydown', (event) => { if (event.key === 'Escape') closeModals(); });
+
+  // ---- Create Remarks: strand / topic picker ----
+
+  const strandSelect = document.getElementById('strand-select');
+  strandSelect.innerHTML = '<option value="">Select strand</option>' +
+    Object.keys(STRANDS).map((strand) => `<option>${escapeHtml(strand)}</option>`).join('');
+
+  function renderTopicOptions() {
+    const strand = strandSelect.value;
+    const container = document.getElementById('topic-options');
+    container.innerHTML = strand
+      ? STRANDS[strand].map((topic) => {
+          const picked = pickedTags.some((tag) => tag.strand === strand && tag.topic === topic);
+          return `<button type="button" class="topic-option" aria-pressed="${picked}" data-topic="${escapeHtml(topic)}">${escapeHtml(topic)}</button>`;
+        }).join('')
+      : '';
+
+    document.getElementById('picked-tags').innerHTML = pickedTags.map((tag, index) =>
+      `<span class="topic-chip"><span class="strand">${escapeHtml(tag.strand)} ›</span> ${escapeHtml(tag.topic)}<button type="button" data-unpick="${index}" aria-label="Remove ${escapeHtml(tag.topic)}">×</button></span>`
+    ).join('');
+  }
+
+  strandSelect.addEventListener('change', renderTopicOptions);
+
+  document.getElementById('topic-options').addEventListener('click', (event) => {
+    const button = event.target.closest('[data-topic]');
+    if (!button) return;
+    const strand = strandSelect.value;
+    const topic = button.dataset.topic;
+    const existingIndex = pickedTags.findIndex((tag) => tag.strand === strand && tag.topic === topic);
+    if (existingIndex >= 0) pickedTags.splice(existingIndex, 1);
+    else pickedTags.push({ strand, topic });
+    renderTopicOptions();
+  });
+
+  document.getElementById('picked-tags').addEventListener('click', (event) => {
+    const button = event.target.closest('[data-unpick]');
+    if (!button) return;
+    pickedTags.splice(Number(button.dataset.unpick), 1);
+    renderTopicOptions();
+  });
+
+  document.getElementById('open-create').addEventListener('click', () => {
+    document.getElementById('create-remark-form').reset();
+    pickedTags = [];
+    strandSelect.value = '';
+    renderTopicOptions();
+    openModal('create-remark');
+    document.getElementById('mark-title').focus();
+  });
+
+  document.getElementById('create-remark-form').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const titleInput = document.getElementById('mark-title');
+    if (!titleInput.value.trim()) {
+      titleInput.focus();
+      showToast('Remark title is required.');
+      return;
+    }
+    const now = new Date();
+    remarks.unshift({
+      id: Date.now(),
+      title: titleInput.value.trim(),
+      description: document.getElementById('mark-description').value.trim(),
+      status: document.querySelector('input[name="remark-status"]:checked').value,
+      tutor: 'tutor_linh01',
+      date: now.toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
+      attachment: false,
+      tags: pickedTags.map((tag) => ({ ...tag, resolved: false })),
+    });
+    closeModals();
+    renderAll();
+    showToast(pickedTags.length ? 'Remark created. Weakness tags updated.' : 'Remark created.');
+  });
+
+  // ---- Weakness list interactions ----
+
+  document.getElementById('weakness-list').addEventListener('change', (event) => {
+    const key = event.target.dataset.select;
+    if (!key) return;
+    if (event.target.checked) selectedWeaknessKeys.add(key);
+    else selectedWeaknessKeys.delete(key);
+    renderWeaknessList();
+  });
+
+  document.getElementById('weakness-list').addEventListener('click', (event) => {
+    const detailButton = event.target.closest('[data-detail]');
+    if (detailButton) openRemarkDetail(detailButton.dataset.detail);
+    const resolveButton = event.target.closest('[data-resolve]');
+    if (resolveButton) openConfirmResolve(resolveButton.dataset.resolve);
+  });
+
+  // ---- Remark detail popup ----
+
+  function openRemarkDetail(key) {
+    const { remark, tag: focusTag } = findByKey(key);
+    const color = STATUS[remark.status].color;
+    const chips = remark.tags.map((tag) => {
+      const classes = ['topic-chip', tag === focusTag ? 'is-focus' : '', tag.resolved ? 'is-resolved' : ''].join(' ');
+      return `<span class="${classes}"><span class="strand">${escapeHtml(tag.strand)} ›</span> ${escapeHtml(tag.topic)}</span>`;
+    }).join('');
+
+    // Stars reuse the remark-card scope so production colours apply
+    const stars = scoped(`<div class="${color} auto-width float-start me-2"><div class="ball">${STARS[color]}</div></div>`, '2bb8a050');
+
+    document.getElementById('remark-detail-body').innerHTML = `
+      <div class="detail-title">${stars}<h3>${escapeHtml(remark.title)}</h3></div>
+      <p class="detail-desc">${escapeHtml(remark.description)}</p>
+      <div class="tag-row">${chips}</div>
+      <div class="detail-meta mb-4">
+        Remark by: <strong>${tutorName(remark)}</strong><br>
+        ${escapeHtml(remark.date)}
+      </div>
+      <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap: 12px;">
+        ${remark.attachment ? '<button type="button" class="btn btn-trans p-0"> See Attachment </button>' : '<span></span>'}
+        <button type="button" class="btn btn-primary-line" data-detail-resolve="${escapeHtml(key)}"><i class="fa-regular fa-circle-check"></i> Mark “${escapeHtml(focusTag.topic)}” as resolved</button>
+      </div>`;
+    openModal('remark-detail');
+  }
+
+  document.getElementById('remark-detail-body').addEventListener('click', (event) => {
+    const button = event.target.closest('[data-detail-resolve]');
+    if (!button) return;
+    closeModals();
+    openConfirmResolve(button.dataset.detailResolve);
+  });
+
+  // ---- Confirm resolve popup ----
+
+  let pendingResolveKey = null;
+
+  function openConfirmResolve(key) {
+    pendingResolveKey = key;
+    const { remark, tag } = findByKey(key);
+    const otherTutorAlert = isMine(remark) ? '' : `
+      <div class="proto-alert" role="alert">
+        ${ALERT_ICON}
+        <div>This topic was tagged by <strong>${escapeHtml(remark.tutor)}</strong>, not by you. Resolving it removes it from the To Improve list for every tutor of this student.</div>
+      </div>`;
+
+    document.getElementById('confirm-resolve-body').innerHTML = `
+      ${otherTutorAlert}
+      <p class="confirm-text">
+        <strong>${escapeHtml(tag.topic)}</strong> (${escapeHtml(tag.strand)}) will be removed from the To Improve list.
+        The original remark stays unchanged.
+      </p>
+      <div class="d-flex justify-content-end align-items-center" style="gap: 12px;">
+        <button type="button" class="btn btn-link" data-close-inline>Cancel</button>
+        <button type="button" class="btn btn-primary" data-confirm-resolve> Mark as Resolved </button>
+      </div>`;
+    openModal('confirm-resolve');
+  }
+
+  document.getElementById('confirm-resolve-body').addEventListener('click', (event) => {
+    if (event.target.closest('[data-close-inline]')) closeModals();
+    if (!event.target.closest('[data-confirm-resolve]')) return;
+    const { tag } = findByKey(pendingResolveKey);
+    tag.resolved = true;
+    pendingResolveKey = null;
+    closeModals();
+    renderAll();
+    showToast(`“${tag.topic}” marked as resolved.`);
+  });
+
+  document.getElementById('status-filter').addEventListener('change', renderRemarks);
+  document.getElementById('tutor-filter').addEventListener('change', renderRemarks);
+
+  // ---- Generate follow-up worksheet ----
+
+  function selectedWeaknesses() {
+    return getWeaknesses().filter((item) => selectedWeaknessKeys.has(item.key));
+  }
+
+  function renderGenerateForm() {
+    const items = selectedWeaknesses();
+    const defaultName = `Follow-up: ${items[0].tag.topic}${items.length > 1 ? ` + ${items.length - 1} more` : ''}`;
+    const fromOthers = items.filter(({ remark }) => !isMine(remark));
+    const otherTutorAlert = fromOthers.length ? `
+      <div class="proto-alert" role="alert">
+        ${ALERT_ICON}
+        <div>
+          ${fromOthers.length === 1 ? 'This topic was' : 'These topics were'} tagged by another tutor:
+          <ul>${fromOthers.map(({ remark, tag }) => `<li><strong>${escapeHtml(tag.topic)}</strong> by ${escapeHtml(remark.tutor)}</li>`).join('')}</ul>
+        </div>
+      </div>` : '';
+    document.getElementById('generate-body').innerHTML = `
+      ${otherTutorAlert}
+      <form id="generate-form" novalidate>
+        <div class="form-group">
+          <span class="label d-block">Selected topics</span>
+          <div class="tag-row">${items.map(({ tag }) => `<span class="topic-chip"><span class="strand">${escapeHtml(tag.strand)} ›</span> ${escapeHtml(tag.topic)}</span>`).join('')}</div>
+        </div>
+        <div class="form-group">
+          <label class="label" for="worksheet-name">Worksheet name</label>
+          <input id="worksheet-name" class="form-control" type="text" value="${escapeHtml(defaultName)}">
+        </div>
+        <div class="row">
+          <div class="col-6 form-group">
+            <label class="label" for="question-count">Number of questions</label>
+            <select id="question-count" class="form-control"><option>10</option><option selected>20</option><option>30</option></select>
+          </div>
+          <div class="col-6 form-group">
+            <label class="label" for="difficulty">Difficulty</label>
+            <select id="difficulty" class="form-control"><option>Foundation</option><option selected>Standard</option><option>Challenging</option></select>
+          </div>
+        </div>
+        <div class="d-flex justify-content-end align-items-center" style="gap: 12px;">
+          <button type="button" class="btn btn-link" data-close-inline>Cancel</button>
+          <button type="submit" class="btn btn-primary"> Generate Worksheet </button>
+        </div>
+      </form>`;
+  }
+
+  function renderGenerateSuccess(name, questionCount, difficulty) {
+    const items = selectedWeaknesses();
+    // Spread questions evenly across topics; leftovers go to the first topics
+    const base = Math.floor(questionCount / items.length);
+    const extra = questionCount % items.length;
+    const rows = items.map(({ tag }, index) => `<tr><td>${escapeHtml(tag.topic)}</td><td>${base + (index < extra ? 1 : 0)} questions</td></tr>`).join('');
+
+    document.getElementById('generate-body').innerHTML = `
+      <div class="text-center mb-4">
+        <div class="success-icon"><i class="fa-solid fa-check"></i></div>
+        <h3 style="font-size: 18px; font-weight: 700;">Worksheet generated</h3>
+        <p style="font-family: var(--hh-font-body); color: var(--hh-muted); margin: 0;">${escapeHtml(name)} · ${escapeHtml(difficulty)}</p>
+      </div>
+      <div class="summary-box mb-4"><table>${rows}</table></div>
+      <div class="d-flex justify-content-end align-items-center flex-wrap" style="gap: 12px;">
+        <button type="button" class="btn btn-primary-line" data-mock="Print view is not part of this prototype."><i class="fa-solid fa-print"></i> Print</button>
+        <button type="button" class="btn btn-primary" data-mock="Worksheet assigned to Anthony Test."> Assign to Student </button>
+      </div>`;
+  }
+
+  document.getElementById('open-generate').addEventListener('click', () => {
+    renderGenerateForm();
+    openModal('generate-worksheet');
+  });
+
+  document.getElementById('generate-body').addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = document.getElementById('worksheet-name').value.trim() || 'Follow-up worksheet';
+    renderGenerateSuccess(name, Number(document.getElementById('question-count').value), document.getElementById('difficulty').value);
+  });
+
+  document.getElementById('generate-body').addEventListener('click', (event) => {
+    if (event.target.closest('[data-close-inline]')) closeModals();
+    const mock = event.target.closest('[data-mock]');
+    if (mock) {
+      closeModals();
+      showToast(mock.dataset.mock);
+    }
+  });
+
+  renderLegend();
+  renderAll();
+</script>
+</body>
+</html>
