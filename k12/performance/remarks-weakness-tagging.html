@@ -196,6 +196,32 @@
     .topic-chip.is-focus { background: var(--hh-red-soft); font-weight: 700; }
     .confirm-text { font-family: var(--hh-font-body); font-size: 15px; margin-bottom: 20px; }
 
+    /* "Worksheet generated" marker */
+    .ws-badge {
+      display: inline-flex; align-items: center; gap: 6px; margin-top: 6px;
+      border: 0; border-radius: 10px; padding: 2px 8px;
+      background: var(--hh-green-soft); color: #00a152;
+      font-family: var(--hh-font-body); font-size: 12px; font-weight: 700; cursor: pointer;
+    }
+    .ws-badge:hover { text-decoration: underline; }
+    .ws-history { list-style: none; margin: 0 0 20px; padding: 0; }
+    .ws-history li {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      padding: 10px 0; border-top: 1px solid #f0f0f0; font-family: var(--hh-font-body); font-size: 14px;
+    }
+    .ws-history .btn-link { padding: 0; font-size: 14px; font-weight: 700; white-space: nowrap; }
+
+    /* Worksheet preview */
+    .ws-meta { font-family: var(--hh-font-body); font-size: 14px; color: var(--hh-muted); margin-bottom: 20px; }
+    .ws-section { margin-bottom: 20px; }
+    .ws-section h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; }
+    .ws-question {
+      display: flex; gap: 12px; padding: 10px 14px; margin-bottom: 8px;
+      background: var(--hh-bg); border-radius: 12px; font-family: var(--hh-font-body); font-size: 14px;
+    }
+    .ws-question .number { font-weight: 700; color: var(--hh-primary); min-width: 28px; }
+    .ws-question .placeholder { color: var(--hh-muted); }
+
     /* Prototype toast */
     .proto-toast {
       position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
@@ -454,6 +480,21 @@
   </div>
 </div>
 
+<!-- NEW: Worksheet preview (opened via View Worksheet / the "generated" marker) -->
+<div id="worksheet-view" role="dialog" aria-modal="true" aria-labelledby="worksheet-view-title" class="modal fade show" style="display: none;">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <header class="modal-header">
+        <div class="d-flex justify-content-between align-items-start w-100">
+          <h2 class="m-0" id="worksheet-view-title">Worksheet</h2>
+          <img aria-label="Close" role="button" data-close src="https://elb-onlinequiz.smartjen.com/images/svg/icon-close-gray.svg" class="pointer" alt="Close">
+        </div>
+      </header>
+      <div class="modal-body" id="worksheet-view-body"></div>
+    </div>
+  </div>
+</div>
+
 <!-- Confirm delete (own remarks only, selected via checkbox / Check All) -->
 <div id="confirm-delete" role="dialog" aria-modal="true" aria-labelledby="confirm-delete-title" class="modal fade show" style="display: none;">
   <div class="modal-dialog modal-md">
@@ -533,6 +574,16 @@
     },
   ];
 
+  // Worksheets generated from To Improve topics. Each item: { key, strand, topic, count }.
+  // Seeded with one earlier worksheet so the "generated" marker is visible on load.
+  const worksheets = [
+    {
+      id: 1, name: 'Follow-up: Inferential Questions', difficulty: 'Standard',
+      generatedBy: 'tutor_sarah02', date: 'Sep 30, 2026 3:15 PM',
+      items: [{ key: '4|Comprehension|Inferential Questions', strand: 'Comprehension', topic: 'Inferential Questions', count: 10 }],
+    },
+  ];
+
   const selectedWeaknessKeys = new Set();
   // Remark ids checked for deletion (only the current tutor's own remarks)
   const checkedRemarkIds = new Set();
@@ -574,6 +625,10 @@
     const tag = remark.tags.find((item) => item.strand === strand && item.topic === topic);
     return { remark, tag };
   }
+
+  // Worksheets that include this sidebar topic, newest first
+  const worksheetsFor = (key) => worksheets.filter((sheet) => sheet.items.some((item) => item.key === key)).reverse();
+  const generatedByLabel = (sheet) => (sheet.generatedBy === CURRENT_TUTOR ? 'You' : escapeHtml(sheet.generatedBy));
 
   const ALERT_ICON = '<i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i>';
 
@@ -639,6 +694,7 @@
               ${escapeHtml(tag.strand)} · ${shortDate(remark.date)}<br>
               ${isMine(remark) ? 'by You' : `<span class="other-tutor">by ${escapeHtml(remark.tutor)}</span>`}
             </div>
+            ${renderWorksheetBadge(key)}
           </div>
           <button type="button" class="resolve-btn" data-resolve="${escapeHtml(key)}" title="Mark as resolved" aria-label="Mark ${escapeHtml(tag.topic)} as resolved"><i class="fa-regular fa-circle-check"></i></button>
         </li>`).join('');
@@ -650,6 +706,16 @@
     document.getElementById('selection-hint').textContent = count
       ? `${count} topic${count > 1 ? 's' : ''} selected.`
       : 'Select topics to build a follow-up worksheet.';
+  }
+
+  function renderWorksheetBadge(key) {
+    const sheets = worksheetsFor(key);
+    if (!sheets.length) return '';
+    const label = sheets.length === 1
+      ? `Worksheet generated · ${shortDate(sheets[0].date)}`
+      : `${sheets.length} worksheets generated`;
+    // Opens the latest worksheet; the full history is in the remark detail
+    return `<button type="button" class="ws-badge" data-view-ws="${sheets[0].id}" title="View worksheet"><i class="fa-solid fa-file-lines" aria-hidden="true"></i> ${label}</button>`;
   }
 
   function renderRemarks() {
@@ -854,11 +920,26 @@
         Remark by: <strong>${tutorName(remark)}</strong><br>
         ${escapeHtml(remark.date)}
       </div>
+      ${renderWorksheetHistory(key, focusTag)}
       <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap: 12px;">
         ${remark.attachment ? '<button type="button" class="btn btn-trans p-0"> See Attachment </button>' : '<span></span>'}
         <button type="button" class="btn btn-primary-line" data-detail-resolve="${escapeHtml(key)}"><i class="fa-regular fa-circle-check"></i> Mark “${escapeHtml(focusTag.topic)}” as resolved</button>
       </div>`;
     openModal('remark-detail');
+  }
+
+  function renderWorksheetHistory(key, tag) {
+    const sheets = worksheetsFor(key);
+    if (!sheets.length) return '';
+    return `
+      <span class="label d-block">Worksheets generated for “${escapeHtml(tag.topic)}”</span>
+      <ul class="ws-history">
+        ${sheets.map((sheet) => `
+          <li>
+            <span><strong>${escapeHtml(sheet.name)}</strong><br><span class="text-muted">${escapeHtml(sheet.date)} · by ${generatedByLabel(sheet)}</span></span>
+            <button type="button" class="btn btn-link" data-view-ws="${sheet.id}">View Worksheet</button>
+          </li>`).join('')}
+      </ul>`;
   }
 
   document.getElementById('remark-detail-body').addEventListener('click', (event) => {
@@ -1014,7 +1095,19 @@
     // Spread questions evenly across topics; leftovers go to the first topics
     const base = Math.floor(questionCount / items.length);
     const extra = questionCount % items.length;
-    const rows = items.map(({ tag }, index) => `<tr><td>${escapeHtml(tag.topic)}</td><td>${base + (index < extra ? 1 : 0)} questions</td></tr>`).join('');
+    const sheet = {
+      id: Date.now(),
+      name,
+      difficulty,
+      generatedBy: CURRENT_TUTOR,
+      date: new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' }),
+      items: items.map(({ key, tag }, index) => ({ key, strand: tag.strand, topic: tag.topic, count: base + (index < extra ? 1 : 0) })),
+    };
+    worksheets.push(sheet);
+    // Clear the selection and refresh so the "generated" marker shows right away
+    selectedWeaknessKeys.clear();
+    renderWeaknessList();
+    const rows = sheet.items.map((item) => `<tr><td>${escapeHtml(item.topic)}</td><td>${item.count} questions</td></tr>`).join('');
 
     document.getElementById('generate-body').innerHTML = `
       <div class="text-center mb-4">
@@ -1025,9 +1118,53 @@
       <div class="summary-box mb-4"><table>${rows}</table></div>
       <div class="d-flex justify-content-end align-items-center flex-wrap" style="gap: 12px;">
         <button type="button" class="btn btn-primary-line" data-mock="Print view is not part of this prototype."><i class="fa-solid fa-print"></i> Print</button>
-        <button type="button" class="btn btn-primary" data-mock="Worksheet assigned to Anthony Test."> Assign to Student </button>
+        <button type="button" class="btn btn-primary-line" data-mock="Worksheet assigned to Anthony Test."> Assign to Student </button>
+        <button type="button" class="btn btn-primary" data-view-ws="${sheet.id}"> View Worksheet </button>
       </div>`;
   }
+
+  // ---- Worksheet preview ----
+
+  function openWorksheet(id) {
+    const sheet = worksheets.find((item) => item.id === Number(id));
+    const total = sheet.items.reduce((sum, item) => sum + item.count, 0);
+    let questionNumber = 0;
+    const sections = sheet.items.map((item) => {
+      const questions = Array.from({ length: item.count }, () => {
+        questionNumber += 1;
+        return `<div class="ws-question"><span class="number">Q${questionNumber}</span><span class="placeholder">Generated question on ${escapeHtml(item.topic)}</span></div>`;
+      }).join('');
+      return `
+        <div class="ws-section">
+          <h4>${escapeHtml(item.topic)} <span class="text-muted" style="font-weight: 400;">· ${escapeHtml(item.strand)}</span></h4>
+          ${questions}
+        </div>`;
+    }).join('');
+
+    document.getElementById('worksheet-view-title').textContent = sheet.name;
+    document.getElementById('worksheet-view-body').innerHTML = `
+      <div class="ws-meta">${total} questions · ${escapeHtml(sheet.difficulty)} · Generated ${escapeHtml(sheet.date)} by ${generatedByLabel(sheet)}</div>
+      ${sections}
+      <div class="d-flex justify-content-end align-items-center flex-wrap" style="gap: 12px;">
+        <button type="button" class="btn btn-primary-line" data-mock="Print view is not part of this prototype."><i class="fa-solid fa-print"></i> Print</button>
+        <button type="button" class="btn btn-primary" data-mock="Worksheet assigned to Anthony Test."> Assign to Student </button>
+      </div>`;
+    closeModals();
+    openModal('worksheet-view');
+  }
+
+  // Handles every "View Worksheet" button and "generated" marker, wherever rendered
+  document.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-view-ws]');
+    if (button) openWorksheet(button.dataset.viewWs);
+  });
+
+  document.getElementById('worksheet-view-body').addEventListener('click', (event) => {
+    const mock = event.target.closest('[data-mock]');
+    if (!mock) return;
+    closeModals();
+    showToast(mock.dataset.mock);
+  });
 
   document.getElementById('open-generate').addEventListener('click', () => {
     renderGenerateForm();
