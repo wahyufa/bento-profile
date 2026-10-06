@@ -1,0 +1,13 @@
+ATLAS DESIGN OPTIONS — 6 October 2026
+
+1. Extract the entire ZIP into a folder.
+2. Double-click START-HERE.html in Chrome or Edge.
+3. Choose a prototype to explore.
+
+Includes all four student course options, the course authoring editor, and the saved dashboard prototype, along with source files and preview images.
+The earlier dashboard appearance is retained as preview-desktop.png and preview-mobile.png; a separate interactive build of that earlier appearance was not found.
+
+These are local design prototypes. No live ATLAS connection or publishing.
+Jen responses are demonstrations. Video and external fonts require internet.
+Course progress and notes reset on reload. Dashboard and admin drafts use browser storage.
+Share the whole ZIP, not a localhost link: localhost links only work on the original computer.

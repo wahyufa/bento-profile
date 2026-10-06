@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#146a62"><title>Your learning space · ATLAS</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<svg class="svg-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+ <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+ <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 5c-3-2-6-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-3-1-6-1-9 1v15"/></symbol>
+ <symbol id="i-path" viewBox="0 0 24 24"><circle cx="5" cy="5" r="2"/><circle cx="19" cy="19" r="2"/><path d="M7 5h9a4 4 0 0 1 0 8H8a3 3 0 0 0 0 6h9"/></symbol>
+ <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
+ <symbol id="i-assess" viewBox="0 0 24 24"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V2h6v2M9 10h6m-6 4h6m-6 4h3"/></symbol>
+ <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 4v16h16M8 15v-4m5 4V6m5 9V9"/></symbol>
+ <symbol id="i-spark" viewBox="0 0 24 24"><path d="m12 3 2.6 6.4L21 12l-6.4 2.6L12 21l-2.6-6.4L3 12l6.4-2.6L12 3Zm7-2v4m-2-2h4"/></symbol>
+ <symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 11a8 8 0 0 1-8 8H7l-5 3 2-6a8 8 0 1 1 17-5Z"/><path d="M8 10h8m-8 4h5"/></symbol>
+ <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+ <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6"/></symbol>
+ <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+ <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+ <symbol id="i-flame" viewBox="0 0 24 24"><path d="M13 2c1 5-3 6-2 10 2-1 3-3 3-5 4 3 6 6 5 10-2 7-14 7-15-1-1-5 3-7 4-10-1 5 2 5 3 3Z"/></symbol>
+ <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9ZM9 21h6"/></symbol>
+ <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 0 1 6 0c0 2-3 2-3 4m0 3v.1"/></symbol>
+ <symbol id="i-x" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+ <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 5 11 7-11 7V5Z"/></symbol>
+ <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+ <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+ <symbol id="i-award" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="m8 12-2 9 6-3 6 3-2-9"/></symbol>
+</defs></svg>
+
+<aside class="sidebar" id="sidebar">
+ <a class="brand" href="#" aria-label="ATLAS home"><img src="atlas-logo.png" alt="ATLAS by HeyHi"></a>
+ <div class="workspace"><span class="workspace-icon">a.</span><div>My learning space<small>Make room to grow</small></div></div>
+ <div class="nav-label">WORKSPACE</div>
+ <nav aria-label="Main navigation">
+  <button class="nav-item active" data-nav="overview" aria-current="page"><svg><use href="#i-grid"/></svg>Overview</button>
+  <button class="nav-item" data-nav="courses"><svg><use href="#i-book"/></svg>My courses<span class="nav-count">4</span></button>
+  <button class="nav-item" data-nav="path"><svg><use href="#i-path"/></svg>Learning path<span class="tiny-label">PALS</span></button>
+  <button class="nav-item" data-nav="assessments"><svg><use href="#i-assess"/></svg>Assessments<span class="nav-dot"></span></button>
+  <button class="nav-item" data-nav="progress"><svg><use href="#i-chart"/></svg>My progress</button>
+ </nav>
+ <div class="nav-label second-label">DISCOVER & PRACTICE</div>
+ <nav aria-label="Learning tools">
+  <button class="nav-item" data-nav="library"><svg><use href="#i-book"/></svg>Course library</button>
+  <button class="nav-item" data-nav="practice"><svg><use href="#i-chat"/></svg>Scenario practice</button>
+  <button class="nav-item assistant-nav" data-nav="assistant"><svg><use href="#i-spark"/></svg>Learning assistant</button>
+ </nav>
+ <div class="sidebar-bottom">
+  <div class="sidebar-note"><span class="note-spark">✳</span><p>A little curiosity.<br>A world of possibility.</p><span>Your next chapter starts here.</span></div>
+  <button class="nav-item" data-nav="help"><svg><use href="#i-help"/></svg>Help & resources<svg class="end-icon"><use href="#i-arrow"/></svg></button>
+  <button class="profile" data-nav="profile"><span class="avatar">JL</span><span>Jamie Lee<small>Learner account</small></span><svg><use href="#i-chevron"/></svg></button>
+ </div>
+</aside>
+<div class="sidebar-shade" id="sidebar-shade"></div>
+<div class="app">
+ <header class="topbar">
+  <div class="breadcrumb"><button class="icon-button menu-toggle" id="menu" aria-label="Open navigation"><svg><use href="#i-menu"/></svg></button><span>My workspace</span><span class="slash">/</span><strong>Overview</strong></div>
+  <div class="top-actions"><button class="search-trigger" id="search-button" aria-label="Search courses"><svg><use href="#i-search"/></svg><span>Find something to learn</span><kbd>Ctrl K</kbd></button><span class="header-divider"></span><button class="icon-button notification-trigger" id="notifications" aria-label="Notifications, 2 unread"><svg><use href="#i-bell"/></svg><i></i></button><button class="avatar small-avatar" data-nav="profile" aria-label="Your profile">JL</button></div>
+ </header>
+ <main id="main">
+  <section class="greeting entrance"><div><div class="eyebrow">YOUR NEXT CHAPTER</div><h1>Welcome back, Jamie.</h1><p>A new day. A new opportunity to grow your skills.</p></div><div class="today"><span class="live-dot"></span>Wednesday, 30 September</div></section>
+  <div class="dashboard-grid">
+   <div class="primary-column">
+    <section class="assistant-spotlight entrance" aria-labelledby="assistant-title">
+     <div class="assistant-hero-copy"><div class="assistant-kicker"><svg><use href="#i-spark"/></svg>YOUR ATLAS LEARNING ASSISTANT</div><h2 id="assistant-title">How can I help you<br>learn today?</h2><p>A tricky concept. Your next course. A fresh perspective.<br> Let’s figure it out together.</p></div>
+     <img class="assistant-hero-art" src="atlas-learning-v2.png" alt="" width="1280" height="1280">
+     <form class="assistant-ask-form" id="assistant-ask-form"><svg aria-hidden="true"><use href="#i-spark"/></svg><input id="assistant-question" aria-label="Ask your learning assistant" placeholder="Ask anything about your learning…" maxlength="400" autocomplete="off" required><button type="submit" aria-label="Ask learning assistant"><svg><use href="#i-arrow"/></svg></button></form>
+     <div class="assistant-prompts" aria-label="Suggested questions"><button data-ask="What should I learn next?">What should I learn next?<svg><use href="#i-arrow"/></svg></button><button data-ask="Explain active listening">Explain a concept<svg><use href="#i-arrow"/></svg></button><button data-ask="Summarize my learning progress">My learning progress<svg><use href="#i-arrow"/></svg></button></div>
+    </section>
+    <section class="resume-card entrance" aria-label="Continue learning"><span class="resume-icon"><svg><use href="#i-book"/></svg></span><div class="resume-copy"><span class="resume-eyebrow">PICK UP WHERE YOU LEFT OFF</span><h2>Effective Communication</h2><div class="resume-meta"><span>Lesson 4 of 8 · 12 min</span><div class="track"><span id="hero-progress-fill" style="width:38%"></span></div><span id="hero-progress-text">38% complete</span></div></div><button class="button primary" id="continue-learning">Continue learning<svg><use href="#i-arrow"/></svg></button></section>
+    <section class="courses-section entrance" id="courses-section">
+     <div class="section-heading"><h2>Your learning, in motion</h2><button class="text-button" id="all-courses">View all courses<svg><use href="#i-arrow"/></svg></button></div>
+     <div class="course-tabs" role="tablist" aria-label="Course status"><button role="tab" aria-selected="true" class="selected" data-filter="progress">In progress <span>3</span></button><button role="tab" aria-selected="false" data-filter="completed">Completed <span>1</span></button><button role="tab" aria-selected="false" data-filter="saved">Saved <span id="saved-count">1</span></button></div>
+     <div class="course-grid" id="course-grid" role="tabpanel" aria-label="Courses"></div>
+    </section>
+    <section class="explore-section entrance"><div class="section-heading"><div><h2>More ways to grow</h2><p>Find the learning style that feels like you.</p></div></div><div class="explore-grid">
+     <button class="explore-card" data-nav="path"><span class="explore-icon sage"><svg><use href="#i-path"/></svg></span><div><h3>Your own way forward</h3><p>A learning path that adapts to you.</p><span>Explore PALS <svg><use href="#i-arrow"/></svg></span></div></button>
+     <button class="explore-card" data-nav="practice"><span class="explore-icon peach"><svg><use href="#i-chat"/></svg></span><div><h3>Turn knowing into doing</h3><p>Build confidence with real scenarios.</p><span>Try a role-play <svg><use href="#i-arrow"/></svg></span></div></button>
+    </div></section>
+   </div>
+   <aside class="secondary-column" aria-label="Your learning activity">
+    <section class="goal-card panel entrance"><div class="card-heading"><h2>A good week to grow</h2><button class="icon-button subtle" id="edit-goal" aria-label="Edit weekly goal"><svg><use href="#i-target"/></svg></button></div><div class="goal-main"><div class="goal-ring"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-track" cx="60" cy="60" r="49"/><circle class="ring-value" id="goal-ring" cx="60" cy="60" r="49"/></svg><div><strong id="goal-done">3<span>/ 5</span></strong><small>DAYS</small></div></div><div class="goal-copy"><span class="streak"><svg><use href="#i-flame"/></svg>3-day streak</span><h3>You’re showing up.</h3><p id="goal-caption">2 more days to hit<br>your weekly goal.</p></div></div><div class="week-days"><div><span>M</span><i class="done"><svg><use href="#i-check"/></svg></i></div><div><span>T</span><i class="done"><svg><use href="#i-check"/></svg></i></div><div class="current"><span>W</span><i class="done"><svg><use href="#i-check"/></svg></i></div><div><span>T</span><i>1</i></div><div><span>F</span><i>2</i></div><div><span>S</span><i>3</i></div><div><span>S</span><i>4</i></div></div><div class="goal-footer"><svg><use href="#i-clock"/></svg><strong>1h 24m</strong> learned this week<span>↗ 18%</span></div></section>
+    <section class="bites-card entrance"><div class="bites-label"><svg><use href="#i-spark"/></svg>SMART BITES<span>DAILY PRACTICE</span></div><div class="bites-body"><div><h2>Small bite.<br>Big brain energy.</h2><p>A quick refresh to make<br>your knowledge stick.</p></div><div class="bolt-art" aria-hidden="true">ϟ<span>✦</span></div></div><button class="button bites-button" id="start-quiz">Let’s do a quick 5<svg><use href="#i-arrow"/></svg></button><div class="bites-meta">5 questions <span>·</span> About 3 minutes</div></section>
+    <section class="up-next panel entrance"><div class="card-heading"><h2>On your horizon</h2><svg><use href="#i-assess"/></svg></div><button class="assignment" data-nav="assessments"><span class="assignment-date"><strong>02</strong>OCT</span><span><strong>Communication check-in</strong><small>Assessment · 10 questions</small><em>Due in 2 days</em></span><svg><use href="#i-chevron"/></svg></button><div class="up-next-footer"><span class="mini-dot"></span>A small step toward your next milestone.</div></section>
+    <button class="assistant-card entrance" data-nav="assistant"><span class="assistant-orb"><svg><use href="#i-spark"/></svg></span><span><strong>A little help goes a long way.</strong><small>Ask your learning assistant<svg><use href="#i-arrow"/></svg></small></span></button>
+   </aside>
+  </div>
+  <footer class="page-footer"><span>Made for your next “I get it.”</span><span>ATLAS by HeyHi <i>·</i> Local design preview</span></footer>
+ </main>
+</div>
+<dialog id="dialog"><div class="dialog-top"><span class="dialog-eyebrow" id="dialog-eyebrow">YOUR LEARNING SPACE</span><button class="icon-button" id="close-dialog" aria-label="Close dialog"><svg><use href="#i-x"/></svg></button></div><div id="dialog-content"></div></dialog>
+<div class="toast" id="toast" role="status"><svg><use href="#i-check"/></svg><span></span></div>
+<script src="app.js"></script>
+</body>
+</html>
