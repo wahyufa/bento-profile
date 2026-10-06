@@ -316,6 +316,16 @@
   .rb-acc__obtained b { color: var(--ink); }
   .rb-acc__desc { margin: 0 0 10px 16px; }
   .rb-acc__desc li { font-size: 12.5px; line-height: 1.55; color: var(--ink-soft); margin-bottom: 5px; }
+  .rb-next {
+    margin-top: 8px; background: #f1edff; border-left: 3px solid #7884b9; border-radius: 8px;
+    padding: 10px 12px; font-size: 12.5px; line-height: 1.6; color: var(--ink-soft);
+  }
+  .rb-next b { color: var(--ink); }
+  .model-strategy { margin: 0 0 8px 20px; font-size: 15px; line-height: 1.7; color: var(--ink); }
+  .model-answer { background: #fff; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 10px; }
+  .model-answer__q { font-weight: 700; font-size: 13.5px; color: var(--ink-soft); margin-bottom: 6px; }
+  .model-answer__a { font-size: 15.5px; line-height: 1.7; color: var(--ink); }
+  .model-notes { margin: 0 0 0 20px; font-size: 14px; line-height: 1.7; color: var(--ink-soft); }
   .rb-feedback {
     background: #eaf8ff; border-left: 3px solid var(--blue); border-radius: 8px;
     padding: 10px 12px; font-size: 12.5px; line-height: 1.6; color: var(--ink-soft);
@@ -517,6 +527,7 @@
             'Simple structures used mostly accurately; errors often occur when attempting more complex structures but these do not impede understanding.',
           ],
           remark: 'Past tense slipped in Part 1 ("someone repair something" instead of "repaired"), but Part 2 and 3 held complex structures together well. Review irregular past tense forms before the next attempt.',
+          next: 'Use more complex structures (for example conditionals and relative clauses) and keep errors rare, even in longer sentences.',
         },
         {
           name: 'Vocabulary', obtained: 8, max: 10, level: 4,
@@ -524,6 +535,7 @@
             'A sufficient range of vocabulary used appropriately to discuss a variety of ideas, facts and opinions.',
           ],
           remark: 'Good range across all three parts — "over-consumption," "convenience" and "ordering in" all appeared naturally in Part 2. Strongest criterion this attempt.',
+          next: 'Choose more precise words for each idea, such as “reduce waste” instead of “make less rubbish”.',
         },
         {
           name: 'Development', obtained: 6, max: 10, level: 3,
@@ -532,6 +544,7 @@
             'Communication is maintained but with frequent support from the examiner.',
           ],
           remark: 'Part 1 answers were on-topic but stayed short until prompted. In the short talk, both options were covered but the comparison between them could go further — say which you would choose and why, not just list pros and cons.',
+          next: 'Develop most answers with a reason and an example on your own, without waiting for the examiner’s follow-up prompt.',
         },
         {
           name: 'Pronunciation', obtained: 7, max: 10, level: 4,
@@ -540,6 +553,7 @@
             'Intonation is sometimes used effectively to convey intended meaning.',
           ],
           remark: 'Clear throughout, with word stress on multi-syllable words ("re-spon-si-ble", "en-vi-ron-ment") as the main thing to keep practising.',
+          next: 'Keep word stress consistent and use intonation to highlight your key ideas.',
         },
       ],
     },
@@ -593,11 +607,57 @@
       ${part.note ? `<p class="prompt-script">${escapeHtml(part.note)}</p>` : ''}`;
   }
 
+  // Model answers: what a Level 5 response could sound like, plus the
+  // strategy behind it, so repeat attempts have something to copy from.
+  const MODELS = {
+    '1': {
+      strategy: ['Answer the question directly in your first sentence.', 'Give one reason.', 'Add a short, real example — then stop or add a second point.'],
+      answers: [
+        { q: 'What things do people recycle, and why?', a: 'People mostly recycle paper, plastic bottles and glass. I think they do it because it reduces waste and saves natural resources. For example, at my school we have separate bins, and the paper we collect is turned into new notebooks.' },
+        { q: 'Can you tell me about a time when you, or someone you know, repaired something?', a: 'Last year my brother’s bicycle broke because the chain snapped. Instead of buying a new one, we watched a video and replaced the chain ourselves. It took an afternoon, but it saved money and the bike still works well.' },
+        { q: 'Do you think that we should stop buying new things to protect the environment? Why? Why not?', a: 'I partly agree. Buying fewer new things would certainly reduce waste, but stopping completely is unrealistic. A better idea is to repair things and buy second-hand when possible, so we still get what we need without harming the environment.' },
+      ],
+      notes: [['Development', 'Every answer has a reason and an example, without waiting for a follow-up prompt.'], ['Vocabulary', '“reduces waste”, “natural resources” and “second-hand” are more precise than “makes less rubbish”.']],
+    },
+    '2': {
+      strategy: ['Use your 1 minute to plan three blocks: Option 1, Option 2, your choice.', 'For each option give one advantage and one disadvantage.', 'Finish with a clear choice and the reason for it.'],
+      answers: [
+        { q: 'Party food: talk about the advantages and disadvantages of each option, and say which you would prefer.', a: 'I would like to talk about two ways to organise food for a party. First, asking guests to bring their favourite food. One advantage is that there is a lot of variety, and it costs me less. However, I cannot control what arrives, and some dishes might be similar. Second, ordering from a fast food restaurant. This is quick and convenient, so I would not need to cook. On the other hand, it can be expensive, and it is not very healthy. Overall, I would prefer asking my guests to bring food, because it feels more personal, and everyone can enjoy something they like.' },
+      ],
+      notes: [['Grammar', 'Linking structures (“However”, “On the other hand”, “which means”) join ideas into complex sentences.'], ['Development', 'Both options get equal time, and the final choice is justified.']],
+    },
+    '3': {
+      strategy: ['Give your opinion first.', 'Explain why, then acknowledge another point of view.', 'Do not repeat points you already made in the short talk.'],
+      answers: [
+        { q: 'Do you think that young people enjoy cooking?', a: 'Many of them do, especially when they cook with friends. It feels creative and social. However, some find it a chore if they have to do it every day.' },
+        { q: 'Some people say that healthy food is not very tasty. Do you agree?', a: 'Not really. Healthy food can be delicious if it is prepared well. For instance, a fresh salad with a good dressing is far better than many snacks I have tried.' },
+        { q: 'Is it easier to plan a party by yourself or with a group of people?', a: 'I think a group is easier, because the work is shared. On the other hand, with a group there are more opinions, so deciding can take longer.' },
+      ],
+      notes: [['Development', 'Each answer gives an opinion and a second point of view in two or three sentences.'], ['Pronunciation', 'Pause after the opinion and stress key words (“delicious”, “shared”) to show meaning.']],
+    },
+  };
+
+  function modelHtml(part) {
+    const m = MODELS[part.number];
+    return `
+      <p class="eyebrow">Strategy</p>
+      <ol class="model-strategy">${m.strategy.map((s) => `<li>${escapeHtml(s)}</li>`).join('')}</ol>
+      <p class="eyebrow eyebrow--tight">Model answer</p>
+      ${m.answers.map((x, i) => `
+        <div class="model-answer">
+          <p class="model-answer__q">${m.answers.length > 1 ? (i + 1) + '. ' : ''}${escapeHtml(x.q)}</p>
+          <p class="model-answer__a">${escapeHtml(x.a)}</p>
+        </div>`).join('')}
+      <p class="eyebrow eyebrow--tight">Why this scores higher</p>
+      <ul class="model-notes">${m.notes.map(([c, t]) => `<li><b>${escapeHtml(c)}:</b> ${escapeHtml(t)}</li>`).join('')}</ul>`;
+  }
+
   function partCardHtml(part) {
     return `
       <section class="qblock" id="qblock-${part.number}" data-q="${part.number}">
         <div class="tabs" role="tablist">
           <button class="tab tab--active" data-tab="question">${escapeHtml(part.label)}</button>
+          <button class="tab" data-tab="model">Model answer</button>
           <button class="tab" data-tab="rubrics">Rubrics</button>
         </div>
         <div class="card">
@@ -613,6 +673,9 @@
               <button class="btn-see-result" data-see-result="${part.number}">See result</button>
             </div>
             ${recordingsHtml(part)}
+          </div>
+          <div class="card__scroll" data-panel="model" hidden>
+            ${modelHtml(part)}
           </div>
           <div class="card__scroll" data-panel="rubrics" hidden>
             ${rubricsViewHtml()}
@@ -660,6 +723,7 @@
               <p class="rb-acc__obtained">Obtained: <b>${c.obtained} / ${c.max} Marks</b></p>
               <ul class="rb-acc__desc">${c.descriptors.map((d) => `<li>${escapeHtml(d)}</li>`).join('')}</ul>
               <div class="rb-feedback">${escapeHtml(c.remark)}</div>
+              <div class="rb-next"><b>To reach Level ${c.level + 1}:</b> ${escapeHtml(c.next)}</div>
             </div>
           </div>`).join('')}
       </div>`;
