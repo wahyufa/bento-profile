@@ -1,0 +1,1451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ATLAS Lesson Blocks Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Design tokens — taken from demo.atlaslearn.ai (Montserrat, navy header, teal primary)
+   ========================================================================== */
+:root {
+  --navy: #31425D;
+  --primary: #0D719A;
+  --primary-ink: #0A5A7B;
+  --primary-soft: #E6F2F7;
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --ink: #171A26;
+  --muted: #5B6475;
+  --line: #E1E5EB;
+  --accent: #F5A623;
+  --accent-ink: #8A5600;
+  --accent-soft: #FEF4E1;
+  --green: #1E8A5A;
+  --green-soft: #E3F4EC;
+  --radius-sm: 10px;
+  --radius: 16px;
+  --radius-lg: 20px;
+  --font: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --topbar-h: 54px;
+  --proto-h: 48px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: calc(var(--topbar-h) + 24px); }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font); font-size: 16px; line-height: 1.7;
+}
+h1, h2, h3, h4, p, ul, ol { margin: 0; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+
+/* ---------- Prototype controls (not part of the design) ---------- */
+.proto {
+  position: sticky; top: 0; z-index: 60; min-height: var(--proto-h);
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px;
+  padding: 6px 20px; background: #FFF8E6; border-bottom: 1px dashed var(--accent);
+  font-size: 13px;
+}
+.proto b { color: var(--accent-ink); font-weight: 600; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); overflow: hidden; }
+.seg button { border: 0; background: none; padding: 6px 14px; font-size: 13px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+
+/* ---------- App chrome (mirrors production) ---------- */
+.topbar {
+  position: sticky; top: var(--proto-h); z-index: 50; height: var(--topbar-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px; background: var(--navy); color: #fff; font-weight: 600;
+}
+.topbar button { border: 0; background: none; color: #fff; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.progressbar { position: sticky; top: calc(var(--proto-h) + var(--topbar-h)); z-index: 49; height: 4px; background: var(--line); }
+.progressbar i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .12s linear; }
+
+.layout {
+  display: grid; grid-template-columns: minmax(0, 1fr) 64px; gap: 0;
+  max-width: 1280px; margin: 0 auto; padding: 24px 16px 96px;
+}
+.stage { display: grid; grid-template-columns: 280px minmax(0, 760px); justify-content: center; gap: 32px; }
+.stage.no-rail { grid-template-columns: minmax(0, 840px); }
+
+/* Icon rail */
+.iconrail { position: sticky; top: calc(var(--proto-h) + var(--topbar-h) + 28px); align-self: start; display: grid; gap: 10px; }
+.iconrail button {
+  width: 44px; height: 44px; border-radius: 12px; border: 1px solid var(--line);
+  background: var(--surface); color: var(--primary); display: grid; place-items: center;
+}
+.iconrail button:hover { background: var(--primary-soft); }
+
+/* ---------- Course outline (left panel on desktop, drawer on smaller screens) ---------- */
+.outline {
+  position: sticky; top: calc(var(--proto-h) + var(--topbar-h) + 28px); align-self: start;
+  max-height: calc(100vh - var(--proto-h) - var(--topbar-h) - 52px); overflow-y: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 12px 14px; font-size: 13.5px;
+}
+.ol-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; padding: 0 6px; }
+.outline h2 { font-size: 15px; font-weight: 700; line-height: 1.35; }
+.ol-close { display: none; border: 0; background: var(--bg); border-radius: 8px; width: 32px; height: 32px; font-size: 16px; flex: none; }
+.ol-count { margin: 8px 6px 6px; font-size: 12.5px; color: var(--muted); }
+.ol-bar { margin: 0 6px 12px; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
+.ol-bar i { display: block; height: 100%; width: 0; background: var(--green); transition: width .3s; }
+.ol-list { list-style: none; padding: 0; display: grid; gap: 2px; }
+.ol-item > button {
+  display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left; border: 0; background: none;
+  padding: 8px 8px; border-radius: 10px; line-height: 1.35;
+}
+.ol-item > button:hover { background: var(--bg); }
+.ol-item.cur > button { background: var(--primary-soft); }
+.ol-item.cur .ol-name { font-weight: 600; }
+.ol-status { flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 11px; font-weight: 700; color: #fff; }
+.ol-item.cur .ol-status { border-color: var(--primary); }
+.ol-item.cur .ol-status::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--primary); }
+.ol-item.done .ol-status { background: var(--green); border-color: var(--green); }
+.ol-item.done .ol-status::after { content: "✓"; width: auto; height: auto; background: none; }
+.ol-text { min-width: 0; }
+.ol-name { display: block; }
+.ol-text small { display: block; color: var(--muted); font-size: 12px; margin-top: 1px; }
+.ol-sections { list-style: none; margin: 2px 0 8px 29px; padding: 0 0 0 0; border-left: 2px solid var(--line); }
+.ol-sections a { display: block; padding: 4px 10px; margin-left: -2px; border-left: 2px solid transparent; color: var(--muted); text-decoration: none; font-size: 12.5px; line-height: 1.4; }
+.ol-sections a:hover { color: var(--ink); }
+.ol-sections a.on { color: var(--primary-ink); font-weight: 600; border-left-color: var(--primary); }
+.topbar .outline-btn { display: none; border: 0; background: rgba(255,255,255,.12); color: #fff; border-radius: 10px; padding: 6px 12px; font-size: 13.5px; font-weight: 600; align-items: center; gap: 8px; }
+.scrim { display: none; }
+
+/* ---------- Lesson shell ---------- */
+.lesson-card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 1px 2px rgba(23,26,38,.04); padding: 32px 36px 40px; }
+.crumb { font-size: 12.5px; color: var(--muted); }
+.lesson-title { display: flex; align-items: center; gap: 12px; font-size: clamp(26px, 3.4vw, 32px); font-weight: 700; line-height: 1.2; margin: 6px 0 12px; }
+.meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--muted); }
+.pill { border: 1px solid var(--line); border-radius: 999px; padding: 2px 12px; font-weight: 600; font-size: 12.5px; color: var(--ink); }
+.lesson-body { margin-top: 28px; padding-top: 28px; border-top: 1px solid var(--line); }
+.lesson-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 20px; }
+.btn {
+  border: 1px solid var(--line); background: var(--surface); border-radius: var(--radius);
+  padding: 11px 22px; font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; gap: 8px;
+}
+.btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn.primary:hover { background: var(--primary-ink); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.jen {
+  display: inline-flex; align-items: center; gap: 8px; margin-top: 36px; padding: 8px 16px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--bg); font-size: 14px;
+}
+
+/* ==========================================================================
+   BLOCKS
+   ========================================================================== */
+.block { margin: 0 0 44px; }
+.block:last-child { margin-bottom: 0; }
+.block h2.block-title { font-size: 22px; font-weight: 700; line-height: 1.3; margin-bottom: 14px; }
+.block h3 { font-size: 17px; font-weight: 700; line-height: 1.35; margin-bottom: 6px; }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--primary-ink); margin-bottom: 6px; }
+.lead { font-size: 18px; line-height: 1.7; }
+.prose p + p { margin-top: 14px; }
+.muted { color: var(--muted); }
+
+/* Callout */
+.callout { display: flex; gap: 14px; padding: 18px 20px; border-radius: var(--radius); background: var(--primary-soft); border-left: 5px solid var(--primary); }
+.callout.note { background: var(--accent-soft); border-left-color: var(--accent); }
+.callout.good { background: var(--green-soft); border-left-color: var(--green); }
+.callout .ic { flex: none; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--primary); color: #fff; font-weight: 700; font-size: 15px; }
+.callout.note .ic { background: var(--accent-ink); }
+.callout.good .ic { background: var(--green); }
+.callout strong { display: block; font-weight: 700; margin-bottom: 2px; }
+.callout p { font-size: 15px; line-height: 1.65; }
+.callout a, .link { color: var(--primary-ink); font-weight: 600; }
+
+/* Card grid */
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+.card p { font-size: 14.5px; line-height: 1.6; color: var(--muted); }
+.card .badge { width: 42px; height: 42px; border-radius: 12px; background: var(--primary-soft); color: var(--primary); display: grid; place-items: center; margin-bottom: 12px; }
+.card .num { width: 34px; height: 34px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 15px; margin-bottom: 12px; }
+.card.accent-top { border-top: 4px solid var(--primary); }
+
+/* Checklist */
+.checklist { display: flex; gap: 14px; align-items: flex-start; padding: 20px; border: 1px solid var(--line); border-radius: var(--radius); }
+.checklist input { width: 22px; height: 22px; margin-top: 3px; accent-color: var(--primary); flex: none; }
+.checklist label { cursor: pointer; }
+.checklist label b { display: block; font-size: 17px; }
+.checklist label span { display: block; color: var(--muted); font-size: 14.5px; line-height: 1.6; margin-top: 4px; }
+
+/* Community / feature panel */
+.panel { background: var(--navy); color: #fff; border-radius: var(--radius-lg); padding: 28px; display: grid; gap: 18px; }
+.panel h2 { color: #fff; font-size: 22px; line-height: 1.3; }
+.panel ul { list-style: none; padding: 0; display: grid; gap: 10px; }
+.panel li { display: flex; gap: 10px; align-items: flex-start; font-size: 15px; line-height: 1.55; }
+.panel li::before { content: ""; flex: none; width: 8px; height: 8px; margin-top: 8px; border-radius: 50%; background: var(--accent); }
+.panel .fine { font-size: 13px; color: rgba(255,255,255,.8); }
+.panel .btn { background: #fff; color: var(--navy); border-color: #fff; justify-self: start; }
+
+/* Video */
+.video { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 16/9; background: #0f1724; display: grid; place-items: center; }
+.video svg.bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.play { position: relative; width: 76px; height: 76px; border-radius: 50%; border: 0; background: #fff; color: var(--primary); display: grid; place-items: center; box-shadow: 0 10px 28px rgba(0,0,0,.35); }
+.video .vmeta { position: absolute; left: 18px; bottom: 14px; right: 18px; color: #fff; font-size: 14px; display: flex; justify-content: space-between; gap: 10px; }
+.video .vmeta b { font-weight: 600; }
+.chips-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.chip { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 14px; font-size: 13.5px; font-weight: 500; }
+.chip.solid { background: var(--primary-soft); border-color: transparent; color: var(--primary-ink); font-weight: 600; }
+
+/* Transcript */
+details.disclosure { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+details.disclosure summary { cursor: pointer; padding: 16px 20px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+details.disclosure summary::-webkit-details-marker { display: none; }
+details.disclosure summary::after { content: "+"; font-size: 22px; line-height: 1; color: var(--primary); }
+details.disclosure[open] summary::after { content: "–"; }
+details.disclosure .inner { padding: 0 20px 20px; font-size: 15px; line-height: 1.75; color: var(--muted); }
+details.disclosure .inner p + p { margin-top: 12px; }
+details.disclosure .inner h4 { color: var(--ink); font-size: 14px; margin: 18px 0 4px; }
+
+/* Funnel */
+.funnel-wrap { display: grid; gap: 18px; }
+.who { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 14px; color: var(--muted); }
+.funnel { display: grid; gap: 6px; justify-items: center; }
+.stage-btn {
+  --w: 100%; width: var(--w); border: 2px solid transparent; border-radius: 12px; background: var(--primary-soft); color: var(--ink);
+  padding: 12px 16px; text-align: center; font-weight: 600; font-size: 15px; position: relative; transition: background .15s, border-color .15s;
+}
+.stage-btn:hover { border-color: var(--primary); }
+.stage-btn[aria-pressed="true"] { background: var(--primary); color: #fff; }
+.stage-btn .start { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11.5px; font-weight: 600; background: var(--accent); color: #3b2600; border-radius: 999px; padding: 1px 10px; display: none; }
+.stage-btn.is-start .start { display: inline-block; }
+.stage-detail { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 20px; font-size: 15px; min-height: 84px; }
+.stage-detail b { display: block; font-size: 16px; margin-bottom: 2px; }
+
+/* Stepper */
+.stepper { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; counter-reset: s; }
+.stepper li { position: relative; padding: 38px 8px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--muted); counter-increment: s; }
+.stepper li::before {
+  content: counter(s); position: absolute; top: 0; left: 0; width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center; font-weight: 700; font-size: 13px; background: var(--surface); border: 2px solid var(--line); color: var(--muted); z-index: 1;
+}
+.stepper li::after { content: ""; position: absolute; top: 13px; left: 30px; right: 4px; height: 2px; background: var(--line); }
+.stepper li:last-child::after { display: none; }
+.stepper li.done::before { content: "✓"; background: var(--green); border-color: var(--green); color: #fff; }
+.stepper li.done::after { background: var(--green); }
+.stepper li.now { color: var(--ink); font-weight: 600; }
+.stepper li.now::before { background: var(--primary); border-color: var(--primary); color: #fff; box-shadow: 0 0 0 4px var(--primary-soft); }
+.stepper .here { display: inline-block; margin-top: 4px; font-size: 11.5px; font-weight: 600; color: var(--primary-ink); background: var(--primary-soft); border-radius: 999px; padding: 0 8px; }
+
+/* Two-column definition */
+.define { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.define .box { border-radius: var(--radius); padding: 18px 20px; background: var(--surface); border: 1px solid var(--line); }
+.define .box.hl { background: var(--primary-soft); border-color: transparent; }
+.ticks { list-style: none; padding: 0; display: grid; gap: 8px; margin-top: 8px; }
+.ticks li { display: flex; gap: 10px; font-size: 15px; line-height: 1.5; }
+.ticks li::before { content: "✓"; color: var(--green); font-weight: 700; flex: none; }
+
+/* Persona */
+.persona { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.persona header { padding: 16px 20px; background: var(--primary-soft); display: flex; align-items: center; gap: 12px; }
+.persona header .av { width: 40px; height: 40px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 700; flex: none; }
+.persona header small { display: block; color: var(--muted); font-size: 12.5px; line-height: 1.3; }
+.persona header b { font-size: 16px; line-height: 1.3; }
+.persona dl { margin: 0; padding: 6px 20px 16px; display: grid; gap: 12px; }
+.persona dt { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+.persona dd { margin: 2px 0 0; font-size: 14.5px; line-height: 1.55; }
+.persona dd ul { padding-left: 18px; }
+.persona .chips-row { margin-top: 4px; }
+
+/* Task / exercise */
+.task { border: 2px solid var(--primary); border-radius: var(--radius-lg); background: var(--surface); overflow: hidden; }
+.task-head { background: var(--primary); color: #fff; padding: 16px 22px; display: flex; gap: 12px; align-items: center; }
+.task-head b { font-size: 17px; }
+.task-head small { display: block; opacity: .9; font-size: 13px; line-height: 1.4; }
+.task form { padding: 20px 22px 22px; display: grid; gap: 16px; }
+.field label { display: block; font-weight: 600; font-size: 14.5px; margin-bottom: 2px; }
+.field small { display: block; color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+.field input, .field textarea {
+  width: 100%; font: inherit; font-size: 15px; padding: 11px 14px; border: 1.5px solid var(--line); border-radius: 12px; background: var(--bg); color: var(--ink);
+}
+.field textarea { min-height: 84px; resize: vertical; }
+.field input:focus, .field textarea:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px var(--primary-soft); }
+.task-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.saved { margin-top: 18px; display: grid; gap: 14px; }
+.saved .persona header { background: var(--green-soft); }
+.saved .persona header .av { background: var(--green); }
+.empty { padding: 16px; text-align: center; color: var(--muted); font-size: 14px; border: 1.5px dashed var(--line); border-radius: var(--radius); }
+.saved-note { font-size: 13px; color: var(--muted); }
+
+/* ---------- Lesson review (enhanced) ---------- */
+.btn.primary.locked { background: var(--navy); border-color: var(--navy); }
+.btn.primary.locked:hover { background: #26344b; }
+.review { margin-top: 20px; background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 1px 2px rgba(23,26,38,.04); border: 2px solid transparent; padding: 28px 36px 32px; scroll-margin-top: calc(var(--topbar-h) + 40px); }
+.review.nudge { animation: nudge .9s ease-out; }
+@keyframes nudge { 0% { box-shadow: 0 0 0 0 rgba(13,113,154,.6); border-color: var(--primary); } 100% { box-shadow: 0 0 0 16px rgba(13,113,154,0); border-color: transparent; } }
+.rv-head { display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
+.rv-ic { flex: none; width: 46px; height: 46px; border-radius: 14px; background: var(--primary-soft); color: var(--primary); display: grid; place-items: center; }
+.review.passed .rv-ic { background: var(--green-soft); color: var(--green); }
+.review h2 { font-size: 20px; font-weight: 700; line-height: 1.3; }
+.rv-head p { font-size: 14px; color: var(--muted); line-height: 1.5; }
+.rv-note { font-size: 15px; margin-bottom: 18px; }
+.rv-dots { display: flex; gap: 6px; margin-bottom: 14px; }
+.rv-dots span { flex: 1; height: 6px; border-radius: 999px; background: var(--line); }
+.rv-dots span.ok { background: var(--green); }
+.rv-dots span.bad { background: #D9534F; }
+.rv-dots span.cur { background: var(--primary); }
+.rv-count { font-size: 12.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.rv-q { font-size: 19px; font-weight: 700; line-height: 1.4; margin: 6px 0 16px; outline: none; }
+.rv-opts { display: grid; gap: 10px; }
+.rv-opt { display: flex; gap: 12px; align-items: flex-start; border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; cursor: pointer; font-size: 15px; line-height: 1.5; background: var(--surface); }
+.rv-opt:hover { border-color: var(--primary); }
+.rv-opt input { position: absolute; opacity: 0; pointer-events: none; }
+.rv-opt .l { flex: none; width: 28px; height: 28px; border-radius: 8px; background: var(--bg); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+.rv-opt:has(input:checked) { border-color: var(--primary); background: var(--primary-soft); }
+.rv-opt:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: 2px; }
+/* :has(input) matches the specificity of the :checked rule above, so these win by coming later. */
+.rv-opt.right, .rv-opt.right:has(input) { border-color: var(--green); background: var(--green-soft); }
+.rv-opt.right .l { background: var(--green); color: #fff; }
+.rv-opt.wrong, .rv-opt.wrong:has(input) { border-color: #D9534F; background: #FDECEA; }
+.rv-opt.wrong .l { background: #D9534F; color: #fff; }
+.rv-opt.locked { cursor: default; }
+.rv-fb { margin-top: 14px; border-radius: 14px; padding: 14px 16px; font-size: 15px; line-height: 1.6; outline: none; }
+.rv-fb.ok { background: var(--green-soft); }
+.rv-fb.no { background: var(--accent-soft); }
+.rv-fb b { display: block; }
+.rv-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 18px; }
+.rv-skel { display: grid; gap: 12px; margin: 6px 0 4px; }
+.rv-skel i { display: block; height: 46px; border-radius: 14px; background: linear-gradient(90deg, var(--line), var(--bg), var(--line)); background-size: 200% 100%; animation: shimmer 1.2s linear infinite; }
+.rv-skel i:first-child { height: 26px; width: 70%; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+.rv-result { text-align: center; padding: 6px 0 4px; }
+.rv-result .big { width: 72px; height: 72px; margin: 0 auto 10px; border-radius: 50%; display: grid; place-items: center; font-size: 34px; font-weight: 700; color: #fff; background: var(--green); }
+.rv-result.fail .big { background: var(--accent-ink); }
+.rv-result h3 { font-size: 22px; margin-bottom: 4px; }
+.rv-result p { color: var(--muted); font-size: 15px; }
+.rv-missed { text-align: left; margin-top: 18px; display: grid; gap: 12px; }
+.rv-missed article { border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; font-size: 14.5px; line-height: 1.55; }
+.rv-missed b { display: block; margin-bottom: 4px; }
+.rv-result .rv-actions { justify-content: center; }
+
+/* Current (production) gate, kept for comparison */
+.gate-old { margin-top: 20px; background: var(--surface); border-radius: var(--radius-lg); padding: 22px 26px; }
+.gate-old h2 { font-size: 16px; font-weight: 700; }
+.gate-old .sub { font-size: 13px; color: var(--muted); }
+.gate-old .q { font-weight: 500; margin: 16px 0 6px; font-size: 14.5px; }
+.gate-old label { display: block; border: 1px solid var(--line); border-radius: 10px; padding: 9px 12px; margin-bottom: 6px; font-size: 14px; cursor: pointer; }
+.gate-old .row { display: flex; gap: 12px; align-items: center; margin-top: 14px; }
+.gate-old .row .link { background: none; border: 0; }
+.gate-old .msg { font-size: 14px; margin-top: 12px; }
+.gate-old .spin { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,.5); border-top-color: #fff; border-radius: 50%; animation: spin .8s linear infinite; margin-right: 8px; vertical-align: -2px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 640px) { .review { padding: 22px 18px 26px; border-radius: var(--radius); } }
+
+/* ---------- Course quiz (lesson 13) ---------- */
+.qz-title { font-size: 22px; font-weight: 700; line-height: 1.3; outline: none; }
+.qz-steps { display: flex; gap: 8px; margin-bottom: 16px; }
+.qz-step { flex: 1; height: 40px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); font-weight: 700; font-size: 14px; }
+.qz-step.ans { background: var(--primary-soft); border-color: transparent; color: var(--primary-ink); }
+.qz-step.cur { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.qz-scn { background: var(--bg); border-radius: 14px; padding: 16px 18px; margin: 6px 0 20px; font-size: 15.5px; line-height: 1.65; }
+.qz-scn .eyebrow { margin-bottom: 4px; }
+.qz-scn .persona { margin-top: 14px; background: var(--surface); }
+.qz-review { list-style: none; padding: 0; display: grid; gap: 10px; margin: 16px 0; }
+.qz-review li { display: flex; gap: 12px; align-items: flex-start; border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }
+.qz-review .n { flex: none; width: 28px; height: 28px; border-radius: 50%; background: var(--primary-soft); color: var(--primary-ink); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+.qz-review .t { flex: 1; min-width: 0; }
+.qz-review .t b { display: block; font-size: 15px; line-height: 1.4; }
+.qz-review .t span { font-size: 14px; color: var(--muted); line-height: 1.5; }
+.qz-review .change { flex: none; border: 0; background: none; color: var(--primary-ink); font-weight: 600; font-size: 14px; text-decoration: underline; text-underline-offset: 3px; }
+.qz-ring { --p: 0; width: 108px; height: 108px; margin: 0 auto 14px; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--p) * 1%), var(--line) 0); display: grid; place-items: center; }
+.qz-ring.fail { background: conic-gradient(var(--accent-ink) calc(var(--p) * 1%), var(--line) 0); }
+.qz-ring::after { content: attr(data-label); width: 86px; height: 86px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; font-size: 26px; font-weight: 700; }
+.qz-list { display: grid; gap: 12px; margin-top: 22px; text-align: left; }
+.qz-bd { border: 1px solid var(--line); border-left-width: 5px; border-radius: 14px; padding: 14px 16px; display: grid; gap: 6px; font-size: 14.5px; line-height: 1.55; }
+.qz-bd.ok { border-left-color: var(--green); }
+.qz-bd.bad { border-left-color: #D9534F; }
+.qz-bd h3 { font-size: 15px; font-weight: 700; display: flex; gap: 10px; line-height: 1.4; margin: 0; }
+.qz-bd .mark { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; color: #fff; font-size: 12px; font-weight: 700; }
+.qz-bd.ok .mark { background: var(--green); }
+.qz-bd.bad .mark { background: #D9534F; }
+.qz-bd .why { color: var(--muted); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.legacy-table { border-collapse: collapse; width: 100%; margin: 8px 0 12px; font-size: 15px; }
+.legacy-table td { border: 1px solid #444; padding: 8px 12px; vertical-align: top; }
+.legacy-table tr:first-child td { font-weight: 700; }
+
+/* Current (before) view */
+.legacy { font-size: 14px; line-height: 1.45; }
+.legacy p { margin: 0 0 6px; }
+.legacy.single { font-size: 16px; line-height: 1.65; }
+.legacy-tag { display: inline-block; font-size: 12px; font-weight: 600; background: #FDECEA; color: #9B2C1F; border-radius: 6px; padding: 2px 10px; margin-bottom: 14px; }
+
+.toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--navy); color: #fff;
+  border-radius: 12px; padding: 10px 18px; font-size: 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 80;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1199px) {
+  .stage { grid-template-columns: minmax(0, 760px); }
+  /* The outline becomes a drawer opened from the app bar. */
+  body[data-mode="new"] .topbar .outline-btn { display: inline-flex; }
+  .outline {
+    position: fixed; z-index: 70; top: 0; left: 0; bottom: 0; width: min(340px, 88vw); max-height: none;
+    border-radius: 0 var(--radius) var(--radius) 0; transform: translateX(-104%); transition: transform .25s; padding-top: 16px;
+    box-shadow: 0 0 40px rgba(23,26,38,.25);
+  }
+  body.drawer .outline { transform: none; }
+  body.drawer .scrim { display: block; position: fixed; inset: 0; z-index: 65; background: rgba(23,26,38,.45); }
+  .ol-close { display: block; }
+}
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); padding: 12px 12px 80px; }
+  .iconrail { display: none; }
+}
+@media (max-width: 640px) {
+  :root { --topbar-h: 50px; --proto-h: 0px; }
+  /* The prototype bar wraps to several lines here, so let it scroll away instead of overlapping the app bar. */
+  .proto { position: static; padding: 6px 12px; }
+  .lesson-card { padding: 22px 18px 28px; border-radius: var(--radius); }
+  .lead { font-size: 17px; }
+  .define { grid-template-columns: 1fr; }
+  .stepper { grid-template-columns: 1fr; gap: 14px; }
+  .stepper li { padding: 0 0 0 42px; min-height: 30px; }
+  .stepper li::after { display: none; }
+  .stage-btn .start { position: static; transform: none; margin-left: 8px; }
+  .lesson-nav .btn { flex: 1; justify-content: center; padding: 11px 12px; }
+  .panel { padding: 22px 18px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Prototype controls -->
+<div class="proto">
+  <b>Prototype</b>
+  <div class="seg" role="group" aria-label="Lesson">
+    <button data-lesson="0" aria-pressed="true">1 · Article</button>
+    <button data-lesson="1" aria-pressed="false">2 · Video</button>
+    <button data-lesson="2" aria-pressed="false">3 · Scenario</button>
+    <button data-lesson="12" aria-pressed="false">13 · Quiz</button>
+  </div>
+  <div class="seg" role="group" aria-label="Layout version">
+    <button data-mode="old" aria-pressed="false">Current</button>
+    <button data-mode="new" aria-pressed="true">Enhanced</button>
+  </div>
+  <button class="seg" id="resetBtn" type="button" style="padding:6px 14px;font-size:13px;font-weight:500" title="Clear completed lessons and review results">Reset progress</button>
+</div>
+
+<header class="topbar">
+  <button id="backBtn" type="button"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Back to Course</button>
+  <div style="display:flex;align-items:center;gap:14px">
+    <button class="outline-btn" id="outlineBtn" type="button" aria-expanded="false" aria-controls="outline"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Outline</button>
+    <span id="counter" aria-label="Lesson position">1/13</span>
+  </div>
+</header>
+<div class="progressbar" aria-hidden="true"><i id="progressFill"></i></div>
+
+<div class="layout">
+  <div class="stage" id="stage">
+    <aside class="outline" id="outline" aria-label="Course outline">
+      <div class="ol-head">
+        <h2>Digital Marketing Strategy</h2>
+        <button class="ol-close" id="olClose" type="button" aria-label="Close outline">✕</button>
+      </div>
+      <div class="ol-count" id="olCount"></div>
+      <div class="ol-bar" aria-hidden="true"><i id="olFill"></i></div>
+      <ol class="ol-list" id="olList"></ol>
+    </aside>
+
+    <main>
+      <article class="lesson-card">
+        <div class="crumb">Module 1</div>
+        <h1 class="lesson-title" id="lessonTitle"></h1>
+        <div class="meta" id="lessonMeta"></div>
+        <div class="lesson-body" id="lessonBody"></div>
+        <button class="jen" type="button" id="jenBtn"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/></svg>Learn with Jen</button>
+      </article>
+      <div id="gateMount"></div>
+      <div class="lesson-nav">
+        <button class="btn" id="prevBtn" type="button">‹ Previous</button>
+        <button class="btn primary" id="nextBtn" type="button">Next ›</button>
+      </div>
+    </main>
+  </div>
+
+  <aside class="iconrail" aria-label="Lesson tools">
+    <button type="button" aria-label="Share" data-toast="Share (as in production)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg></button>
+    <button type="button" aria-label="Bookmark" data-toast="Bookmark (as in production)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/></svg></button>
+    <button type="button" aria-label="Comments" data-toast="Comments (as in production)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></button>
+  </aside>
+</div>
+
+<div class="scrim" id="scrim"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ======================================================================
+     LESSON 1 · Article · Getting started
+     ====================================================================== -->
+<template id="l1-new">
+  <section class="block" data-rail="Welcome" id="l1-welcome">
+    <p class="lead">In this course, you will explore how digital marketing campaigns can be used to effectively communicate with your target customers to support your business and develop your business growth.</p>
+  </section>
+
+  <section class="block" data-rail="What you will learn" id="l1-learn">
+    <h2 class="block-title">What you will learn</h2>
+    <div class="cards">
+      <div class="card accent-top">
+        <div class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="0.8"/></svg></div>
+        <h3>Plan</h3>
+        <p>Develop a clear and comprehensive understanding of how to develop a digital marketing campaign.</p>
+      </div>
+      <div class="card accent-top">
+        <div class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11v2a1 1 0 001 1h3l5 4V6L7 10H4a1 1 0 00-1 1z"/><path d="M16 9a4 4 0 010 6M19 6.5a8 8 0 010 11"/></svg></div>
+        <h3>Promote</h3>
+        <p>Examine ways of promoting your content using paid, earned and owned approaches, such as search engine optimization and influencer marketing.</p>
+      </div>
+      <div class="card accent-top">
+        <div class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+        <h3>Measure</h3>
+        <p>Learn how to measure how successful your campaign is with your customers.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Before you start" id="l1-before">
+    <h2 class="block-title">Before you start</h2>
+    <div class="checklist">
+      <input type="checkbox" id="docsCheck" data-persist="atlas-proto-docs">
+      <label for="docsCheck"><b>Gather your marketing and sales documentation</b><span>To complete all the exercises in this course, it will be helpful to have the documentation you currently hold on your marketing and sales activities.</span></label>
+    </div>
+    <div class="callout good" style="margin-top:14px">
+      <div class="ic" aria-hidden="true">✓</div>
+      <div><strong>Do not worry if your documentation is limited</strong><p>This course will provide guidance on how to develop and record digital marketing strategies for your business.</p></div>
+    </div>
+  </section>
+
+  <section class="block" id="l1-prereq">
+    <div class="callout note">
+      <div class="ic" aria-hidden="true">i</div>
+      <div><strong>Not yet confident with your market and customers?</strong><p>If your market or customers are changing, you may wish to first complete one of the other 10,000 Women courses, <a href="#" data-toast="Course link (as in production)">Fundamentals of Sales and Marketing</a>.</p></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="10,000 Women community" id="l1-community">
+    <div class="panel">
+      <div>
+        <div class="eyebrow" style="color:var(--accent)">Community</div>
+        <h2>Register with 10,000 Women</h2>
+      </div>
+      <ul>
+        <li>Share ideas with other participants in the discussion forums, and learn from participants and graduates.</li>
+        <li>Receive newsletters with helpful guidance and invitations to exclusive webinars on key topics to support your business growth.</li>
+      </ul>
+      <p class="fine">To be eligible to register with 10,000 Women, you must identify as a woman.</p>
+      <button class="btn" type="button" data-toast="Opens the registration form (as in production)">Register now</button>
+    </div>
+  </section>
+</template>
+
+<template id="l1-old">
+  <span class="legacy-tag">Current layout (production)</span>
+  <p class="legacy single">In this course, you will explore how digital marketing campaigns can be used to effectively communicate with your target customers to support your business and develop your business growth. You will develop a clear and comprehensive understanding of how to develop a digital marketing campaign. You will also examine ways of promoting your content using paid, earned and owned approaches such as search engine optimization and influencer marketing. You will then learn how to measure how successful your campaign is with your customers. Are you ready to start? To complete all the exercises in this course, it will be helpful for you to gather the documentation that you currently have on your marketing and sales activities. Do not worry if this documentation is limited – this course will provide guidance on how to develop and record digital marketing strategies for your business. If you are not yet confident with your market and customers, or these are changing, you may wish to first complete one of the other 10,000 Women courses, Fundamentals of Sales and Marketing. Register with 10,000 Women As well as sharing ideas with other participants in the discussion forums, you can register with 10,000 Women today to learn from other participants and graduates. When you register with 10,000 Women, you will receive newsletters that include helpful guidance and invitations to exclusive webinars that focus on key topics to support your business growth To be eligible to register with 10,000 Women, you must identify as a woman. Register now by completing this simple form</p>
+</template>
+
+<!-- ======================================================================
+     LESSON 2 · Video · Developing a digital marketing campaign
+     ====================================================================== -->
+<template id="l2-new">
+  <section class="block" id="l2-video">
+    <div class="video" role="group" aria-label="Video player placeholder">
+      <svg class="bg" viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="640" height="360" fill="#1d2b44"/>
+        <circle cx="190" cy="205" r="58" fill="#0D719A"/><rect x="124" y="262" width="132" height="120" rx="50" fill="#0D719A"/>
+        <circle cx="450" cy="205" r="58" fill="#F5A623" opacity=".9"/><rect x="384" y="262" width="132" height="120" rx="50" fill="#F5A623" opacity=".9"/>
+        <defs><linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></linearGradient></defs>
+        <rect width="640" height="360" fill="url(#vg)"/>
+      </svg>
+      <button class="play" type="button" aria-label="Play video" data-toast="YouTube embed plays here in production"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+      <div class="vmeta"><b>Developing a digital marketing campaign</b><span>Captions available</span></div>
+    </div>
+    <details class="disclosure" style="margin-top:14px">
+      <summary>Read the transcript</summary>
+      <div class="inner">
+        <p>What is digital marketing? Digital marketing is everywhere, from social media ads, search engines and websites, to emails and, even, online reviews. So, what exactly is digital marketing? Digital marketing is the use of digital technologies to create integrated, targeted and measurable communications with the purpose of acquiring and retaining customers. Digital marketing is a data-driven process, which allows you to target individual customers and provide personalized and interactive content, as well as ensure that you get measurable results across multiple channels.</p>
+        <h4>Consideration 1 · Marketing objectives</h4>
+        <p>The main goal of digital marketing is to reach customers at the moments that most influence their decisions. These moments, or touch points, can be understood through the customer journey funnel where customers begin at the wide end of the funnel with a number of potential options on their mind. As they gather more information, the number of options gradually reduce until they arrive at the conversion stage, where they potentially buy your product or sign up for your service. Finally, the post-sale phase becomes an important stage, where you'll try and retain this individual and make them a loyal customer. As a marketer, you hope to reach out to your customers at each stage of their customer journey and drive them towards the end of the funnel to become a loyal customer.</p>
+        <p>Take customer one, for example. They just picked up photography as a hobby. They are searching for a suitable camera. Their customer journey starts from the awareness stage. Take customer two, a camera enthusiast looking to buy a digital camera. Their customer journey can start from the consideration stage where they are debating between different cameras.</p>
+        <h4>Consideration 2 · Audience</h4>
+        <p>Think about your own customers, what are their motivations and needs at each stage of the customer journey? What should your marketing objectives be to meet their needs?</p>
+        <h4>Consideration 3 · Promoting your content</h4>
+        <p>As a marketer, you'll want to be able to guide customer one and two through the funnel by addressing their needs. By providing them with a great experience at each stage, you hope to convince them to convert, and, ultimately, retain them as a loyal customer.</p>
+        <h4>Consideration 4 · Measuring success</h4>
+        <p>While the outcomes for customer one and two are the same, you can see that their customer journeys differ. Understanding how customer motivations and needs differ, allows you to identify your objectives at each stage. You can then meet potential buyers where they are, and encourage them to convert.</p>
+        <p>These are the key points to consider when creating a digital marketing plan, and you will find out more about each stage as you progress through this course.</p>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" data-rail="What is digital marketing?" id="l2-what">
+    <h2 class="block-title">What is digital marketing?</h2>
+    <p class="lead">Digital marketing is everywhere: social media ads, search engines, websites, emails and even online reviews.</p>
+    <div class="callout" style="margin-top:16px">
+      <div class="ic" aria-hidden="true">“</div>
+      <div><strong>Definition</strong><p>The use of digital technologies to create <b>integrated, targeted and measurable</b> communications with the purpose of acquiring and retaining customers.</p></div>
+    </div>
+    <p class="prose" style="margin-top:14px">It is a data-driven process. It lets you target individual customers, provide personalized and interactive content, and get measurable results across multiple channels.</p>
+  </section>
+
+  <section class="block" data-rail="Four things to consider" id="l2-four">
+    <h2 class="block-title">Four things to consider in your plan</h2>
+    <div class="cards">
+      <div class="card"><div class="num">1</div><h3>What are your marketing objectives?</h3><p>Reach customers at the moments that most influence their decisions.</p></div>
+      <div class="card"><div class="num">2</div><h3>Who is my audience and where are they located?</h3><p>Think about their motivations and needs at each stage of the journey.</p></div>
+      <div class="card"><div class="num">3</div><h3>How do I promote the content?</h3><p>Guide customers through the funnel by addressing their needs.</p></div>
+      <div class="card"><div class="num">4</div><h3>How can I measure success?</h3><p>Track outcomes along the customer journey.</p></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="The customer journey" id="l2-funnel">
+    <h2 class="block-title">The customer journey funnel</h2>
+    <p class="muted" style="margin-bottom:16px">Customers start at the wide end with many options in mind. As they gather information, the options narrow. Select a stage, then see where two customers begin.</p>
+    <div class="funnel-wrap" id="funnel">
+      <div class="who" role="group" aria-label="Show where a customer starts">
+        <span>Start point for:</span>
+        <div class="seg">
+          <button type="button" data-who="" aria-pressed="true">None</button>
+          <button type="button" data-who="1" aria-pressed="false">Customer 1</button>
+          <button type="button" data-who="2" aria-pressed="false">Customer 2</button>
+        </div>
+      </div>
+      <div class="funnel">
+        <button class="stage-btn" style="--w:100%" data-stage="0" aria-pressed="true" type="button">Awareness<span class="start">Customer 1 starts</span></button>
+        <button class="stage-btn" style="--w:84%" data-stage="1" aria-pressed="false" type="button">Consideration<span class="start">Customer 2 starts</span></button>
+        <button class="stage-btn" style="--w:68%" data-stage="2" aria-pressed="false" type="button">Conversion</button>
+        <button class="stage-btn" style="--w:52%" data-stage="3" aria-pressed="false" type="button">Post-sale: loyalty</button>
+      </div>
+      <div class="stage-detail" id="stageDetail" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Key takeaway" id="l2-take">
+    <div class="callout good">
+      <div class="ic" aria-hidden="true">★</div>
+      <div><strong>Key takeaway</strong><p>Understanding how customer motivations and needs differ allows you to identify your objectives at each stage. You can then meet potential buyers where they are, and encourage them to convert.</p></div>
+    </div>
+    <p class="muted" style="margin-top:14px;font-size:14.5px">You will find out more about each stage as you progress through this course.</p>
+  </section>
+</template>
+
+<template id="l2-old">
+  <span class="legacy-tag">Current layout (production)</span>
+  <div class="video" style="margin-bottom:18px"><svg class="bg" viewBox="0 0 640 360" aria-hidden="true"><rect width="640" height="360" fill="#000"/></svg><button class="play" type="button" aria-label="Play video" data-toast="Embed (as in production)"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button></div>
+  <p class="legacy single">What is digital marketing? Digital marketing is everywhere, from social media ads, search engines and websites, to emails and, even, online reviews. So, what exactly is digital marketing? Digital marketing is the use of digital technologies to create integrated, targeted and measurable communications with the purpose of acquiring and retaining customers. Digital marketing is a data-driven process, which allows you to target individual customers and provide personalized and interactive content, as well as ensure that you get measurable results across multiple channels. How can we make the most of the benefits of digital marketing? Here is a list of considerations when you're deciding on how to design your digital marketing plan. 1. What are your marketing objectives? 2. Who is my audience and where are they located? 3. How do I promote the content? 4. How can I measure success? We begin with key consideration one: What are your marketing objectives? The main goal of digital marketing, is to reach customers at the moments that most influence their decisions. These moments, or touch points, can be understood through the customer journey funnel where customers begin at the wide end of the funnel with a number of potential options on their mind. As they gather more information, the number of options gradually reduce until they arrive at the conversion stage, where they potentially buy your product or sign up for your service. Finally, the post-sale phase becomes an important stage, where you'll try and retain this individual and make them a loyal customer. As a marketer, you hope to reach out to your customers at each stage of their customer journey and drive them towards the end of the funnel to become a loyal customer. [MUSIC] Take customer one, for example. They just picked up photography as a hobby. They are searching for a suitable camera. Their customer journey starts from the awareness stage. Take customer two, a camera enthusiast looking to buy a digital camera. Their customer journey can start from the consideration stage where they are debating between different cameras. Now, moving to key consideration two: Who is my audience and where are they located? Think about your own customers, what are their motivations and needs at each stage of the customer journey? What should your marketing objectives be to meet their needs? [MUSIC] Moving to key consideration three: how to promote your content. As a marketer, you'll want to be able to guide customer one and two through the funnel by addressing their needs. By providing them with a great experience at each stage, you hope to convince them to convert, and, ultimately, retain them as a loyal customer. Finally, we will discuss key consideration four: measuring success along the customer journey. While the outcomes for customer one and two are the same, you can see that their customer journeys differ. Understanding how customer motivations and needs differ, allows you to identify your objectives at each stage. You can then meet potential buyers where they are, and encourage them to convert. These are the key points to consider when creating a digital marketing plan, and you will find out more about each stage as you progress through this course.</p>
+</template>
+
+<!-- ======================================================================
+     LESSON 3 · Scenario · Exercise 1: Finding your audience
+     ====================================================================== -->
+<template id="l3-new">
+  <section class="block" data-rail="Where you are" id="l3-where">
+    <div class="eyebrow">Four key considerations</div>
+    <ol class="stepper" aria-label="Campaign planning steps">
+      <li class="done">What are my marketing objectives?</li>
+      <li class="now">Who is my audience and where are they located?<br><span class="here">You are here</span></li>
+      <li>How do I promote the content?</li>
+      <li>How can I measure the success of my campaign?</li>
+    </ol>
+    <p class="muted" style="margin-top:16px;font-size:14.5px">In the previous video, you learned about identifying your marketing objectives. To explore this further, you can complete one of the other 10,000 Women courses: <a class="link" href="#" data-toast="Course link (as in production)">Fundamentals of Sales and Marketing</a>.</p>
+  </section>
+
+  <section class="block" data-rail="Identify your audience" id="l3-audience">
+    <div class="eyebrow">Step 2</div>
+    <h2 class="block-title">Identify your audience</h2>
+    <p class="lead">Once your objectives are clear, the next step is determining <b>where to promote</b> your digital marketing content.</p>
+    <p style="margin-top:14px">To do this effectively, you must understand:</p>
+    <div class="chips-row"><span class="chip solid">Who your audience is</span><span class="chip solid">Where they are active online</span></div>
+  </section>
+
+  <section class="block" data-rail="Marketing personas" id="l3-persona">
+    <h2 class="block-title">Marketing personas</h2>
+    <p>One effective way to define your audience is by developing marketing personas.</p>
+    <div class="define" style="margin-top:16px">
+      <div class="box hl">
+        <h3>What is a marketing persona?</h3>
+        <p style="font-size:15px">A semi-fictional representation of your ideal customer, based on:</p>
+        <ul class="ticks"><li>Real data from existing customers</li><li>Market research</li></ul>
+      </div>
+      <div class="box">
+        <h3>Why create several?</h3>
+        <p style="font-size:15px">Creating multiple personas helps you:</p>
+        <ul class="ticks"><li>Better understand your target customers</li><li>Design the best user experience across all digital touchpoints</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Digital touchpoints" id="l3-touch">
+    <h2 class="block-title">Digital touchpoints</h2>
+    <p>Digital touchpoints are any points of interaction between your customer and your business across digital channels, including:</p>
+    <div class="cards" style="margin-top:14px;grid-template-columns:repeat(auto-fit,minmax(130px,1fr))">
+      <div class="card" style="padding:14px 16px"><h3 style="margin:0;font-size:15px">Social media</h3></div>
+      <div class="card" style="padding:14px 16px"><h3 style="margin:0;font-size:15px">Search engines</h3></div>
+      <div class="card" style="padding:14px 16px"><h3 style="margin:0;font-size:15px">Websites</h3></div>
+      <div class="card" style="padding:14px 16px"><h3 style="margin:0;font-size:15px">Online reviews</h3></div>
+    </div>
+    <p class="muted" style="margin-top:14px;font-size:14.5px">By identifying the channels where your audience is most active, you can align your content with their needs at the right stage of the customer journey.</p>
+  </section>
+
+  <section class="block" data-rail="Example personas" id="l3-examples">
+    <h2 class="block-title">Example personas</h2>
+    <p class="muted" style="margin-bottom:16px">The two customers introduced in the previous video.</p>
+    <div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <article class="persona">
+        <header><div class="av" aria-hidden="true">1</div><div><small>Persona 1</small><b>Customer 1</b></div></header>
+        <dl>
+          <dt>Demographic</dt><dd>Hobbyist, casually interested in photography</dd>
+          <dt>Motivation &amp; needs</dt><dd>Looking for an entry-level digital camera. Awareness stage of the buying journey.</dd>
+          <dt>What you can do</dt><dd><ul><li>Provide information about various digital cameras</li><li>Inform them that you sell these products</li></ul></dd>
+          <dt>Digital touchpoints</dt><dd><div class="chips-row"><span class="chip">Search engine results</span><span class="chip">Social media (e.g. photography hobby groups)</span><span class="chip">Online reviews</span></div></dd>
+        </dl>
+      </article>
+      <article class="persona">
+        <header><div class="av" aria-hidden="true">2</div><div><small>Persona 2</small><b>Customer 2</b></div></header>
+        <dl>
+          <dt>Demographic</dt><dd>Camera enthusiast, very interested in photography</dd>
+          <dt>Motivation &amp; needs</dt><dd>Comparing digital cameras. Consideration stage of the buying journey.</dd>
+          <dt>What you can do</dt><dd><ul><li>Provide detailed digital camera comparisons</li></ul></dd>
+          <dt>Digital touchpoints</dt><dd><div class="chips-row"><span class="chip">Search engine results</span><span class="chip">Influencer marketing</span></div></dd>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Your task" id="l3-task">
+    <div class="task">
+      <div class="task-head">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+        <div><b>Your task: write a persona for your business</b><small>Use your customer knowledge and data. Saved in this browser only in the prototype.</small></div>
+      </div>
+      <form id="personaForm" novalidate>
+        <div class="field"><label for="pName">Persona name</label><small>A short label, e.g. "Weekend baker".</small><input id="pName" name="name" type="text" autocomplete="off" required></div>
+        <div class="field"><label for="pDemo">Demographic</label><small>Who are they?</small><textarea id="pDemo" name="demo"></textarea></div>
+        <div class="field"><label for="pNeeds">Motivation and needs</label><small>What do they want, and where are they in the buying journey?</small><textarea id="pNeeds" name="needs"></textarea></div>
+        <div class="field"><label for="pDo">What you can do for them</label><small>How can your business help?</small><textarea id="pDo" name="do"></textarea></div>
+        <div class="field"><label for="pTouch">Digital touchpoints</label><small>Separate with commas, e.g. Instagram, search results.</small><input id="pTouch" name="touch" type="text" autocomplete="off"></div>
+        <div class="task-actions">
+          <button class="btn primary" type="submit">Save persona</button>
+          <span class="saved-note" id="formNote" role="status" aria-live="polite"></span>
+        </div>
+      </form>
+    </div>
+    <div class="saved" id="savedList" aria-label="Your personas"></div>
+  </section>
+</template>
+
+<!-- ======================================================================
+     LESSON 13 · Quiz (rendered by script)
+     ====================================================================== -->
+<template id="l13-new"><div id="quizRoot"></div></template>
+<template id="l13-old"><div id="quizOld"></div></template>
+
+<template id="l3-old">
+  <span class="legacy-tag">Current layout (production)</span>
+  <div class="legacy">
+    <p>When developing your digital marketing campaign, there are <b>four key considerations</b>:</p>
+    <p><b>What are my marketing objectives?</b></p><p><b>Who is my audience and where are they located?</b></p><p><b>How do I promote the content?</b></p><p><b>How can I measure the success of my campaign?</b></p>
+    <p>In the previous video, you learned about identifying your marketing objectives.</p>
+    <p>If you would like to explore this further, you can complete one of the other <i>10,000 Women</i> courses: <b>Fundamentals of Sales and Marketing</b>.</p>
+    <p style="border-top:1px solid #ddd;padding-top:6px">Step 2: Identify Your Audience</p>
+    <p>Once your objectives are clear, the next step is determining <b>where to promote your digital marketing content</b>. To do this effectively, you must understand:</p>
+    <p><b>Who your audience is</b></p><p><b>Where they are active online</b></p>
+    <p style="border-top:1px solid #ddd;padding-top:6px">Identifying Your Audience: Marketing Personas</p>
+    <p>One effective way to define your audience is by developing <b>marketing personas</b>.</p>
+    <p>What is a Marketing Persona?</p>
+    <p>A <b>marketing persona</b> is a semi-fictional representation of your ideal customer, based on:</p>
+    <p>Real data from existing customers</p><p>Market research</p>
+    <p>Creating multiple personas helps you:</p><p>Better understand your target customers</p><p>Design the best user experience across all digital touchpoints</p>
+    <p style="border-top:1px solid #ddd;padding-top:6px">What Are Digital Touchpoints?</p>
+    <p>Digital touchpoints are any points of interaction between your customer and your business across digital channels, including:</p>
+    <p>Social media</p><p>Search engines</p><p>Websites</p><p>Online reviews</p>
+    <p>By identifying the channels where your audience is most active, you can align your content with their needs at the right stage of the customer journey.</p>
+    <p style="border-top:1px solid #ddd;padding-top:6px">Example Personas</p>
+    <p>Below are two example personas introduced previously:</p>
+    <p>Persona 1: Customer 1</p><p>Demographic:</p><p>Hobbyist (casually interested in photography)</p><p>Motivation &amp; Needs:</p><p>Looking for an entry-level digital camera</p><p>Awareness stage of the buying journey</p><p>What You Can Do:</p><p>Provide information about various digital cameras</p><p>Inform them that you sell these products</p><p>Digital Touchpoints:</p><p>Search engine results</p><p>Social media (e.g., photography hobby groups)</p><p>Online reviews</p>
+    <p>Persona 2: Customer 2</p><p>Demographic:</p><p>Camera enthusiast (very interested in photography)</p><p>Motivation &amp; Needs:</p><p>Comparing digital cameras</p><p>Consideration stage of the buying journey</p><p>What You Can Do:</p><p>Provide detailed digital camera comparisons</p><p>Digital Touchpoints:</p><p>Search engine results</p><p>Influencer marketing</p>
+    <p style="border-top:1px solid #ddd;padding-top:6px">Task</p>
+    <p>On a document or notepad, write down potential personas for your own business.</p>
+    <p>Use your customer knowledge and data to include:</p><p>Demographic</p><p>Motivation and needs</p><p>What you can do for them</p><p>Digital touchpoints</p>
+  </div>
+</template>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function make(tag, cls) { var n = document.createElement(tag); if (cls) n.className = cls; return n; }
+
+  // ---------- Course data (titles, types and durations match production) ----------
+  var COURSE = [
+    { title: 'Getting started', type: 'Article' },
+    { title: 'Developing a digital marketing campaign', type: 'Video' },
+    { title: 'Exercise 1: Finding your audience', type: 'Scenario' },
+    { title: 'Promoting your content', type: 'Article' },
+    { title: 'Using owned media', type: 'Video' },
+    { title: 'Using paid media', type: 'Video' },
+    { title: 'Using earned media', type: 'Article' },
+    { title: 'Exercise 2: Using viral marketing', type: 'Scenario' },
+    { title: 'Monitoring the success of your digital marketing campaign', type: 'Article' },
+    { title: 'Using social listening', type: 'Article' },
+    { title: 'Exercise 3: Reflect on your learning', type: 'Scenario' },
+    { title: 'Key tips for successfully managing a digital marketing campaign', type: 'Article' },
+    { title: 'Quiz', type: 'Quiz' }
+  ];
+  var QUIZ_IDX = 12;  // the course quiz is lesson 13
+  function isBuilt(i) { return i < 3 || i === QUIZ_IDX; } // only these lessons have prototype content
+  var ICONS = {
+    Quiz: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D719A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01"/></svg>',
+    Article: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D719A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
+    Video: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D719A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/></svg>',
+    Scenario: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D719A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></svg>'
+  };
+  var LOCK = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 018 0v4"/></svg>';
+  var BRAIN = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3a3 3 0 00-3 3 3 3 0 00-2 5 3 3 0 002 5 3 3 0 003 4h1V3zM15 3a3 3 0 013 3 3 3 0 012 5 3 3 0 01-2 5 3 3 0 01-3 4h-1V3z"/></svg>';
+
+  // Review questions. Lesson 1 mirrors production; lessons 2 and 3 are samples written from the lesson text.
+  var PASS_MARK = 80; // percent, same as production
+  var QUIZ = [
+    [
+      { q: 'What is the primary focus of this course regarding digital marketing campaigns?',
+        opts: ['To exclusively learn about social media advertising.', 'To develop effective communication with target customers and foster business growth.', 'To only measure campaign success without prior planning.', 'To understand traditional marketing methods.'],
+        a: 1, why: 'The course is about using digital campaigns to communicate with your target customers, supporting your business and its growth.' },
+      { q: 'Which types of promotional approaches are mentioned for content promotion in the lesson?',
+        opts: ['Only paid approaches like search engine optimization.', 'Earned and owned approaches, excluding paid methods.', 'Paid, earned, and owned approaches, including influencer marketing.', 'Just a single, undifferentiated approach for all content.'],
+        a: 2, why: 'The lesson names paid, earned and owned approaches, such as search engine optimization and influencer marketing.' },
+      { q: 'What documentation is suggested as helpful to gather before starting the course exercises?',
+        opts: ['Financial statements from the last five years.', 'Documentation related to current marketing and sales activities.', 'Personal identification documents for registration.', 'Future business plans and projections.'],
+        a: 1, why: 'Gather the documentation you already have on your marketing and sales activities. It is fine if it is limited.' }
+    ],
+    [
+      { q: 'How does the video define digital marketing?',
+        opts: ['Posting on social media as often as possible.', 'Using digital technologies to create integrated, targeted and measurable communications that acquire and retain customers.', 'Buying advertising space on websites.', 'Sending marketing emails only.'],
+        a: 1, why: 'Digital marketing is the use of digital technologies to create integrated, targeted and measurable communications to acquire and retain customers.' },
+      { q: 'Customer 2 is a camera enthusiast comparing different cameras. Where does their journey start?',
+        opts: ['Awareness', 'Consideration', 'Conversion', 'Post-sale'],
+        a: 1, why: 'Customer 2 is already debating between cameras, so their journey starts at the consideration stage. Customer 1 starts at awareness.' },
+      { q: 'What happens at the post-sale stage of the funnel?',
+        opts: ['The customer first hears about your product.', 'The customer compares several options.', 'You try to retain the customer and make them loyal.', 'The customer buys for the first time.'],
+        a: 2, why: 'Post-sale is where you work to retain the customer and turn them into a loyal customer.' }
+    ],
+    [
+      { q: 'A marketing persona is a semi-fictional representation of your ideal customer, based on…',
+        opts: ['Guesses about everyone who might buy.', 'Real data from existing customers and market research.', 'Your own personal preferences.', 'Your competitors\' price lists.'],
+        a: 1, why: 'Personas are built from real data from existing customers and from market research.' },
+      { q: 'Which of these is a digital touchpoint?',
+        opts: ['Online reviews', 'A printed flyer', 'A radio advert', 'A shop window display'],
+        a: 0, why: 'Digital touchpoints include social media, search engines, websites and online reviews.' },
+      { q: 'Creating multiple personas helps you to…',
+        opts: ['Use fewer channels.', 'Better understand your target customers and design the best experience across all digital touchpoints.', 'Skip market research.', 'Replace your marketing objectives.'],
+        a: 1, why: 'Several personas help you understand different customers and design the best experience across all digital touchpoints.' }
+    ]
+  ];
+  function needed(n) { return Math.ceil((PASS_MARK / 100) * n); }
+
+  // ---------- State ----------
+  var state = { lesson: 0, mode: 'new' };
+  var reviews = {};   // enhanced review state per lesson
+  var gates = {};     // production-style gate state per lesson
+
+  // localStorage can be blocked (private mode, embedded previews): keep an in-memory copy too.
+  var memory = {};
+  function load(key, fallback) {
+    if (key in memory) return memory[key];
+    try { var v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; }
+  }
+  function save(key, value) {
+    memory[key] = value;
+    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* memory copy is enough */ }
+  }
+  function doneMap() { return load('atlas-proto-done', {}); }
+  function isDone(i) { return !!doneMap()[i]; }
+  function doneCount() { return Object.keys(doneMap()).filter(function (k) { return doneMap()[k]; }).length; }
+  function markDone(i) { var d = doneMap(); d[i] = true; save('atlas-proto-done', d); }
+
+  function toast(msg) {
+    var t = $('#toast'); t.textContent = msg; t.classList.add('show');
+    clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('show'); }, 2200);
+  }
+
+  // ---------- Rendering ----------
+  function render() {
+    var l = state.lesson, meta = COURSE[l];
+    var tpl = $('#l' + (l + 1) + '-' + state.mode);
+    var body = $('#lessonBody');
+    body.innerHTML = '';
+    body.appendChild(tpl.content.cloneNode(true));
+
+    document.body.dataset.mode = state.mode;
+    $('#lessonTitle').innerHTML = ICONS[meta.type] + '<span></span>';
+    $('#lessonTitle span').textContent = meta.title;
+    $('#lessonMeta').innerHTML = '<span class="pill">' + meta.type + '</span><span>5m</span>';
+    $('#counter').textContent = (l + 1) + '/13';
+    document.title = meta.title + ' · ATLAS Lesson Blocks Prototype';
+
+    $$('[data-lesson]').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.lesson === l)); });
+    $$('[data-mode]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)); });
+
+    renderGate();      // also builds the outline and updates the Next button
+    initBlocks();
+    renderQuiz(); renderQuizOld();   // only does anything on the quiz lesson
+    closeDrawer();
+    window.scrollTo(0, 0);
+    onScroll();
+  }
+
+  // ---------- Outline ----------
+  function renderOutline() {
+    var enhanced = state.mode === 'new';
+    $('#stage').classList.toggle('no-rail', !enhanced);
+    $('#outline').style.display = enhanced ? '' : 'none';
+    if (!enhanced) return;
+
+    var list = $('#olList'); list.innerHTML = '';
+    COURSE.forEach(function (c, i) {
+      var cur = i === state.lesson, done = isDone(i);
+      var li = make('li', 'ol-item' + (cur ? ' cur' : '') + (done ? ' done' : ''));
+      var b = make('button'); b.type = 'button'; b.dataset.go = String(i);
+      if (cur) b.setAttribute('aria-current', 'page');
+      var detail = c.type + ' · 5m' + (done ? ' · Done' : (cur ? (i === QUIZ_IDX ? ' · Pass to finish' : ' · Review to complete') : ''));
+      b.innerHTML = '<span class="ol-status" aria-hidden="true"></span><span class="ol-text"><span class="ol-name">' + esc(c.title) + '</span><small>' + esc(detail) + '</small></span>';
+      li.appendChild(b);
+
+      if (cur) {
+        var secs = $$('[data-rail]', $('#lessonBody')).map(function (s) { return { id: s.id, text: s.dataset.rail }; });
+        if (i !== QUIZ_IDX) secs.push({ id: 'review', text: 'Lesson review' });
+        if (secs.length) {
+          var ul = make('ul', 'ol-sections');
+          secs.forEach(function (s) {
+            var item = make('li'), a = make('a'); a.href = '#' + s.id; a.textContent = s.text; a.dataset.target = s.id;
+            item.appendChild(a); ul.appendChild(item);
+          });
+          li.appendChild(ul);
+        }
+      }
+      list.appendChild(li);
+    });
+
+    var n = doneCount(), pct = Math.round((n / COURSE.length) * 100);
+    $('#olCount').textContent = n + ' of ' + COURSE.length + ' lessons completed · ' + pct + '%';
+    $('#olFill').style.width = pct + '%';
+  }
+
+  function openDrawer() { document.body.classList.add('drawer'); $('#outlineBtn').setAttribute('aria-expanded', 'true'); var c = $('#olClose'); if (c) c.focus(); }
+  function closeDrawer() { if (!document.body.classList.contains('drawer')) return; document.body.classList.remove('drawer'); $('#outlineBtn').setAttribute('aria-expanded', 'false'); }
+
+  function goTo(i) {
+    if (!isBuilt(i)) { closeDrawer(); toast('Lesson ' + (i + 1) + ' is not part of this prototype'); return; }
+    state.lesson = i; render();
+  }
+
+  // ---------- Links to the other prototype pages ----------
+  var COURSE_PAGE = 'atlas-course-page-prototype.html';
+  var COURSES_PAGE = 'atlas-courses-prototype.html';
+  // Tells the course pages how far the learner got: completed once the quiz is passed, in progress after any lesson.
+  function progParam() { return isDone(QUIZ_IDX) ? 'done' : (doneCount() > 0 ? 'some' : 'none'); }
+
+  // ---------- Next / Previous ----------
+  function updateNav() {
+    var n = $('#nextBtn'), l = state.lesson;
+    $('#prevBtn').disabled = l === 0;
+    n.classList.remove('locked');
+    if (l === QUIZ_IDX) {
+      // The quiz ends the course, so Next becomes "Finish course".
+      if (state.mode === 'old') n.innerHTML = 'Finish Course';
+      else if (isDone(l)) n.innerHTML = 'Finish course ›';
+      else { n.innerHTML = LOCK + 'Pass the quiz to finish'; n.classList.add('locked'); }
+    }
+    else if (state.mode === 'new' && !isDone(l)) { n.innerHTML = LOCK + 'Take the review to continue'; n.classList.add('locked'); }
+    else { n.innerHTML = state.mode === 'new' ? 'Next lesson ›' : 'Next ›'; }
+  }
+
+  function advance() {
+    if (!isBuilt(state.lesson + 1)) { toast('Lesson ' + (state.lesson + 2) + ' is not part of this prototype'); return; }
+    state.lesson++; render();
+  }
+
+  function onNext() {
+    var l = state.lesson;
+    if (l === QUIZ_IDX) { onNextQuiz(); return; }
+    if (isDone(l)) { advance(); return; }
+    if (state.mode === 'new') {
+      var card = $('#review'), r = reviewState(l);
+      card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      card.classList.remove('nudge'); void card.offsetWidth; card.classList.add('nudge');
+      if (r.phase === 'idle') startReview(); else toast('Finish the review to continue');
+    } else {
+      gates[l] = gates[l] || { stage: 'required', picks: [] };
+      renderGate();
+      var g = $('.gate-old'); if (g) g.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+  // ==========================================================================
+  // ENHANCED REVIEW — visible from the start, one question at a time, instant feedback
+  // ==========================================================================
+  function reviewState(l) { return reviews[l] || (reviews[l] = { phase: 'idle', idx: 0, picks: [], pick: null, checked: false, timer: null }); }
+
+  function renderGate() {
+    var m = $('#gateMount'); m.innerHTML = '';
+    if (state.lesson === QUIZ_IDX) { /* the quiz is its own assessment, no lesson review */ }
+    else if (state.mode === 'new') renderReview(m); else renderGateOld(m);
+    renderOutline();
+    updateNav();
+  }
+
+  function renderReview(m) {
+    var l = state.lesson, r = reviewState(l), qs = QUIZ[l], n = qs.length, done = isDone(l);
+    var card = make('section', 'review' + (done && r.phase !== 'active' ? ' passed' : ''));
+    card.id = 'review'; card.setAttribute('aria-label', 'Lesson review');
+    var h = '';
+
+    if (r.phase === 'idle') {
+      h += '<div class="rv-head"><div class="rv-ic">' + BRAIN + '</div><div><h2>' + (done ? 'Review passed' : 'Lesson review') + '</h2><p>' + n + ' questions · about 1 minute · pass mark ' + PASS_MARK + '% (' + needed(n) + ' of ' + n + ' correct)</p></div></div>';
+      h += done
+        ? '<p class="rv-note">This lesson is complete. You can retake the review any time.</p><div class="rv-actions"><button class="btn" data-rv="start" type="button">Retake review</button><button class="btn primary" data-rv="continue" type="button">Next lesson ›</button></div>'
+        : '<p class="rv-note">Pass this short review to mark the lesson complete and continue. You can read the lesson again whenever you like.</p><div class="rv-actions"><button class="btn primary" data-rv="start" type="button">Start review</button></div>';
+    } else if (r.phase === 'loading') {
+      h += '<div class="rv-head"><div class="rv-ic">' + BRAIN + '</div><div><h2>Preparing your questions…</h2><p>Based on what you just read</p></div></div><div class="rv-skel" role="status" aria-live="polite"><i></i><i></i><i></i></div>';
+    } else if (r.phase === 'active') {
+      var q = qs[r.idx], dots = '';
+      for (var i = 0; i < n; i++) {
+        var c = i < r.idx || (i === r.idx && r.checked) ? (r.picks[i] === qs[i].a ? 'ok' : 'bad') : (i === r.idx ? 'cur' : '');
+        dots += '<span class="' + c + '"></span>';
+      }
+      h += '<div class="rv-dots" aria-hidden="true">' + dots + '</div>';
+      h += '<div class="rv-count">Question ' + (r.idx + 1) + ' of ' + n + '</div>';
+      h += '<h2 class="rv-q" id="rvQ" tabindex="-1">' + esc(q.q) + '</h2>';
+      h += '<div class="rv-opts" role="radiogroup" aria-labelledby="rvQ">';
+      q.opts.forEach(function (o, i) {
+        var cls = 'rv-opt';
+        if (r.checked) cls += ' locked' + (i === q.a ? ' right' : (i === r.pick ? ' wrong' : ''));
+        h += '<label class="' + cls + '"><input type="radio" name="rv" value="' + i + '"' + (r.pick === i ? ' checked' : '') + (r.checked ? ' disabled' : '') + '><span class="l">' + 'ABCD'.charAt(i) + '</span><span>' + esc(o) + '</span></label>';
+      });
+      h += '</div>';
+      if (r.checked) {
+        var ok = r.pick === q.a;
+        h += '<div class="rv-fb ' + (ok ? 'ok' : 'no') + '" id="rvFb" tabindex="-1" role="status"><b>' + (ok ? 'Correct' : 'Not quite') + '</b>' + (ok ? '' : 'The answer is ' + 'ABCD'.charAt(q.a) + '. ') + esc(q.why) + '</div>';
+        h += '<div class="rv-actions"><button class="btn primary" data-rv="next" type="button">' + (r.idx + 1 < n ? 'Next question' : 'See result') + '</button></div>';
+      } else {
+        h += '<div class="rv-actions"><button class="btn primary" data-rv="check" type="button"' + (r.pick === null ? ' disabled' : '') + '>Check answer</button><button class="btn" data-rv="later" type="button">Not now</button></div>';
+      }
+    } else if (r.phase === 'result') {
+      var score = r.picks.filter(function (p, i) { return p === qs[i].a; }).length, pass = score >= needed(n);
+      card.className = 'review' + (pass ? ' passed' : '');
+      h += '<div class="rv-result ' + (pass ? 'good' : 'fail') + '" role="status"><div class="big" aria-hidden="true">' + (pass ? '✓' : '!') + '</div>';
+      h += '<h3 id="rvRes" tabindex="-1">' + (pass ? 'Lesson complete' : 'Almost there') + '</h3>';
+      h += '<p>' + score + ' of ' + n + ' correct' + (pass ? '' : ' · you need ' + needed(n) + ' of ' + n + ' (' + PASS_MARK + '%) to pass') + '</p>';
+      if (!pass) {
+        h += '<div class="rv-missed">';
+        qs.forEach(function (q, i) {
+          if (r.picks[i] === q.a) return;
+          h += '<article><b>' + esc(q.q) + '</b>Correct answer: ' + esc(q.opts[q.a]) + '<br><span class="muted">' + esc(q.why) + '</span></article>';
+        });
+        h += '</div><div class="rv-actions"><button class="btn" data-rv="reread" type="button">Read the lesson again</button><button class="btn primary" data-rv="start" type="button">Try again</button></div>';
+      } else {
+        h += '<div class="rv-actions"><button class="btn" data-rv="retake" type="button">Retake review</button><button class="btn primary" data-rv="continue" type="button">Next lesson ›</button></div>';
+      }
+      h += '</div>';
+    }
+    card.innerHTML = h; m.appendChild(card);
+  }
+
+  function startReview() {
+    var r = reviewState(state.lesson);
+    r.phase = 'loading'; r.idx = 0; r.picks = []; r.pick = null; r.checked = false;
+    var lesson = state.lesson;
+    renderGate();
+    clearTimeout(r.timer);
+    r.timer = setTimeout(function () {
+      if (state.lesson !== lesson || state.mode !== 'new' || r.phase !== 'loading') return;
+      r.phase = 'active'; renderGate(); focusEl('#rvQ');
+    }, 1100);
+  }
+
+  function focusEl(sel) { var e = $(sel); if (e) e.focus({ preventScroll: false }); }
+
+  $('#gateMount').addEventListener('change', function (e) {
+    if (e.target.name === 'rv') {
+      var r = reviewState(state.lesson); r.pick = +e.target.value;
+      var c = $('[data-rv="check"]'); if (c) c.disabled = false;   // no re-render, keeps keyboard focus on the radio
+    }
+  });
+
+  $('#gateMount').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-rv]'); if (b) { reviewAction(b.dataset.rv); return; }
+    var g = e.target.closest('[data-gate]'); if (g) gateAction(g.dataset.gate);
+  });
+
+  function reviewAction(a) {
+    var l = state.lesson, r = reviewState(l), qs = QUIZ[l];
+    if (a === 'start' || a === 'retake') { startReview(); return; }
+    if (a === 'continue') { advance(); return; }
+    if (a === 'reread') { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+    if (a === 'later') { r.phase = 'idle'; r.idx = 0; r.picks = []; r.pick = null; r.checked = false; renderGate(); toast('No problem. Your answers were not saved.'); return; }
+    if (a === 'check') {
+      if (r.pick === null) return;
+      r.picks[r.idx] = r.pick; r.checked = true; renderGate(); focusEl('#rvFb'); return;
+    }
+    if (a === 'next') {
+      if (r.idx + 1 < qs.length) { r.idx++; r.pick = null; r.checked = false; renderGate(); focusEl('#rvQ'); return; }
+      r.phase = 'result';
+      var score = r.picks.filter(function (p, i) { return p === qs[i].a; }).length;
+      if (score >= needed(qs.length)) markDone(l);
+      renderGate(); focusEl('#rvRes');
+    }
+  }
+
+  // ==========================================================================
+  // CURRENT (production) GATE — kept so stakeholders can compare
+  // ==========================================================================
+  function renderGateOld(m) {
+    var l = state.lesson, g = gates[l], qs = QUIZ[l];
+    if (!g || isDone(l) && g.stage === 'required') return;
+    var box = make('section', 'gate-old'), h = '';
+    if (g.stage === 'required' || g.stage === 'loading') {
+      h += '<h2>Lesson Review Required</h2><p class="sub">Pass a short AI-generated review to mark this lesson complete.</p>';
+      h += '<div class="row"><button class="btn primary" data-gate="start" type="button"' + (g.stage === 'loading' ? ' disabled' : '') + '>' + (g.stage === 'loading' ? '<span class="spin"></span>' : '') + 'Start Review</button><button class="link" data-gate="cancel" type="button">Cancel</button></div>';
+    } else if (g.stage === 'questions') {
+      h += '<h2>Lesson Review</h2><p class="sub">' + qs.length + ' questions · ' + PASS_MARK + '% to pass</p>';
+      qs.forEach(function (q, i) {
+        h += '<p class="q">Q' + (i + 1) + '. ' + esc(q.q) + '</p>';
+        q.opts.forEach(function (o, j) { h += '<label><input type="radio" name="og' + i + '" value="' + j + '"' + (g.picks[i] === j ? ' checked' : '') + '> ' + 'ABCD'.charAt(j) + '. ' + esc(o) + '</label>'; });
+      });
+      h += '<div class="row"><button class="btn primary" data-gate="submit" type="button">Submit Review</button><button class="link" data-gate="cancel" type="button">Cancel</button></div>';
+      if (g.msg) h += '<p class="msg" role="status">' + esc(g.msg) + '</p>';
+    }
+    box.innerHTML = h; m.appendChild(box);
+  }
+
+  function gateAction(a) {
+    var l = state.lesson, g = gates[l], qs = QUIZ[l];
+    if (!g) return;
+    if (a === 'cancel') { delete gates[l]; renderGate(); return; }
+    if (a === 'start') {
+      g.stage = 'loading'; renderGate();
+      setTimeout(function () { if (gates[l] === g && state.mode === 'old') { g.stage = 'questions'; renderGate(); } }, 1100);
+      return;
+    }
+    if (a === 'submit') {
+      g.picks = qs.map(function (q, i) { var c = $('input[name="og' + i + '"]:checked'); return c ? +c.value : null; });
+      if (g.picks.indexOf(null) !== -1) { g.msg = 'Please answer every question.'; renderGate(); return; }
+      var score = g.picks.filter(function (p, i) { return p === qs[i].a; }).length;
+      if (score >= needed(qs.length)) { markDone(l); delete gates[l]; renderGate(); toast('Review passed (' + score + '/' + qs.length + '). Next is now available.'); }
+      else { g.msg = 'Not passed: ' + score + '/' + qs.length + '. Try again.'; g.picks = []; g.stage = 'required'; renderGate(); toast('Not passed (' + score + '/' + qs.length + ')'); }
+    }
+  }
+
+  // ==========================================================================
+  // COURSE QUIZ (lesson 13)
+  // Scenario text, persona and answer options are copied from production. Production only shows a score
+  // and a Retry button, so the pass mark, question stems and explanations are samples.
+  // Answer key: production scores A, A, A, A as 4/4 (verified on the demo account). Q1 option A is
+  // "tennis shoes ... high bounce rate", which contradicts the scenario, so the key below follows the
+  // lesson content instead (C, A, D, A). Differs from production on Q1 and Q3: raise with the content team.
+  // ==========================================================================
+  var QUIZ_PASS = 75; // percent (3 of 4). A proposal, not production behaviour.
+  var QUIZ_ICON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01"/></svg>';
+  var FINAL_QUIZ = [
+    { scenario: 'Consider the following persona, who is interested in purchasing running shoes and is currently in the ‘awareness’ stage.',
+      persona: [['Demographic', 'Hobbyist/beginner'], ['Motivation and needs', 'Looking for entry-level running shoes to train for his/her/their first half-marathon.'], ['What can you do?', 'Provide them with information on various running shoes and let them know that you sell such products.'], ['Digital touchpoints', ['Search engine results', 'Social media – local running groups on social media channels', 'Online reviews of running shoes']]],
+      stem: 'Which action best fits this persona?',
+      opts: ['Develop your webpage of tennis shoes and aim to achieve a high bounce rate.', 'Identify influencers whose online ads would resonate with an experienced running audience.', 'Create easy to understand content about running shoe fitting to share on social media.', 'Create PPC (Pay-Per-Click) ads on the expert-range running shoes with a “Buy Now” call-to-action.'],
+      a: 2, why: 'The persona is a beginner at the awareness stage, and local running groups on social media are one of their touchpoints. Helpful, easy content there informs them without pushing a sale.' },
+    { scenario: 'You are using earned marketing to increase engagement with your product. You select an influencer and are choosing between different social media promotion options.',
+      stem: 'Which option is an example of earned marketing?',
+      opts: ['You give the influencer a free sample of your product. The influencer can then choose to provide a review of their user experience.', 'The influencer promotes a product and provides a hyperlink or discount code that means they gets paid for every sale that can be traced back to that content.', 'You provide the influencer with a free trial and ask to check their content prior to posting.', 'You offer the influencer a free stay at your boutique hotel, in return for an honest review.'],
+      a: 0, why: 'Earned marketing is exposure you earn rather than pay for. With a free sample the influencer is free to decide whether to review it. A paid-per-sale link is paid media.' },
+    { scenario: 'You have posted a PPC (Pay-per-click) ad on social media and you are checking its success via your KPIs.',
+      stem: 'Which result best shows the ad is working?',
+      opts: ['The ad has been seen by over 30,000 customers.', 'People are clicking the ad and then closing it quickly.', 'The ad has low engagement.', 'The ad has helped to push customers further down the customer journey funnel to convert and purchase the product.'],
+      a: 3, why: 'Reach alone does not show success. The ad is working when it moves customers further down the funnel so they convert.' },
+    { scenario: 'You have developed a digital marketing campaign for your product, but you are struggling to engage with your audience. Your brand manager suggests that you implement social listening techniques.',
+      stem: 'Which statement best explains why social listening helps?',
+      opts: ['Social listening is effective because it can help you to shape or optimize your marketing strategy and monitor your audience engagement, by using campaign and sentiment analysis.', 'Social listening is a form of paid, earned, and owned media and can help you to engage with specific personas in your audience.', 'Social listening is effective because it can help you to identify the top influencers in your industry, and you can also attempt to attract your competitors’ influencers and persuade them to work with you instead.', 'Social listening is effective because it often evokes surprise and other emotions, capturing the imagination of your target personas.'],
+      a: 0, why: 'Social listening helps you shape or optimise your strategy and monitor engagement through campaign and sentiment analysis.' }
+  ];
+  var quiz = { phase: 'intro', idx: 0, answers: [] };
+  var qold = { picks: [], done: false };
+  function resetQuiz() { quiz = { phase: 'intro', idx: 0, answers: [] }; qold = { picks: [], done: false }; }
+  function letter(i) { return 'ABCD'.charAt(i); }
+  function quizNeeded() { return Math.ceil(QUIZ_PASS / 100 * FINAL_QUIZ.length); }
+  function quizScore(ans) { return FINAL_QUIZ.filter(function (q, i) { return ans[i] === q.a; }).length; }
+
+  function personaCard(rows) {
+    var dl = rows.map(function (r) {
+      var v = Array.isArray(r[1]) ? '<div class="chips-row">' + r[1].map(function (c) { return '<span class="chip">' + esc(c) + '</span>'; }).join('') + '</div>' : esc(r[1]);
+      return '<dt>' + esc(r[0]) + '</dt><dd>' + v + '</dd>';
+    }).join('');
+    return '<article class="persona"><header><div class="av" aria-hidden="true">A</div><div><small>Persona 1</small><b>Customer A</b></div></header><dl>' + dl + '</dl></article>';
+  }
+
+  function renderQuiz() {
+    var root = $('#quizRoot'); if (!root) return;
+    var qs = FINAL_QUIZ, n = qs.length, h = '';
+
+    if (quiz.phase === 'intro') {
+      var before = isDone(QUIZ_IDX);
+      h += '<div class="rv-head"><div class="rv-ic">' + QUIZ_ICON + '</div><div><h2 class="qz-title" id="qzH" tabindex="-1">Course quiz</h2><p>' + n + ' scenario questions · about 5 minutes · pass mark ' + QUIZ_PASS + '% (' + quizNeeded() + ' of ' + n + ')</p></div></div>';
+      h += '<ul class="ticks"><li>Read each scenario, then choose the best answer.</li><li>You can go back and change answers. Nothing is graded until you submit.</li><li>After you submit, you see why each answer is right or wrong.</li><li>You can retake the quiz.</li></ul>';
+      h += '<div class="rv-actions"><button class="btn primary" type="button" data-qz="start">' + (before ? 'Retake quiz' : 'Start quiz') + '</button>' + (before ? '<button class="btn" type="button" data-qz="finish">Finish course ›</button>' : '') + '</div>';
+    } else if (quiz.phase === 'q') {
+      var q = qs[quiz.idx], ans = quiz.answers[quiz.idx];
+      h += '<div class="qz-steps" role="group" aria-label="Questions">';
+      for (var i = 0; i < n; i++) h += '<button type="button" class="qz-step' + (quiz.answers[i] != null ? ' ans' : '') + (i === quiz.idx ? ' cur' : '') + '" data-qz-go="' + i + '" aria-label="Question ' + (i + 1) + (quiz.answers[i] != null ? ', answered' : ', not answered') + '"' + (i === quiz.idx ? ' aria-current="step"' : '') + '>' + (i + 1) + '</button>';
+      h += '</div><div class="rv-count">Question ' + (quiz.idx + 1) + ' of ' + n + '</div>';
+      h += '<div class="qz-scn"><div class="eyebrow">Scenario</div><p>' + esc(q.scenario) + '</p>' + (q.persona ? personaCard(q.persona) : '') + '</div>';
+      h += '<h2 class="rv-q" id="qzQ" tabindex="-1">' + esc(q.stem) + '</h2><div class="rv-opts" role="radiogroup" aria-labelledby="qzQ">';
+      q.opts.forEach(function (o, j) { h += '<label class="rv-opt"><input type="radio" name="qz" value="' + j + '"' + (ans === j ? ' checked' : '') + '><span class="l">' + letter(j) + '</span><span>' + esc(o) + '</span></label>'; });
+      h += '</div><div class="rv-actions"><button class="btn" type="button" data-qz="back"' + (quiz.idx === 0 ? ' disabled' : '') + '>‹ Back</button><button class="btn primary" type="button" data-qz="next"' + (ans == null ? ' disabled' : '') + '>' + (quiz.idx + 1 < n ? 'Next question' : 'Review answers') + '</button></div>';
+    } else if (quiz.phase === 'review') {
+      h += '<h2 class="qz-title" id="qzH" tabindex="-1">Review your answers</h2><p class="muted" style="margin-top:4px">Check your choices, then submit. You can still change any answer.</p><ol class="qz-review">';
+      qs.forEach(function (q, i) {
+        var a = quiz.answers[i];
+        h += '<li><span class="n">' + (i + 1) + '</span><div class="t"><b>' + esc(q.stem) + '</b><span>' + (a == null ? 'Not answered' : letter(a) + '. ' + esc(q.opts[a])) + '</span></div><button class="change" type="button" data-qz-go="' + i + '">Change</button></li>';
+      });
+      var open = quiz.answers.filter(function (x) { return x == null; }).length;
+      h += '</ol>' + (open ? '<p class="muted" role="status">' + open + ' question' + (open > 1 ? 's' : '') + ' not answered yet.</p>' : '') +
+        '<div class="rv-actions"><button class="btn primary" type="button" data-qz="submit"' + (open ? ' disabled' : '') + '>Submit answers</button></div>';
+    } else if (quiz.phase === 'result') {
+      var score = quizScore(quiz.answers), pass = score >= quizNeeded(), pct = Math.round(score / n * 100);
+      h += '<div class="rv-result ' + (pass ? 'good' : 'fail') + '" role="status"><div class="qz-ring' + (pass ? '' : ' fail') + '" style="--p:' + pct + '" data-label="' + pct + '%"></div>' +
+        '<h2 class="qz-title" id="qzH" tabindex="-1">' + (pass ? 'Quiz passed' : 'Not quite yet') + '</h2><p>' + score + ' of ' + n + ' correct · pass mark ' + QUIZ_PASS + '% (' + quizNeeded() + ' of ' + n + ')</p></div>';
+      h += '<div class="qz-list">';
+      qs.forEach(function (q, i) {
+        var a = quiz.answers[i], ok = a === q.a;
+        h += '<div class="qz-bd ' + (ok ? 'ok' : 'bad') + '"><h3><span class="mark" aria-hidden="true">' + (ok ? '✓' : '✕') + '</span><span><span class="sr-only">' + (ok ? 'Correct. ' : 'Incorrect. ') + '</span>' + (i + 1) + '. ' + esc(q.stem) + '</span></h3>' +
+          '<div>Your answer: <b>' + letter(a) + '</b>. ' + esc(q.opts[a]) + '</div>' + (ok ? '' : '<div>Correct answer: <b>' + letter(q.a) + '</b>. ' + esc(q.opts[q.a]) + '</div>') + '<div class="why">' + esc(q.why) + '</div></div>';
+      });
+      h += '</div><div class="rv-actions" style="justify-content:center;margin-top:22px">' + (pass
+        ? '<button class="btn" type="button" data-qz="start">Retake quiz</button><button class="btn primary" type="button" data-qz="finish">Finish course ›</button>'
+        : '<button class="btn" type="button" data-qz="lessons">Review the lessons</button><button class="btn primary" type="button" data-qz="start">Retake quiz</button>') + '</div>';
+    } else if (quiz.phase === 'complete') {
+      var sc = quizScore(quiz.answers);
+      h += '<div class="rv-result good" role="status"><div class="big" aria-hidden="true">✓</div><h2 class="qz-title" id="qzH" tabindex="-1">Course complete</h2><p>You finished Digital Marketing Strategy.</p>' +
+        '<div class="chips-row" style="justify-content:center;margin:14px 0 4px"><span class="chip solid">13 lessons</span><span class="chip solid">' + (quiz.answers.length ? 'Quiz ' + sc + '/' + n : 'Quiz passed') + '</span></div>' +
+        '<div class="rv-actions" style="justify-content:center;margin-top:20px"><button class="btn" type="button" data-qz="courses">Browse courses</button><button class="btn primary" type="button" data-qz="back-course">Back to course</button></div></div>';
+    }
+    root.innerHTML = h;
+  }
+
+  function quizAction(a) {
+    var n = FINAL_QUIZ.length, focus = '#qzQ';
+    if (a === 'start') { quiz = { phase: 'q', idx: 0, answers: [] }; }
+    else if (a === 'back') { if (quiz.idx > 0) quiz.idx--; }
+    else if (a === 'next') { if (quiz.idx + 1 < n) quiz.idx++; else { quiz.phase = 'review'; focus = '#qzH'; } }
+    else if (a === 'submit') {
+      quiz.phase = 'result'; focus = '#qzH';
+      if (quizScore(quiz.answers) >= quizNeeded()) markDone(QUIZ_IDX);
+    }
+    else if (a === 'finish') { quiz.phase = 'complete'; focus = '#qzH'; }
+    else if (a === 'lessons') { toast('Opens the lesson list (as in production)'); return; }
+    else if (a === 'courses') { window.location.href = COURSES_PAGE + '?prog=' + progParam(); return; }
+    else if (a === 'back-course') { window.location.href = COURSE_PAGE + '?prog=' + progParam(); return; }
+    renderQuiz(); renderOutline(); updateNav(); focusEl(focus);
+    if (quiz.phase !== 'q') window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function onNextQuiz() {
+    if (state.mode === 'old') { toast('Finish Course (as in production)'); return; }
+    if (isDone(QUIZ_IDX)) { quizAction('finish'); return; }
+    var r = $('#quizRoot'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    toast('Pass the quiz to finish the course');
+  }
+
+  // ---- Current (production) quiz: all questions on one page, one Submit button, score only ----
+  function renderQuizOld() {
+    var root = $('#quizOld'); if (!root) return;
+    var n = FINAL_QUIZ.length, h = '<span class="legacy-tag">Current layout (production)</span><div class="gate-old" style="margin:0;padding:0">';
+    FINAL_QUIZ.forEach(function (q, i) {
+      h += '<p class="q"><b>Q' + (i + 1) + '.</b> ' + esc(q.scenario) + '</p>';
+      if (q.persona) {
+        h += '<table class="legacy-table"><tr><td colspan="2">Persona 1: Customer A</td></tr>' + q.persona.map(function (r) { return '<tr><td>' + esc(r[0]) + '</td><td>' + (Array.isArray(r[1]) ? r[1].map(esc).join('<br>') : esc(r[1])) + '</td></tr>'; }).join('') + '</table>';
+      }
+      q.opts.forEach(function (o, j) { h += '<label><input type="radio" name="qo' + i + '" value="' + j + '"' + (qold.picks[i] === j ? ' checked' : '') + (qold.done ? ' disabled' : '') + '> ' + letter(j) + '. ' + esc(o) + '</label>'; });
+    });
+    if (qold.done) { var s = quizScore(qold.picks); h += '<div class="row"><b>Score: ' + s + '/' + n + ' (' + Math.round(s / n * 100) + '%)</b><button class="btn" type="button" data-qo="retry">Retry</button></div>'; }
+    else h += '<div class="row"><button class="btn primary" type="button" data-qo="submit">Submit Answers</button></div>';
+    root.innerHTML = h + '</div>';
+  }
+
+  $('#lessonBody').addEventListener('change', function (e) {
+    if (e.target.name === 'qz') {
+      quiz.answers[quiz.idx] = +e.target.value;
+      var nx = $('[data-qz="next"]'); if (nx) nx.disabled = false;     // update in place so keyboard focus stays on the radio
+      var st = $('.qz-step.cur'); if (st) { st.classList.add('ans'); st.setAttribute('aria-label', 'Question ' + (quiz.idx + 1) + ', answered'); }
+    } else if (/^qo\d$/.test(e.target.name || '')) { qold.picks[+e.target.name.slice(2)] = +e.target.value; }
+  });
+  $('#lessonBody').addEventListener('click', function (e) {
+    var go = e.target.closest('[data-qz-go]');
+    if (go) { quiz.idx = +go.dataset.qzGo; quiz.phase = 'q'; renderQuiz(); focusEl('#qzQ'); return; }
+    var a = e.target.closest('[data-qz]'); if (a) { quizAction(a.dataset.qz); return; }
+    var o = e.target.closest('[data-qo]');
+    if (o) {
+      if (o.dataset.qo === 'retry') qold = { picks: [], done: false };
+      else if (qold.picks.filter(function (x) { return x != null; }).length < FINAL_QUIZ.length) { toast('Please answer every question.'); return; }
+      else qold.done = true;
+      renderQuizOld();
+    }
+  });
+
+  // ==========================================================================
+  // LESSON BLOCK BEHAVIOURS (funnel, personas, checklist)
+  // ==========================================================================
+  var STAGES = [
+    { name: 'Awareness', text: 'Customers begin at the wide end of the funnel with a number of potential options on their mind.' },
+    { name: 'Consideration', text: 'As they gather more information, the number of options gradually reduces. They are debating between different choices.' },
+    { name: 'Conversion', text: 'Customers potentially buy your product or sign up for your service.' },
+    { name: 'Post-sale: loyalty', text: 'An important stage where you try to retain the customer and make them loyal.' }
+  ];
+  var CUSTOMERS = {
+    '1': { stage: 0, text: 'Customer 1 just picked up photography as a hobby and is searching for a suitable camera. Their journey starts at the awareness stage.' },
+    '2': { stage: 1, text: 'Customer 2 is a camera enthusiast looking to buy a digital camera. Their journey can start at the consideration stage, debating between cameras.' }
+  };
+
+  function showStage(i, customerText) {
+    $$('.stage-btn').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.stage === i)); });
+    var d = $('#stageDetail'); if (!d) return;
+    d.innerHTML = '<b></b><span></span>';
+    d.querySelector('b').textContent = STAGES[i].name;
+    d.querySelector('span').textContent = customerText || STAGES[i].text;
+  }
+
+  function initBlocks() {
+    $$('[data-persist]').forEach(function (c) { c.checked = !!load(c.dataset.persist, false); });
+    if ($('#funnel')) showStage(0);
+    if ($('#personaForm')) renderPersonas();
+  }
+
+  function renderPersonas() {
+    var list = $('#savedList'), data = load('atlas-proto-personas', []);
+    list.innerHTML = '';
+    if (!data.length) return;
+    var h = make('h3'); h.textContent = 'Your personas (' + data.length + ')'; list.appendChild(h);
+    data.forEach(function (p, idx) {
+      var art = make('article', 'persona'), head = make('header');
+      var av = make('div', 'av'); av.textContent = (p.name || '?').charAt(0).toUpperCase();
+      var who = make('div'), sm = make('small'), nm = make('b');
+      sm.textContent = 'Your persona ' + (idx + 1); nm.textContent = p.name; who.appendChild(sm); who.appendChild(nm);
+      head.appendChild(av); head.appendChild(who);
+      var del = make('button', 'btn'); del.type = 'button'; del.textContent = 'Remove';
+      del.style.cssText = 'margin-left:auto;padding:4px 12px;font-size:13px'; del.dataset.remove = String(idx); head.appendChild(del);
+      var dl = make('dl');
+      [['Demographic', p.demo], ['Motivation & needs', p.needs], ['What you can do', p.do]].forEach(function (r) {
+        if (!r[1]) return; var dt = make('dt'), dd = make('dd'); dt.textContent = r[0]; dd.textContent = r[1]; dl.appendChild(dt); dl.appendChild(dd);
+      });
+      if (p.touch && p.touch.length) {
+        var dt2 = make('dt'); dt2.textContent = 'Digital touchpoints';
+        var dd2 = make('dd'), row = make('div', 'chips-row');
+        p.touch.forEach(function (t) { var c = make('span', 'chip'); c.textContent = t; row.appendChild(c); });
+        dd2.appendChild(row); dl.appendChild(dt2); dl.appendChild(dd2);
+      }
+      art.appendChild(head); art.appendChild(dl); list.appendChild(art);
+    });
+  }
+
+  // ---------- Delegated events (re-rendered blocks keep working) ----------
+  $('#lessonBody').addEventListener('click', function (e) {
+    var stage = e.target.closest('.stage-btn');
+    if (stage) {
+      $$('.stage-btn').forEach(function (b) { b.classList.remove('is-start'); });
+      $$('[data-who]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.who === '')); });
+      showStage(+stage.dataset.stage); return;
+    }
+    var who = e.target.closest('[data-who]');
+    if (who) {
+      $$('[data-who]').forEach(function (b) { b.setAttribute('aria-pressed', String(b === who)); });
+      $$('.stage-btn').forEach(function (b) { b.classList.remove('is-start'); });
+      var c = CUSTOMERS[who.dataset.who];
+      if (c) { $$('.stage-btn')[c.stage].classList.add('is-start'); showStage(c.stage, c.text); } else { showStage(0); }
+      return;
+    }
+    var rm = e.target.closest('[data-remove]');
+    if (rm) { var data = load('atlas-proto-personas', []); data.splice(+rm.dataset.remove, 1); save('atlas-proto-personas', data); renderPersonas(); return; }
+    var t = e.target.closest('[data-toast]');
+    if (t) { e.preventDefault(); toast(t.dataset.toast); }
+  });
+  $('#lessonBody').addEventListener('change', function (e) {
+    if (e.target.matches('[data-persist]')) save(e.target.dataset.persist, e.target.checked);
+  });
+  $('#lessonBody').addEventListener('submit', function (e) {
+    if (e.target.id !== 'personaForm') return;
+    e.preventDefault();
+    var f = e.target, name = f.name.value.trim(), note = $('#formNote');
+    if (!name) { note.textContent = 'Give your persona a name first.'; f.name.focus(); return; }
+    var data = load('atlas-proto-personas', []);
+    data.push({
+      name: name, demo: f.demo.value.trim(), needs: f.needs.value.trim(), do: f.do.value.trim(),
+      touch: f.touch.value.split(',').map(function (s) { return s.trim(); }).filter(Boolean)
+    });
+    save('atlas-proto-personas', data);
+    f.reset(); note.textContent = 'Saved. Add another persona if you serve different customers.';
+    renderPersonas();
+  });
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('.iconrail [data-toast], #jenBtn');
+    if (t && t.id === 'jenBtn') { toast('Learning assistant opens here (as in production)'); }
+    else if (t) { toast(t.dataset.toast); }
+  });
+
+  // ---------- Outline + prototype controls ----------
+  $('#olList').addEventListener('click', function (e) {
+    var go = e.target.closest('[data-go]'); if (go) { goTo(+go.dataset.go); return; }
+    if (e.target.closest('.ol-sections a')) closeDrawer();
+  });
+  $('#outlineBtn').addEventListener('click', openDrawer);
+  $('#olClose').addEventListener('click', closeDrawer);
+  $('#scrim').addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { closeDrawer(); $('#outlineBtn').focus(); } });
+
+  $$('[data-lesson]').forEach(function (b) { b.addEventListener('click', function () { state.lesson = +b.dataset.lesson; render(); }); });
+  $$('[data-mode]').forEach(function (b) { b.addEventListener('click', function () { state.mode = b.dataset.mode; render(); }); });
+  $('#resetBtn').addEventListener('click', function () {
+    save('atlas-proto-done', {}); reviews = {}; gates = {}; resetQuiz(); render(); toast('Progress reset');
+  });
+  $('#prevBtn').addEventListener('click', function () {
+    if (state.lesson > 0 && isBuilt(state.lesson - 1)) { state.lesson--; render(); }
+    else if (state.lesson > 0) toast('Lesson ' + state.lesson + ' is not part of this prototype');
+  });
+  $('#nextBtn').addEventListener('click', onNext);
+  $('#backBtn').addEventListener('click', function () { window.location.href = COURSE_PAGE + '?prog=' + progParam(); });
+
+  // ---------- Reading progress + active section ----------
+  function onScroll() {
+    var doc = document.documentElement, max = doc.scrollHeight - window.innerHeight;
+    $('#progressFill').style.width = (max > 0 ? Math.min(100, (window.scrollY / max) * 100) : 0) + '%';
+    var current = null;
+    $$('.ol-sections a').forEach(function (a) {
+      var t = document.getElementById(a.dataset.target);
+      if (t && t.getBoundingClientRect().top < window.innerHeight * 0.35) current = a.dataset.target;
+    });
+    $$('.ol-sections a').forEach(function (a) { a.classList.toggle('on', a.dataset.target === current); });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+
+  // Deep links from the index page, e.g. ?lesson=13 or ?lesson=1&mode=old
+  (function applyParams() {
+    var q; try { q = new URLSearchParams(window.location.search); } catch (e) { return; }
+    var l = parseInt(q.get('lesson'), 10) - 1;
+    if (l >= 0 && l < COURSE.length && isBuilt(l)) state.lesson = l;
+    if (q.get('mode') === 'old' || q.get('mode') === 'new') state.mode = q.get('mode');
+  })();
+
+  render();
+})();
+</script>
+</body>
+</html>
