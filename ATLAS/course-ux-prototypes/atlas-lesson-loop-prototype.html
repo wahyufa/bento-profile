@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ATLAS Lesson Loop Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Design tokens (same brand tokens as the other prototypes)
+   ========================================================================== */
+:root {
+  --navy: #31425D;
+  --primary: #0D719A;
+  --primary-ink: #0A5A7B;
+  --primary-soft: #E6F2F7;
+  --bg: #F6F7F9;
+  --surface: #FFFFFF;
+  --ink: #171A26;
+  --muted: #5B6475;
+  --line: #E1E5EB;
+  --accent: #F5A623;
+  --accent-ink: #8A5600;
+  --accent-soft: #FEF4E1;
+  --green: #1E8A5A;
+  --green-soft: #E3F4EC;
+  --radius: 16px;
+  --radius-lg: 22px;
+  --font: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --proto-h: 48px;
+  --bar-h: 58px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: linear-gradient(180deg, #E3F0F6 0, var(--bg) 360px) no-repeat, var(--bg); color: var(--ink); font-family: var(--font); font-size: 16px; line-height: 1.7; min-height: 100vh; }
+h1, h2, h3, p, ul, ol { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 8px; }
+[tabindex="-1"]:focus { outline: none; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+/* ---------- Prototype controls (not part of the design) ---------- */
+.proto { position: relative; z-index: 90; min-height: var(--proto-h); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 6px 20px; background: #FFF8E6; border-bottom: 1px dashed var(--accent); font-size: 13px; }
+.proto b { color: var(--accent-ink); font-weight: 600; }
+.proto select { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 12.5px; font-weight: 500; }
+.proto a { color: var(--primary-ink); font-weight: 600; }
+.proto .plain { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 5px 12px; font-size: 12.5px; font-weight: 500; }
+
+/* ---------- Top bar ---------- */
+.bar { position: sticky; top: 0; z-index: 60; height: var(--bar-h); display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 20px; background: rgba(255,255,255,.92); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.bar a.back { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14.5px; text-decoration: none; color: var(--primary-ink); }
+.bar .ctx { font-size: 13.5px; color: var(--muted); text-align: center; line-height: 1.3; }
+.bar .ctx b { display: block; color: var(--ink); font-size: 14px; }
+.course-ring { display: flex; align-items: center; gap: 10px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.course-ring i { --p: 0; width: 34px; height: 34px; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--p) * 1%), var(--line) 0); display: grid; place-items: center; transition: background .6s; }
+.course-ring i::after { content: attr(data-n); width: 26px; height: 26px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-style: normal; font-size: 12px; font-weight: 700; color: var(--ink); }
+
+/* ---------- Step indicator ---------- */
+.steps { max-width: 880px; margin: 0 auto; padding: 22px 20px 0; }
+.steps ol { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(10, 1fr); gap: 6px; }
+.steps li i { display: block; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.steps li i::after { content: ""; display: block; height: 100%; width: 0; background: var(--primary); border-radius: 999px; transition: width .4s; }
+.steps li.done i::after { width: 100%; background: var(--green); }
+.steps li.now i::after { width: 100%; }
+.steps .meta { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.steps .meta b { color: var(--ink); }
+
+/* ---------- Stage ---------- */
+.stage { max-width: 880px; margin: 0 auto; padding: 18px 20px 120px; }
+.card { background: var(--surface); border-radius: var(--radius-lg); box-shadow: 0 2px 6px rgba(23,26,38,.05), 0 12px 32px rgba(23,26,38,.05); padding: 32px 36px 36px; }
+/* Motion only where something new appears: the card on a step change, and feedback after an answer. */
+.card.enter, .anim { animation: rise .4s ease both; }
+@keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+.eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--primary-ink); margin-bottom: 6px; }
+.h { font-size: clamp(24px, 3.4vw, 30px); line-height: 1.25; font-weight: 700; outline: none; }
+.sub { color: var(--muted); margin-top: 8px; max-width: 62ch; }
+.body-text { margin-top: 14px; max-width: 64ch; }
+.body-text + .body-text { margin-top: 10px; }
+.muted { color: var(--muted); }
+
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1.5px solid var(--line); background: var(--surface); border-radius: var(--radius); padding: 12px 24px; font-weight: 600; font-size: 15.5px; text-decoration: none; transition: background .15s, border-color .15s, transform .1s; }
+.btn:hover:not(:disabled) { border-color: var(--primary); }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn.primary:hover:not(:disabled) { background: var(--primary-ink); }
+.btn.lg { padding: 14px 30px; font-size: 16.5px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.linkbtn { border: 0; background: none; padding: 0; color: var(--primary-ink); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; font-size: 14.5px; }
+.foot { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; margin-top: 28px; padding-top: 22px; border-top: 1px solid var(--line); }
+.foot .right { display: flex; align-items: center; gap: 16px; margin-left: auto; }
+
+/* ---------- Jen ---------- */
+.jen { display: flex; gap: 14px; align-items: flex-start; margin: 20px 0 0; }
+.jen .av { flex: none; width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #1B9AAA, #F2B134); display: grid; place-items: center; color: #fff; font-size: 18px; box-shadow: 0 4px 12px rgba(27,154,170,.3); }
+.jen .say { background: var(--primary-soft); border-radius: 4px 16px 16px 16px; padding: 12px 16px; font-size: 15.5px; line-height: 1.6; max-width: 62ch; }
+.jen .say small { display: block; font-size: 12px; font-weight: 600; color: var(--primary-ink); margin-bottom: 2px; }
+.jen.soft .say { background: var(--accent-soft); }
+.jen.good .say { background: var(--green-soft); }
+
+/* ---------- Welcome ---------- */
+.plan { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 22px; }
+.plan li { background: var(--bg); border-radius: var(--radius); padding: 14px 16px; font-size: 14.5px; line-height: 1.5; display: grid; gap: 4px; }
+.plan li b { font-size: 15px; display: flex; gap: 8px; align-items: center; }
+.plan li svg { color: var(--primary); }
+.plan li span { color: var(--muted); }
+
+/* ---------- Video ---------- */
+.video { position: relative; border-radius: var(--radius); overflow: hidden; aspect-ratio: 16/9; background: #0f1724; display: grid; place-items: center; margin-top: 18px; }
+.video svg.bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.play { position: relative; width: 78px; height: 78px; border-radius: 50%; border: 0; background: #fff; color: var(--primary); display: grid; place-items: center; box-shadow: 0 10px 28px rgba(0,0,0,.35); transition: transform .15s; }
+.play:hover { transform: scale(1.06); }
+.video .vmeta { position: absolute; left: 18px; bottom: 14px; right: 18px; color: #fff; font-size: 14px; display: flex; justify-content: space-between; gap: 10px; }
+.covers { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 18px; counter-reset: c; }
+.covers li { counter-increment: c; display: flex; gap: 12px; align-items: flex-start; background: var(--bg); border-radius: 14px; padding: 12px 14px; font-size: 14.5px; line-height: 1.5; }
+.covers li::before { content: counter(c); flex: none; width: 26px; height: 26px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 12.5px; }
+.covers b { display: block; font-size: 14.5px; }
+.covers span { color: var(--muted); }
+details.tx { margin-top: 14px; border: 1px solid var(--line); border-radius: var(--radius); }
+details.tx summary { cursor: pointer; padding: 14px 18px; font-weight: 600; list-style: none; display: flex; justify-content: space-between; }
+details.tx summary::-webkit-details-marker { display: none; }
+details.tx summary::after { content: "+"; font-size: 22px; line-height: 1; color: var(--primary); }
+details.tx[open] summary::after { content: "–"; }
+details.tx .inner { padding: 0 18px 18px; font-size: 15px; color: var(--muted); line-height: 1.75; }
+details.tx .inner p + p { margin-top: 10px; }
+details.tx .inner h4 { color: var(--ink); font-size: 14px; margin: 14px 0 2px; }
+
+/* ---------- Options (predict + check) ---------- */
+.q { font-size: 20px; line-height: 1.4; font-weight: 700; margin: 6px 0 16px; outline: none; }
+.tag-try { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: 3px 12px; margin-bottom: 8px; }
+.opts { display: grid; gap: 10px; }
+.opt { display: flex; gap: 12px; align-items: flex-start; border: 1.5px solid var(--line); background: var(--surface); border-radius: 14px; padding: 12px 14px; text-align: left; width: 100%; font-size: 15.5px; line-height: 1.5; transition: border-color .15s, background .15s; }
+.opt:hover:not(:disabled) { border-color: var(--primary); }
+.opt .l { flex: none; width: 28px; height: 28px; border-radius: 8px; background: var(--bg); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+.opt:disabled { cursor: default; }
+.opt.chosen { border-color: var(--primary); background: var(--primary-soft); }
+.opt.right { border-color: var(--green); background: var(--green-soft); }
+.opt.right .l { background: var(--green); color: #fff; }
+.opt.miss { border-color: var(--accent); background: var(--accent-soft); }
+.opt.miss .l { background: var(--accent-ink); color: #fff; }
+.skip { margin-top: 14px; }
+
+/* ---------- Content blocks ---------- */
+.callout { display: flex; gap: 14px; padding: 16px 20px; border-radius: var(--radius); background: var(--primary-soft); border-left: 5px solid var(--primary); margin-top: 18px; }
+.callout.warm { background: var(--accent-soft); border-left-color: var(--accent); }
+.callout .ic { flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 700; }
+.callout.warm .ic { background: var(--accent-ink); }
+.callout strong { display: block; }
+.callout p { font-size: 15.5px; line-height: 1.6; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 16px; }
+.mini { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; }
+.mini .num { width: 32px; height: 32px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 14px; margin-bottom: 10px; }
+.mini h3 { font-size: 15.5px; line-height: 1.35; margin-bottom: 4px; }
+.mini p { font-size: 14px; color: var(--muted); line-height: 1.55; }
+.block-title { font-size: 19px; font-weight: 700; margin: 26px 0 0; }
+.two { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 18px; }
+.who { border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.who header { padding: 12px 16px; background: var(--primary-soft); display: flex; align-items: center; gap: 10px; }
+.who header .av { width: 34px; height: 34px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+.who header b { font-size: 15px; line-height: 1.2; }
+.who header small { display: block; font-size: 12px; color: var(--muted); }
+.who dl { margin: 0; padding: 4px 16px 14px; }
+.who dt { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 10px; }
+.who dd { margin: 2px 0 0; font-size: 14.5px; line-height: 1.5; }
+
+/* ---------- Funnel ---------- */
+.funnel { display: grid; gap: 6px; justify-items: center; margin-top: 16px; }
+.stage-btn { --w: 100%; width: var(--w); border: 2px solid transparent; border-radius: 12px; background: var(--primary-soft); color: var(--ink); padding: 13px 16px; text-align: center; font-weight: 600; font-size: 15.5px; position: relative; transition: background .15s, border-color .15s; }
+.stage-btn:hover:not(:disabled) { border-color: var(--primary); }
+.stage-btn:disabled { cursor: default; }
+.stage-btn[aria-pressed="true"] { background: var(--primary); color: #fff; }
+.stage-btn.wrongpick { background: var(--accent-soft); border-color: var(--accent); }
+.stage-btn .start { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-size: 11.5px; font-weight: 700; background: var(--accent); color: #3b2600; border-radius: 999px; padding: 1px 10px; }
+.stage-detail { background: var(--bg); border-radius: var(--radius); padding: 14px 18px; font-size: 15px; margin-top: 14px; min-height: 76px; outline: none; }
+.stage-detail b { display: block; margin-bottom: 2px; }
+.stage-detail dl { margin: 8px 0 0; display: grid; gap: 8px; }
+.stage-detail dt { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.stage-detail dd { margin: 0; }
+.stagetabs { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+.stagetabs button { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 7px 16px; font-size: 14.5px; font-weight: 600; }
+.stagetabs button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+
+/* ---------- Match + assign ---------- */
+.mrow { display: grid; grid-template-columns: 150px minmax(0, 1fr) 28px; gap: 10px; align-items: center; margin-top: 10px; }
+.mrow .sc { font-weight: 700; font-size: 14.5px; background: var(--primary-soft); color: var(--primary-ink); border-radius: 10px; padding: 8px 12px; text-align: center; }
+.mrow select, .field input, .field textarea, .field select { width: 100%; border: 1.5px solid var(--line); border-radius: 12px; background: var(--surface); padding: 10px 12px; font-size: 15px; }
+.mrow select:focus, .field input:focus, .field textarea:focus, .field select:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.mrow.ok select { border-color: var(--green); background: var(--green-soft); }
+.mrow.miss select { border-color: var(--accent); background: var(--accent-soft); }
+.mrow .mk { font-weight: 700; text-align: center; }
+.mrow.ok .mk { color: var(--green); }
+.mrow.miss .mk { color: var(--accent-ink); }
+.mnote { grid-column: 2 / 4; font-size: 13.5px; color: var(--accent-ink); margin-top: -4px; }
+.assign { display: grid; gap: 10px; margin-top: 14px; }
+.arow { border: 1.5px solid var(--line); border-radius: 14px; padding: 12px 14px; display: grid; gap: 10px; }
+.arow.ok { border-color: var(--green); background: var(--green-soft); }
+.arow.miss { border-color: var(--accent); background: var(--accent-soft); }
+.arow .st { font-size: 15.5px; font-weight: 500; }
+.arow .picks { display: flex; gap: 8px; flex-wrap: wrap; }
+.arow .picks button { border: 1.5px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 16px; font-size: 14.5px; font-weight: 600; }
+.arow .picks button:hover:not(:disabled) { border-color: var(--primary); }
+.arow .picks button.on { background: var(--navy); border-color: var(--navy); color: #fff; }
+.arow .picks button:disabled { cursor: default; }
+.arow .why { font-size: 14px; color: var(--muted); }
+
+/* ---------- Apply ---------- */
+.field { margin-top: 16px; }
+.field label { display: block; font-weight: 600; font-size: 15px; }
+.field small { display: block; color: var(--muted); font-size: 13px; margin-bottom: 6px; }
+.field textarea { min-height: 76px; resize: vertical; }
+.myplan { margin-top: 18px; border: 2px solid var(--green); border-radius: var(--radius); background: var(--green-soft); padding: 16px 20px; }
+.myplan h3 { font-size: 16px; margin-bottom: 8px; }
+.myplan dl { margin: 0; display: grid; gap: 8px; }
+.myplan dt { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.myplan dd { margin: 0; font-size: 15px; }
+
+/* ---------- Check ---------- */
+.dots { display: flex; gap: 6px; margin-bottom: 14px; }
+.dots span { flex: 1; height: 6px; border-radius: 999px; background: var(--line); }
+.dots span.ok { background: var(--green); }
+.dots span.miss { background: var(--accent); }
+.dots span.cur { background: var(--primary); }
+.fb { margin-top: 14px; border-radius: 14px; padding: 12px 16px; font-size: 15px; line-height: 1.6; outline: none; }
+.fb.ok { background: var(--green-soft); }
+.fb.miss { background: var(--accent-soft); }
+.fb b { display: block; }
+.result { text-align: center; }
+.result .ring { --p: 0; width: 104px; height: 104px; margin: 0 auto 14px; border-radius: 50%; background: conic-gradient(var(--green) calc(var(--p) * 1%), var(--line) 0); display: grid; place-items: center; }
+.result .ring.some { background: conic-gradient(var(--accent) calc(var(--p) * 1%), var(--line) 0); }
+.result .ring::after { content: attr(data-label); width: 82px; height: 82px; border-radius: 50%; background: var(--surface); display: grid; place-items: center; font-size: 26px; font-weight: 700; }
+.revisit { text-align: left; display: grid; gap: 10px; margin-top: 22px; }
+.rv { border: 1px solid var(--line); border-left: 5px solid var(--accent); border-radius: 14px; padding: 14px 16px; }
+.rv .top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; }
+.rv b { font-size: 15.5px; }
+.rv .added { font-size: 12px; font-weight: 700; color: var(--accent-ink); background: var(--accent-soft); border-radius: 999px; padding: 1px 10px; white-space: nowrap; }
+.rv p { font-size: 14.5px; color: var(--muted); line-height: 1.6; margin-top: 8px; }
+
+/* ---------- Done ---------- */
+.done { text-align: center; }
+.badge { width: 112px; height: 112px; margin: 4px auto 14px; display: block; }
+.badge .ring-c { stroke-dasharray: 302; stroke-dashoffset: 302; animation: draw .9s .15s ease forwards; }
+.badge .tick { stroke-dasharray: 60; stroke-dashoffset: 60; animation: draw .5s .8s ease forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+.pill-row { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 14px; }
+.pill { background: var(--primary-soft); color: var(--primary-ink); font-weight: 600; font-size: 13.5px; border-radius: 999px; padding: 3px 14px; }
+.pill.green { background: var(--green-soft); color: #176B45; }
+.take { text-align: left; margin-top: 26px; }
+.take ul { list-style: none; padding: 0; display: grid; gap: 8px; margin-top: 10px; }
+.take li { display: flex; gap: 12px; font-size: 15.5px; line-height: 1.55; }
+.take li::before { content: "✓"; flex: none; width: 24px; height: 24px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 700; margin-top: 2px; }
+.mini-path { display: flex; align-items: flex-start; justify-content: center; gap: 0; margin: 28px 0 6px; }
+.mp { width: 130px; text-align: center; font-size: 13px; font-weight: 600; line-height: 1.35; }
+.mp .c { width: 54px; height: 54px; margin: 0 auto 8px; border-radius: 50%; display: grid; place-items: center; border: 3px solid var(--line); background: #F1F3F6; color: #8A94A6; box-shadow: 0 5px 0 #CFD6E0; font-weight: 700; }
+.mp.done .c { background: var(--green-soft); border-color: #5DB88B; color: var(--green); box-shadow: 0 5px 0 #7BCBA3; font-size: 20px; }
+.mp.refresh .c { background: var(--accent-soft); border: 3px dashed var(--accent-ink); color: var(--accent-ink); box-shadow: 0 5px 0 #EBC987; }
+.mp.next .c { background: #DDF0F8; border-color: var(--primary); color: var(--primary); box-shadow: 0 5px 0 #7CC3E0; }
+.mp small { display: block; font-weight: 500; color: var(--muted); font-size: 12px; }
+.mp-link { flex: none; width: 34px; height: 4px; background: var(--line); border-radius: 4px; margin-top: 25px; }
+.upnext { display: flex; gap: 16px; align-items: center; text-align: left; background: var(--bg); border-radius: var(--radius); padding: 16px 18px; margin-top: 24px; flex-wrap: wrap; }
+.upnext .t { flex: 1; min-width: 200px; }
+.upnext .t small { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--primary-ink); }
+.upnext .t b { display: block; font-size: 17px; line-height: 1.35; }
+.upnext .t span { font-size: 14px; color: var(--muted); }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--navy); color: #fff; border-radius: 12px; padding: 10px 18px; font-size: 14px; opacity: 0; pointer-events: none; transition: .25s; z-index: 120; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  .card { padding: 24px 20px 28px; border-radius: var(--radius); }
+  .plan, .covers, .two { grid-template-columns: 1fr; }
+  .steps ol { gap: 4px; }
+  .bar { padding: 0 14px; }
+  .bar .ctx { display: none; }
+  .foot .right { width: 100%; justify-content: space-between; margin-left: 0; }
+  .foot .btn { flex: 1; }
+  .mrow { grid-template-columns: minmax(0, 1fr) 28px; }
+  .mrow .sc { grid-column: 1 / 3; text-align: left; }
+  .mrow select { grid-column: 1; }
+  .mnote { grid-column: 1 / 3; }
+  .mp { width: 96px; font-size: 12px; }
+  .mp-link { width: 18px; }
+}
+@media (max-width: 640px) { .proto { padding: 6px 12px; } }
+</style>
+</head>
+<body>
+
+<div class="proto">
+  <b>Prototype</b>
+  <label for="jump">Jump to:</label>
+  <select id="jump"></select>
+  <button class="plain" type="button" id="resetBtn">Reset</button>
+  <a href="atlas-lesson-blocks-prototype.html?lesson=2">Open the current version of this lesson</a>
+</div>
+
+<header class="bar">
+  <a class="back" href="atlas-course-page-prototype.html?prog=some"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>Course</a>
+  <div class="ctx"><b>Developing a digital marketing campaign</b>Lesson 2 of 13 · Video</div>
+  <div class="course-ring" aria-live="polite"><span id="ringText">1 of 13 done</span><i id="ring" data-n="1"></i></div>
+</header>
+
+<nav class="steps" aria-label="Lesson steps"><div class="meta" id="stepMeta"></div><ol id="stepList"></ol></nav>
+<main class="stage" id="stage"></main>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function () {
+  'use strict';
+
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function toast(msg) { var t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(t._h); t._h = setTimeout(function () { t.classList.remove('show'); }, 2400); }
+  function letter(i) { return 'ABCD'.charAt(i); }
+
+  // ==========================================================================
+  // CONTENT
+  // From production: the video, its transcript, the definition, the four planning questions, the funnel stages,
+  // and the two customer personas (lesson 3). Everything else (guesses, objectives per stage, examples of
+  // channels and measures, the matching and sorting activities, the check questions and the Jen lines) is
+  // sample material written for this prototype and needs review by the content team.
+  // ==========================================================================
+  var DONE_BEFORE = 1;   // lesson 1 is already complete in this demo
+  var TOTAL = 13, MINS = 10;
+  var STEPS = [
+    { key: 'welcome', label: 'Welcome', left: 10 },
+    { key: 'watch', label: 'Watch', left: 9 },
+    { key: 'idea', label: 'The big idea', left: 7 },
+    { key: 'funnel', label: 'The funnel', left: 6 },
+    { key: 'objectives', label: 'Objectives', left: 5 },
+    { key: 'audience', label: 'Audience', left: 4 },
+    { key: 'promote', label: 'Promote and measure', left: 3 },
+    { key: 'apply', label: 'Your turn', left: 2 },
+    { key: 'check', label: 'Check yourself', left: 1 },
+    { key: 'done', label: 'Done', left: 0 }
+  ];
+  var I_WELCOME = 0, I_WATCH = 1, I_IDEA = 2, I_FUNNEL = 3, I_OBJ = 4, I_AUD = 5, I_PROMO = 6, I_APPLY = 7, I_CHECK = 8, I_DONE = 9;
+
+  var PREDICT1 = {
+    q: 'What do you think digital marketing is mainly for?',
+    opts: ['Posting as often as possible on every platform', 'Reaching customers at the moments that most influence their decisions', 'Collecting as many followers as possible', 'Replacing the sales team'],
+    a: 1,
+    right: 'That is the main goal in the video.',
+    miss: 'A common first guess. The video\'s answer is to reach customers at the moments that most influence their decisions.'
+  };
+  var FOUR = [
+    ['What are your marketing objectives?', 'Reach customers at the moments that most influence their decisions.'],
+    ['Who is my audience and where are they located?', 'Think about their motivations and needs at each stage of the journey.'],
+    ['How do I promote the content?', 'Guide customers through the funnel by addressing their needs.'],
+    ['How can I measure success?', 'Track outcomes along the customer journey.']
+  ];
+  var VIDEO_COVERS = [
+    ['What digital marketing is', 'Integrated, targeted and measurable.'],
+    ['The customer journey funnel', 'From many options to a decision, then loyalty.'],
+    ['Two customers, two starting points', 'A hobbyist and a camera enthusiast.'],
+    ['Four questions to plan around', 'Objectives, audience, promotion, measurement.']
+  ];
+  var STAGES = [
+    { name: 'Awareness', text: 'Customers begin at the wide end of the funnel with a number of potential options on their mind.',
+      reach: 'Search engine results and social media, where people look around without a plan to buy yet.', measure: 'Reach: how many of the right people saw you.' },
+    { name: 'Consideration', text: 'As they gather more information, the options gradually reduce. They are debating between different choices.',
+      reach: 'Online reviews, comparisons and influencer content, where people weigh their options.', measure: 'Engagement: do they read, click and come back?' },
+    { name: 'Conversion', text: 'Customers potentially buy your product or sign up for your service.',
+      reach: 'A clear product page and a simple way to buy or sign up.', measure: 'Conversions: how many buy or sign up.' },
+    { name: 'Post-sale: loyalty', text: 'An important stage where you try to retain the customer and make them loyal.',
+      reach: 'Follow-up emails, communities and good support after the sale.', measure: 'Loyalty: do they come back and recommend you?' }
+  ];
+  // Objectives activity: one objective per funnel stage. The list is shown in a mixed order.
+  var OBJ = [
+    { t: 'Keep customers happy so they come back', stage: 3 },
+    { t: 'Get noticed by people who are not looking for you yet', stage: 0 },
+    { t: 'Make buying or signing up quick and easy', stage: 2 },
+    { t: 'Show why you are a better choice than the alternatives', stage: 1 }
+  ];
+  // Audience activity: customer personas are from production (lesson 3).
+  var CUSTOMERS = [
+    { n: 'Customer 1', role: 'Hobbyist, casually interested in photography', need: 'Looking for an entry-level digital camera', stage: 'Awareness', touch: 'Search engine results, social media (photography hobby groups), online reviews' },
+    { n: 'Customer 2', role: 'Camera enthusiast, very interested in photography', need: 'Comparing digital cameras', stage: 'Consideration', touch: 'Search engine results, influencer marketing' }
+  ];
+  var ASSIGN = [
+    { s: 'A beginner\'s guide: "Choosing your first digital camera"', a: 0, why: 'Customer 1 is a hobbyist looking for an entry-level camera.' },
+    { s: 'A side-by-side comparison of two cameras', a: 1, why: 'Customer 2 is already comparing cameras.' },
+    { s: 'A post in a local photography hobby group', a: 0, why: 'Photography hobby groups are one of Customer 1\'s touchpoints.' },
+    { s: 'A review of a camera by an influencer', a: 1, why: 'Influencer marketing is one of Customer 2\'s touchpoints.' }
+  ];
+  var CHECK = [
+    { q: 'How does the video define digital marketing?',
+      opts: ['Posting on social media as often as possible.', 'Using digital technologies to create integrated, targeted and measurable communications that acquire and retain customers.', 'Buying advertising space on websites.', 'Sending marketing emails only.'],
+      a: 1, topic: 'What digital marketing is',
+      why: 'Digital marketing is the use of digital technologies to create integrated, targeted and measurable communications to acquire and retain customers.',
+      refresher: 'Digital marketing uses digital technologies to create integrated, targeted and measurable communications that acquire and retain customers. It is data-driven, so you can target individual customers and measure results across channels.' },
+    { q: 'Which question is one of the four planning questions in the video?',
+      opts: ['Who is my audience and where are they located?', 'How big is my competitor\'s budget?', 'Which platform has the most users?', 'What colour should the logo be?'],
+      a: 0, topic: 'The four planning questions',
+      why: 'The four questions are: your marketing objectives, your audience, how to promote the content, and how to measure success.',
+      refresher: 'Plan around four questions: What are your marketing objectives? Who is my audience and where are they located? How do I promote the content? How can I measure success?' },
+    { q: 'A customer is comparing several products and has not decided yet. Which objective fits best?',
+      opts: ['Get noticed for the first time.', 'Show why you are a better choice than the alternatives.', 'Keep them coming back after the sale.', 'Make the checkout as short as possible.'],
+      a: 1, topic: 'Objectives for each stage',
+      why: 'Someone who is comparing options is at the consideration stage, so the objective is to show why you are the better choice.',
+      refresher: 'Each funnel stage needs its own objective: awareness, get noticed. Consideration, show why you are a better choice. Conversion, make buying easy. Post-sale, keep customers happy and loyal.' },
+    { q: 'Your ad was seen by 30,000 people, but very few clicked or bought. What does this tell you?',
+      opts: ['The ad is a success because so many people saw it.', 'Reach alone is not success. Check whether customers moved further down the funnel.', 'You should stop measuring.', 'The audience does not exist.'],
+      a: 1, topic: 'Measuring success',
+      why: 'A big number is not the same as success. The ad is working when it moves customers further down the funnel so they convert.',
+      refresher: 'Measure success along the customer journey, not only at the top. Many people seeing an ad (reach) matters, but what counts is whether customers move on to consider, convert and stay loyal.' },
+    { q: 'What happens at the post-sale stage of the funnel?',
+      opts: ['The customer first hears about your product.', 'The customer compares several options.', 'You try to retain the customer and make them loyal.', 'The customer buys for the first time.'],
+      a: 2, topic: 'The post-sale stage',
+      why: 'Post-sale is where you work to retain the customer and turn them into a loyal customer.',
+      refresher: 'After a customer buys, the post-sale stage matters: this is where you try to retain them and make them a loyal customer.' }
+  ];
+  var TAKEAWAYS = [
+    'The main goal of digital marketing is to reach customers at the moments that most influence their decisions.',
+    'Customers move through a funnel: awareness, consideration, conversion and post-sale loyalty. They can join at different points.',
+    'Each stage needs its own objective, its own way of reaching people, and its own measure of success.',
+    'Plan around four questions: objectives, audience, promotion and measuring success.'
+  ];
+  var TRANSCRIPT = [
+    ['', 'What is digital marketing? Digital marketing is everywhere, from social media ads, search engines and websites, to emails and, even, online reviews. Digital marketing is the use of digital technologies to create integrated, targeted and measurable communications with the purpose of acquiring and retaining customers. It is a data-driven process, which allows you to target individual customers and provide personalized and interactive content, as well as ensure that you get measurable results across multiple channels.'],
+    ['Consideration 1 · Marketing objectives', 'The main goal of digital marketing is to reach customers at the moments that most influence their decisions. These moments, or touch points, can be understood through the customer journey funnel where customers begin at the wide end of the funnel with a number of potential options on their mind. As they gather more information, the number of options gradually reduce until they arrive at the conversion stage, where they potentially buy your product or sign up for your service. Finally, the post-sale phase becomes an important stage, where you\'ll try and retain this individual and make them a loyal customer.'],
+    ['', 'Take customer one, for example. They just picked up photography as a hobby. They are searching for a suitable camera. Their customer journey starts from the awareness stage. Take customer two, a camera enthusiast looking to buy a digital camera. Their customer journey can start from the consideration stage where they are debating between different cameras.'],
+    ['Consideration 2 to 4', 'Think about your own customers: what are their motivations and needs at each stage of the customer journey? As a marketer, you\'ll want to guide customer one and two through the funnel by addressing their needs. Understanding how customer motivations and needs differ allows you to identify your objectives at each stage. You can then meet potential buyers where they are, and encourage them to convert.']
+  ];
+
+  // ---------- State ----------
+  function fresh() {
+    return { step: 0, p1: null, p2: null, sel: 1, obj: { picks: [null, null, null, null], checked: false }, aud: { picks: [null, null, null, null] }, tab: 0,
+      plan: { who: '', stage: '', goal: '', measure: '', saved: false }, check: { idx: 0, picks: [], checked: false, phase: 'q' }, open: {} };
+  }
+  var S = fresh();
+  var focusHeading = true;   // true when the step changed: move focus to the heading and scroll to the top
+  var animNew = false;       // true when a re-render adds feedback that should fade in
+
+  // ---------- Pieces ----------
+  function jen(text, tone, label) {
+    return '<div class="jen ' + (tone || '') + '"><div class="av" aria-hidden="true">✦</div><div class="say"><small>' + (label || 'Jen') + '</small>' + text + '</div></div>';
+  }
+  function eb(i) { return '<div class="eyebrow">Step ' + (i + 1) + ' of ' + STEPS.length + ' · ' + STEPS[i].label + '</div>'; }
+  function foot(back, right) { return '<div class="foot">' + (back ? '<button class="btn" type="button" data-go="back">‹ Back</button>' : '<span></span>') + '<div class="right">' + (right || '') + '</div></div>'; }
+  function cont(label, enabled) { return '<button class="btn primary" type="button" data-go="next"' + (enabled === false ? ' disabled' : '') + '>' + (label || 'Continue') + ' ›</button>'; }
+  function optHtml(opts, st) {
+    return '<div class="opts" role="group" aria-label="Answer options">' + opts.map(function (o, i) {
+      var cls = 'opt';
+      if (st.revealed) { if (i === st.correct) cls += ' right'; else if (i === st.picked) cls += ' miss'; }
+      else if (st.picked === i) cls += ' chosen';
+      return '<button type="button" class="' + cls + '" aria-pressed="' + (st.picked === i) + '" data-pick="' + i + '"' + (st.revealed ? ' disabled' : '') + '><span class="l">' + letter(i) + '</span><span>' + esc(o) + '</span></button>';
+    }).join('') + '</div>';
+  }
+  function heading(i, title, sub) { return eb(i) + '<h2 class="h" id="stepH" tabindex="-1">' + title + '</h2>' + (sub ? '<p class="sub">' + sub + '</p>' : ''); }
+
+  // ==========================================================================
+  // STEPS
+  // ==========================================================================
+  function stepWelcome() {
+    var ic = function (p) { return '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>'; };
+    return '<section class="card"><div class="eyebrow">Lesson 2 · Video · about 10 minutes</div><h1 class="h" id="stepH" tabindex="-1">Planning a digital marketing campaign</h1>' +
+      '<p class="sub">Every later lesson builds on this plan, so it is worth getting the big picture first.</p>' +
+      jen('Welcome back. In this lesson you will learn how to plan a campaign around <b>four simple questions</b>, then try them on a business you know. I will ask for a few quick guesses along the way. There is nothing to pass here, just a chance to see what sticks.', '', 'Jen · your learning assistant') +
+      '<ul class="plan"><li><b>' + ic('<circle cx="12" cy="12" r="9"/><path d="M10 8.5l5 3.5-5 3.5z"/>') + 'Watch and learn</b><span>The video, then each question in turn</span></li>' +
+      '<li><b>' + ic('<path d="M9 18h6M10 21h4M12 3a6 6 0 00-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0012 3z"/>') + 'Try it</b><span>Guesses, matching and a mini plan for your business</span></li>' +
+      '<li><b>' + ic('<path d="M5 12l4 4 10-10"/>') + 'Check yourself</b><span>Five questions, with a refresher if you need one</span></li></ul>' +
+      foot(false, '<button class="btn primary lg" type="button" data-go="next">Let\'s start ›</button>') + '</section>';
+  }
+
+  function stepWatch() {
+    var tx = TRANSCRIPT.map(function (t) { return (t[0] ? '<h4>' + esc(t[0]) + '</h4>' : '') + '<p>' + esc(t[1]) + '</p>'; }).join('');
+    return '<section class="card">' + heading(I_WATCH, 'Watch: Developing a digital marketing campaign', 'Listen for the four questions, and for where each of the two customers enters the funnel.') +
+      '<div class="video" role="group" aria-label="Video player placeholder"><svg class="bg" viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="640" height="360" fill="#1d2b44"/><circle cx="190" cy="205" r="58" fill="#0D719A"/><rect x="124" y="262" width="132" height="120" rx="50" fill="#0D719A"/><circle cx="450" cy="205" r="58" fill="#F5A623" opacity=".9"/><rect x="384" y="262" width="132" height="120" rx="50" fill="#F5A623" opacity=".9"/><defs><linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></linearGradient></defs><rect width="640" height="360" fill="url(#vg)"/></svg>' +
+      '<button class="play" type="button" aria-label="Play video" data-toast="The YouTube video plays here in production"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button><div class="vmeta"><b>Developing a digital marketing campaign</b><span>Captions available</span></div></div>' +
+      '<h3 class="block-title" style="font-size:16px;margin-top:20px">In this video</h3><ol class="covers">' + VIDEO_COVERS.map(function (c) { return '<li><div><b>' + esc(c[0]) + '</b><span>' + esc(c[1]) + '</span></div></li>'; }).join('') + '</ol>' +
+      '<details class="tx"><summary>Prefer to read? Open the transcript</summary><div class="inner">' + tx + '</div></details>' +
+      foot(true, cont('I\'ve watched it')) + '</section>';
+  }
+
+  function stepIdea() {
+    var a = S.p1, answered = a !== null;
+    var h = '<section class="card">' + heading(I_IDEA, 'The big idea', 'Before I explain it, take a guess.') +
+      '<div style="margin-top:18px"><span class="tag-try">Quick guess</span><h3 class="q">' + esc(PREDICT1.q) + '</h3>' +
+      optHtml(PREDICT1.opts, { picked: answered && a !== 'skip' ? a : null, correct: PREDICT1.a, revealed: answered }) + '</div>';
+    if (!answered) {
+      h += '<p class="skip"><button class="linkbtn" type="button" data-skip="p1">Skip the guess and show me</button></p>';
+    } else {
+      var ok = a === PREDICT1.a;
+      h += (a === 'skip' ? '' : jen(ok ? 'Good instinct. ' + PREDICT1.right : PREDICT1.miss, ok ? 'good' : 'soft')) +
+        '<div class="callout"><div class="ic" aria-hidden="true">“</div><div><strong>Digital marketing, in one line</strong><p>The use of digital technologies to create <b>integrated, targeted and measurable</b> communications with the purpose of acquiring and retaining customers.</p></div></div>' +
+        '<p class="body-text">It is a data-driven process. It lets you target individual customers, provide personalized and interactive content, and get measurable results across multiple channels. Social media ads, search engines, websites, emails and even online reviews are all part of it.</p>' +
+        '<h3 class="block-title">Four questions to plan around</h3><div class="cards">' + FOUR.map(function (f, i) { return '<div class="mini"><div class="num">' + (i + 1) + '</div><h3>' + esc(f[0]) + '</h3><p>' + esc(f[1]) + '</p></div>'; }).join('') + '</div>' +
+        '<p class="body-text muted" style="font-size:14.5px">The next steps take these four questions one at a time.</p>';
+    }
+    return h + foot(true, cont('Continue', answered)) + '</section>';
+  }
+
+  function stepFunnel() {
+    var revealed = S.p2 !== null, picked = S.p2;
+    var h = '<section class="card">' + heading(I_FUNNEL, 'The customer journey funnel', 'Customers move down a funnel, from many options to a decision. They do not all start in the same place.') +
+      '<div style="margin-top:18px"><span class="tag-try">Your turn</span><h3 class="q">Customer 2 is a camera enthusiast, already comparing cameras. Which stage do you think their journey starts at?</h3></div><div class="funnel">';
+    STAGES.forEach(function (st, i) {
+      var cls = 'stage-btn', start = '';
+      if (revealed) { if (i === 0) start = '<span class="start">Customer 1 starts</span>'; if (i === 1) start = '<span class="start">Customer 2 starts</span>'; if (picked === i && i !== 1) cls += ' wrongpick'; }
+      h += '<button type="button" class="' + cls + '" style="--w:' + (100 - i * 16) + '%" aria-pressed="' + (revealed ? S.sel === i : false) + '" ' + (revealed ? 'data-explore="' + i + '"' : 'data-pick2="' + i + '"') + '>' + st.name + start + '</button>';
+    });
+    h += '</div>';
+    if (revealed) {
+      var ok = picked === 1;
+      h += (picked === 'skip' ? '' : jen(ok ? 'Right. Someone already comparing cameras is in the <b>consideration</b> stage.' : 'Easy to mix up. Someone already comparing cameras has moved past awareness, so they start at <b>consideration</b>.', ok ? 'good' : 'soft')) +
+        '<div class="stage-detail" id="detail" tabindex="-1" role="status" aria-live="polite"><b>' + STAGES[S.sel].name + '</b>' + (S.sel === 0 ? 'Customer 1 just picked up photography as a hobby and is searching for a suitable camera, so their journey starts here. ' : '') + (S.sel === 1 ? 'Customer 2 is a camera enthusiast looking to buy, so their journey can start here, debating between cameras. ' : '') + STAGES[S.sel].text + '</div>' +
+        '<p class="muted" style="margin-top:10px;font-size:14px">Tap any stage to read more. The touchpoints where customers meet you along this funnel are the "moments" from the big idea.</p>';
+    } else {
+      h += '<p class="skip"><button class="linkbtn" type="button" data-skip="p2">Skip the guess and show me</button></p>';
+    }
+    return h + foot(true, cont('Continue', revealed)) + '</section>';
+  }
+
+  function stepObjectives() {
+    var O = S.obj, all = O.picks.every(function (p) { return p !== null; });
+    var h = '<section class="card">' + heading(I_OBJ, 'Question 1: What are your marketing objectives?', 'Because customers are at different stages, each stage needs a different objective.') +
+      '<p class="body-text">The main goal of digital marketing is to reach customers at the moments that most influence their decisions. A customer who has never heard of you needs something different from one who is ready to buy. Understanding this lets you set your objectives <b>at each stage</b>.</p>' +
+      '<div style="margin-top:20px"><span class="tag-try">Match it</span><h3 class="q" style="margin-bottom:4px">Choose the objective that fits each stage</h3></div>';
+    STAGES.forEach(function (st, i) {
+      var p = O.picks[i], good = OBJ.findIndex(function (o) { return o.stage === i; }), cls = 'mrow' + (O.checked ? (p === good ? ' ok' : ' miss') : '');
+      h += '<div class="' + cls + '"><div class="sc">' + st.name + '</div><select data-match="' + i + '" aria-label="Objective for ' + st.name + '"' + (O.checked ? ' disabled' : '') + '><option value="">Choose an objective…</option>' +
+        OBJ.map(function (o, k) { return '<option value="' + k + '"' + (p === k ? ' selected' : '') + '>' + esc(o.t) + '</option>'; }).join('') + '</select><span class="mk" aria-hidden="true">' + (O.checked ? (p === good ? '✓' : '!') : '') + '</span>' +
+        (O.checked && p !== good ? '<div class="mnote">Better fit: ' + esc(OBJ[good].t) + '</div>' : '') + '</div>';
+    });
+    if (O.checked) {
+      var score = STAGES.filter(function (st, i) { return O.picks[i] === OBJ.findIndex(function (o) { return o.stage === i; }); }).length;
+      h += jen(score === 4 ? 'All four match. You are thinking in stages already.' : (score >= 2 ? score + ' of 4 match. The stages that did not are marked above, with a better fit.' : 'These are easy to mix up. The better fit for each stage is shown above. Take a moment to read them.'), score === 4 ? 'good' : 'soft');
+    } else {
+      h += '<div class="skip"><button class="btn" type="button" data-obj="check"' + (all ? '' : ' disabled') + '>Check my matches</button></div>';
+    }
+    return h + foot(true, cont('Continue')) + '</section>';
+  }
+
+  function stepAudience() {
+    var A = S.aud, done = A.picks.every(function (p) { return p !== null; });
+    var h = '<section class="card">' + heading(I_AUD, 'Question 2: Who is my audience, and where are they?', 'Think about your customers\' motivations and needs at each stage of the journey.') +
+      '<p class="body-text">Two customers can want the same kind of product and still need very different things from you. Here are the two customers from the video.</p><div class="two">' +
+      CUSTOMERS.map(function (c, i) { return '<article class="who"><header><div class="av" aria-hidden="true">' + (i + 1) + '</div><div><b>' + c.n + '</b><small>' + c.stage + ' stage</small></div></header><dl><dt>Who they are</dt><dd>' + c.role + '</dd><dt>What they need</dt><dd>' + c.need + '</dd><dt>Where they meet you</dt><dd>' + c.touch + '</dd></dl></article>'; }).join('') + '</div>' +
+      '<div style="margin-top:24px"><span class="tag-try">Sort it</span><h3 class="q" style="margin-bottom:0">Who would respond to each of these?</h3></div><div class="assign">';
+    ASSIGN.forEach(function (x, i) {
+      var p = A.picks[i], rev = p !== null, ok = rev && p === x.a;
+      h += '<div class="arow' + (rev ? (ok ? ' ok' : ' miss') : '') + '"><div class="st">' + esc(x.s) + '</div><div class="picks" role="group" aria-label="Who would respond to: ' + esc(x.s) + '">' +
+        [0, 1].map(function (c) { return '<button type="button" class="' + (p === c ? 'on' : '') + '" data-assign="' + i + ':' + c + '" aria-pressed="' + (p === c) + '"' + (rev ? ' disabled' : '') + '>Customer ' + (c + 1) + '</button>'; }).join('') + '</div>' +
+        (rev ? '<div class="why"><b>' + (ok ? 'Yes. ' : 'Not quite. ') + '</b>' + esc(x.why) + '</div>' : '') + '</div>';
+    });
+    h += '</div>';
+    if (done) { var n = ASSIGN.filter(function (x, i) { return A.picks[i] === x.a; }).length; h += jen(n === ASSIGN.length ? 'All four. Matching the message to the customer is half the job.' : n + ' of ' + ASSIGN.length + '. The reasons above show how each customer differs. You will build your own personas in the next exercise.', n === ASSIGN.length ? 'good' : 'soft'); }
+    return h + foot(true, cont('Continue')) + '</section>';
+  }
+
+  function stepPromote() {
+    var st = STAGES[S.tab];
+    return '<section class="card">' + heading(I_PROMO, 'Questions 3 and 4: Promote it, then measure it', 'Guide customers through the funnel by addressing their needs, and track outcomes along the way.') +
+      '<p class="body-text">Once you know the objective and the audience, ask <b>how will I reach them</b> and <b>how will I know it worked</b>. The answers change at every stage. Pick a stage to see an example.</p>' +
+      '<div class="stagetabs" role="group" aria-label="Funnel stage">' + STAGES.map(function (s, i) { return '<button type="button" data-tab="' + i + '" aria-pressed="' + (S.tab === i) + '">' + s.name + '</button>'; }).join('') + '</div>' +
+      '<div class="stage-detail" role="status" aria-live="polite"><b>' + st.name + '</b>' + st.text + '<dl><div><dt>Reach them through</dt><dd>' + st.reach + '</dd></div><div><dt>Measure success by</dt><dd>' + st.measure + '</dd></div></dl></div>' +
+      '<div class="callout warm"><div class="ic" aria-hidden="true">!</div><div><strong>A big number is not the same as success</strong><p>Thirty thousand people seeing an ad sounds impressive. Ask instead: did customers move further down the funnel and convert?</p></div></div>' +
+      '<p class="body-text muted" style="font-size:14.5px">The next lessons cover how to promote with paid, earned and owned media, and how to measure the results.</p>' +
+      foot(true, cont('Continue')) + '</section>';
+  }
+
+  function stepApply() {
+    var P = S.plan;
+    var h = '<section class="card">' + heading(I_APPLY, 'Your turn: a mini plan for your business', 'Pick one customer you want to reach and answer the four questions in a line each. A rough answer is fine.') +
+      jen('Use a real business you know: yours, your team\'s, or one you admire. You can change anything later.');
+    if (P.saved) {
+      var stg = P.stage !== '' ? STAGES[+P.stage].name : 'Not chosen';
+      h += '<div class="myplan" role="status"><h3>Your mini plan</h3><dl><dt>Customer</dt><dd>' + esc(P.who || 'Not filled in') + '</dd><dt>Where they are in the funnel today</dt><dd>' + esc(stg) + '</dd><dt>Objective for that stage</dt><dd>' + esc(P.goal || 'Not filled in') + '</dd><dt>How you would know it worked</dt><dd>' + esc(P.measure || 'Not filled in') + '</dd></dl>' +
+        '<p style="margin-top:10px"><button class="linkbtn" type="button" data-plan="edit">Edit</button></p></div>' + jen('Nice. You have sketched a plan. In the next exercise you will turn that customer into a persona.', 'good');
+    } else {
+      h += '<form id="planForm" novalidate>' +
+        '<div class="field"><label for="pWho">1. Who is one customer you want to reach?</label><small>For example: "a first-time home baker".</small><input id="pWho" name="who" type="text" autocomplete="off" value="' + esc(P.who) + '"></div>' +
+        '<div class="field"><label for="pStage">2. Where are they in the funnel today?</label><select id="pStage" name="stage"><option value="">Choose a stage…</option>' + STAGES.map(function (s, i) { return '<option value="' + i + '"' + (P.stage === String(i) ? ' selected' : '') + '>' + s.name + '</option>'; }).join('') + '</select></div>' +
+        '<div class="field"><label for="pGoal">3. What is your objective for that stage?</label><small>Think about the question: what should happen next for this customer?</small><textarea id="pGoal" name="goal">' + esc(P.goal) + '</textarea></div>' +
+        '<div class="field"><label for="pMeasure">4. How would you know it worked?</label><small>One thing you could count or observe.</small><textarea id="pMeasure" name="measure">' + esc(P.measure) + '</textarea></div>' +
+        '<div class="foot" style="margin-top:22px;padding-top:0;border-top:0;justify-content:flex-start;gap:16px"><button class="btn primary" type="submit">Save my plan</button><button class="linkbtn" type="button" data-skipapply>Skip for now</button></div></form>';
+    }
+    return h + foot(true, cont('Continue')) + '</section>';
+  }
+
+  function stepCheck() {
+    var C = S.check, n = CHECK.length;
+    if (C.phase === 'q') {
+      var q = CHECK[C.idx], pick = C.picks[C.idx], dots = '';
+      for (var i = 0; i < n; i++) { var cl = i < C.idx || (i === C.idx && C.checked) ? (C.picks[i] === CHECK[i].a ? 'ok' : 'miss') : (i === C.idx ? 'cur' : ''); dots += '<span class="' + cl + '"></span>'; }
+      var h = '<section class="card">' + heading(I_CHECK, 'Let\'s see what stuck', 'No pass mark. If something is fuzzy, I will add a short refresher to your path.') +
+        '<div class="dots" style="margin-top:20px" aria-hidden="true">' + dots + '</div>' +
+        '<div class="muted" style="font-size:12.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase">Question ' + (C.idx + 1) + ' of ' + n + '</div><h3 class="q" id="qH" tabindex="-1">' + esc(q.q) + '</h3>' +
+        optHtml(q.opts, { picked: pick === undefined ? null : pick, correct: q.a, revealed: C.checked });
+      if (C.checked) { var ok = pick === q.a; h += '<div class="fb ' + (ok ? 'ok' : 'miss') + '" id="fb" tabindex="-1" role="status"><b>' + (ok ? 'Correct' : 'Not quite') + '</b>' + (ok ? '' : 'The answer is ' + letter(q.a) + '. ') + esc(q.why) + '</div>'; }
+      var right = C.checked ? '<button class="btn primary" type="button" data-chk="next">' + (C.idx + 1 < n ? 'Next question' : 'See how it went') + ' ›</button>' : '<button class="btn primary" type="button" data-chk="check"' + (pick === undefined ? ' disabled' : '') + '>Check answer</button>';
+      return h + foot(true, right) + '</section>';
+    }
+    var score = CHECK.filter(function (q, i) { return C.picks[i] === q.a; }).length, pct = Math.round(score / n * 100);
+    var missed = CHECK.filter(function (q, i) { return C.picks[i] !== q.a; });
+    var msg = score === n ? 'All clear. You are ready for the next lesson.' : (missed.length === 1 ? 'Nearly there. One idea is worth another look.' : 'A few ideas are worth another look. That is exactly what refreshers are for.');
+    var r = '<section class="card result">' + eb(I_CHECK) + '<div class="ring ' + (score === n ? '' : 'some') + '" style="--p:' + pct + '" data-label="' + score + '/' + n + '" role="img" aria-label="' + score + ' of ' + n + ' correct"></div>' +
+      '<h2 class="h" id="stepH" tabindex="-1">' + (score === n ? 'Nicely done' : 'Good start') + '</h2><p class="sub" style="margin-left:auto;margin-right:auto">' + msg + '</p>';
+    if (missed.length) {
+      r += '<div class="revisit">' + missed.map(function (q) {
+        var key = q.topic, open = !!S.open[key];
+        return '<div class="rv"><div class="top"><b>' + esc(q.topic) + '</b><span class="added">Refresher added to your path</span></div>' +
+          '<button class="linkbtn" type="button" data-refresh="' + esc(key) + '" aria-expanded="' + open + '" style="margin-top:6px">' + (open ? 'Hide the refresher' : 'Read the 20-second refresher') + '</button>' + (open ? '<p>' + esc(q.refresher) + '</p>' : '') + '</div>';
+      }).join('') + '</div>';
+    }
+    return r + foot(true, '<button class="linkbtn" type="button" data-chk="retry">Try again</button><button class="btn primary" type="button" data-go="next">Continue ›</button>') + '</section>';
+  }
+
+  function stepDone() {
+    var C = S.check, missed = CHECK.filter(function (q, i) { return C.picks[i] !== q.a; }), score = CHECK.length - missed.length;
+    var doneN = DONE_BEFORE + 1, left = (TOTAL - doneN) * 5;
+    var nodes = '<div class="mp done"><div class="c">✓</div>Lesson 2<small>Complete</small></div>';
+    if (missed.length) nodes += '<span class="mp-link"></span><div class="mp refresh"><div class="c">↻</div>Refresher<small>' + missed.length + (missed.length > 1 ? ' ideas' : ' idea') + ' · ' + Math.max(1, missed.length) + ' min</small></div>';
+    nodes += '<span class="mp-link"></span><div class="mp next"><div class="c">3</div>Exercise 1<small>Finding your audience</small></div>';
+    var P = S.plan;
+    return '<section class="card done"><svg class="badge" viewBox="0 0 112 112" aria-hidden="true"><circle cx="56" cy="56" r="50" fill="#E3F4EC"/><circle class="ring-c" cx="56" cy="56" r="48" fill="none" stroke="#1E8A5A" stroke-width="6" stroke-linecap="round" transform="rotate(-90 56 56)"/><path class="tick" d="M36 58l14 14 26-30" fill="none" stroke="#1E8A5A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+      '<h2 class="h" id="stepH" tabindex="-1">Lesson 2 complete</h2><p class="sub" style="margin-left:auto;margin-right:auto">You now have the plan the rest of the course builds on.</p>' +
+      '<div class="pill-row"><span class="pill green">' + doneN + ' of ' + TOTAL + ' lessons</span><span class="pill">About ' + left + ' min left</span><span class="pill">Check: ' + score + '/' + CHECK.length + '</span>' + (P.saved ? '<span class="pill green">Mini plan saved</span>' : '') + '</div>' +
+      '<div class="take"><h3 class="block-title" style="margin-top:0">Four things to remember</h3><ul>' + TAKEAWAYS.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul></div>' +
+      '<div class="mini-path" aria-label="Your path">' + nodes + '</div>' +
+      jen(missed.length ? 'I have added a short refresher on <b>' + esc(missed.map(function (m) { return m.topic.toLowerCase(); }).join(', ')) + '</b> to your path. You can take it now or later.' : 'Next up is a hands-on exercise: you will build a persona for <b>your own</b> business.', missed.length ? 'soft' : 'good') +
+      '<div class="upnext"><div class="t"><small>Up next</small><b>Exercise 1: Finding your audience</b><span>Exercise · 5 min · put the funnel to work</span></div><a class="btn primary lg" href="atlas-lesson-blocks-prototype.html?lesson=3">Start next lesson ›</a></div>' +
+      '<div class="foot" style="justify-content:center"><a class="linkbtn" href="atlas-course-page-prototype.html?prog=some">Back to the course</a></div></section>';
+  }
+
+  var RENDER = [stepWelcome, stepWatch, stepIdea, stepFunnel, stepObjectives, stepAudience, stepPromote, stepApply, stepCheck, stepDone];
+
+  // ---------- Render ----------
+  function render() {
+    $('#stage').innerHTML = RENDER[S.step]();
+    var card = $('#stage .card');
+    if (card && focusHeading) card.classList.add('enter');                       // slide in only when the step changes
+    if (animNew) $$('#stage .jen .say, #stage .fb, #stage .stage-detail').forEach(function (el) { el.classList.add('anim'); });
+    animNew = false;
+    var st = STEPS[S.step];
+    $('#stepList').innerHTML = STEPS.map(function (s, i) { return '<li class="' + (i < S.step ? 'done' : (i === S.step ? 'now' : '')) + '"' + (i === S.step ? ' aria-current="step"' : '') + '><i></i><span class="sr">' + s.label + '</span></li>'; }).join('');
+    $('#stepMeta').innerHTML = '<span>Step <b>' + (S.step + 1) + '</b> of ' + STEPS.length + ' · <b>' + st.label + '</b></span><span>' + (st.left ? 'About ' + st.left + ' min left' : 'Done') + '</span>';
+    var done = DONE_BEFORE + (S.step === I_DONE ? 1 : 0);
+    var ring = $('#ring'); ring.style.setProperty('--p', Math.round(done / TOTAL * 100)); ring.dataset.n = done; $('#ringText').textContent = done + ' of ' + TOTAL + ' done';
+    $('#jump').value = String(S.step);
+    document.title = st.label + ' · Lesson 2 · ATLAS Lesson Loop Prototype';
+    if (focusHeading) { var h = $('#stepH'); if (h) h.focus({ preventScroll: true }); window.scrollTo({ top: 0 }); }
+    focusHeading = true;
+  }
+  function go(step) { S.step = Math.max(0, Math.min(STEPS.length - 1, step)); render(); }
+  function inStep(animate) { focusHeading = false; animNew = !!animate; render(); }   // re-render without moving focus or scrolling
+  function focusAfter(sel) { var el = $(sel); if (el) { if (!el.hasAttribute('tabindex') && !/^(BUTTON|A|SELECT|INPUT)$/.test(el.tagName)) el.setAttribute('tabindex', '-1'); el.focus({ preventScroll: true }); } }
+
+  // Jump menu (prototype only)
+  $('#jump').innerHTML = STEPS.map(function (s, i) { return '<option value="' + i + '">' + (i + 1) + '. ' + s.label + '</option>'; }).join('');
+
+  // ---------- Events ----------
+  $('#jump').addEventListener('change', function (e) {
+    var n = +e.target.value;
+    // Fill in the earlier steps so a later step shows what a learner would have seen.
+    if (n > I_IDEA && S.p1 === null) S.p1 = 'skip';
+    if (n > I_FUNNEL && S.p2 === null) S.p2 = 'skip';
+    if (n === I_DONE && !S.check.picks.length) S.check = { idx: 0, picks: [CHECK[0].a, CHECK[1].a, CHECK[2].a, 0, CHECK[4].a], checked: true, phase: 'result' };
+    go(n);
+  });
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-toast]'); if (t) { toast(t.dataset.toast); return; }
+    if (e.target.closest('#resetBtn')) { S = fresh(); go(0); toast('Lesson reset'); return; }
+    var g = e.target.closest('[data-go]'); if (g) { go(S.step + (g.dataset.go === 'next' ? 1 : -1)); return; }
+    var sk = e.target.closest('[data-skip]'); if (sk) { if (sk.dataset.skip === 'p1') S.p1 = 'skip'; else S.p2 = 'skip'; inStep(true); return; }
+    var p = e.target.closest('[data-pick]');
+    if (p) {
+      var i = +p.dataset.pick;
+      if (S.step === I_IDEA) { S.p1 = i; inStep(true); focusAfter('.jen .say'); }
+      else if (S.step === I_CHECK) { S.check.picks[S.check.idx] = i; inStep(); focusAfter('[data-chk="check"]'); }
+      return;
+    }
+    var p2 = e.target.closest('[data-pick2]'); if (p2) { S.p2 = +p2.dataset.pick2; S.sel = 1; inStep(true); focusAfter('#detail'); return; }
+    var ex = e.target.closest('[data-explore]'); if (ex) { S.sel = +ex.dataset.explore; inStep(); focusAfter('[data-explore="' + S.sel + '"]'); return; }
+    var ob = e.target.closest('[data-obj]'); if (ob) { S.obj.checked = true; inStep(true); return; }
+    var as = e.target.closest('[data-assign]'); if (as) { var pr = as.dataset.assign.split(':'); S.aud.picks[+pr[0]] = +pr[1]; inStep(true); focusAfter('[data-assign^="' + pr[0] + ':"]'); return; }
+    var tb = e.target.closest('[data-tab]'); if (tb) { S.tab = +tb.dataset.tab; inStep(); focusAfter('[data-tab="' + S.tab + '"]'); return; }
+    var pl = e.target.closest('[data-plan]'); if (pl) { S.plan.saved = false; inStep(); focusAfter('#pWho'); return; }
+    if (e.target.closest('[data-skipapply]')) { go(S.step + 1); return; }
+    var c = e.target.closest('[data-chk]');
+    if (c) {
+      var C = S.check, a = c.dataset.chk;
+      if (a === 'check') { C.checked = true; inStep(true); focusAfter('#fb'); }
+      else if (a === 'next') { if (C.idx + 1 < CHECK.length) { C.idx++; C.checked = false; inStep(); focusAfter('#qH'); } else { C.phase = 'result'; focusHeading = true; render(); } }
+      else if (a === 'retry') { S.check = { idx: 0, picks: [], checked: false, phase: 'q' }; S.open = {}; focusHeading = true; render(); }
+      return;
+    }
+    var rf = e.target.closest('[data-refresh]'); if (rf) { var k = rf.dataset.refresh; S.open[k] = !S.open[k]; inStep(); focusAfter('[data-refresh="' + k + '"]'); }
+  });
+
+  // Matching selects update in place so keyboard focus stays on the select, and the check button enables as soon as all four are chosen.
+  document.addEventListener('change', function (e) {
+    var m = e.target.closest('[data-match]');
+    if (m) { S.obj.picks[+m.dataset.match] = m.value === '' ? null : +m.value; var b = $('[data-obj="check"]'); if (b) b.disabled = !S.obj.picks.every(function (x) { return x !== null; }); }
+  });
+  document.addEventListener('submit', function (e) {
+    if (e.target.id !== 'planForm') return;
+    e.preventDefault();
+    var f = e.target; S.plan = { who: f.who.value.trim(), stage: f.stage.value, goal: f.goal.value.trim(), measure: f.measure.value.trim(), saved: true };
+    inStep(true); focusAfter('.myplan');
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

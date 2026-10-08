@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>ATLAS Lesson Blocks Prototype</title>
+<title>ATLAS Learn</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -715,17 +715,11 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
 <!-- Prototype controls -->
 <div class="proto">
   <b>Prototype</b>
-  <div class="seg" role="group" aria-label="Lesson">
-    <button data-lesson="0" aria-pressed="true">1 · Article</button>
-    <button data-lesson="1" aria-pressed="false">2 · Video</button>
-    <button data-lesson="2" aria-pressed="false">3 · Scenario</button>
-    <button data-lesson="12" aria-pressed="false">13 · Quiz</button>
-  </div>
   <div class="seg" role="group" aria-label="Layout version">
     <button data-mode="old" aria-pressed="false">Current</button>
     <button data-mode="new" aria-pressed="true">Enhanced</button>
   </div>
-  <button class="seg" id="resetBtn" type="button" style="padding:6px 14px;font-size:13px;font-weight:500" title="Clear completed lessons and review results">Reset progress</button>
+  <button id="resetBtn" type="button" hidden style="display:none">Reset progress</button>
 </div>
 
 <header class="topbar">
@@ -898,7 +892,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
 </template>
 
 <template id="l1-old">
-  <span class="legacy-tag">Current layout (production)</span>
+  
   <p class="legacy single">In this course, you will explore how digital marketing campaigns can be used to effectively communicate with your target customers to support your business and develop your business growth. You will develop a clear and comprehensive understanding of how to develop a digital marketing campaign. You will also examine ways of promoting your content using paid, earned and owned approaches such as search engine optimization and influencer marketing. You will then learn how to measure how successful your campaign is with your customers. Are you ready to start? To complete all the exercises in this course, it will be helpful for you to gather the documentation that you currently have on your marketing and sales activities. Do not worry if this documentation is limited – this course will provide guidance on how to develop and record digital marketing strategies for your business. If you are not yet confident with your market and customers, or these are changing, you may wish to first complete one of the other 10,000 Women courses, Fundamentals of Sales and Marketing. Register with 10,000 Women As well as sharing ideas with other participants in the discussion forums, you can register with 10,000 Women today to learn from other participants and graduates. When you register with 10,000 Women, you will receive newsletters that include helpful guidance and invitations to exclusive webinars that focus on key topics to support your business growth To be eligible to register with 10,000 Women, you must identify as a woman. Register now by completing this simple form</p>
 </template>
 
@@ -915,7 +909,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
         <defs><linearGradient id="vg" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></linearGradient></defs>
         <rect width="640" height="360" fill="url(#vg)"/>
       </svg>
-      <button class="play" type="button" aria-label="Play video" data-toast="YouTube embed plays here in production"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+      <button class="play" type="button" aria-label="Play video" data-toast="Not available in this preview"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
       <div class="vmeta"><b>Developing a digital marketing campaign</b><span>Captions available</span></div>
     </div>
     <details class="disclosure" style="margin-top:14px">
@@ -988,8 +982,8 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
 </template>
 
 <template id="l2-old">
-  <span class="legacy-tag">Current layout (production)</span>
-  <div class="video" style="margin-bottom:18px"><svg class="bg" viewBox="0 0 640 360" aria-hidden="true"><rect width="640" height="360" fill="#000"/></svg><button class="play" type="button" aria-label="Play video" data-toast="Embed (as in production)"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button></div>
+  
+  <div class="video" style="margin-bottom:18px"><svg class="bg" viewBox="0 0 640 360" aria-hidden="true"><rect width="640" height="360" fill="#000"/></svg><button class="play" type="button" aria-label="Play video" data-toast="Not available in this preview"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button></div>
   <p class="legacy single">What is digital marketing? Digital marketing is everywhere, from social media ads, search engines and websites, to emails and, even, online reviews. So, what exactly is digital marketing? Digital marketing is the use of digital technologies to create integrated, targeted and measurable communications with the purpose of acquiring and retaining customers. Digital marketing is a data-driven process, which allows you to target individual customers and provide personalized and interactive content, as well as ensure that you get measurable results across multiple channels. How can we make the most of the benefits of digital marketing? Here is a list of considerations when you're deciding on how to design your digital marketing plan. 1. What are your marketing objectives? 2. Who is my audience and where are they located? 3. How do I promote the content? 4. How can I measure success? We begin with key consideration one: What are your marketing objectives? The main goal of digital marketing, is to reach customers at the moments that most influence their decisions. These moments, or touch points, can be understood through the customer journey funnel where customers begin at the wide end of the funnel with a number of potential options on their mind. As they gather more information, the number of options gradually reduce until they arrive at the conversion stage, where they potentially buy your product or sign up for your service. Finally, the post-sale phase becomes an important stage, where you'll try and retain this individual and make them a loyal customer. As a marketer, you hope to reach out to your customers at each stage of their customer journey and drive them towards the end of the funnel to become a loyal customer. [MUSIC] Take customer one, for example. They just picked up photography as a hobby. They are searching for a suitable camera. Their customer journey starts from the awareness stage. Take customer two, a camera enthusiast looking to buy a digital camera. Their customer journey can start from the consideration stage where they are debating between different cameras. Now, moving to key consideration two: Who is my audience and where are they located? Think about your own customers, what are their motivations and needs at each stage of the customer journey? What should your marketing objectives be to meet their needs? [MUSIC] Moving to key consideration three: how to promote your content. As a marketer, you'll want to be able to guide customer one and two through the funnel by addressing their needs. By providing them with a great experience at each stage, you hope to convince them to convert, and, ultimately, retain them as a loyal customer. Finally, we will discuss key consideration four: measuring success along the customer journey. While the outcomes for customer one and two are the same, you can see that their customer journeys differ. Understanding how customer motivations and needs differ, allows you to identify your objectives at each stage. You can then meet potential buyers where they are, and encourage them to convert. These are the key points to consider when creating a digital marketing plan, and you will find out more about each stage as you progress through this course.</p>
 </template>
 
@@ -1005,7 +999,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       <li>How do I promote the content?</li>
       <li>How can I measure the success of my campaign?</li>
     </ol>
-    <p class="muted" style="margin-top:16px;font-size:14.5px">In the previous video, you learned about identifying your marketing objectives. To explore this further, you can complete one of the other 10,000 Women courses: <a class="link" href="#" data-toast="Course link (as in production)">Fundamentals of Sales and Marketing</a>.</p>
+    <p class="muted" style="margin-top:16px;font-size:14.5px">In the previous video, you learned about identifying your marketing objectives. To explore this further, you can complete one of the other 10,000 Women courses: <a class="link" href="#" data-toast="Not available in this preview">Fundamentals of Sales and Marketing</a>.</p>
   </section>
 
   <section class="block" data-rail="Identify your audience" id="l3-audience">
@@ -1074,7 +1068,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     <div class="task">
       <div class="task-head">
         <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
-        <div><b>Your task: write a persona for your business</b><small>Use your customer knowledge and data. Saved in this browser only in the prototype.</small></div>
+        <div><b>Your task: write a persona for your business</b><small>Use your customer knowledge and data.</small></div>
       </div>
       <form id="personaForm" novalidate>
         <div class="field"><label for="pName">Persona name</label><small>A short label, e.g. "Weekend baker".</small><input id="pName" name="name" type="text" autocomplete="off" required></div>
@@ -1099,7 +1093,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
 <template id="l13-old"><div id="quizOld"></div></template>
 
 <template id="l3-old">
-  <span class="legacy-tag">Current layout (production)</span>
+  
   <div class="legacy">
     <p>When developing your digital marketing campaign, there are <b>four key considerations</b>:</p>
     <p><b>What are my marketing objectives?</b></p><p><b>Who is my audience and where are they located?</b></p><p><b>How do I promote the content?</b></p><p><b>How can I measure the success of my campaign?</b></p>
@@ -1128,6 +1122,16 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   </div>
 </template>
 
+<script>
+/* Keep the Current / Enhanced choice when moving between pages. */
+(function () {
+  try {
+    var p = new URLSearchParams(location.search), saved = sessionStorage.getItem('atlas-mode');
+    if (!p.get('mode') && saved) { p.set('mode', saved); history.replaceState(null, '', location.pathname + '?' + p.toString() + location.hash); }
+    document.addEventListener('click', function (e) { var b = e.target.closest && e.target.closest('[data-mode]'); if (b) sessionStorage.setItem('atlas-mode', b.dataset.mode); });
+  } catch (e) { /* storage unavailable: every page simply uses its default */ }
+})();
+</script>
 <script>
 (function () {
   'use strict';
@@ -1208,15 +1212,15 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   var reviews = {};   // enhanced review state per lesson
   var gates = {};     // production-style gate state per lesson
 
-  // localStorage can be blocked (private mode, embedded previews): keep an in-memory copy too.
+  // sessionStorage can be blocked (private mode, embedded previews): keep an in-memory copy too.
   var memory = {};
   function load(key, fallback) {
     if (key in memory) return memory[key];
-    try { var v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; }
+    try { var v = sessionStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; }
   }
   function save(key, value) {
     memory[key] = value;
-    try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* memory copy is enough */ }
+    try { sessionStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* memory copy is enough */ }
   }
   function doneMap() { return load('atlas-proto-done', {}); }
   function isDone(i) { return !!doneMap()[i]; }
@@ -1241,7 +1245,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     $('#lessonTitle span').textContent = meta.title;
     $('#lessonMeta').innerHTML = '<span class="pill">' + meta.type + '</span><span>5m</span>';
     $('#counter').textContent = (l + 1) + '/13';
-    document.title = meta.title + ' · ATLAS Lesson Blocks Prototype';
+    document.title = meta.title + ' · ATLAS Learn';
 
     $$('[data-lesson]').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.lesson === l)); });
     $$('[data-mode]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.mode === state.mode)); });
@@ -1325,13 +1329,13 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   }
 
   function goTo(i) {
-    if (!isBuilt(i)) { closeDrawer(); toast('Lesson ' + (i + 1) + ' is not part of this prototype'); return; }
+    if (!isBuilt(i)) { closeDrawer(); toast('Lesson ' + (i + 1) + ' is not available in this preview'); return; }
     state.lesson = i; render();
   }
 
   // ---------- Links to the other prototype pages ----------
-  var COURSE_PAGE = 'atlas-course-page-prototype.html';
-  var COURSES_PAGE = 'atlas-courses-prototype.html';
+  var COURSE_PAGE = 'course.html';
+  var COURSES_PAGE = 'index.html';
   // Tells the course pages how far the learner got: completed once the quiz is passed, in progress after any lesson.
   function progParam() { return isDone(QUIZ_IDX) ? 'done' : (doneCount() > 0 ? 'some' : 'none'); }
 
@@ -1351,7 +1355,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   }
 
   function advance() {
-    if (!isBuilt(state.lesson + 1)) { toast('Lesson ' + (state.lesson + 2) + ' is not part of this prototype'); return; }
+    if (!isBuilt(state.lesson + 1)) { toast('Lesson ' + (state.lesson + 2) + ' is not available in this preview'); return; }
     state.lesson++; render();
   }
 
@@ -1652,7 +1656,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       if (quizScore(quiz.answers) >= quizNeeded()) markDone(QUIZ_IDX);
     }
     else if (a === 'finish') { quiz.phase = 'complete'; focus = '#qzH'; }
-    else if (a === 'lessons') { toast('Opens the lesson list (as in production)'); return; }
+    else if (a === 'lessons') { toast('Not available in this preview'); return; }
     else if (a === 'courses') { window.location.href = COURSES_PAGE + '?prog=' + progParam(); return; }
     else if (a === 'back-course') { window.location.href = COURSE_PAGE + '?prog=' + progParam(); return; }
     renderQuiz(); renderOutline(); updateNav(); focusEl(focus);
@@ -1660,7 +1664,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   }
 
   function onNextQuiz() {
-    if (state.mode === 'old') { toast('Finish Course (as in production)'); return; }
+    if (state.mode === 'old') { toast('Not available in this preview'); return; }
     if (isDone(QUIZ_IDX)) { quizAction('finish'); return; }
     var r = $('#quizRoot'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' });
     toast('Pass the quiz to finish the course');
@@ -1669,7 +1673,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   // ---- Current (production) quiz: all questions on one page, one Submit button, score only ----
   function renderQuizOld() {
     var root = $('#quizOld'); if (!root) return;
-    var n = FINAL_QUIZ.length, h = '<span class="legacy-tag">Current layout (production)</span><div class="gate-old" style="margin:0;padding:0">';
+    var n = FINAL_QUIZ.length, h = '<div class="gate-old" style="margin:0;padding:0">';
     FINAL_QUIZ.forEach(function (q, i) {
       h += '<p class="q"><b>Q' + (i + 1) + '.</b> ' + esc(q.scenario) + '</p>';
       if (q.persona) {
@@ -1826,7 +1830,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   });
   $('#prevBtn').addEventListener('click', function () {
     if (state.lesson > 0 && isBuilt(state.lesson - 1)) { state.lesson--; render(); }
-    else if (state.lesson > 0) toast('Lesson ' + state.lesson + ' is not part of this prototype');
+    else if (state.lesson > 0) toast('Lesson ' + state.lesson + ' is not available in this preview');
   });
   $('#nextBtn').addEventListener('click', onNext);
   $('#backBtn').addEventListener('click', function () { window.location.href = COURSE_PAGE + '?prog=' + progParam(); });
@@ -1897,7 +1901,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     if (a === 'back') { fund.step = 'check'; renderFund(); return; }
     if (a === 'start') { setFundStatus('started'); fund.step = 'started'; renderFund(); $('#fundTitle').focus(); return; }
     if (a === 'remove') { setFundStatus(null); d.close(); toast('Removed from your plan.'); return; }
-    if (a === 'resume') { toast('Opens the course (as in production)'); return; }
+    if (a === 'resume') { toast('Not available in this preview'); return; }
     if (a === 'ready') { setFundStatus('ready'); d.close(); toast('Great. Enjoy the course.'); return; }
     if (a === 'skip') { setFundStatus('skipped'); d.close(); }
   }
@@ -1968,8 +1972,8 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     if (a === 'close') { d.close(); return; }
     if (a === 'next' && reg.eligible) { reg.step = 'form'; renderReg(); $('#rName').focus(); return; }
     if (a === 'back') { reg.step = 'intro'; renderReg(); return; }
-    if (a === 'forums') { toast('Opens the forums (as in production)'); return; }
-    if (a === 'webinars') { toast('Opens the webinars (as in production)'); }
+    if (a === 'forums') { toast('Not available in this preview'); return; }
+    if (a === 'webinars') { toast('Not available in this preview'); }
   }
   function regSubmit() {
     var v = reg.values, er = {};
@@ -2177,7 +2181,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   }
 
   function openPanel(tab) {
-    if (state.mode !== 'new') { toast('Learning assistant opens here (as in production)'); return; }
+    if (state.mode !== 'new') { toast('Not available in this preview'); return; }
     JEN.open = true; document.body.classList.add('jen-open'); $('#jenPanel').inert = false;
     setPanelTab(tab || 'jen');
     setTimeout(function () {
@@ -2377,19 +2381,19 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', on ? 'Remove bookmark from this lesson' : 'Bookmark this lesson');
   }
   $('#shareBtn').addEventListener('click', function () {
-    if (state.mode === 'old') { toast('Share (as in production)'); return; }
+    if (state.mode === 'old') { toast('Not available in this preview'); return; }
     var url = window.location.href.split('#')[0].split('?')[0] + '?lesson=' + (state.lesson + 1);
     var done = function () { toast('Link to this lesson copied'); }, fail = function () { toast('Copy the link from the address bar'); };
     try { navigator.clipboard.writeText(url).then(done, fail); } catch (e) { fail(); }
   });
   $('#bookmarkBtn').addEventListener('click', function () {
-    if (state.mode === 'old') { toast('Bookmark (as in production)'); return; }
+    if (state.mode === 'old') { toast('Not available in this preview'); return; }
     var m = bookmarks(); if (m[state.lesson]) delete m[state.lesson]; else m[state.lesson] = true;
     save(KEY_MARKS, m); renderRail(); renderOutline(); jenRefresh();
     toast(m[state.lesson] ? 'Lesson bookmarked' : 'Bookmark removed');
   });
   $('#notesRail').addEventListener('click', function () {
-    if (state.mode === 'old') { toast('Notes (as in production)'); return; }
+    if (state.mode === 'old') { toast('Not available in this preview'); return; }
     if (JEN.open && JEN.tab === 'notes') closeJen(); else openPanel('notes');
   });
 
@@ -2533,7 +2537,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   $('#discInput').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('#discForm').requestSubmit(); } });
   $('#discForm').addEventListener('click', function (e) { var k = e.target.closest('[data-dkind]'); if (k) { DISC.kind = k.dataset.dkind; renderDisc(); $('#discInput').focus(); } });
   $('#discRail').addEventListener('click', function () {
-    if (state.mode === 'old') { toast('Comments (as in production)'); return; }
+    if (state.mode === 'old') { toast('Not available in this preview'); return; }
     if (JEN.open && JEN.tab === 'disc') closeJen(); else openPanel('disc');
   });
 
