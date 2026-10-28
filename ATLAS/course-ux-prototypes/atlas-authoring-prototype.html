@@ -1170,8 +1170,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   function renderPv() {
     var l = cur();
     $('#pvBody').innerHTML = '<div class="pvh"><span id="pvTitle" tabindex="-1">Learner preview</span><span class="sp"></span><div class="seg" role="group" aria-label="Device"><button type="button" data-dev="desktop" aria-pressed="' + (P.device === 'desktop') + '">Desktop</button><button type="button" data-dev="phone" aria-pressed="' + (P.device === 'phone') + '">Phone</button></div><button class="ico" type="button" data-act="pvclose" aria-label="Close preview">✕</button></div>' +
-      '<div class="pvs" id="pvs"><div class="pvf ' + (P.device === 'phone' ? 'phone' : '') + '" id="pvf">' + previewHtml(l) + '</div></div>' +
-      (idx(l) <= 2 ? '<div style="padding:10px 14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--muted)">Want the real thing? <a href="atlas-lesson-blocks-prototype.html?lesson=' + (idx(l) + 1) + '" target="_blank" rel="noopener">Open this lesson in the learner prototype</a></div>' : '');
+      '<div class="pvs" id="pvs"><div class="pvf ' + (P.device === 'phone' ? 'phone' : '') + '" id="pvf">' + previewHtml(l) + '</div></div>';
   }
 
   // The production editor, kept for comparison

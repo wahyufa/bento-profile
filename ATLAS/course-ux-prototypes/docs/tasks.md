@@ -322,3 +322,4 @@ Update (authoring prototype, round 12: Summary removed)
 Update (authoring prototype, round 13: objectives list removed from Details)
 - [x] Removed the separate "What learners will be able to do" list (not in production). The objectives text is back inside Description, as in production. Removed its check; the Learning Objectives tab banner now only says competencies are separate from the Description
 - [ ] The learner course page prototype still shows objectives as a checklist from sample data; how production builds it from the Description was not checked
+- [x] Removed the "Open this lesson in the learner prototype" link from the learner preview dialog
