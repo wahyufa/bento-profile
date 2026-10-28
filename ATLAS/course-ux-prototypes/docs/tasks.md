@@ -143,3 +143,150 @@ Reference: https://demo.atlaslearn.ai (Digital Marketing Strategy course).
 - Review questions: lesson 1 copied from production; lessons 2 and 3 are samples written from the lesson text.
 - Are lessons meant to be freely navigable from the outline (as in prototype), or sequential/locked?
 - Does a failed review generate new questions in production, or repeat them? Prototype repeats them.
+
+## Authoring (admin) prototype: `atlas-authoring-prototype.html`
+Done
+- [x] Read-only review of production admin (Digital Marketing): Details, Content, Learning Objectives, Knowledge Mapping, quiz editor. Nothing saved, generated, unpublished or archived.
+- [x] Prototype with Current (replica of production editor) vs Enhanced toggle
+- [x] Block-based lesson editor for all 12 learner blocks, with live learner preview (desktop/phone), reorder (buttons + drag), duplicate, delete
+- [x] AI generator flow (source, options, outline review, insert as "AI draft" that must be approved). Rule-based sample: restructures, never rewrites
+- [x] "Convert remaining lessons" bulk flow, lessons 1-3 pre-converted
+- [x] Pre-publish checks per lesson (blockers vs suggestions, with one-click fixes)
+- [x] Quiz editor: explicit "Correct" marking, "Answer not confirmed" state, answer check vs scenario, explanations
+- [x] Duration estimated from content; course duration can be calculated from lessons (fixes 180 vs 65)
+- [x] Jen settings (chips, terms), discussion starter, check-yourself mode (AI / authored / off)
+
+Findings from production admin
+- Quiz: radio group preselects option A for every question; nothing shows whether it was chosen on purpose. Likely cause of the A,A,A,A key.
+- One rich-text blob per lesson; "Generate Learning Materials" only on some lessons; Knowledge Mapping is "No mappings" for all 13 lessons.
+- Learning Objectives lists hundreds of duplicate custom competencies (many repeated titles).
+- Course description holds the learning objectives as plain text.
+
+Next / open
+- [ ] Stakeholder feedback on authoring prototype
+- [ ] Decide whether generated blocks are stored as structured JSON (needed for the learner blocks) or rendered back to HTML
+- [ ] Knowledge Mapping and Learning Objectives tabs are not redesigned
+- [ ] Link the authoring prototype from index.html (not done, not requested)
+- [ ] Save/Publish are simulated; state is kept in localStorage only
+
+Update (authoring prototype, round 2)
+- [x] Removed the permanent preview column; one "Preview as learner" button in the header opens it in a dialog (desktop/phone)
+- [x] Learning Objectives redesigned: search, All/Skills Framework/Custom filter, repeated custom names grouped with a count, selected panel, suggestions from lesson text (with the lessons they come from), target job roles
+- [x] Knowledge Mapping redesigned: lessons list with coverage, per-lesson attached sources, suggestions (single lesson or all, nothing attached until added), browse and search
+- [ ] Knowledge Base sources in the prototype are invented samples; production Knowledge Base picker was not opened
+- [ ] Custom competency list is a sample of production; Learning Objectives starts empty (production selection state not verified)
+
+Update (authoring prototype, round 3: production parity)
+- [x] Editor uses the full width (right column removed)
+- [x] Resources per lesson ("Upload Resource" in production): upload, rename, remove; shown in the learner preview. Files are not stored in the prototype; only .txt is readable
+- [x] "Generate learning materials" is one dialog with three kinds: Lesson blocks, Quiz questions, Flashcards. Sources: lesson text, uploaded .txt, whole course, pasted text, video transcript
+- [x] Generated quiz questions are never confirmed: suggested answer only, correct position spread over A-D, must be confirmed by the author
+- [x] New Flashcards block in the editor and in the learner prototype (lesson 2: flip, "Still learning" / "I know this", review the missed ones)
+- [x] Learner prototype lesson 3 has a Resources section (sample files); clean build regenerated
+- [ ] Generators are rule-based samples (no language model), so question and card quality is only indicative
+- [ ] Production's "Generate Learning Materials" options were described by the user, not opened; confirm the real flashcards/quiz flow
+- [ ] Sample files, flashcards and resource names are invented, not from production
+
+Update (authoring prototype, round 4: Details tab)
+- [x] Details tab redesigned: About (title, summary with counter, description, learner-facing objectives as a list), Cover image (change, reposition with sliders, AI generate with 3 options), Level/duration/industry, Linked assessments (link/unlink, relevance check against lesson content)
+- [x] Right column: live course card and course-page crop, plus "Before publishing" checks (summary length, industry, duration vs lessons, competencies, assessment relevance)
+- [x] Removed the "Adaptive" toggle I had added earlier; it is not a field in production
+- [ ] Assessment titles are samples; the two linked ones are chosen to show the relevance check (production titles not copied, and production showed two unrelated published assessments)
+- [ ] AI cover generation is simulated with colour covers
+- [ ] Industry list is a sample; production list not inspected. Summary field is new (production has description only)
+
+Update (authoring prototype, round 5: Module > Lesson)
+- [x] Structure is now Module > Lesson, like production: add / delete / reorder modules (delete asks to confirm and removes its lessons), add lesson per module (goes before the module's quiz)
+- [x] Lessons can be deleted (confirm), moved up/down inside a module, and moved to another module from the lesson header
+- [x] Knowledge Mapping groups lessons by module; Current replica shows one card per module; progress counts only non-quiz lessons
+- [ ] Not in the prototype: drag-and-drop of lessons between modules (buttons and the module select do it instead)
+- [ ] The learner prototypes still show a single module; multi-module outline/path is not designed
+
+Update (authoring prototype, round 6: course list and empty course)
+- [x] Course list page (/admin/courses): title, Import SCORM, Create Course, All/Published/Draft tabs with counts, Trash, search, level filter, ownership chips, cards. Current = production layout; Enhanced adds summary, modules/lessons count and a "Ready / N to look at" chip
+- [x] Create Course dialog (title + start empty or generate an outline), creates a draft that opens on the Content tab
+- [x] Empty course: guided empty state in Content, empty states in Knowledge Mapping and Details checks, Publish blocked until there is a lesson
+- [x] Outline generator (topic or pasted notes): proposes modules and lessons, rename/untick, creates empty lessons; the Quiz lesson is created with zero questions and flagged
+- [x] Publishing a draft changes its status to Published in the list; the app starts on the course list; ?screen=new opens an empty course directly
+- [ ] Production's Create Course screen and Import SCORM were not opened (could create records); both are designed, not copied
+- [ ] Prototype holds one new course at a time; Time Management Essentials is shown in the list but not editable
+- [ ] The outline generator is rule-based (a standard 3-module structure or the pasted headings), not a language model
+
+Update (authoring prototype, round 7: status tooltips)
+- [x] Tooltips (hover and keyboard focus) on every status chip: lesson status (Empty, Rich text, AI draft, N to fix, N to confirm, Ready), Blocked/Ready on the lesson checks, Draft/Published/Version/Unsaved in the header, "Before publishing", and the course list chips. "Fix 1" is now "1 to fix" and the tooltip lists what to fix
+- [x] Fixed: empty lessons were counted as "built from blocks" (and "All lessons are built from blocks" showed). They now show "Empty" and are counted as still empty
+- [ ] Tooltips need a hover or focus, so they are not shown on touch screens
+
+## Learner dashboard: `atlas-dashboard-prototype.html` (new file; other files unchanged)
+Findings from production (`/dashboard`, account "Vin", read only; the welcome modal was not dismissed)
+- Shows the brand-new-learner page ("Your learning journey starts here", "Start your first course") although Time Management Essentials is 100% complete and Digital Marketing Strategy is enrolled
+- "Your progress: 0 / 0 knowledge points" although PALS shows Hospitality 101 with 19 knowledge points and "Up next: Market Trend Analysis"
+- No "continue" on the dashboard; the next lesson and the PALS next step live on other pages
+- Duplicate links: Courses, Psychometric and Performance each twice; "Evaluate My Skills" and "View All" both go to /performance
+- Performance says "No PALS courses assigned yet" while PALS has Hospitality 101
+- A "Welcome to ATLAS" modal opens after signing in; content is the same as the August dashboard explorations
+
+Done
+- [x] Current (production replica incl. welcome modal and the findings) vs Enhanced; states New learner / Learning / All done; `?prog=none|some|done&mode=old|new`
+- [x] Learning: greeting with a one-line status, small streak; Continue card (Digital Marketing lesson 5, matches the course page "in progress" sample) with PALS "Market Trend Analysis" as the second option; "For today" (refresher from the lesson loop, daily practice that runs inline, a facilitator reply); Your courses (in progress first); This week (days, minutes, lessons; XP and badges as a small line); From your lessons (note, highlight, bookmark); Learning Hub without duplicates, Performance and Leaderboard as links
+- [x] New learner: one first step (start the assigned course), "How learning works here" (lessons + refreshers, adaptive path, CBL), psychometric as an optional dashed card, empty states that say what will appear
+- [x] All done: completion banner, PALS as the way to keep going, today and courses still available
+- [x] Links: Courses -> courses prototype, Continue / Start -> course page, refresher -> loop lesson, reply -> lesson 2, note -> lesson 3; PALS, CBL, Assessments, Performance show "not part of the prototype"
+
+Next / open
+- [ ] Link the dashboard from the other prototypes' "Dashboard" menu and from index.html (left out so existing files stay untouched)
+- [ ] Samples, not production: week chart, minutes, streak length, XP/badge numbers, the facilitator reply, the note, the daily-practice questions
+- [ ] Decide how much of streak / XP / badges / leaderboard to show (prototype: small streak, the rest secondary)
+- [ ] "Continue lesson" goes to the course page because lessons 4-12 are not built
+- [ ] PALS, CBL and Assessments pages are not prototyped; the dashboard only links to them
+
+## New-learner welcome: `atlas-welcome-prototype.html` (new file; replaces the "New learner" dashboard state as a concept)
+Why: feedback that the new-learner dashboard was not appealing or motivating and looked like generic AI output.
+- [x] Warm editorial look from the design-inspiration references (off-white, greige surfaces, black pill buttons, large light headline, organic gradient cards with grain); gradient colours taken from the ATLAS logo
+- [x] Headline is a sentence the learner completes ("I run [a small bakery] and I want to [find more customers online]"); real selects styled as words, sized to the chosen word; everything below adapts (promise, demo question, role-play, Jen, plan)
+- [x] Try-it stage with three tabs instead of feature cards: Learn (a 30-second funnel guess from lesson 2), Practise (CBL-style reply on a gradient), Your plan (the plan the learner ends up with; trying the other tabs fills lines)
+- [x] Jen as a conversation in progress; "Your first week" (five 5-minute days) with a reminder choice; closing call to action; "Skip to dashboard"
+- [x] Start lesson 1 -> lesson prototype lesson 1; Skip / Look around -> dashboard prototype (New learner)
+- [x] Checked at 1280px and 375px (no overflow for any business/goal combination; headline scales on phones because a select cannot wrap)
+
+Open
+- [ ] Type change: Inter Tight / Inter instead of ATLAS's Montserrat, to match the references. Confirm with brand, or switch back
+- [ ] Business types, goals, customer/where/rival lines, the role-play and the plan slots are samples; the "plan" idea assumes learners run a business (true for the 10,000 Women course, not for every ATLAS course)
+- [ ] Reminder choice is not stored anywhere real; there is no settings page
+- [ ] Decide whether this replaces the New learner dashboard or runs once before it (first visit only)
+
+## New-learner onboarding (cinematic) — `atlas-onboarding-prototype.html`
+Replaces the direction of `atlas-welcome-prototype.html`, which felt worse: too busy, generic SaaS styling, not ATLAS.
+- [x] Four full-screen moments, one action each: Hello → one question (goal) → try it (drag a customer into the funnel, from lesson 2) → the path (13 production lessons as 4 stops) → straight into lesson 1. No dashboard in between.
+- [x] ATLAS brand back: Montserrat, navy/teal, real logo; the three logo colours are the motion motif (rising lines, funnel, path).
+- [x] Skip to dashboard, Back, Enter/arrow keys, reduced-motion support, `?step=1..4` deep links, Restart in the prototype bar.
+- [x] Current mode = the production "Welcome to ATLAS" modal.
+- [x] Tested at 1280px and 375px (path becomes a vertical list on phones); no console errors.
+- [ ] Decide: show once on first sign-in, then the dashboard (recommended), or keep it re-openable.
+- [ ] Goal options, personas (Sari/Budi/Dewi) and lesson pointers are sample copy, to check with the content team.
+- [ ] Decide whether to keep or retire `atlas-welcome-prototype.html` (left untouched).
+
+## Learner home (dashboard redesign) — `atlas-home-prototype.html`
+Same visual language as the onboarding. `atlas-dashboard-prototype.html` is left untouched; its Current mode is linked from the toggle.
+- [x] Navy hero with one next step (big lesson title + Continue) and the course path: 13 lesson dots on the curve, grouped into the onboarding's four stops, "You are here" marker.
+- [x] Goal picked in onboarding is read back ("Your campaign plan to … · 31% there"); PALS "also in progress" in one line.
+- [x] Below the hero only three blocks: For today (2 items), Your courses (each with a mini path), Explore ATLAS (Learning Hub without duplicates).
+- [x] States: Just started / Learning / All done (`?prog=start|some|done`). Onboarding "Skip to dashboard" now opens this page.
+- [x] Tested at 1280px and 375px, no overflow or console errors.
+- [ ] Removed vs the old dashboard: This week chart, From your lessons, inline daily practice, streak/XP. Confirm none of these is a must-have.
+- [ ] Facilitator name (Aisha), reply text and goal copy are samples.
+
+## Dashboard, light touch — `atlas-dashboard-lite-prototype.html`
+Requested after the home redesign felt like too much change: keep production's sections, order and styling; fix only the content. Built from `atlas-dashboard-prototype.html` (its Current mode is unchanged).
+- [x] Greeting subtitle per state ("You are 4 of 13 lessons into …").
+- [x] "Get started" stays for new learners (button now starts the course directly); becomes "Continue learning" (lesson 5 + PALS next, with progress bars) once started.
+- [x] "What happens next" keeps its three rows; locked rows say when they unlock, unlocked rows ("Ready for you") get actions: Open review, inline daily practice, See badges.
+- [x] Your progress shows real numbers (lessons completed, 0/19 PALS knowledge points, streak); badges + leaderboard in one line.
+- [x] Learning Hub: 6 → 5 cards ("Evaluate My Skills" duplicate removed), each with a status line.
+- [x] Welcome modal only for new learners, one action ("Start the course").
+- [x] Tested at 1280px and 375px, no overflow or console errors.
+- [x] Illustrations: 6 images generated with gpt-image-2 on Replicate (quality medium, 3:2, ATLAS palette) into `assets/illustrations/` (courses, pals, assessments, cbl, psychometric, welcome). Used on the Learning Hub cards and the new-learner welcome modal. Token lives in `D:\Claude\bento-profile\.env` (git-ignored).`n- [ ] Illustrations are referenced by relative path, so the `assets/` folder must travel with the HTML when shared.
+- [ ] Decide which dashboard direction goes to stakeholders: light touch (this), the earlier enhanced dashboard, or the home redesign.
+- [x] Feedback round: "Evaluate My Skills" restored as its own Learning Hub card (6 cards again, own illustration `evaluate.webp`). Removing it was my call, not a confirmed duplicate.
+- [x] Feedback round: the empty right side of the greeting band now holds the progress panel (course ring, last-7-days streak strip, lessons / knowledge points / badges, links to Performance and Leaderboard). The separate "Your progress" section below was removed so the numbers are not shown twice.
+- [ ] Check with product what "Evaluate My Skills" opens in production vs "Assessments", to write distinct descriptions.

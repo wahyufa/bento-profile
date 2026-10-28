@@ -305,6 +305,30 @@ details.disclosure .inner h4 { color: var(--ink); font-size: 14px; margin: 18px 
 .field textarea { min-height: 84px; resize: vertical; }
 .field input:focus, .field textarea:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px var(--primary-soft); }
 .task-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+
+/* Flashcards */
+.fc-meta { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--muted); margin-bottom: 10px; }
+.fc-card { display: grid; align-content: center; justify-items: center; gap: 8px; width: 100%; min-height: 190px; padding: 26px 28px; border: 2px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); text-align: center; cursor: pointer; font: inherit; color: inherit; transition: background .2s, border-color .2s; }
+.fc-card:hover { border-color: var(--primary); }
+.fc-card small { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--primary); }
+.fc-card b { font-size: 19px; line-height: 1.45; font-weight: 600; }
+.fc-card .fc-hint { font-size: 13px; color: var(--muted); }
+.fc-card.flip { background: var(--primary-soft); border-color: var(--primary); }
+.fc-card.flip b { font-weight: 500; font-size: 17px; }
+.fc-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 14px; min-height: 44px; align-items: center; }
+.fc-done { text-align: center; padding: 26px 20px; border: 2px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.fc-done b { display: block; font-size: 20px; margin-bottom: 4px; }
+.fc-done .fc-actions { margin-top: 16px; }
+@media (prefers-reduced-motion: reduce) { .fc-card { transition: none; } }
+
+/* Resources */
+.res { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.res li { display: flex; align-items: center; gap: 14px; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.res li > div { flex: 1; min-width: 0; }
+.res b { display: block; font-size: 15.5px; line-height: 1.35; }
+.res small { color: var(--muted); font-size: 13px; }
+.res-ic { flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--primary-soft); color: var(--primary-ink); display: grid; place-items: center; font-weight: 700; font-size: 12px; letter-spacing: .04em; }
+@media (max-width: 520px) { .res li { flex-wrap: wrap; } .res li .btn { width: 100%; } }
 .saved { margin-top: 18px; display: grid; gap: 14px; }
 .saved .persona header { background: var(--green-soft); }
 .saved .persona header .av { background: var(--green); }
@@ -985,6 +1009,13 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     </div>
     <p class="muted" style="margin-top:14px;font-size:14.5px">You will find out more about each stage as you progress through this course.</p>
   </section>
+
+  <!-- Sample flashcards written from this lesson's text (not in production) -->
+  <section class="block" data-rail="Flashcards" id="l2-cards">
+    <h2 class="block-title">Test yourself</h2>
+    <p class="muted" style="margin-bottom:14px">Tap a card to flip it, then mark whether you know it.</p>
+    <div class="fc" id="fcRoot"></div>
+  </section>
 </template>
 
 <template id="l2-old">
@@ -1089,6 +1120,15 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       </form>
     </div>
     <div class="saved" id="savedList" aria-label="Your personas"></div>
+  </section>
+
+  <!-- Sample files: production lessons can attach files through "Upload Resource" -->
+  <section class="block" data-rail="Resources" id="l3-res">
+    <h2 class="block-title">Resources</h2>
+    <ul class="res">
+      <li><span class="res-ic" aria-hidden="true">DOC</span><div><b>Customer Journey Plan</b><small>Word document · 84 KB</small></div><button class="btn" type="button" data-res="Customer Journey Plan">Download</button></li>
+      <li><span class="res-ic" aria-hidden="true">PDF</span><div><b>Marketing persona template</b><small>PDF · 120 KB</small></div><button class="btn" type="button" data-res="Marketing persona template">Download</button></li>
+    </ul>
   </section>
 </template>
 
@@ -1728,9 +1768,48 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     $$('[data-persist]').forEach(function (c) { c.checked = !!load(c.dataset.persist, false); });
     if ($('#funnel')) showStage(0);
     if ($('#personaForm')) renderPersonas();
+    renderFlash();
     renderFundCard();
     renderCommunity();
   }
+
+  // Flashcards (lesson 2). Progress is kept so a learner can come back to the cards they missed.
+  var FLASH = [
+    ['What is digital marketing?', 'The use of digital technologies to create integrated, targeted and measurable communications with the purpose of acquiring and retaining customers.'],
+    ['What are the four stages of the customer journey funnel?', 'Awareness, consideration, conversion and post-sale (loyalty).'],
+    ['Customer 1 has just picked up photography as a hobby. Which stage does their journey start at?', 'Awareness. They are searching for a suitable camera.'],
+    ['What do you try to do at the post-sale stage?', 'Retain the customer and make them loyal.']
+  ];
+  function fcState() { return load('atlas-proto-flash', null) || { deck: FLASH.map(function (_, i) { return i; }), p: 0, flip: false, known: {}, done: false }; }
+  function renderFlash(focusCard) {
+    var root = $('#fcRoot'); if (!root) return;
+    var s = fcState(), knownN = Object.keys(s.known).filter(function (k) { return s.known[k]; }).length;
+    if (s.done) {
+      var missed = FLASH.length - knownN;
+      root.innerHTML = '<div class="fc-done" role="status"><b>You know ' + knownN + ' of ' + FLASH.length + '</b>' + (missed ? 'Go back over the ' + missed + ' you marked as still learning.' : 'Nice. You know every card.') + '<div class="fc-actions">' + (missed ? '<button class="btn primary" type="button" data-fc="missed">Review the ' + missed + ' I missed</button>' : '') + '<button class="btn" type="button" data-fc="restart">Start again</button></div></div>';
+      var f = root.querySelector('button'); if (f && focusCard) f.focus();
+      return;
+    }
+    var c = FLASH[s.deck[s.p]];
+    root.innerHTML = '<div class="fc-meta"><span>Card ' + (s.p + 1) + ' of ' + s.deck.length + '</span><span>' + knownN + ' known</span></div>' +
+      '<button class="fc-card' + (s.flip ? ' flip' : '') + '" type="button" data-fc="flip" aria-label="' + (s.flip ? 'Answer shown. Tap to see the question again' : 'Question shown. Tap to see the answer') + '"><small>' + (s.flip ? 'Answer' : 'Question') + '</small><b>' + esc(s.flip ? c[1] : c[0]) + '</b><span class="fc-hint">' + (s.flip ? '' : 'Tap to flip') + '</span></button>' +
+      '<div class="fc-actions">' + (s.flip ? '<button class="btn" type="button" data-fc="again">Still learning</button><button class="btn primary" type="button" data-fc="know">I know this</button>' : '<span class="muted" style="font-size:14px">Flip the card, then mark it.</span>') + '</div>';
+    if (focusCard) { var card = root.querySelector('.fc-card'); if (card) card.focus({ preventScroll: true }); }
+  }
+  function flashAct(a) {
+    var s = fcState(), cur = s.deck[s.p];
+    function next() { s.p++; s.flip = false; if (s.p >= s.deck.length) s.done = true; }
+    if (a === 'flip') s.flip = !s.flip;
+    else if (a === 'know') { s.known[cur] = true; next(); }
+    else if (a === 'again') { s.known[cur] = false; next(); }
+    else if (a === 'missed') { s.deck = FLASH.map(function (_, i) { return i; }).filter(function (i) { return !s.known[i]; }); s.p = 0; s.flip = false; s.done = false; }
+    else if (a === 'restart') s = { deck: FLASH.map(function (_, i) { return i; }), p: 0, flip: false, known: {}, done: false };
+    save('atlas-proto-flash', s); renderFlash(true);
+  }
+  document.addEventListener('click', function (e) {
+    var f = e.target.closest('[data-fc]'); if (f) { flashAct(f.dataset.fc); return; }
+    var r = e.target.closest('[data-res]'); if (r) toast(r.dataset.res + ' download is not part of this prototype');
+  });
 
   function renderPersonas() {
     var list = $('#savedList'), data = load('atlas-proto-personas', []);
