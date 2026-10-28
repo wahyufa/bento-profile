@@ -104,7 +104,8 @@ button { cursor: pointer; }
 .tabs button[aria-selected="true"] { background: #fff; font-weight: 600; box-shadow: 0 1px 2px rgba(23,26,38,.08); }
 
 /* ---------- Content tab: structure | editor | preview ---------- */
-.cw { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 20px; align-items: start; }
+.cw { display: grid; grid-template-columns: 290px minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+.eside { display: grid; gap: 12px; position: sticky; top: calc(var(--proto-h) + 16px); max-height: calc(100vh - var(--proto-h) - 32px); overflow: auto; padding-bottom: 4px; }
 .cv { position: relative; overflow: hidden; background: var(--primary-soft); display: grid; place-items: center; color: #fff; font-weight: 700; text-align: center; }
 .cv img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .cv span { padding: 0 14px; font-size: 15px; line-height: 1.3; text-shadow: 0 1px 6px rgba(0,0,0,.3); }
@@ -266,6 +267,8 @@ label.btn:focus-within { outline: 3px solid var(--primary); outline-offset: 2px;
 .ls .n { font-size: 12px; color: var(--muted); font-weight: 600; padding-top: 1px; }
 .ls .t { font-size: 13.5px; font-weight: 500; line-height: 1.35; display: block; }
 .ls .s { display: flex; flex-wrap: wrap; gap: 4px 6px; margin-top: 3px; align-items: center; font-size: 12px; color: var(--muted); }
+.sfoot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; padding-top: 16px; border-top: 1px solid var(--line); }
+.sfoot .mini { width: 100%; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; font-size: 11.5px; }
 .st .add { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
 
 .ed { display: grid; gap: 14px; min-width: 0; }
@@ -495,6 +498,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
 .only-narrow { display: none; }
 @media (max-width: 1360px) {
   .cw { grid-template-columns: 250px minmax(0, 1fr); }
+  .eside { grid-column: 2; position: static; max-height: none; overflow: visible; }
   .pvw { display: none; position: static; max-height: none; }
   .cw.show-pv .pvw { display: flex; grid-column: 1 / -1; }
   .cw.show-pv .ed { display: none; }
@@ -749,14 +753,12 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   }
   var STARTERS = { 0: 'What is one thing you hope to change in your marketing after this course?', 1: 'Which stage of the funnel are most of your customers in today?', 2: 'Share the first persona you wrote. What does your customer want most?' };
 
-  // Title, description (without the objectives text) and difficulty are from production; the summary is a sample.
+  // Title, description (it includes the learning objectives text) and difficulty are from production.
   // Industry is empty in production. The two linked assessments are samples chosen to show the relevance check.
   function detailsSeed() {
     return {
       title: 'Digital Marketing Strategy',
-      summary: 'Plan a digital marketing campaign, promote it with paid, earned and owned media, and measure how well it works.',
-      description: 'In this course, you will consider what is needed in an effective digital marketing campaign. You will develop a practical understanding of planning a digital marketing campaign and how to use paid, earned and owned media approaches within a campaign. By the end of this course, you will be able to effectively plan and measure digital marketing approaches in your business opportunities.',
-      objectives: ['Develop an understanding of paid, earned and owned approaches.', 'Explore digital marketing approaches and how these can support your business.', 'Evaluate digital marketing approaches with a focus on social media campaigns.', 'Develop transferable skills, helping you to create your own digital media campaign.'],
+      description: 'In this course, you will consider what is needed in an effective digital marketing campaign. You will develop a practical understanding of planning a digital marketing campaign and how to use paid, earned and owned media approaches within a campaign. By the end of this course, you will be able to effectively plan and measure digital marketing approaches in your business opportunities. Learning Objectives: Develop an understanding of paid, earned and owned approaches. Explore digital marketing approaches and how these can support your business. Evaluate digital marketing approaches with a focus on social media campaigns. Develop transferable skills, helping you to create your own digital media campaign.',
       difficulty: 'Beginner', industry: [], linked: ['a1', 'a2'],
       cover: { type: 'image', src: 'assets/course-cover.jpg', x: 50, y: 50 }
     };
@@ -1138,18 +1140,27 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
       '<div style="margin-top:10px"><label class="btn sm" style="cursor:pointer">+ Upload resource<input type="file" multiple data-resup="1" class="sr"></label></div></div></details>';
   }
 
+  // Below the lesson: grow the course without going back to the left panel
+  function structureFooter(l) {
+    return '<div class="sfoot"><span class="mini">Course structure</span><button class="btn" type="button" data-act="addlesson" data-m="' + l.mod + '">+ Add lesson to ' + esc(modById(l.mod).title) + '</button><button class="btn" type="button" data-act="addmodule">+ Add module</button></div>';
+  }
   function editor(l) {
     var h = lessonHeader(l);
     if (l.quiz) {
       h += '<div class="card" style="padding:14px 16px"><div class="row2"><div class="fld" style="margin:0"><label class="lbl" for="qp">Passing score (%)</label><input id="qp" class="in" type="number" min="0" max="100" value="' + l.quiz.pass + '" data-qp="1"><p class="hint">' + Math.ceil(l.quiz.questions.length * l.quiz.pass / 100) + ' of ' + l.quiz.questions.length + ' correct to pass</p></div><div style="display:flex;align-items:flex-end;justify-content:flex-end"><button class="btn ai" type="button" data-act="qcheck">✦ Check answers against the scenarios</button></div></div></div>' +
-        qEditor(l.quiz.questions, 'quiz', true, l) + '<button class="btn" type="button" data-act="qadd" data-prefix="quiz" style="justify-self:start">+ Add question</button> <button class="btn ai" type="button" data-act="genq" style="justify-self:start">✦ Generate questions</button>' + settingsLite(l) + qualityCard(l);
+        qEditor(l.quiz.questions, 'quiz', true, l) + '<button class="btn" type="button" data-act="qadd" data-prefix="quiz" style="justify-self:start">+ Add question</button> <button class="btn ai" type="button" data-act="genq" style="justify-self:start">✦ Generate questions</button>' + structureFooter(l);
       return h;
     }
-    if (!l.converted) return h + legacyBanner(l) + resourcesCard(l) + settings(l) + qualityCard(l);
+    if (!l.converted) return h + legacyBanner(l) + structureFooter(l);
     h += l.blocks.length ? '<div class="ins"><button type="button" data-act="insert" data-i="0">+ Add block</button></div>' : '';
     h += l.blocks.map(function (b, i) { return blockCard(l, b, i); }).join('');
     h += '<div class="addrow"><button class="btn primary" type="button" data-act="insert" data-i="' + l.blocks.length + '">+ Add block</button><button class="btn ai" type="button" data-act="gen">✦ Generate learning materials</button>' + (l.legacy ? '<button class="btn" type="button" data-act="orig">View original text</button>' : '') + '</div>';
-    return h + resourcesCard(l) + settings(l) + qualityCard(l);
+    return h + structureFooter(l);
+  }
+  // Right column: publish checks first, then the lesson's settings
+  function editorSide(l) {
+    if (l.quiz) return qualityCard(l) + settingsLite(l);
+    return qualityCard(l) + resourcesCard(l) + settings(l);
   }
   function settingsLite(l) {
     return '<details class="card sec"><summary>Discussion <span class="chip ' + (l.disc.on ? 'ok' : '') + '">' + (l.disc.on ? 'On' : 'Off') + '</span></summary><div class="in-body"><label class="tog"><input type="checkbox" data-dc="on"' + (l.disc.on ? ' checked' : '') + '> Learners can discuss this lesson after they submit the quiz</label></div></details>';
@@ -1201,7 +1212,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   }
   function courseCardHtml() {
     var d = D.details, total = D.lessons.reduce(function (n, l) { return n + l.mins; }, 0), mins = D.course.durationAuto ? total : D.course.duration;
-    return '<div class="ccard" id="dtCard">' + coverHtml(d.cover, 'card', '') + '<div class="cb"><b>' + esc(d.title || 'Untitled course') + '</b><p>' + esc(d.summary || 'No summary yet') + '</p><div class="cm"><span class="chip">' + esc(d.difficulty) + '</span>' + (d.industry.length ? '<span class="chip">' + esc(d.industry[0]) + (d.industry.length > 1 ? ' +' + (d.industry.length - 1) : '') + '</span>' : '') + '<span class="mini">' + mins + ' min</span></div></div></div>';
+    return '<div class="ccard" id="dtCard">' + coverHtml(d.cover, 'card', '') + '<div class="cb"><b>' + esc(d.title || 'Untitled course') + '</b><p>' + esc(d.description || 'No description yet') + '</p><div class="cm"><span class="chip">' + esc(d.difficulty) + '</span>' + (d.industry.length ? '<span class="chip">' + esc(d.industry[0]) + (d.industry.length > 1 ? ' +' + (d.industry.length - 1) : '') + '</span>' : '') + '<span class="mini">' + mins + ' min</span></div></div></div>';
   }
   function detailsChecks() {
     var d = D.details, c = [], total = D.lessons.reduce(function (n, l) { return n + l.mins; }, 0);
@@ -1209,8 +1220,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     add(d.title.trim() ? 'ok' : 'bad', d.title.trim() ? 'Title is set' : 'The course needs a title');
     add(D.lessons.length ? 'ok' : 'bad', D.lessons.length ? D.lessons.length + ' lessons in ' + D.modules.length + ' module' + (D.modules.length > 1 ? 's' : '') : 'No lessons yet', D.lessons.length ? null : { act: 'dettab', label: 'Add', tab: 'content' });
     add(d.cover.type === 'none' ? 'warn' : 'ok', d.cover.type === 'none' ? 'No cover image. The course card shows a blank space.' : 'Cover image set');
-    add(d.summary.trim() && d.summary.length <= 200 ? 'ok' : 'warn', !d.summary.trim() ? 'No summary. Learners see an empty card.' : d.summary.length > 200 ? 'Summary is ' + d.summary.length + ' characters. Under 200 reads best on the card.' : 'Summary fits the course card');
-    add(d.objectives.filter(function (o) { return o.trim(); }).length >= 3 ? 'ok' : 'warn', d.objectives.filter(function (o) { return o.trim(); }).length + ' learner-facing objectives. Three or four work best.');
+    add(d.description.trim() ? 'ok' : 'warn', d.description.trim() ? 'Description is set' : 'No description. Learners see an empty card.');
     add(d.industry.length ? 'ok' : 'warn', d.industry.length ? 'Industry set' : 'No industry. Learners cannot find this course by industry.');
     var mism = !D.course.durationAuto && D.course.duration !== total;
     add(mism ? 'warn' : 'ok', mism ? 'Duration says ' + D.course.duration + ' min but the lessons add up to ' + total + ' min.' : 'Duration matches the lessons', mism ? { act: 'detauto', label: 'Calculate' } : null);
@@ -1224,10 +1234,9 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     var d = D.details, total = D.lessons.reduce(function (n, l) { return n + l.mins; }, 0), cv = d.cover;
     var cover = '<div class="card" style="padding:18px 20px"><h2 class="h2">Cover image</h2><div class="cvrow"><div class="cvbox">' + coverHtml(cv, 'hero', 'Cover image') + '</div><div class="cvside"><div class="cvbtns"><label class="btn sm" style="cursor:pointer">Change<input type="file" accept="image/*" class="sr" data-cvup="1"></label><button class="btn sm ai" type="button" data-act="cvai">✦ Generate with AI</button></div>' +
       (cv.type === 'image' ? '<div class="fld" style="margin:0"><label class="lbl" for="cvx">Reposition: left to right</label><input id="cvx" type="range" min="0" max="100" value="' + cv.x + '" data-cvx="x"></div><div class="fld" style="margin:0"><label class="lbl" for="cvy">Reposition: top to bottom</label><input id="cvy" type="range" min="0" max="100" value="' + cv.y + '" data-cvx="y"></div><p class="hint">The same image is cropped differently on the course page and on the card. Both are shown on the right.</p>' : (cv.type === 'none' ? '<p class="hint">Upload an image, or generate one from a description. Courses without a cover look unfinished in the catalogue.</p>' : '<p class="hint">This is a generated colour cover. Upload an image if you want a photo or illustration.</p>')) + '</div></div></div>';
-    var objs = '<div class="fld" style="margin:0"><span class="lbl">What learners will be able to do</span><div class="pairs">' + d.objectives.map(function (o, i) { return '<div class="pair" style="grid-template-columns:1fr 32px"><input class="in" value="' + esc(o) + '" aria-label="Objective ' + (i + 1) + '" data-dto="' + i + '"><button class="ico dng" type="button" data-act="dtodel" data-i="' + i + '" aria-label="Remove objective ' + (i + 1) + '">✕</button></div>'; }).join('') + '</div><button class="btn sm" type="button" data-act="dtoadd" style="margin-top:6px">+ Add objective</button><p class="hint">Kept apart from the description so the course page can show them as a checklist. In production they sit inside the description text.</p></div>';
     var basics = '<div class="card" style="padding:18px 20px;display:grid;gap:14px"><h2 class="h2">About the course</h2><div class="fld" style="margin:0"><label class="lbl" for="dtT">Course title</label><input id="dtT" class="in" value="' + esc(d.title) + '" data-dt="title"></div>' +
-      '<div class="fld" style="margin:0"><label class="lbl" for="dtS">Summary</label><textarea id="dtS" class="ta" rows="2" data-dt="summary">' + esc(d.summary) + '</textarea><p class="hint"><span id="dtSn">' + d.summary.length + '</span> / 200. Shown on the course card and at the top of the course page.</p></div>' +
-      '<div class="fld" style="margin:0"><label class="lbl" for="dtD">Description</label><textarea id="dtD" class="ta" rows="5" data-dt="description">' + esc(d.description) + '</textarea></div>' + objs + '</div>';
+      
+      '<div class="fld" style="margin:0"><label class="lbl" for="dtD">Description</label><textarea id="dtD" class="ta" rows="5" data-dt="description">' + esc(d.description) + '</textarea></div>' + '</div>';
     var meta = '<div class="card" style="padding:18px 20px;display:grid;gap:14px"><h2 class="h2">Level, time and industry</h2><div class="row2"><div class="fld" style="margin:0"><label class="lbl" for="dtL">Difficulty</label><select id="dtL" class="sel" data-dt="difficulty">' + ['Beginner', 'Intermediate', 'Advanced'].map(function (x) { return '<option' + (x === d.difficulty ? ' selected' : '') + '>' + x + '</option>'; }).join('') + '</select></div>' +
       '<div class="fld" style="margin:0"><label class="lbl" for="cdur">Duration (minutes)</label><input id="cdur" class="in" type="number" value="' + (D.course.durationAuto ? total : D.course.duration) + '"' + (D.course.durationAuto ? ' disabled' : '') + ' data-cdur="1"><label class="tog" style="margin-top:6px"><input type="checkbox" data-cauto="1"' + (D.course.durationAuto ? ' checked' : '') + '> Calculate from the lessons (' + total + ' min)</label>' + (!D.course.durationAuto && D.course.duration !== total ? '<p class="hint" style="color:var(--accent-ink)">This says ' + D.course.duration + ' min, but the lessons add up to ' + total + ' min. Learners see both numbers.</p>' : '') + '</div></div>' +
       '<div class="fld" style="margin:0"><span class="lbl">Industry</span><div class="ocs">' + INDUSTRIES.map(function (x) { return '<button class="oc" type="button" aria-pressed="' + (d.industry.indexOf(x) !== -1) + '" data-act="dtind" data-v="' + esc(x) + '">' + esc(x) + '</button>'; }).join('') + '</div><p class="hint">Pick every industry this course suits. Learners can filter the catalogue by industry.</p></div></div>';
@@ -1254,8 +1263,6 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
       '<div class="dft"><button class="btn" type="button" data-act="cvclose">Cancel</button>' + (s.options ? '<button class="btn" type="button" data-act="cvgen">Try again</button><button class="btn primary" type="button" data-act="cvuse">Use this cover</button>' : '<button class="btn primary" type="button" data-act="cvgen"' + (s.busy || !s.prompt.trim() ? ' disabled' : '') + '>✦ Generate 3 options</button>') + '</div>';
   }
   var DET_ACTS = {
-    dtodel: function (a) { D.details.objectives.splice(+a.dataset.i, 1); render(); saveState(); },
-    dtoadd: function () { D.details.objectives.push(''); render(); saveState(); var ins = $$('[data-dto]'); if (ins.length) ins[ins.length - 1].focus(); },
     dtind: function (a) { var s = D.details.industry, i = s.indexOf(a.dataset.v); if (i === -1) s.push(a.dataset.v); else s.splice(i, 1); var y = window.scrollY; render(); window.scrollTo(0, y); saveState(); },
     dtlink: function (a) { D.details.linked.push(a.dataset.v); var y = window.scrollY; render(); window.scrollTo(0, y); saveState(); },
     dtunlink: function (a) { D.details.linked = D.details.linked.filter(function (id) { return id !== a.dataset.v; }); var y = window.scrollY; render(); window.scrollTo(0, y); saveState(); },
@@ -1346,7 +1353,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     return cover + sugHtml + roles;
   }
   function objTab() {
-    return header() + '<div class="legacy" style="margin-bottom:16px"><b>Two different lists</b><p>What learners will be able to do is written in <button class="linkb" type="button" data-act="dettab" data-tab-to="details">Details</button>, in plain words. Competencies here are standard skills, used for reporting and for matching courses to job roles.</p></div>' +
+    return header() + '<div class="legacy" style="margin-bottom:16px"><b>Competencies, not the course description</b><p>These are standard skills, used for reporting and for matching courses to job roles. What learners read about the course stays in the <button class="linkb" type="button" data-act="dettab" data-tab-to="details">Description</button>.</p></div>' +
       '<div class="ow2"><section class="card" style="padding:18px 20px" aria-label="Competency library"><h2 class="h2">Library</h2><p class="mini" style="margin:2px 0 12px">Tick the competencies this course builds.</p>' +
       '<div class="orow"><div class="srch"><label class="sr" for="objS">Search competencies</label><input id="objS" class="in" type="search" placeholder="Search competencies" value="' + esc(P.os || '') + '" data-os="1"></div><div class="seg" role="group" aria-label="Show">' + [['all', 'All'], ['ssf', 'Skills Framework'], ['custom', 'Custom']].map(function (x) { return '<button type="button" data-og="' + x[0] + '" aria-pressed="' + ((P.og || 'all') === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div></div><div id="objList" class="objscroll">' + objListHtml() + '</div></section>' +
       '<div id="objRight" class="ow-right">' + objRightHtml() + '</div></div>';
@@ -1470,18 +1477,18 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   var TM_DESC = 'Master the fundamentals of effective time management by learning how to prioritise tasks, set achievable goals, manage distractions, and plan your workload efficiently. This course equips you with practical techniques to boost productivity, reduce stress, and make better use of your time in both work and everyday life.';
   function emptyCourse(title) {
     return { lessons: [], modules: [], obj: { sel: [], custom: [], roles: [], map: {} }, km: {}, kmSug: {}, status: 'draft', ver: null,
-      details: { title: title, summary: '', description: '', objectives: [], difficulty: 'Beginner', industry: [], linked: [], cover: { type: 'none' } },
+      details: { title: title, description: '', difficulty: 'Beginner', industry: [], linked: [], cover: { type: 'none' } },
       course: { duration: 0, durationAuto: true } };
   }
   function listCourses() {
     var out = [], dm = STORE.dm, nw = STORE.nw;
     function fromState(key, s) {
       var d = s.details, total = s.lessons.reduce(function (n, l) { return n + l.mins; }, 0);
-      return { key: key, title: d.title || 'Untitled course', status: s.status, desc: d.description + (d.objectives.length ? ' Learning Objectives: ' + d.objectives.join(' ') : ''), summary: d.summary, level: d.difficulty.toLowerCase(), mins: s.course.durationAuto ? total : s.course.duration, cover: d.cover, lessons: s.lessons.length, modules: s.modules.length, openable: true };
+      return { key: key, title: d.title || 'Untitled course', status: s.status, desc: d.description, level: d.difficulty.toLowerCase(), mins: s.course.durationAuto ? total : s.course.duration, cover: d.cover, lessons: s.lessons.length, modules: s.modules.length, openable: true };
     }
     if (nw) out.push(fromState('nw', nw));
     out.push(fromState('dm', dm));
-    out.push({ key: 'tm', title: 'Time Management Essentials', status: 'published', desc: TM_DESC, summary: '', level: 'beginner', mins: 0, cover: { type: 'image', src: TM_COVER, x: 50, y: 50 }, lessons: 0, modules: 0, openable: false });
+    out.push({ key: 'tm', title: 'Time Management Essentials', status: 'published', desc: TM_DESC, level: 'beginner', mins: 0, cover: { type: 'image', src: TM_COVER, x: 50, y: 50 }, lessons: 0, modules: 0, openable: false });
     return out;
   }
   function courseIssues(key) {
@@ -1503,7 +1510,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     return cs.map(function (c) {
       var issues = enh && c.openable ? courseIssues(c.key) : 0;
       return '<article class="lpc' + (c.status === 'draft' ? ' draft' : '') + '"><button class="lpb" type="button" data-act="opencourse" data-k="' + c.key + '" aria-label="Open ' + esc(c.title) + '">' + coverHtml(c.cover, 'card', '') + '<span class="lpt"><b>' + esc(c.title) + '</b><span class="chip ' + (c.status === 'published' ? 'ok' : 'draft') + '"' + tipA(c.status === 'published' ? 'Learners can see this course.' : 'Only admins can see this course. Learners see it after you publish.') + '>' + c.status + '</span></span>' +
-        '<span class="lpd">' + esc(enh && c.summary ? c.summary : (c.desc || 'No description yet')) + '</span><span class="lpm"><span class="chip">ATLAS Demo</span><span class="chip">' + (enh ? c.level.charAt(0).toUpperCase() + c.level.slice(1) : c.level) + '</span>' + (c.mins ? '<span class="mini">' + c.mins + (enh ? ' min' : 'm') + '</span>' : '') + (enh && c.modules ? '<span class="mini">' + c.modules + ' module' + (c.modules > 1 ? 's' : '') + ' · ' + c.lessons + ' lesson' + (c.lessons === 1 ? '' : 's') + '</span>' : '') + (enh && c.openable ? '<span class="chip ' + (issues ? 'warn' : 'ok') + '"' + tipA(issues ? 'Open the course to see the checks: lessons that need work and details still missing. Only must-fix items stop publishing.' : 'Every lesson and the course details pass their checks.') + '>' + (issues ? issues + ' to look at' : 'Ready') + '</span>' : '') + '</span></button></article>';
+        '<span class="lpd">' + esc(c.desc || 'No description yet') + '</span><span class="lpm"><span class="chip">ATLAS Demo</span><span class="chip">' + (enh ? c.level.charAt(0).toUpperCase() + c.level.slice(1) : c.level) + '</span>' + (c.mins ? '<span class="mini">' + c.mins + (enh ? ' min' : 'm') + '</span>' : '') + (enh && c.modules ? '<span class="mini">' + c.modules + ' module' + (c.modules > 1 ? 's' : '') + ' · ' + c.lessons + ' lesson' + (c.lessons === 1 ? '' : 's') + '</span>' : '') + (enh && c.openable ? '<span class="chip ' + (issues ? 'warn' : 'ok') + '"' + tipA(issues ? 'Open the course to see the checks: lessons that need work and details still missing. Only must-fix items stop publishing.' : 'Every lesson and the course details pass their checks.') + '>' + (issues ? issues + ' to look at' : 'Ready') + '</span>' : '') + '</span></button></article>';
     }).join('');
   }
   function listPage() {
@@ -1614,7 +1621,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     if (P.tab === 'details') body = detailsTab();
     else if (P.tab === 'content') {
       if (!D.modules.length) body = emptyContent();
-      else body = '<div class="cw">' + structure() + '<section class="ed" aria-label="Lesson editor">' + (l ? editor(l) : '<div class="card emptyc"><h2>This module has no lessons yet</h2><p>Add a lesson to start building it.</p><div class="eacts"><button class="btn primary" type="button" data-act="addlesson" data-m="' + D.modules[0].id + '">+ Add lesson</button></div></div>') + '</section></div>';
+      else body = '<div class="cw">' + structure() + '<section class="ed" aria-label="Lesson editor">' + (l ? editor(l) : '<div class="card emptyc"><h2>This module has no lessons yet</h2><p>Add a lesson to start building it.</p><div class="eacts"><button class="btn primary" type="button" data-act="addlesson" data-m="' + D.modules[0].id + '">+ Add lesson</button></div></div>') + '</section>' + (l ? '<aside class="eside" aria-label="Lesson checks and settings">' + editorSide(l) + '</aside>' : '') + '</div>';
     }
     else if (P.tab === 'obj') body = objTab();
     else body = kmTab();
@@ -2025,8 +2032,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     if (t.dataset.olm) { OL.material = t.value; return; }
     if (t.dataset.olmt != null) { OL.plan[+t.dataset.olmt].title = t.value; return; }
     if (t.dataset.oll) { var op = t.dataset.oll.split(':'); OL.plan[+op[0]].lessons[+op[1]].title = t.value; return; }
-    if (t.dataset.dt) { D.details[t.dataset.dt] = t.value; if (t.dataset.dt === 'summary') { var sn = $('#dtSn'); if (sn) sn.textContent = t.value.length; } detLive(); return; }
-    if (t.dataset.dto != null) { D.details.objectives[+t.dataset.dto] = t.value; saveState(); return; }
+    if (t.dataset.dt) { D.details[t.dataset.dt] = t.value; detLive(); return; }
     if (t.dataset.cvx) { D.details.cover[t.dataset.cvx] = +t.value; $$('.cv img').forEach(function (im) { im.style.objectPosition = D.details.cover.x + '% ' + D.details.cover.y + '%'; }); saveState(); return; }
     if (t.dataset.cvp) { COVER_DLG.prompt = t.value; var gb = $('[data-act="cvgen"]'); if (gb && !COVER_DLG.options) gb.disabled = !t.value.trim(); return; }
     if (t.dataset.resn != null) { l.resources[+t.dataset.resn].name = t.value; saveState(); return; }

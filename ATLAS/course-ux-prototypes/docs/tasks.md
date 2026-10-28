@@ -307,3 +307,18 @@ Update (authoring prototype, round 9: Knowledge Mapping matrix)
 - [ ] Production Knowledge Base list and how sources are attached were not inspected; sources and topic keywords are invented samples
 - [ ] Suggestions are keyword matches: 49 of 130 cells get a suggestion on the sample course because lessons 5-12 share vocabulary. A real matcher should rank and cap them
 - [ ] "Jen answers from attached sources" is the intended behaviour as described to the prototype, not confirmed against production
+
+Update (authoring prototype, round 10: right column in Content)
+- [x] Lesson checks and settings (publish checks, Resources, Check yourself, Jen, Discussion) moved from below the blocks to a sticky right column; blocks get the middle column. Checks come first because they show whether the lesson can be published
+- [x] Quiz lessons: checks and Discussion in the right column; unconverted lessons: banner in the middle, checks and settings on the right
+- [ ] Under 1360px wide the right column drops below the editor instead of beside it
+
+Update (authoring prototype, round 11: add lesson / module below the editor)
+- [x] "+ Add lesson to <module>" and "+ Add module" below the lesson editor (all lesson types), so the course grows without going back to the left panel
+
+Update (authoring prototype, round 12: Summary removed)
+- [x] Removed the Summary field I had added; production only has Description. The course card, course list and checks use Description. Removed the "summary length" check, added "Description is set"
+
+Update (authoring prototype, round 13: objectives list removed from Details)
+- [x] Removed the separate "What learners will be able to do" list (not in production). The objectives text is back inside Description, as in production. Removed its check; the Learning Objectives tab banner now only says competencies are separate from the Description
+- [ ] The learner course page prototype still shows objectives as a checklist from sample data; how production builds it from the Description was not checked
