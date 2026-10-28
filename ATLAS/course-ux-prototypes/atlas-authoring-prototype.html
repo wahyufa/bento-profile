@@ -171,6 +171,60 @@ label.btn:focus-within { outline: 3px solid var(--primary); outline-offset: 2px;
 @media (max-width: 640px) { .kinds { grid-template-columns: 1fr; } }
 .h2 { font-size: 15.5px; font-weight: 700; margin: 0; display: flex; align-items: center; gap: 8px; }
 .ow { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: start; }
+.ow2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); gap: 20px; align-items: start; }
+.ow-right { display: grid; gap: 14px; }
+.objscroll { max-height: 560px; overflow: auto; padding-right: 4px; }
+.orl { list-style: none; padding: 0; margin: 0; display: grid; gap: 2px; }
+.orw { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 10px; cursor: pointer; font-size: 14px; }
+.orw:hover { background: var(--bg); }
+.orw.on { background: var(--primary-soft); }
+.orw input { width: 18px; height: 18px; accent-color: var(--primary); flex: none; }
+.orw:has(input:focus-visible) { outline: 3px solid var(--primary); outline-offset: -1px; }
+.orn { flex: 1; min-width: 0; }
+.orw em { font-style: normal; font-size: 11px; color: var(--muted); }
+.osl { list-style: none; padding: 0; margin: 12px 0 0; display: grid; gap: 8px; }
+.osr { border: 1px solid var(--line); border-radius: 12px; }
+.osr.open { border-color: var(--primary); }
+.osh { display: flex; align-items: center; gap: 4px; padding-right: 8px; }
+.osb { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; border: 0; background: none; text-align: left; padding: 10px 12px; font-size: 14px; font-weight: 600; }
+.osb .ot { flex: 1; min-width: 0; }
+.osb .chev { color: var(--muted); }
+.osx { padding: 2px 12px 14px; display: grid; gap: 10px; }
+.osm { display: grid; gap: 4px; }
+.lns { display: flex; flex-wrap: wrap; gap: 6px; }
+.ln { min-width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); font-size: 13px; font-weight: 600; }
+.ln:hover { border-color: #b9c2d0; }
+.ln[aria-pressed="true"] { background: var(--primary); border-color: var(--primary); color: #fff; }
+.linkb { border: 0; background: none; padding: 0; color: var(--primary-ink); font: inherit; font-weight: 600; text-decoration: underline; cursor: pointer; }
+.km2 { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.km2 .ow-right { position: sticky; top: calc(var(--proto-h) + 16px); }
+.kmscroll { overflow: auto; max-height: 640px; }
+.kmt { border-collapse: separate; border-spacing: 0; width: 100%; }
+.kmt th, .kmt td { padding: 0; }
+.kmc0 { position: sticky; left: 0; z-index: 2; background: var(--surface); min-width: 230px; max-width: 280px; text-align: left; padding: 8px 12px 8px 4px !important; border-bottom: 1px solid var(--line); }
+.kmt thead .kmc0, .kmt tfoot .kmc0 { border-bottom: 0; }
+.kt { display: block; font-size: 13.5px; font-weight: 600; line-height: 1.35; }
+.ks { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; margin-top: 4px; }
+.kmg { font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--primary-ink); text-align: left; padding: 0 0 6px 6px !important; border-left: 1px solid var(--line); }
+.kmh { padding: 0 2px 6px !important; text-align: center; }
+.kmh button { width: 34px; height: 28px; border: 0; background: none; border-radius: 8px; font-size: 12.5px; font-weight: 700; color: var(--muted); }
+.kmh button:hover { background: var(--bg); }
+.kmh.cur button { background: var(--primary-soft); color: var(--primary-ink); }
+.kmx { text-align: center; border-bottom: 1px solid var(--line); padding: 4px 2px !important; }
+.kmt tfoot .kmx, .kmt thead .kmx { border-bottom: 0; }
+.kmx.cur { background: rgba(13,113,154,.05); }
+.kmcell { width: 34px; height: 34px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--surface); font-size: 15px; font-weight: 700; color: var(--primary-ink); }
+.kmcell:hover { border-color: var(--primary); }
+.kmcell.on { background: var(--primary); border-color: var(--primary); color: #fff; }
+.kmcell.sug { border-style: dashed; border-color: var(--accent); color: #8a5a00; background: #FFF8EA; }
+.kmcell.sel { outline: 3px solid var(--navy); outline-offset: 1px; }
+.kmn { display: inline-block; min-width: 24px; font-size: 12.5px; font-weight: 700; padding: 3px 0; border-radius: 8px; background: var(--bg); color: var(--muted); }
+.kmn.zero { background: #FDECEC; color: #B3261E; }
+.kmq { margin: 10px 0 0; padding: 8px 12px; border-left: 3px solid var(--accent); background: #FFF8EA; border-radius: 0 10px 10px 0; font-size: 13px; line-height: 1.55; }
+.kmq mark { background: #FFE2A1; padding: 0 2px; border-radius: 3px; }
+.kmj { list-style: none; padding: 0; margin: 0; display: grid; gap: 6px; font-size: 13.5px; }
+.kmj li { display: flex; gap: 8px; align-items: flex-start; }
+@media (max-width: 1100px) { .km2 { grid-template-columns: minmax(0, 1fr); } .km2 .ow-right { position: static; } }
 .ow-side { display: grid; gap: 14px; position: sticky; top: calc(var(--proto-h) + 16px); }
 .orow { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-bottom: 8px; }
 .srch { flex: 1; min-width: 200px; }
@@ -195,7 +249,7 @@ label.btn:focus-within { outline: 3px solid var(--primary); outline-offset: 2px;
 .pvdlg .pvs { max-height: calc(100vh - 170px); }
 .pvdlg .pvf { max-width: 720px; }
 .pvdlg .pvf.phone { max-width: 340px; }
-@media (max-width: 1100px) { .ow, .kmw { grid-template-columns: minmax(0, 1fr); } .ow-side { position: static; } }
+@media (max-width: 1100px) { .ow2 { grid-template-columns: minmax(0, 1fr); } .ow, .kmw { grid-template-columns: minmax(0, 1fr); } .ow-side { position: static; } }
 .st { padding: 14px; position: sticky; top: calc(var(--proto-h) + 16px); max-height: calc(100vh - var(--proto-h) - 32px); overflow-y: auto; }
 .st h2 { font-size: 15px; font-weight: 700; }
 .st .meta { font-size: 12.5px; color: var(--muted); margin: 2px 0 10px; }
@@ -720,7 +774,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
       return les;
     });
     lessons.forEach(function (l) { l.mod = 'm1'; });
-    return { lessons: lessons, modules: [{ id: 'm1', title: 'Module 1', desc: 'Boost your Digital Marketing: Planning Social Media Campaigns' }], obj: { sel: [], custom: [], roles: [] }, km: {}, kmSug: {}, details: detailsSeed(), status: 'published', ver: 'V1', course: { duration: 180, durationAuto: false } };
+    return { lessons: lessons, modules: [{ id: 'm1', title: 'Module 1', desc: 'Boost your Digital Marketing: Planning Social Media Campaigns' }], obj: { sel: [], custom: [], roles: [], map: {} }, km: {}, kmSug: {}, details: detailsSeed(), status: 'published', ver: 'V1', course: { duration: 180, durationAuto: false } };
   }
 
   // ==========================================================================
@@ -1225,7 +1279,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   // What each competency looks for in the lesson text, so suggestions can say why
   var OBJ_HINTS = { 'Digital Marketing': ['digital marketing', 'paid media', 'earned media', 'owned media'], 'Data-Driven Marketing': ['kpi', 'bounce rate', 'click-through', 'conversion'], 'Customer Relationship Management': ['loyal', 'retain'], 'Content Creation & Strategy': ['content'], 'Customer Experience Management': ['customer journey', 'funnel'], 'Identifying and Engaging Different Types of Customers': ['persona', 'audience'], 'Customer Satisfaction and Its Impact': ['online review'], 'Building Stronger Brand: Creating Distinctive Trademarks': ['brand'] };
   var KB = [
-    { id: 'k1', title: 'Digital marketing handbook', type: 'PDF', kw: ['digital marketing', 'campaign', 'objectives'] },
+    { id: 'k1', title: 'Digital marketing handbook', type: 'PDF', kw: ['digital marketing'] },
     { id: 'k2', title: 'Paid, earned and owned media (PEO) one-pager', type: 'Doc', kw: ['paid media', 'earned media', 'owned media', 'peo'] },
     { id: 'k3', title: 'Customer journey and funnel guide', type: 'Doc', kw: ['funnel', 'customer journey', 'awareness', 'consideration'] },
     { id: 'k4', title: 'Building customer personas', type: 'Template', kw: ['persona', 'touchpoint'] },
@@ -1234,7 +1288,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     { id: 'k7', title: 'Influencer and word-of-mouth guide', type: 'Article', kw: ['influencer', 'word-of-mouth', 'viral'] },
     { id: 'k8', title: 'Marketing KPI glossary', type: 'Glossary', kw: ['kpi', 'bounce rate', 'click-through', 'impressions'] },
     { id: 'k9', title: 'Social listening playbook', type: 'Doc', kw: ['social listening', 'sentiment'] },
-    { id: 'k10', title: 'Customer Journey Plan template', type: 'Template', kw: ['customer journey plan', 'take stock'] }
+    { id: 'k10', title: 'Customer Journey Plan template', type: 'Template', kw: ['customer journey plan'] }
   ];
   function kbById(id) { return KB.filter(function (k) { return k.id === id; })[0]; }
   function lessonText(l) { return (l.title + ' ' + (l.legacy || '') + ' ' + l.blocks.map(function (b) { return JSON.stringify(b.data); }).join(' ') + ' ' + (l.quiz ? l.quiz.questions.map(function (q) { return q.scenario + ' ' + q.stem; }).join(' ') : '')).toLowerCase(); }
@@ -1247,60 +1301,163 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     return KB.filter(function (k) { return have.indexOf(k.id) === -1; }).map(function (k) { return { k: k, hit: k.kw.filter(function (w) { return t.indexOf(w) !== -1; }) }; }).filter(function (s) { return s.hit.length; }).sort(function (a, b) { return b.hit.length - a.hit.length; }).slice(0, 4);
   }
 
+  // Two panels: the library on the left (search, pick), "In this course" on the right (set the lessons for each pick).
+  // D.obj.sel = chosen competency names, D.obj.map = { name: [lesson ids] }.
+  function lessonIdsMentioning(keys) { return D.lessons.filter(function (l) { var t = lessonText(l); return keys.some(function (k) { return t.indexOf(k) !== -1; }); }).map(function (l) { return l.id; }); }
+  function objLinked(name) { return (D.obj.map[name] || []).filter(function (id) { return D.lessons.some(function (l) { return l.id === id; }); }); }
+  function objRow(n, cnt) {
+    var on = D.obj.sel.indexOf(n) !== -1;
+    return '<li><label class="orw' + (on ? ' on' : '') + '"><input type="checkbox" data-act="objtog" data-v="' + esc(n) + '"' + (on ? ' checked' : '') + '><span class="orn">' + esc(n) + '</span>' + (cnt > 1 ? '<em title="' + cnt + ' entries in the library share this name">×' + cnt + '</em>' : '') + '</label></li>';
+  }
   function objListHtml() {
-    var q = (P.os || '').toLowerCase(), g = P.og || 'all', sel = D.obj.sel, out = '';
+    var q = (P.os || '').toLowerCase(), g = P.og || 'all', out = '';
     var ssf = g !== 'custom' ? SSF.filter(function (n) { return n.toLowerCase().indexOf(q) !== -1; }) : [];
     var cus = g !== 'ssf' ? D.obj.custom.concat(CUSTOM).filter(function (c) { return c[0].toLowerCase().indexOf(q) !== -1; }) : [];
-    function chip(n, cnt) { return '<button class="oc" type="button" aria-pressed="' + (sel.indexOf(n) !== -1) + '" data-act="objtog" data-v="' + esc(n) + '"' + (cnt > 1 ? ' title="' + cnt + ' entries in the library share this name"' : '') + '>' + esc(n) + (cnt > 1 ? '<em>×' + cnt + '</em>' : '') + '</button>'; }
-    if (ssf.length) out += '<h3 class="og">Singapore Skills Framework</h3><div class="ocs">' + ssf.map(function (n) { return chip(n, 1); }).join('') + '</div>';
-    if (cus.length) out += '<h3 class="og">Custom <span class="mini">(sample from production; repeated names are grouped)</span></h3><div class="ocs">' + cus.map(function (c) { return chip(c[0], c[1]); }).join('') + '</div>';
+    if (ssf.length) out += '<h3 class="og">Singapore Skills Framework <span class="mini">' + ssf.length + '</span></h3><ul class="orl">' + ssf.map(function (n) { return objRow(n, 1); }).join('') + '</ul>';
+    if (cus.length) out += '<h3 class="og">Custom <span class="mini">' + cus.length + ' (sample from production; repeated names are grouped)</span></h3><ul class="orl">' + cus.map(function (c) { return objRow(c[0], c[1]); }).join('') + '</ul>';
     if (!ssf.length && !cus.length) out = '<p class="pv-empty">Nothing matches “' + esc(P.os) + '”.</p>';
-    if (P.os && P.os.trim() && !ssf.concat(cus.map(function (c) { return c[0]; })).some(function (n) { return n.toLowerCase() === q.trim(); })) out += '<button class="btn sm" type="button" data-act="objadd" style="margin-top:12px">+ Add “' + esc(P.os.trim()) + '” as a custom objective</button>';
+    if (P.os && P.os.trim() && !ssf.concat(cus.map(function (c) { return c[0]; })).some(function (n) { return n.toLowerCase() === q.trim(); })) out += '<button class="btn sm" type="button" data-act="objadd" style="margin:12px 0 4px">+ Add “' + esc(P.os.trim()) + '” as a custom competency</button>';
     return out;
   }
+  function objSelectedRow(n) {
+    var linked = objLinked(n), open = P.oexp === n, expl = open ? '' : '';
+    var head = '<div class="osh"><button class="osb" type="button" data-act="objexp" data-v="' + esc(n) + '" aria-expanded="' + open + '"><span class="ot">' + esc(n) + '</span>' +
+      (linked.length ? '<span class="chip ok">' + linked.length + ' lesson' + (linked.length > 1 ? 's' : '') + '</span>' : '<span class="chip warn"' + tipA('No lesson is linked to this competency yet, so it cannot be reported on. Open it and choose the lessons that build it.', false) + '>No lessons yet</span>') + '<span class="chev" aria-hidden="true">' + (open ? '▴' : '▾') + '</span></button><button class="ico dng" type="button" data-act="objtog" data-v="' + esc(n) + '" aria-label="Remove ' + esc(n) + '">✕</button></div>';
+    if (open) {
+      expl = '<div class="osx"><p class="mini">Which lessons build this competency?</p>' + D.modules.map(function (m) {
+        var ls = lessonsIn(m); if (!ls.length) return '';
+        return '<div class="osm">' + (D.modules.length > 1 ? '<span class="mini">' + esc(m.title) + '</span>' : '') + '<div class="lns">' + ls.map(function (l) { return '<button class="ln" type="button" data-act="objles" data-v="' + esc(n) + '" data-l="' + l.id + '" aria-pressed="' + (linked.indexOf(l.id) !== -1) + '" aria-label="Lesson ' + (D.lessons.indexOf(l) + 1) + ': ' + esc(l.title) + '"' + tipA(l.title, false) + '>' + (D.lessons.indexOf(l) + 1) + '</button>'; }).join('') + '</div></div>';
+      }).join('') + '<button class="btn sm ai" type="button" data-act="objfind" data-v="' + esc(n) + '">✦ Suggest lessons</button></div>';
+    }
+    return '<li class="osr' + (open ? ' open' : '') + '">' + head + expl + '</li>';
+  }
+  function objRightHtml() {
+    var sel = D.obj.sel, sug = objSuggestions(), n = D.lessons.length;
+    var covered = D.lessons.filter(function (l) { return sel.some(function (c) { return objLinked(c).indexOf(l.id) !== -1; }); });
+    var gaps = D.lessons.filter(function (l) { return covered.indexOf(l) === -1; });
+    var cover = '<div class="card" style="padding:16px"><h2 class="h2">In this course <span class="chip ' + (sel.length ? 'ok' : '') + '">' + sel.length + '</span></h2>' +
+      (sel.length ? '<p class="meta" style="font-size:12.5px;color:var(--muted);margin:6px 0 4px">' + covered.length + ' of ' + n + ' lessons are linked to a competency</p><div class="prog" aria-hidden="true"><i style="width:' + (n ? Math.round(covered.length / n * 100) : 0) + '%"></i></div>' +
+        (gaps.length && gaps.length < n ? '<p class="mini" style="margin-top:6px">Not linked yet: ' + gaps.slice(0, 8).map(function (l) { return D.lessons.indexOf(l) + 1; }).join(', ') + (gaps.length > 8 ? ', …' : '') + '</p>' : '') +
+        '<ul class="osl">' + sel.map(objSelectedRow).join('') + '</ul><button class="btn sm" type="button" data-act="objclear" style="margin-top:10px">Clear all</button>'
+        : '<p class="mini" style="margin-top:6px">Nothing yet. Tick competencies in the library, or add the suggestions below.</p>') + '</div>';
+    var sugHtml = '<div class="card" style="padding:16px"><h2 class="h2">✦ Suggested from the lessons</h2><p class="mini" style="margin:2px 0 10px">Matched on the words used in the lessons. Adding one also links the lessons it was found in; you can change that.</p>' +
+      (sug.length ? '<ul class="sugs">' + sug.map(function (s) { return '<li><div><b>' + esc(s.name) + '</b><span class="mini">Found in ' + s.ls.length + ' of ' + n + ' lessons (' + s.ls.slice(0, 5).join(', ') + (s.ls.length > 5 ? ', …' : '') + ')</span></div><button class="btn sm" type="button" data-act="objtog" data-v="' + esc(s.name) + '" data-suggest="1">Add</button></li>'; }).join('') + '</ul>' + (sug.length > 1 ? '<button class="btn sm" type="button" data-act="objsuggall" style="margin-top:8px">Add all ' + sug.length + '</button>' : '') : '<p class="mini">' + (sel.length ? 'No more suggestions from the lesson content.' : 'No suggestions found.') + '</p>') + '</div>';
+    var roles = '<div class="card" style="padding:16px"><h2 class="h2">Target job roles</h2><p class="mini" style="margin:2px 0 10px">Learners with matching roles see this course recommended.</p><div class="ocs">' + ROLES.map(function (r) { return '<button class="oc" type="button" aria-pressed="' + (D.obj.roles.indexOf(r) !== -1) + '" data-act="roletog" data-v="' + esc(r) + '">' + esc(r) + '</button>'; }).join('') + '</div></div>';
+    return cover + sugHtml + roles;
+  }
   function objTab() {
-    var sel = D.obj.sel, sug = objSuggestions();
-    var selHtml = sel.length ? '<div class="ocs">' + sel.map(function (n) { return '<button class="oc" type="button" aria-pressed="true" data-act="objtog" data-v="' + esc(n) + '" aria-label="Remove ' + esc(n) + '">' + esc(n) + ' ✕</button>'; }).join('') + '</div><button class="btn sm" type="button" data-act="objclear" style="margin-top:10px">Clear all</button>' : '<p class="mini">Nothing selected yet. Pick from the list, or use the suggestions.</p>';
-    var sugHtml = sug.length ? '<ul class="sugs">' + sug.map(function (s) { return '<li><div><b>' + esc(s.name) + '</b><span class="mini">Mentioned in ' + s.ls.length + ' of ' + D.lessons.length + ' lessons (' + s.ls.slice(0, 5).join(', ') + (s.ls.length > 5 ? ', …' : '') + ')</span></div><button class="btn sm" type="button" data-act="objtog" data-v="' + esc(s.name) + '">Add</button></li>'; }).join('') + '</ul>' + (sug.length > 1 ? '<button class="btn sm" type="button" data-act="objsuggall" style="margin-top:8px">Add all ' + sug.length + '</button>' : '') : '<p class="mini">' + (sel.length ? 'No more suggestions from the lesson content.' : 'No suggestions found.') + '</p>';
-    return header() + '<div class="ow"><div class="card" style="padding:18px 20px"><h2 class="h2">Learning objectives</h2><p class="mini" style="margin:2px 0 12px">Competencies this course addresses. Select as many as apply.</p>' +
-      '<div class="orow"><div class="srch"><label class="sr" for="objS">Search competencies</label><input id="objS" class="in" type="search" placeholder="Search competencies" value="' + esc(P.os || '') + '" data-os="1"></div><div class="seg" role="group" aria-label="Show">' + [['all', 'All'], ['ssf', 'Skills Framework'], ['custom', 'Custom']].map(function (x) { return '<button type="button" data-og="' + x[0] + '" aria-pressed="' + ((P.og || 'all') === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div></div><div id="objList">' + objListHtml() + '</div></div>' +
-      '<aside class="ow-side"><div class="card" style="padding:16px"><h2 class="h2">Selected <span class="chip ' + (sel.length ? 'ok' : '') + '">' + sel.length + '</span></h2><div style="margin-top:10px">' + selHtml + '</div></div>' +
-      '<div class="card" style="padding:16px"><h2 class="h2">✦ Suggested from the lessons</h2><p class="mini" style="margin:2px 0 10px">Based on the words used in the lesson content. Review before adding.</p>' + sugHtml + '</div>' +
-      '<div class="card" style="padding:16px"><h2 class="h2">Target job roles</h2><p class="mini" style="margin:2px 0 10px">Learners with matching roles see this course recommended.</p><div class="ocs">' + ROLES.map(function (r) { return '<button class="oc" type="button" aria-pressed="' + (D.obj.roles.indexOf(r) !== -1) + '" data-act="roletog" data-v="' + esc(r) + '">' + esc(r) + '</button>'; }).join('') + '</div></div></aside></div>';
+    return header() + '<div class="legacy" style="margin-bottom:16px"><b>Two different lists</b><p>What learners will be able to do is written in <button class="linkb" type="button" data-act="dettab" data-tab-to="details">Details</button>, in plain words. Competencies here are standard skills, used for reporting and for matching courses to job roles.</p></div>' +
+      '<div class="ow2"><section class="card" style="padding:18px 20px" aria-label="Competency library"><h2 class="h2">Library</h2><p class="mini" style="margin:2px 0 12px">Tick the competencies this course builds.</p>' +
+      '<div class="orow"><div class="srch"><label class="sr" for="objS">Search competencies</label><input id="objS" class="in" type="search" placeholder="Search competencies" value="' + esc(P.os || '') + '" data-os="1"></div><div class="seg" role="group" aria-label="Show">' + [['all', 'All'], ['ssf', 'Skills Framework'], ['custom', 'Custom']].map(function (x) { return '<button type="button" data-og="' + x[0] + '" aria-pressed="' + ((P.og || 'all') === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div></div><div id="objList" class="objscroll">' + objListHtml() + '</div></section>' +
+      '<div id="objRight" class="ow-right">' + objRightHtml() + '</div></div>';
+  }
+  // Redraw only the two panels, so the search box, list scroll and keyboard focus stay where they were
+  function objRefresh(focusV, focusAct) {
+    var l = $('#objList'), y = l ? l.scrollTop : 0, r = $('#objRight');
+    if (l) { l.innerHTML = objListHtml(); l.scrollTop = y; }
+    if (r) r.innerHTML = objRightHtml();
+    saveState();
+    if (focusV != null) { var t = $$('[data-act="' + focusAct + '"]').filter(function (e) { return e.dataset.v === focusV; })[0]; if (t) t.focus({ preventScroll: true }); }
   }
 
+  // Knowledge Mapping as a matrix: sources in rows, lessons in columns. D.km[lessonId] = attached source ids,
+  // D.kmSug[lessonId] = suggested source ids (not attached until the author accepts).
   function kmCount(l) { return (D.km[l.id] || []).length; }
-  function kbListHtml(l) {
-    var q = (P.ks || '').toLowerCase(), have = D.km[l.id] || [];
-    var items = KB.filter(function (k) { return (k.title + ' ' + k.type).toLowerCase().indexOf(q) !== -1; });
-    return items.length ? '<ul class="kbl">' + items.map(function (k) { var on = have.indexOf(k.id) !== -1; return '<li><label class="kbi"><input type="checkbox" data-act="kmtog" data-k="' + k.id + '"' + (on ? ' checked' : '') + '><span><b>' + esc(k.title) + '</b><span class="mini">' + k.type + '</span></span></label></li>'; }).join('') + '</ul>' : '<p class="pv-empty">No sources match.</p>';
+  function kmHits(k, l) { var t = lessonText(l); return k.kw.filter(function (w) { return t.indexOf(w) !== -1; }); }
+  function kmState(k, l) { if ((D.km[l.id] || []).indexOf(k.id) !== -1) return 'on'; if ((D.kmSug[l.id] || []).indexOf(k.id) !== -1) return 'sug'; return 'off'; }
+  // The sentence around the first matching word, so the author can judge the match for themselves
+  function kmSnippet(l, words_) {
+    var plain = lessonPlain(l).replace(/\s+/g, ' '), low = plain.toLowerCase(), at = -1, w = '', i;
+    for (i = 0; i < words_.length; i++) { var p = low.indexOf(words_[i]); if (p !== -1 && (at === -1 || p < at)) { at = p; w = words_[i]; } }
+    if (at === -1) return '';
+    var from = Math.max(0, at - 70), to = Math.min(plain.length, at + w.length + 90);
+    return (from > 0 ? '…' : '') + plain.slice(from, at) + '\u0001' + plain.slice(at, at + w.length) + '\u0002' + plain.slice(at + w.length, to) + (to < plain.length ? '…' : '');
+  }
+  function kmMatrixHtml() {
+    var q = (P.ks || '').toLowerCase(), rows = KB.filter(function (k) { return (k.title + ' ' + k.type).toLowerCase().indexOf(q) !== -1; });
+    var groups = D.modules.map(function (m) { return { m: m, ls: lessonsIn(m) }; }).filter(function (g) { return g.ls.length; });
+    var head1 = '<tr><th scope="col" class="kmc0"><span class="sr">Source</span></th>' + groups.map(function (g) { return '<th scope="colgroup" colspan="' + g.ls.length + '" class="kmg">' + (D.modules.length > 1 ? esc(g.m.title) : 'Lessons') + '</th>'; }).join('') + '</tr>';
+    var head2 = '<tr><td class="kmc0"></td>' + D.lessons.map(function (l) { var i = D.lessons.indexOf(l); return '<th scope="col" class="kmh' + (l.id === P.kl ? ' cur' : '') + '"><button type="button" data-act="kmcol" data-id="' + l.id + '" aria-label="Lesson ' + (i + 1) + ': ' + esc(l.title) + '"' + tipA(l.title, false) + '>' + (i + 1) + '</button></th>'; }).join('') + '</tr>';
+    var body = rows.map(function (k) {
+      var used = D.lessons.filter(function (l) { return kmState(k, l) === 'on'; }).length, pend = D.lessons.filter(function (l) { return kmState(k, l) === 'sug'; });
+      return '<tr><th scope="row" class="kmc0"><span class="kt">' + esc(k.title) + '</span><span class="ks"><span class="chip">' + k.type + '</span>' + (used ? '<span class="chip ok">' + used + ' lesson' + (used > 1 ? 's' : '') + '</span>' : '<span class="chip"' + tipA('Not attached to any lesson, so Jen never uses it.', true) + '>Unused</span>') + (pend.length ? '<button class="btn sm fix" type="button" data-act="kmrowadd" data-k="' + k.id + '">Add ' + pend.length + ' suggested</button>' : '') + '</span></th>' +
+        D.lessons.map(function (l) {
+          var st = kmState(k, l), i = D.lessons.indexOf(l), cur = P.kc && P.kc.k === k.id && P.kc.l === l.id;
+          var label = k.title + ', lesson ' + (i + 1) + ': ' + (st === 'on' ? 'attached' : (st === 'sug' ? 'suggested, not attached' : 'not attached'));
+          return '<td class="kmx' + (l.id === P.kl ? ' cur' : '') + '"><button type="button" class="kmcell ' + st + (cur ? ' sel' : '') + '" data-act="kmcell" data-k="' + k.id + '" data-l="' + l.id + '" aria-pressed="' + (st === 'on') + '" aria-label="' + esc(label) + '">' + (st === 'on' ? '✓' : (st === 'sug' ? '✦' : '')) + '</button></td>';
+        }).join('') + '</tr>';
+    }).join('');
+    var foot = '<tr class="kmf"><th scope="row" class="kmc0"><span class="kt">Sources per lesson</span></th>' + D.lessons.map(function (l) { var n = kmCount(l); return '<td class="kmx' + (l.id === P.kl ? ' cur' : '') + '"><span class="kmn' + (n ? '' : ' zero') + '"' + (n ? '' : tipA('No sources. Jen answers from the lesson text only.', true)) + '>' + n + '</span></td>'; }).join('') + '</tr>';
+    return rows.length ? '<div class="kmscroll"><table class="kmt"><caption class="sr">Which sources are attached to which lesson</caption><thead>' + head1 + head2 + '</thead><tbody>' + body + '</tbody><tfoot>' + foot + '</tfoot></table></div>' : '<p class="pv-empty">No sources match “' + esc(P.ks) + '”.</p>';
+  }
+  function kmSideHtml() {
+    var l = D.lessons.filter(function (x) { return x.id === P.kl; })[0] || D.lessons[0], have = (D.km[l.id] || []).map(kbById), i = D.lessons.indexOf(l);
+    var why = '';
+    if (P.kc) {
+      var k = kbById(P.kc.k), cl = D.lessons.filter(function (x) { return x.id === P.kc.l; })[0];
+      if (k && cl) {
+        var st = kmState(k, cl), hits = kmHits(k, cl), snip = kmSnippet(cl, hits), on = st === 'on';
+        why = '<div class="card" style="padding:16px"><h2 class="h2">Why this match</h2><p style="margin:8px 0 2px"><b>' + esc(k.title) + '</b></p><p class="mini">Lesson ' + (D.lessons.indexOf(cl) + 1) + ': ' + esc(cl.title) + ' · ' + (on ? 'attached' : (st === 'sug' ? 'suggested' : 'not attached')) + '</p>' +
+          (hits.length ? '<p class="mini" style="margin-top:8px">The lesson uses ' + hits.length + ' of this source’s ' + k.kw.length + ' topics: ' + hits.map(function (h) { return '<span class="chip info">' + esc(h) + '</span>'; }).join(' ') + '</p>' + (snip ? '<blockquote class="kmq">' + esc(snip).replace('\u0001', '<mark>').replace('\u0002', '</mark>') + '</blockquote>' : '') : '<p class="mini" style="margin-top:8px">None of this source’s topics (' + esc(k.kw.slice(0, 4).join(', ')) + ') appear in the lesson. ' + (on ? 'You attached it yourself; keep it if it still helps.' : 'It is probably not relevant here.') + '</p>') +
+          '<div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm ' + (on ? '' : 'primary') + '" type="button" data-act="kmcell" data-k="' + k.id + '" data-l="' + cl.id + '">' + (on ? 'Remove from this lesson' : 'Attach to this lesson') + '</button>' + (st === 'sug' ? '<button class="btn sm" type="button" data-act="kmdismiss" data-k="' + k.id + '" data-l="' + cl.id + '">Dismiss suggestion</button>' : '') + '</div></div>';
+      }
+    }
+    var jen = '<div class="card" style="padding:16px"><h2 class="h2">What Jen uses in lesson ' + (i + 1) + '</h2><p class="mini" style="margin:2px 0 8px">' + esc(l.title) + '</p><ul class="kmj"><li><span class="d ok" aria-hidden="true">✓</span>The lesson text</li>' +
+      (have.length ? have.map(function (k) { return '<li><span class="d ok" aria-hidden="true">✓</span>' + esc(k.title) + ' <span class="mini">' + k.type + '</span></li>'; }).join('') : '<li><span class="d warn" aria-hidden="true">!</span>No sources attached. Questions that go beyond the lesson text get a general answer.</li>') + '</ul></div>';
+    var explain = '<div class="card" style="padding:16px"><h2 class="h2">What this tab does</h2><p class="mini" style="margin-top:6px">When a learner asks Jen something in a lesson, Jen answers from that lesson’s text and from the sources attached to it. More relevant sources mean answers that stay inside your material. Nothing here is shown to learners as a list.</p><p class="mini" style="margin-top:6px"><b>✓</b> attached · <b>✦</b> suggested, not attached yet · empty = not attached. Select any cell to see why it was suggested.</p></div>';
+    return why + jen + explain;
   }
   function kmTab() {
     if (!D.lessons.length) return header() + '<div class="card emptyc"><h2>Nothing to map yet</h2><p>Knowledge Mapping attaches sources to lessons, so add lessons first.</p><div class="eacts"><button class="btn primary" type="button" data-act="dettab" data-tab-to="content">Go to Content</button></div></div>';
-    var l =D.lessons.filter(function (x) { return x.id === P.kl; })[0] || D.lessons[0], have = D.km[l.id] || [], sug = (D.kmSug[l.id] || []).filter(function (id) { return have.indexOf(id) === -1; }), mapped = D.lessons.filter(function (x) { return kmCount(x) > 0; }).length;
-    var local = kmSuggest(l);
-    var sugList = sug.length ? sug.map(function (id) { var k = kbById(id), hit = (local.filter(function (s) { return s.k.id === id; })[0] || { hit: [] }).hit; return '<li><div><b>' + esc(k.title) + '</b><span class="mini">' + k.type + (hit.length ? ' · matches: ' + esc(hit.slice(0, 3).join(', ')) : '') + '</span></div><span class="sp"></span><button class="btn sm primary" type="button" data-act="kmaccept" data-k="' + id + '">Add</button><button class="ico" type="button" data-act="kmdismiss" data-k="' + id + '" aria-label="Dismiss">✕</button></li>'; }).join('') : '';
-    return header() + '<div class="kmw"><aside class="card st" aria-label="Lessons"><h2>Lessons</h2><p class="meta">' + mapped + ' of ' + D.lessons.length + ' have sources</p><div class="prog" aria-hidden="true"><i style="width:' + Math.round(mapped / D.lessons.length * 100) + '%"></i></div><button class="btn ai sm" type="button" data-act="kmsugall" style="width:100%">✦ Suggest sources for all lessons</button><ul class="ls" style="margin-top:10px">' + D.lessons.map(function (x, i) { var n = kmCount(x), p = (D.kmSug[x.id] || []).filter(function (id) { return (D.km[x.id] || []).indexOf(id) === -1; }).length; return ((i === 0 || D.lessons[i - 1].mod !== x.mod) && D.modules.length > 1 ? '<li class="mgh">' + esc(modById(x.mod).title) + '</li>' : '') + '<li><button type="button" data-act="kmsel" data-id="' + x.id + '" aria-current="' + (x.id === l.id) + '"><span class="n">' + (i + 1) + '</span><span><span class="t">' + esc(x.title) + '</span><span class="s">' + (n ? '<span class="chip ok">' + n + ' source' + (n > 1 ? 's' : '') + '</span>' : '<span class="chip">No sources</span>') + (p ? '<span class="chip draft">' + p + ' suggested</span>' : '') + '</span></span></button></li>'; }).join('') + '</ul></aside>' +
-      '<section class="ed" aria-label="Sources for this lesson"><div class="card" style="padding:18px 20px"><div class="qh" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h2 class="h2" style="flex:1">' + esc(l.title) + '</h2><button class="btn primary" type="button" data-act="kmsave">Save mappings</button></div><p class="mini" style="margin-top:4px">Jen answers learners’ questions about this lesson using the sources you attach here. Sample sources shown.</p></div>' +
-      '<div class="card" style="padding:16px 20px"><h2 class="h2">Attached sources <span class="chip ' + (have.length ? 'ok' : '') + '">' + have.length + '</span></h2>' + (have.length ? '<ul class="sugs">' + have.map(function (id) { var k = kbById(id); return '<li><div><b>' + esc(k.title) + '</b><span class="mini">' + k.type + '</span></div><button class="ico dng" type="button" data-act="kmtog" data-k="' + id + '" aria-label="Remove ' + esc(k.title) + '">✕</button></li>'; }).join('') + '</ul>' : '<p class="mini" style="margin-top:6px">No sources yet. Jen will answer from the lesson text only.</p>') + '</div>' +
-      '<div class="card" style="padding:16px 20px"><div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap"><h2 class="h2" style="flex:1">✦ Suggested for this lesson</h2><button class="btn sm ai" type="button" data-act="kmsug1">Find sources</button></div>' + (sugList ? '<ul class="sugs" style="margin-top:8px">' + sugList + '</ul>' + (sug.length > 1 ? '<button class="btn sm" type="button" data-act="kmaccall" style="margin-top:8px">Add all ' + sug.length + '</button>' : '') : '<p class="mini" style="margin-top:6px">Matches the lesson text against the source titles and keywords. Nothing is attached until you add it.</p>') + '</div>' +
-      '<div class="card" style="padding:16px 20px"><h2 class="h2">Browse the Knowledge Base</h2><div class="srch" style="margin:8px 0"><label class="sr" for="kbS">Search sources</label><input id="kbS" class="in" type="search" placeholder="Search sources" value="' + esc(P.ks || '') + '" data-ks="1"></div><div id="kbList">' + kbListHtml(l) + '</div></div></section></div>';
+    var mapped = D.lessons.filter(function (x) { return kmCount(x) > 0; }).length, unused = KB.filter(function (k) { return !D.lessons.some(function (l) { return kmState(k, l) === 'on'; }); }).length;
+    var pend = D.lessons.reduce(function (n, l) { return n + (D.kmSug[l.id] || []).filter(function (id) { return (D.km[l.id] || []).indexOf(id) === -1; }).length; }, 0);
+    return header() + '<div class="card" style="padding:16px 20px;margin-bottom:16px;display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div style="flex:1;min-width:240px"><h2 class="h2">Sources by lesson</h2><p class="mini" id="kmSum" style="margin-top:2px">' + kmSummary(mapped, unused) + '</p></div>' +
+      '<div class="srch" style="flex:0 1 260px;min-width:180px"><label class="sr" for="kbS">Search sources</label><input id="kbS" class="in" type="search" placeholder="Search sources" value="' + esc(P.ks || '') + '" data-ks="1"></div>' +
+      '<button class="btn ai" type="button" data-act="kmsugall">✦ Suggest sources</button>' + '<span id="kmAddAll">' + (pend ? '<button class="btn" type="button" data-act="kmaddall">Add all ' + pend + ' suggested</button>' : '') + '</span></div>' +
+      '<div class="km2"><section class="card" style="padding:14px 16px" id="kmMatrix" aria-label="Matrix of sources and lessons">' + kmMatrixHtml() + '</section><aside class="ow-right" id="kmSide">' + kmSideHtml() + '</aside></div>';
+  }
+  function kmSummary(mapped, unused) { return mapped + ' of ' + D.lessons.length + ' lessons have a source · ' + unused + ' of ' + KB.length + ' sources are not used yet. Click a cell to attach or remove a source.'; }
+  // Redraw the matrix and side panel in place so scroll, search text and keyboard focus stay put
+  function kmRefresh(focusK, focusL) {
+    var sc = $('.kmscroll'), x = sc ? sc.scrollLeft : 0, y = sc ? sc.scrollTop : 0;
+    $('#kmMatrix').innerHTML = kmMatrixHtml(); $('#kmSide').innerHTML = kmSideHtml();
+    sc = $('.kmscroll'); if (sc) { sc.scrollLeft = x; sc.scrollTop = y; }
+    var mapped = D.lessons.filter(function (z) { return kmCount(z) > 0; }).length, unused = KB.filter(function (k) { return !D.lessons.some(function (l) { return kmState(k, l) === 'on'; }); }).length;
+    $('#kmSum').textContent = kmSummary(mapped, unused);
+    var pend = D.lessons.reduce(function (n, l) { return n + (D.kmSug[l.id] || []).filter(function (id) { return (D.km[l.id] || []).indexOf(id) === -1; }).length; }, 0);
+    $('#kmAddAll').innerHTML = pend ? '<button class="btn" type="button" data-act="kmaddall">Add all ' + pend + ' suggested</button>' : '';
+    saveState();
+    if (focusK) { var c = $$('.kmcell').filter(function (e) { return e.dataset.k === focusK && e.dataset.l === focusL; })[0]; if (c) c.focus({ preventScroll: true }); }
   }
   function reObj() { render(); saveState(); }
   var OBJ_ACTS = {
-    objtog: function (a) { var s = D.obj.sel, i = s.indexOf(a.dataset.v); if (i === -1) s.push(a.dataset.v); else s.splice(i, 1); reObj(); },
-    objclear: function () { D.obj.sel = []; reObj(); },
-    objadd: function () { var n = (P.os || '').trim(); if (!n) return; D.obj.custom.unshift([n, 1]); D.obj.sel.push(n); P.os = ''; reObj(); toast('Added “' + n + '”'); },
-    objsuggall: function () { objSuggestions().forEach(function (s) { D.obj.sel.push(s.name); }); reObj(); },
-    roletog: function (a) { var s = D.obj.roles, i = s.indexOf(a.dataset.v); if (i === -1) s.push(a.dataset.v); else s.splice(i, 1); reObj(); },
-    kmsel: function (a) { P.kl = a.dataset.id; P.ks = ''; render(); window.scrollTo(0, 0); },
-    kmtog: function (a) { var id = P.kl, arr = D.km[id] = D.km[id] || [], i = arr.indexOf(a.dataset.k); if (i === -1) arr.push(a.dataset.k); else arr.splice(i, 1); var y = window.scrollY; render(); window.scrollTo(0, y); saveState(); },
-    kmaccept: function (a) { var arr = D.km[P.kl] = D.km[P.kl] || []; if (arr.indexOf(a.dataset.k) === -1) arr.push(a.dataset.k); reObj(); },
-    kmdismiss: function (a) { D.kmSug[P.kl] = (D.kmSug[P.kl] || []).filter(function (id) { return id !== a.dataset.k; }); reObj(); },
-    kmaccall: function () { var arr = D.km[P.kl] = D.km[P.kl] || []; (D.kmSug[P.kl] || []).forEach(function (id) { if (arr.indexOf(id) === -1) arr.push(id); }); reObj(); },
-    kmsug1: function () { var l = D.lessons.filter(function (x) { return x.id === P.kl; })[0], s = kmSuggest(l); D.kmSug[l.id] = s.map(function (x) { return x.k.id; }); reObj(); toast(s.length ? s.length + ' possible sources found' : 'No matching sources found'); },
-    kmsugall: function () { var n = 0; D.lessons.forEach(function (l) { var s = kmSuggest(l); D.kmSug[l.id] = s.map(function (x) { return x.k.id; }); n += s.length; }); reObj(); toast(n + ' suggestions across ' + D.lessons.length + ' lessons. Review each lesson, nothing is attached yet.'); },
-    kmsave: function () { saveState(); toast('Mappings saved'); }
+    objtog: function (a) {
+      var n = a.dataset.v, sel = D.obj.sel, i = sel.indexOf(n);
+      if (i === -1) { sel.push(n); D.obj.map[n] = a.dataset.suggest && OBJ_HINTS[n] ? lessonIdsMentioning(OBJ_HINTS[n]) : []; if (!a.dataset.suggest) P.oexp = n; }
+      else { sel.splice(i, 1); delete D.obj.map[n]; if (P.oexp === n) P.oexp = null; }
+      objRefresh(i === -1 && a.closest('#objList') ? n : null, 'objtog');
+    },
+    objexp: function (a) { P.oexp = P.oexp === a.dataset.v ? null : a.dataset.v; objRefresh(a.dataset.v, 'objexp'); },
+    objles: function (a) { var n = a.dataset.v, m = D.obj.map[n] = D.obj.map[n] || [], i = m.indexOf(a.dataset.l); if (i === -1) m.push(a.dataset.l); else m.splice(i, 1); var y = window.scrollY; objRefresh(); window.scrollTo(0, y); var b = $$('[data-act="objles"]').filter(function (e) { return e.dataset.v === n && e.dataset.l === a.dataset.l; })[0]; if (b) b.focus({ preventScroll: true }); },
+    objfind: function (a) { var n = a.dataset.v, ids = OBJ_HINTS[n] ? lessonIdsMentioning(OBJ_HINTS[n]) : []; if (!ids.length) { toast('No lesson mentions this yet. Choose the lessons yourself.'); return; } D.obj.map[n] = ids; objRefresh(n, 'objfind'); toast(ids.length + ' lesson' + (ids.length > 1 ? 's' : '') + ' linked. Check that they are right.'); },
+    objclear: function () { D.obj.sel = []; D.obj.map = {}; P.oexp = null; objRefresh(); },
+    objadd: function () { var n = (P.os || '').trim(); if (!n) return; D.obj.custom.unshift([n, 1]); D.obj.sel.push(n); D.obj.map[n] = []; P.os = ''; P.oexp = n; render(); saveState(); toast('Added \u201C' + n + '\u201D. Now choose its lessons.'); },
+    objsuggall: function () { objSuggestions().forEach(function (s) { D.obj.sel.push(s.name); D.obj.map[s.name] = lessonIdsMentioning(OBJ_HINTS[s.name]); }); objRefresh(); },
+    roletog: function (a) { var s = D.obj.roles, i = s.indexOf(a.dataset.v); if (i === -1) s.push(a.dataset.v); else s.splice(i, 1); objRefresh(); },
+    kmcol: function (a) { P.kl = a.dataset.id; kmRefresh(); },
+    kmcell: function (a) {
+      var l = D.lessons.filter(function (x) { return x.id === a.dataset.l; })[0], arr = D.km[l.id] = D.km[l.id] || [], i = arr.indexOf(a.dataset.k);
+      if (i === -1) arr.push(a.dataset.k); else arr.splice(i, 1);
+      P.kc = { k: a.dataset.k, l: l.id }; P.kl = l.id; kmRefresh(a.dataset.k, l.id);
+    },
+    kmrowadd: function (a) { D.lessons.forEach(function (l) { var arr = D.km[l.id] = D.km[l.id] || []; if ((D.kmSug[l.id] || []).indexOf(a.dataset.k) !== -1 && arr.indexOf(a.dataset.k) === -1) arr.push(a.dataset.k); }); kmRefresh(); },
+    kmdismiss: function (a) { D.kmSug[a.dataset.l] = (D.kmSug[a.dataset.l] || []).filter(function (id) { return id !== a.dataset.k; }); kmRefresh(a.dataset.k, a.dataset.l); },
+    kmaddall: function () { D.lessons.forEach(function (l) { var arr = D.km[l.id] = D.km[l.id] || []; (D.kmSug[l.id] || []).forEach(function (id) { if (arr.indexOf(id) === -1) arr.push(id); }); }); kmRefresh(); toast('Suggested sources attached'); },
+    kmsugall: function () {
+      var n = 0; D.kmSug = {};
+      D.lessons.forEach(function (l) { var have = D.km[l.id] || []; D.kmSug[l.id] = KB.filter(function (k) { return have.indexOf(k.id) === -1 && kmHits(k, l).length; }).map(function (k) { return k.id; }); n += D.kmSug[l.id].length; });
+      kmRefresh(); toast(n ? n + ' suggestions marked \u2726. Select a cell to see why. Nothing is attached yet.' : 'No matching sources found.');
+    }
   };
 
   // ==========================================================================
@@ -1312,7 +1469,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   var TM_COVER = 'https://arrxhvhsaatoncentirl.supabase.co/storage/v1/object/public/course-resources/covers/d2f17354-edd7-4e2a-935a-c71fffd4e201.png';
   var TM_DESC = 'Master the fundamentals of effective time management by learning how to prioritise tasks, set achievable goals, manage distractions, and plan your workload efficiently. This course equips you with practical techniques to boost productivity, reduce stress, and make better use of your time in both work and everyday life.';
   function emptyCourse(title) {
-    return { lessons: [], modules: [], obj: { sel: [], custom: [], roles: [] }, km: {}, kmSug: {}, status: 'draft', ver: null,
+    return { lessons: [], modules: [], obj: { sel: [], custom: [], roles: [], map: {} }, km: {}, kmSug: {}, status: 'draft', ver: null,
       details: { title: title, summary: '', description: '', objectives: [], difficulty: 'Beginner', industry: [], linked: [], cover: { type: 'none' } },
       course: { duration: 0, durationAuto: true } };
   }
@@ -1874,7 +2031,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     if (t.dataset.cvp) { COVER_DLG.prompt = t.value; var gb = $('[data-act="cvgen"]'); if (gb && !COVER_DLG.options) gb.disabled = !t.value.trim(); return; }
     if (t.dataset.resn != null) { l.resources[+t.dataset.resn].name = t.value; saveState(); return; }
     if (t.dataset.os) { P.os = t.value; $('#objList').innerHTML = objListHtml(); return; }
-    if (t.dataset.ks) { P.ks = t.value; var kl = D.lessons.filter(function (x) { return x.id === P.kl; })[0]; $('#kbList').innerHTML = kbListHtml(kl); return; }
+    if (t.dataset.ks) { P.ks = t.value; $('#kmMatrix').innerHTML = kmMatrixHtml(); return; }
     if (t.id === 'gpaste') { G.paste = t.value; var nx = $('[data-g="next1"]'); if (nx) nx.disabled = genText().trim().length < 20; return; }
     if (t.dataset.b && t.dataset.p && t.type !== 'checkbox' && t.tagName !== 'SELECT') {
       var b = l.blocks.filter(function (x) { return x.id === t.dataset.b; })[0];
@@ -1958,7 +2115,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     if (!s.modules) s.modules = [{ id: 'm1', title: (s.module || {}).title || 'Module 1', desc: (s.module || {}).desc || '' }];
     s.lessons.forEach(function (l) { if (!l.mod) l.mod = s.modules[0].id; l.resources = l.resources || []; l.review = l.review || { mode: 'ai', pass: 80, later: true, questions: [] }; l.jen = l.jen || { on: true, chips: [], glossary: [] }; l.disc = l.disc || { on: true, starter: '' }; });
     s.details = s.details || detailsSeed();
-    s.obj = s.obj || { sel: [], custom: [], roles: [] }; s.km = s.km || {}; s.kmSug = s.kmSug || {};
+    s.obj = s.obj || { sel: [], custom: [], roles: [] }; s.obj.map = s.obj.map || {}; s.km = s.km || {}; s.kmSug = s.kmSug || {};
   }
 
   // Deep links: ?mode=old|new, ?lesson=1..13, ?tab=details|content, ?screen=new (an empty new course)

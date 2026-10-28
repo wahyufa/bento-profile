@@ -290,3 +290,20 @@ Requested after the home redesign felt like too much change: keep production's s
 - [x] Feedback round: "Evaluate My Skills" restored as its own Learning Hub card (6 cards again, own illustration `evaluate.webp`). Removing it was my call, not a confirmed duplicate.
 - [x] Feedback round: the empty right side of the greeting band now holds the progress panel (course ring, last-7-days streak strip, lessons / knowledge points / badges, links to Performance and Leaderboard). The separate "Your progress" section below was removed so the numbers are not shown twice.
 - [ ] Check with product what "Evaluate My Skills" opens in production vs "Assessments", to write distinct descriptions.
+
+Update (authoring prototype, round 8: Learning Objectives, two panels)
+- [x] Learning Objectives redesigned as two panels: Library (search, All/Skills Framework/Custom, tickable rows instead of a chip wall) and "In this course" (each pick expands to choose the lessons that build it, "Suggest lessons", coverage bar, lessons not linked yet)
+- [x] Suggestions add the competency and link the lessons it was found in; target job roles kept
+- [x] Note at the top explains learner-facing objectives (Details) vs competencies (reporting and role matching), with a link to Details
+- [x] Panels redraw in place (search, scroll and focus are kept)
+- [ ] The competency-to-lesson link is new; production has no such field (Knowledge Mapping is per lesson, objectives are per course). Confirm it can be stored and reported on
+- [ ] "Suggest lessons" is keyword matching on a small sample list, not a model; keyword hits are broad (Digital Marketing matched 11 of 13 lessons)
+
+Update (authoring prototype, round 9: Knowledge Mapping matrix)
+- [x] Knowledge Mapping redesigned as a matrix: sources in rows, lessons in columns (grouped by module). Click a cell to attach or remove; suggested cells are dashed with a star; per-lesson totals in the footer (0 shown in red); per-source "Unused" and lesson counts; "Add N suggested" per source; "Add all suggested"; search
+- [x] "Why this match" panel for the selected cell: which of the source's topics the lesson uses, with the sentence from the lesson highlighted; or why it probably does not fit
+- [x] "What Jen uses in lesson N" and "What this tab does" explain the effect (lesson text plus attached sources)
+- [x] Matrix redraws in place (scroll, search and focus are kept). Removed the old per-lesson list and Save mappings button (changes were already kept)
+- [ ] Production Knowledge Base list and how sources are attached were not inspected; sources and topic keywords are invented samples
+- [ ] Suggestions are keyword matches: 49 of 130 cells get a suggestion on the sample course because lessons 5-12 share vocabulary. A real matcher should rank and cap them
+- [ ] "Jen answers from attached sources" is the intended behaviour as described to the prototype, not confirmed against production
