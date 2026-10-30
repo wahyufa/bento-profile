@@ -1464,3 +1464,26 @@ input {
     display: none;
   }
 }
+
+/* ---------- Admin / Tutor worksheet switch (same look as the insight "View by" tabs) ---------- */
+
+.source-tabs {
+  display: flex;
+  margin: 12px 0 4px;
+  border-bottom: 1px solid #d9d9d9;
+}
+
+.source-tab {
+  padding: 5px 20px;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.source-tab.is-active {
+  border-bottom-color: var(--color-success);
+  font-weight: 700;
+}

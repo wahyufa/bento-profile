@@ -18,6 +18,7 @@ const state = {
   subjectLevels: [],
   worksheetId: null,
   branchId: null,
+  source: "all", // "all" | "admin" | "tutor" — who made the worksheet
   creator: null, // "role:Tutor" or "person:<creatorKey>" — only on pages with the Created By filter
   search: "",
   dateRange: null,
@@ -26,6 +27,7 @@ const state = {
 
 const rowsBody = document.getElementById("worksheetRows");
 const paginationList = document.getElementById("pagination");
+const sourceTabs = document.getElementById("sourceTabs");
 const columnCount = document.querySelectorAll(".worksheet-table thead th").length;
 
 /* ---------- Formatting ---------- */
@@ -81,7 +83,14 @@ function rowHtml(worksheet) {
 
 /* ---------- Filtering & rendering ---------- */
 
-function getFilteredWorksheets() {
+// "Admin" covers everything not made by a tutor (HQ's own worksheets included).
+const SOURCE_TABS = [
+  { key: "all", label: "All worksheets", matches: () => true },
+  { key: "admin", label: "Admin", matches: (worksheet) => worksheet.creator.role !== "Tutor" },
+  { key: "tutor", label: "Tutor", matches: (worksheet) => worksheet.creator.role === "Tutor" },
+];
+
+function getFilteredWorksheets(ignoreSource = false) {
   const query = state.search.trim().toLowerCase();
   return SCOPED_WORKSHEETS.filter((worksheet) => {
     const { subject, level } = parseSubject(worksheet.subject);
@@ -92,12 +101,20 @@ function getFilteredWorksheets() {
     const matchesSearch = worksheet.name.toLowerCase().includes(query);
     const matchesDate = !state.dateRange
       || (worksheet.date >= state.dateRange[0] && worksheet.date <= state.dateRange[1]);
+    const matchesSource = ignoreSource || SOURCE_TABS.find((tab) => tab.key === state.source).matches(worksheet);
     return matchesSubject && matchesWorksheet && matchesBranch && matchesCreator(worksheet)
-      && matchesSearch && matchesDate;
+      && matchesSearch && matchesDate && matchesSource;
   });
 }
 
+// Counts follow the other filters, so each tab shows what you'd get by switching to it.
+function renderSourceTabs() {
+  const others = getFilteredWorksheets(true);
+  sourceTabs.innerHTML = SOURCE_TABS.map((tab) => `<button type="button" role="tab" class="source-tab${tab.key === state.source ? " is-active" : ""}" aria-selected="${tab.key === state.source}" data-source="${tab.key}">${tab.label} (${others.filter(tab.matches).length})</button>`).join("");
+}
+
 function render() {
+  renderSourceTabs();
   const filtered = getFilteredWorksheets();
   const totalPages = Math.max(1, Math.ceil(filtered.length / ROWS_PER_PAGE));
   state.page = Math.min(state.page, totalPages);
@@ -224,6 +241,11 @@ document.getElementById("searchInput").addEventListener("input", (event) => {
 });
 
 /* ---------- Table & pagination events ---------- */
+
+sourceTabs.addEventListener("click", (event) => {
+  const tab = event.target.closest("[data-source]");
+  if (tab) applyFilter({ source: tab.dataset.source });
+});
 
 rowsBody.addEventListener("click", (event) => {
   const insightButton = event.target.closest("[data-insight]");
