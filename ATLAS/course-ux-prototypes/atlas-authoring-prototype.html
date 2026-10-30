@@ -246,10 +246,33 @@ label.btn:focus-within { outline: 3px solid var(--primary); outline-offset: 2px;
 .kbi:hover { background: var(--bg); }
 .kbi input { margin-top: 3px; width: 18px; height: 18px; accent-color: var(--primary); }
 .kbi b { display: block; font-size: 13.5px; font-weight: 600; }
-.pvdlg { width: min(900px, calc(100vw - 32px)); }
-.pvdlg .pvs { max-height: calc(100vh - 170px); }
-.pvdlg .pvf { max-width: 720px; }
-.pvdlg .pvf.phone { max-width: 340px; }
+/* Learner preview: full screen, the whole course with its outline */
+dialog.dlg.pvdlg { width: 100vw; height: 100vh; max-width: none; max-height: none; margin: 0; border-radius: 0; overflow: hidden; }
+.pvdlg #pvBody { display: flex; flex-direction: column; height: 100%; }
+.pvh-pos { font-weight: 500; color: var(--muted); }
+.pvwrap { flex: 1; min-height: 0; display: grid; grid-template-columns: 290px minmax(0, 1fr); }
+.pvwrap.phone { grid-template-columns: minmax(0, 1fr); }
+.pvdlg .pvs { min-height: 0; padding: 24px 20px 32px; }
+.pvdlg .pvf { max-width: 760px; }
+.pvdlg .pvf.phone { max-width: 360px; }
+.pvo { overflow-y: auto; background: var(--surface); border-right: 1px solid var(--line); padding: 16px 12px; font-family: var(--learner); }
+.pvo-h { padding: 0 8px 12px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+.pvo-h small, .pvo-m > small { display: block; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.pvo-h b { display: block; margin: 2px 0; font-size: 15px; line-height: 1.3; }
+.pvo-h span { font-size: 12.5px; color: var(--muted); }
+.pvo-m > small { padding: 10px 8px 6px; }
+.pvo ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.pvo button { width: 100%; display: flex; gap: 10px; align-items: flex-start; padding: 8px; border: 0; border-radius: 10px; background: none; font: inherit; font-size: 13.5px; line-height: 1.35; text-align: left; color: var(--ink); cursor: pointer; }
+.pvo button:hover { background: var(--bg); }
+.pvo button[aria-current="page"] { background: var(--primary-soft); color: var(--primary-ink); font-weight: 600; }
+.pvo .n { flex: none; width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--bg); font-size: 11.5px; font-weight: 700; }
+.pvo button[aria-current="page"] .n { background: var(--primary); color: #fff; }
+.pvo .t em { display: block; margin-top: 2px; font-style: normal; font-weight: 400; font-size: 12px; color: var(--muted); }
+.pvnav { max-width: 760px; margin: 16px auto 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.pvnav .btn { display: block; max-width: 48%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pvwrap.phone .pvnav { max-width: 360px; flex-direction: column-reverse; align-items: stretch; }
+.pvwrap.phone .pvnav .btn { max-width: none; }
+@media (max-width: 760px) { .pvwrap { grid-template-columns: minmax(0, 1fr); } .pvo { display: none; } }
 @media (max-width: 1100px) { .ow2 { grid-template-columns: minmax(0, 1fr); } .ow, .kmw { grid-template-columns: minmax(0, 1fr); } .ow-side { position: static; } }
 .st { padding: 14px; position: sticky; top: calc(var(--proto-h) + 16px); max-height: calc(100vh - var(--proto-h) - 32px); overflow-y: auto; }
 .st h2 { font-size: 15px; font-weight: 700; }
@@ -326,10 +349,13 @@ details.orig .txt { padding: 0 16px 14px; font-size: 13.5px; color: var(--muted)
 .qe { padding: 14px 16px; display: grid; gap: 10px; }
 .qe .qh { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .qe .qh b { font-size: 14.5px; }
-.opt { display: grid; grid-template-columns: 26px 1fr 32px; gap: 8px; align-items: center; }
+.opt { display: grid; grid-template-columns: 26px minmax(0, 1fr) auto; gap: 8px; align-items: center; }
 .opt .l { width: 26px; height: 26px; border-radius: 8px; background: var(--bg); display: grid; place-items: center; font-weight: 700; font-size: 12.5px; }
 .opt.ok .l { background: var(--green); color: #fff; }
-.opt label.mk { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.opt label.mk { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 12.5px; font-weight: 500; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.opt label.mk input { margin: 0; accent-color: var(--green); }
+.opt label.mk:hover { border-color: var(--green); }
+.opt.ok label.mk { background: var(--green-soft); border-color: var(--green); color: var(--green); font-weight: 600; }
 .aichk { background: #F4EFFD; border-radius: 12px; padding: 10px 12px; font-size: 13px; color: #3d2b82; display: grid; gap: 6px; }
 .aichk .btns { display: flex; gap: 8px; flex-wrap: wrap; }
 
@@ -1154,11 +1180,26 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     return '<details class="card sec"><summary>Discussion <span class="chip ' + (l.disc.on ? 'ok' : '') + '">' + (l.disc.on ? 'On' : 'Off') + '</span></summary><div class="in-body"><label class="tog"><input type="checkbox" data-dc="on"' + (l.disc.on ? ' checked' : '') + '> Learners can discuss this lesson after they submit the quiz</label></div></details>';
   }
 
-  // Learner preview opens on demand in a dialog instead of taking a permanent column
+  // Learner preview: a full-screen view of the whole course as learners see it, opened at the
+  // lesson being edited. The outline and Previous / Next move between lessons.
+  function pvLesson() { return D.lessons.filter(function (l) { return l.id === P.pvl; })[0] || cur(); }
   function renderPv() {
-    var l = cur();
-    $('#pvBody').innerHTML = '<div class="pvh"><span id="pvTitle" tabindex="-1">Learner preview</span><span class="sp"></span><div class="seg" role="group" aria-label="Device"><button type="button" data-dev="desktop" aria-pressed="' + (P.device === 'desktop') + '">Desktop</button><button type="button" data-dev="phone" aria-pressed="' + (P.device === 'phone') + '">Phone</button></div><button class="ico" type="button" data-act="pvclose" aria-label="Close preview">✕</button></div>' +
-      '<div class="pvs" id="pvs"><div class="pvf ' + (P.device === 'phone' ? 'phone' : '') + '" id="pvf">' + previewHtml(l) + '</div></div>';
+    var l = pvLesson(), i = D.lessons.indexOf(l), prev = D.lessons[i - 1], next = D.lessons[i + 1], phone = P.device === 'phone';
+    var outline = '<nav class="pvo" aria-label="Course outline"><div class="pvo-h"><small>Course</small><b>' + esc((D.details && D.details.title) || 'Untitled course') + '</b><span>' + D.lessons.length + ' lessons</span></div>' +
+      D.modules.map(function (m) {
+        return '<div class="pvo-m"><small>' + esc(m.title) + '</small><ol>' + lessonsIn(m).map(function (x) {
+          var status = x.quiz || x.converted ? '' : ' · not converted yet';
+          return '<li><button type="button" data-pvl="' + x.id + '"' + (x === l ? ' aria-current="page"' : '') + '><span class="n">' + (D.lessons.indexOf(x) + 1) + '</span><span class="t">' + esc(x.title) + '<em>' + x.type + ' · ' + x.mins + ' min' + status + '</em></span></button></li>';
+        }).join('') + '</ol></div>';
+      }).join('') + '</nav>';
+    var nav = '<div class="pvnav">' + (prev ? '<button class="btn" type="button" data-pvl="' + prev.id + '">← ' + esc(prev.title) + '</button>' : '<span></span>') +
+      (next ? '<button class="btn primary" type="button" data-pvl="' + next.id + '">Next: ' + esc(next.title) + ' →</button>' : '<span class="mini">End of the course</span>') + '</div>';
+    $('#pvBody').innerHTML = '<div class="pvh"><span id="pvTitle" tabindex="-1">Learner preview</span><span class="pvh-pos">Lesson ' + (i + 1) + ' of ' + D.lessons.length + '</span><span class="sp"></span>' +
+      '<div class="seg" role="group" aria-label="Device"><button type="button" data-dev="desktop" aria-pressed="' + !phone + '">Desktop</button><button type="button" data-dev="phone" aria-pressed="' + phone + '">Phone</button></div>' +
+      '<button class="btn sm" type="button" data-act="pvedit">Edit this lesson</button><button class="btn sm primary" type="button" data-act="pvclose">Back to editor</button></div>' +
+      '<div class="pvwrap' + (phone ? ' phone' : '') + '">' + (phone ? '' : outline) + '<div class="pvs" id="pvs"><div class="pvf' + (phone ? ' phone' : '') + '" id="pvf">' + previewHtml(l) + '</div>' + nav + '</div></div>';
+    // Keep the lesson being viewed visible in a long outline
+    var here = $('.pvo [aria-current="page"]'); if (here) here.scrollIntoView({ block: 'nearest' });
   }
 
   // The production editor, kept for comparison
@@ -1853,7 +1894,8 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     var ls = e.target.closest('[data-lesson]'); if (ls) { P.lid = ls.dataset.lesson; P.pane = 'edit'; render(); window.scrollTo(0, 0); return; }
     var og = e.target.closest('[data-og]'); if (og) { P.og = og.dataset.og; render(); return; }
     var dv = e.target.closest('[data-dev]'); if (dv) { P.device = dv.dataset.dev; renderPv(); return; }
-    var sg = e.target.closest('[data-stage]'); if (sg) { var pr = sg.dataset.stage.split(':'), l0 = cur(), bb = l0.blocks.filter(function (x) { return x.id === pr[0]; })[0]; P.stage[pr[0]] = { i: +pr[1], text: bb ? (function () { var st = bb.data.stages[+pr[1]]; var ex = bb.data.starts.filter(function (x) { return +x.stage === +pr[1] + 1; })[0]; return ex ? ex.label + ': ' + ex.text : st.text; })() : '' }; var pf = $('#pvf'); if (pf) pf.innerHTML = previewHtml(l0); return; }
+    var pvl = e.target.closest('[data-pvl]'); if (pvl) { P.pvl = pvl.dataset.pvl; renderPv(); $('#pvs').scrollTop = 0; $('#pvTitle').focus(); return; }
+    var sg = e.target.closest('[data-stage]'); if (sg) { var pr = sg.dataset.stage.split(':'), l0 = D.lessons.filter(function (x) { return (x.blocks || []).some(function (y) { return y.id === pr[0]; }); })[0] || cur(), bb = l0.blocks.filter(function (x) { return x.id === pr[0]; })[0]; P.stage[pr[0]] = { i: +pr[1], text: bb ? (function () { var st = bb.data.stages[+pr[1]]; var ex = bb.data.starts.filter(function (x) { return +x.stage === +pr[1] + 1; })[0]; return ex ? ex.label + ': ' + ex.text : st.text; })() : '' }; var pf = $('#pvf'); if (pf) pf.innerHTML = previewHtml(l0); return; }
     var a = e.target.closest('[data-act]'); if (a) { if (a.tagName === 'A') e.preventDefault(); act(a); return; }
     var g = e.target.closest('[data-g]'); if (g) { genAct(g, e); return; }
     var pk = e.target.closest('[data-pk]'); if (pk) {
@@ -1868,8 +1910,9 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     var l = cur(), k = a.dataset.act, bid = a.dataset.b, i = +a.dataset.i;
     function blk() { return l.blocks.filter(function (x) { return x.id === bid; })[0]; }
     if (k === 'menu') { P.menu = !P.menu; render(); return; }
-    if (k === 'learner') { renderPv(); var pd = $('#pvDlg'); if (!pd.open) pd.showModal(); $('#pvTitle').focus(); return; }
+    if (k === 'learner') { P.pvl = P.lid; renderPv(); var pd = $('#pvDlg'); if (!pd.open) pd.showModal(); $('#pvTitle').focus(); return; }
     if (k === 'pvclose') { $('#pvDlg').close(); return; }
+    if (k === 'pvedit') { P.lid = pvLesson().id; P.pane = 'edit'; $('#pvDlg').close(); render(); window.scrollTo(0, 0); return; }
     if (OBJ_ACTS[k]) { OBJ_ACTS[k](a); return; }
     if (DET_ACTS[k]) { DET_ACTS[k](a); return; }
     if (LIST_ACTS[k]) { LIST_ACTS[k](a); return; }

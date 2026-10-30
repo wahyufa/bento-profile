@@ -329,3 +329,9 @@ Update (authoring prototype, round 13: objectives list removed from Details)
 - [x] The Current (production) layout of lesson 1 is unchanged. The Fundamentals dialog and registration scripts stay in the file but do nothing without these sections, so they can be restored from git.
 - [x] Authoring prototype: removed the "Before you start" and "Community invitation" block types (definitions, add-block list, lesson 1 sample, learner-preview renderers and styles). Older saved copies in localStorage drop those blocks on load (`dropRemovedBlocks`). Tested: no console errors, lesson 1 preview shows intro + What you will learn.
 - [ ] If the "gather your documentation" advice is still wanted, it may fit the course page ("What you need") rather than inside a lesson.
+
+## Authoring: full-screen learner preview + quiz "Correct" marker (30 Oct 2026)
+- [x] "Preview as learner" is now full screen and covers the whole course: course outline on the left (modules, lessons, type, minutes, "not converted yet"), the lesson as learners see it, Previous / Next at the bottom, "Lesson n of 13" in the bar. Opens at the lesson being edited; "Edit this lesson" jumps the editor to the lesson on screen; "Back to editor" closes. Desktop / Phone toggle kept (Phone hides the outline). Funnel stage buttons work in any previewed lesson.
+- [x] Quiz editor: the "Correct" marker no longer overflows its 32px column; it is a pill next to each option and turns green when chosen.
+- [x] Tested in the browser at 1440px: lesson 1 → 2 via Next, jump to the quiz via the outline, Phone mode, Edit this lesson; no console errors.
+- [ ] Long option texts are cut off in the single-line option fields (already the case before); consider multi-line fields if authors need to see full options.
