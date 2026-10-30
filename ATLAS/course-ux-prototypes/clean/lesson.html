@@ -58,6 +58,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); overflow: hidden; }
 .seg button { border: 0; background: none; padding: 6px 14px; font-size: 13px; font-weight: 500; }
 .seg button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+/* 13 lesson buttons: scroll sideways on narrow screens instead of being cut off */
+.seg[aria-label="Lesson"] { max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.seg[aria-label="Lesson"] button { flex: none; padding: 6px 11px; }
 
 /* ---------- App chrome (mirrors production) ---------- */
 .topbar {
@@ -327,6 +330,68 @@ details.disclosure .inner h4 { color: var(--ink); font-size: 14px; margin: 18px 
 .res li > div { flex: 1; min-width: 0; }
 .res b { display: block; font-size: 15.5px; line-height: 1.35; }
 .res small { color: var(--muted); font-size: 13px; }
+
+/* ---------- Blocks added for lessons 4 to 12 ---------- */
+/* Flow: a short sequence where each step builds on the previous one */
+.flow { list-style: none; padding: 0; margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; counter-reset: f; }
+.flow li { position: relative; counter-increment: f; padding: 16px 18px 16px 56px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); font-size: 14.5px; line-height: 1.5; }
+.flow li::before { content: counter(f); position: absolute; left: 16px; top: 15px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--primary); color: #fff; font-weight: 700; font-size: 13px; }
+.flow b { display: block; font-size: 15.5px; }
+.flow span { color: var(--muted); }
+/* Search term shown like a search box */
+.kw { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px 14px; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-size: 14px; font-weight: 600; }
+.kw::before { content: ""; width: 12px; height: 12px; border: 2px solid var(--muted); border-radius: 50%; }
+/* Self-check list the learner can tick */
+.checklist { list-style: none; padding: 0; display: grid; gap: 8px; }
+.checklist label { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); font-size: 15px; line-height: 1.5; cursor: pointer; }
+.checklist input { width: 20px; height: 20px; margin: 1px 0 0; flex: none; accent-color: var(--green); }
+.checklist label:has(input:checked) { border-color: var(--green); background: var(--green-soft); }
+/* Think first, then reveal */
+.reveal summary { cursor: pointer; font-weight: 600; color: var(--primary-ink); }
+.reveal[open] summary { margin-bottom: 6px; }
+.reveal p { font-size: 14.5px; }
+/* Task without a submit: answers save as the learner types */
+.task .task-body { padding: 20px 22px 22px; display: grid; gap: 16px; }
+/* Number tiles (KPIs) */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { padding: 14px 16px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+.stat b { display: block; font-size: 15px; }
+.stat span { display: block; margin-top: 2px; font-size: 13.5px; line-height: 1.45; color: var(--muted); }
+/* Calculator */
+.calc { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); padding: 20px 22px; display: grid; gap: 16px; }
+.calc-in { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.calc-in label { display: grid; gap: 6px; font-size: 13.5px; font-weight: 600; }
+.calc-in input { font: inherit; font-weight: 500; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); }
+.calc-in input:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px var(--primary-soft); }
+.calc-out { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+.calc-out div { padding: 14px 16px; border-radius: var(--radius); background: var(--primary-soft); }
+.calc-out small { display: block; font-size: 12.5px; font-weight: 600; color: var(--primary-ink); }
+.calc-out b { display: block; font-size: 22px; line-height: 1.3; }
+.calc-out span { font-size: 13px; color: var(--muted); }
+/* Journey plan: one card per funnel stage */
+.plan { display: grid; gap: 12px; }
+.plan-stage { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); padding: 16px 18px; display: grid; gap: 10px; }
+.plan-stage h3 { margin: 0; display: flex; align-items: center; gap: 10px; }
+.plan-stage h3 i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--navy); color: #fff; font-style: normal; font-size: 12.5px; }
+.plan-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.plan-row label { display: grid; gap: 4px; font-size: 12.5px; font-weight: 600; color: var(--muted); }
+.plan-row input { font: inherit; font-size: 14px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 10px; background: var(--bg); color: var(--ink); }
+.plan-row input:focus { outline: none; border-color: var(--primary); background: #fff; }
+.plan-hint { font-size: 13px; color: var(--muted); }
+@media (max-width: 640px) { .plan-row { grid-template-columns: 1fr; } }
+/* Lesson 12 recap: one numbered consideration per section, with the learner's own notes */
+.recap { display: grid; grid-template-columns: 40px minmax(0, 1fr); gap: 16px; }
+.recap > .num { width: 40px; height: 40px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; }
+.recap .block-title { margin-bottom: 6px; }
+.go-link { margin-top: 14px; padding: 0; border: 0; background: none; font: inherit; font-size: 14.5px; font-weight: 600; color: var(--primary-ink); cursor: pointer; }
+.go-link:hover { text-decoration: underline; }
+.mine { margin-top: 14px; padding: 14px 16px; border-radius: var(--radius); background: var(--primary-soft); font-size: 14.5px; }
+.mine small { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--primary-ink); }
+.mine dl { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 4px 14px; }
+.mine dt { font-weight: 600; }
+.mine dd { margin: 0; color: var(--ink); }
+.mine.empty { background: var(--bg); color: var(--muted); }
+@media (max-width: 640px) { .recap { grid-template-columns: minmax(0, 1fr); gap: 10px; } .mine dl { grid-template-columns: minmax(0, 1fr); } .mine dd { margin-bottom: 6px; } }
 .res-ic { flex: none; width: 44px; height: 44px; border-radius: 12px; background: var(--primary-soft); color: var(--primary-ink); display: grid; place-items: center; font-weight: 700; font-size: 12px; letter-spacing: .04em; }
 @media (max-width: 520px) { .res li { flex-wrap: wrap; } .res li .btn { width: 100%; } }
 .saved { margin-top: 18px; display: grid; gap: 14px; }
@@ -1135,6 +1200,770 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   </div>
 </template>
 
+
+<!-- ======================================================================
+     LESSON 4 · Article · Promoting your content
+     ====================================================================== -->
+<template id="l4-new">
+  <section class="block" data-rail="The PEO model" id="l4-peo">
+    <p class="lead">Given the range of digital content available, you can use the <b>paid, earned and owned media (PEO) model</b> to build a digital marketing strategy that brings these approaches together.</p>
+    <div class="cards" style="margin-top:20px">
+      <div class="card accent-top">
+        <div class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6H9v6H4a1 1 0 01-1-1z"/></svg></div>
+        <h3>Owned media</h3>
+        <p>Digital channels and content you control, so you set the message and the story about your product or service.</p>
+        <div class="chips-row"><span class="chip">Your website</span><span class="chip">Brand pages on social media</span><span class="chip">Email newsletters</span><span class="chip">Your own apps</span></div>
+      </div>
+      <div class="card accent-top">
+        <div class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M14.5 9.5c-.4-.9-1.3-1.5-2.5-1.5-1.5 0-2.5.8-2.5 2s1 1.7 2.5 2 2.5.8 2.5 2-1 2-2.5 2c-1.2 0-2.1-.6-2.5-1.5M12 6.5V8M12 16v1.5"/></svg></div>
+        <h3>Paid media</h3>
+        <p>External marketing you pay for: third parties broadcast your message. You still control the content.</p>
+        <div class="chips-row"><span class="chip">Paid search ads</span><span class="chip">Display ads</span><span class="chip">Shopping ads</span></div>
+      </div>
+      <div class="card accent-top">
+        <div class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16.6 6.6 19.5l1.2-6L3.3 9.3l6.1-.7z"/></svg></div>
+        <h3>Earned media</h3>
+        <p>Publicity you receive without paying, often from credible third parties such as bloggers, journalists and influencers.</p>
+        <div class="chips-row"><span class="chip">Online reviews</span><span class="chip">Word-of-mouth</span><span class="chip">Influencer posts</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Use them together" id="l4-together">
+    <h2 class="block-title">Use them together</h2>
+    <p>The trick is to combine all three, so that you are regarded as the expert in your field, even by your competitors.</p>
+    <ol class="flow" aria-label="How the three media work together">
+      <li><b>Owned</b><span>sets the tone with content you create</span></li>
+      <li><b>Paid</b><span>amplifies the message</span></li>
+      <li><b>Earned</b><span>builds relationships with opinion leaders who share your content with their followers</span></li>
+    </ol>
+  </section>
+
+  <section class="block" data-rail="Your turn" id="l4-task">
+    <div class="task">
+      <div class="task-head">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+        <div><b>Your turn: which media do you already use?</b><small>Note what you use today.</small></div>
+      </div>
+      <div class="task-body">
+        <div class="field"><label for="peoOwned">Owned</label><small>e.g. your website, Instagram page, newsletter</small><textarea id="peoOwned" data-save="atlas-proto-peo-owned"></textarea></div>
+        <div class="field"><label for="peoPaid">Paid</label><small>e.g. boosted posts, search ads</small><textarea id="peoPaid" data-save="atlas-proto-peo-paid"></textarea></div>
+        <div class="field"><label for="peoEarned">Earned</label><small>e.g. customer reviews, a local blogger's post</small><textarea id="peoEarned" data-save="atlas-proto-peo-earned"></textarea></div>
+        <div class="task-actions">
+          <button class="btn primary" type="button" data-open-panel="disc">Share in the discussion</button>
+          <span class="saved-note">Then read what others use: which approaches work well, and how could you build on them?</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</template>
+
+<template id="l4-old">
+  
+  <div class="legacy">
+    <p>One of the key features of 10,000 Women is the power of the network created between like-minded individuals. To make the most of this network, share your experiences with others, discuss the topics presented, and support other participants in identifying their own opportunities.</p>
+    <p>Given the range of digital content available, you can use the paid, earned and owned media (PEO) model to help you develop a digital marketing strategy that integrates paid, earned, shared, and owned approaches.</p>
+    <p>Owned media</p>
+    <p>Owned media refers to the digital channels and content that are in your control. That means you have full control of the messages of your digital marketing campaign, and of the story you want to tell about your product or service. This can include your own websites, your own brand pages on social media, email newsletters and your own mobile apps.</p>
+    <p>Paid media</p>
+    <p>Paid media refers to external marketing efforts that you will have to pay for. In other words, you pay third parties to broadcast your messages to others. Just like owned media, you also have control of the content. These can include paid search ads, display and shopping ads.</p>
+    <p>Earned media</p>
+    <p>Earned media refers to any publicity a company receives from unpaid promotional efforts. These are often generated by opinion leaders and other credible third party sources such as bloggers, journalists, and influencers. These can include the online reviews (or electronic word-of-mouth) you see on review websites.</p>
+    <p>The trick is to combine paid, earned and owned together to build your brand so that you are regarded as the expert in your field, even by your competitors.</p>
+    <p>By creating your own content, you can use owned media to set the tone, paid media to amplify the message and earned media to build relationships with key opinion leaders who may share your content with their followers.</p>
+    <p>Now that you know what paid, earned and owned media are, try to identify those that you are already using.</p>
+    <p>Share your thoughts below, explaining which paid, earned and owned media you are already using in your own business. Read what other participants have shared about their own PEO activities and discuss the following questions:</p>
+    <p>Which PEO approaches are working well for your, and other participants’ businesses?</p>
+    <p>How could you build on or improve your use of the PEO model?</p>
+    <p>Once you have added your own post, take time to read through other posts, and comment on those you find interesting.</p>
+  </div>
+</template>
+
+<!-- ======================================================================
+     LESSON 5 · Video · Using owned media
+     ====================================================================== -->
+<template id="l5-new">
+  <section class="block" id="l5-video">
+    <div class="video" role="group" aria-label="Video player placeholder">
+      <svg class="bg" viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="640" height="360" fill="#1d2b44"/>
+        <rect x="150" y="90" width="340" height="200" rx="14" fill="#0D719A"/>
+        <rect x="174" y="118" width="190" height="16" rx="8" fill="#fff" opacity=".85"/>
+        <rect x="174" y="150" width="292" height="10" rx="5" fill="#fff" opacity=".45"/>
+        <rect x="174" y="172" width="250" height="10" rx="5" fill="#fff" opacity=".45"/>
+        <rect x="174" y="208" width="120" height="44" rx="10" fill="#F5A623"/>
+        <defs><linearGradient id="vg5" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></linearGradient></defs>
+        <rect width="640" height="360" fill="url(#vg5)"/>
+      </svg>
+      <button class="play" type="button" aria-label="Play video" data-toast="Not available in this preview"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+      <div class="vmeta"><b>Using owned media</b><span>Captions available</span></div>
+    </div>
+    <details class="disclosure" style="margin-top:14px">
+      <summary>Read the transcript</summary>
+      <div class="inner">
+        <p>Now that you have a general idea of the PEO Model, let's go into detail about how to use paid, owned and earned media in an integrated digital campaign. Let's begin with owned media. You may not be aware that you already have a number of digital tools at your disposal, including your own websites, your social media accounts and emails. Continuing our previous example with a digital camera, first and foremost, we need to tailor your content to the customer's needs, according to the customer journey stage. Then, we promote this personalized content on owned media channels that the customers will be most likely to use. Customer one is in the awareness stage. You'll need to provide them with information on various digital cameras and ensure that you're carrying the products that they will like.</p>
+        <h4>How customers search</h4>
+        <p>You know that one of the ways that you can reach customer one is via search engines. You know that customer one would search online for various digital camera options that could be suitable for them. Thus, your aim is to ensure that your website would pop up on their search results page. How can we achieve this? First, by understanding how individuals search. At the awareness stage, individuals are often in an abstract mindset. Like customer one, they are simply searching for more information. Thus, they tend to use more general and broad terms. In customer one's case, they are likely to use general and broad search terms or keywords such as 'digital camera'. Since they just want more information on the types of digital cameras available to them, an informational search result would likely catch their attention.</p>
+        <p>In contrast, customer two is further down the customer journey. Customer two is likely to have a more concrete mindset. Since they are more informed on the cameras they like, customer two would also use more specific search terms or keywords, and perhaps mention specific brands and models. Customer two is in the consideration stage of the customer journey. Correspondingly, they use the keyword 'mid-range camera reviews' to look for reviews and comparisons between various mid-range cameras.</p>
+        <h4>Keyword mapping</h4>
+        <p>How can we ensure that our website pops up in both customer one and customer two's search results page? To make our web pages appear on the top of the search results page, we need to ensure that the search term or keywords are incorporated into the content of our web pages. This process is called keyword mapping, assigning keywords to specific web pages based on your keyword research. Customer one uses the keyword 'digital cameras' in their search. Thus, create a category web page on digital cameras using this very keyword. Similarly, customer two is looking for mid-range camera reviews, so you can create a sub-category page of mid-range cameras, incorporating customer two's keyword.</p>
+        <p>In summary, when creating a website for your brand, it is essential to develop different web pages to address the varying customer needs as they progress along the customer journey. We can create more general web pages that gradually link to more specific ones: a general home page about digital cameras for the awareness stage, and increasingly specific product pages for the conversion stage. This process is search engine optimization (SEO): the practice of making changes to web page content to improve its visibility in unpaid search engine results.</p>
+        <h4>Quality and authority</h4>
+        <p>We need to prioritize the quality and authority of our content. This can be done by: posting fresh content, for example, a press section or blog; connecting with your customer, by incorporating the keywords they use in your web pages; or, before publishing, asking yourself, how will this help my audience? What information can I offer that my audience can't get elsewhere? How can I make this content more consumable?</p>
+        <h4>Mantsha Pheeha, Talent Unleashed (South Africa)</h4>
+        <p>At Talent Unleashed, we are content creators. Most of our content is delivered through books, through coaching and consulting services, and also through speaking engagements. The biggest owned media for me is the website, because it's SEO-enabled as well: as people are searching just for generic topics, they are able to find my information there. It doesn't mean I have to be there to make every single sale. You can have a big audience that won't necessarily translate into paying customers. Building your audience is important, and be patient when you're building your audience. Share information, share content, add value to your clients. Engage with your audience, build your audience, be intentional about it, and then sales become easier.</p>
+      </div>
+    </details>
+  </section>
+
+  <section class="block" data-rail="How customers search" id="l5-search">
+    <h2 class="block-title">Search like your customer</h2>
+    <p>Before your website can reach a customer, you need to understand how they search. Their mindset changes as they move along the journey.</p>
+    <div class="define" style="margin-top:16px">
+      <div class="box">
+        <div class="eyebrow">Customer 1 · Awareness</div>
+        <h3>Abstract mindset</h3>
+        <p style="font-size:15px">Just looking for information, so they use broad terms.</p>
+        <div class="kw" aria-label="Search term">digital camera</div>
+      </div>
+      <div class="box hl">
+        <div class="eyebrow">Customer 2 · Consideration</div>
+        <h3>Concrete mindset</h3>
+        <p style="font-size:15px">Better informed, so they use specific terms, even brands and models.</p>
+        <div class="kw" aria-label="Search term">mid-range camera reviews</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Keyword mapping" id="l5-map">
+    <h2 class="block-title">Keyword mapping</h2>
+    <div class="callout">
+      <div class="ic" aria-hidden="true">i</div>
+      <div><strong>Keyword mapping</strong><p>Assigning keywords to specific web pages, based on your keyword research, so each page appears for the searches it is meant for.</p></div>
+    </div>
+    <ol class="flow" style="margin-top:18px" aria-label="From general to specific pages">
+      <li><b>Home page</b><span>“Digital cameras”, for customers at the awareness stage</span></li>
+      <li><b>Category page</b><span>Mid-range cameras, with reviews and comparisons for customer 2</span></li>
+      <li><b>Product pages</b><span>Increasingly specific, for customers ready to convert</span></li>
+    </ol>
+    <p class="muted" style="margin-top:14px;font-size:14.5px">Mapping broad to specific keywords like this is <b>search engine optimization (SEO)</b>: changing your page content to improve its visibility in unpaid search results.</p>
+  </section>
+
+  <section class="block" data-rail="Before you publish" id="l5-check">
+    <h2 class="block-title">Before you publish, ask yourself</h2>
+    <p class="muted" style="margin-bottom:12px">Quality and authority come from fresh content (a blog or press section) and from using the words your customers use.</p>
+    <ul class="checklist">
+      <li><label><input type="checkbox" data-persist="atlas-proto-l5-q1"> How will this help my audience?</label></li>
+      <li><label><input type="checkbox" data-persist="atlas-proto-l5-q2"> What can I offer that they can't get elsewhere?</label></li>
+      <li><label><input type="checkbox" data-persist="atlas-proto-l5-q3"> How can I make this content easier to take in?</label></li>
+    </ul>
+  </section>
+
+  <section class="block" data-rail="From a business owner" id="l5-story">
+    <div class="callout note">
+      <div class="ic" aria-hidden="true">“</div>
+      <div><strong>Mantsha Pheeha, Talent Unleashed, South Africa</strong><p>“My website is the biggest one for me, because it's SEO-enabled. People searching generic topics find my information there.” Her advice: a big audience doesn't always mean paying customers. Share useful content, engage, be patient, and sales become easier.</p></div>
+    </div>
+  </section>
+</template>
+
+<template id="l5-old">
+  
+  <p class="legacy single">Now that you have a general idea of the PEO Model, let's go into detail about how to use paid, owned and earned media in an integrated digital campaign. Let's begin with owned media. You may not be aware that you already have a number of digital tools at your disposal, including your own websites, your social media accounts and emails. Continuing our previous example with a digital camera, first and foremost, we need to tailor your content to the customer's needs, according to the customer journey stage. Then, we promote this personalized content on owned media channels that the customers will be most likely to use. Customer one is in the awareness stage. You'll need to provide them with information on various digital cameras and ensure that you're carrying the products that they will like. You know that one of the ways that you can reach customer one is via search engines. You know that customer one would search online for various digital camera options that could be suitable for them. Thus, your aim is to ensure that your website would pop up on their search results page. How can we achieve this? First, by understanding how individuals search. At the awareness stage, individuals are often in an abstract mindset. Like customer one, they are simply searching for more information. Thus, they tend to use more general and broad terms. In customer one's case, they are likely to use general and broad search terms or keywords such as 'digital camera'. Since they just want more information on the types of digital cameras available to them, an informational search result, like the following would likely catch their attention. In contrast, customer two is further down the customer journey. Customer two is likely to have a more concrete mindset. Since they are more informed on the cameras they like, customer two would also use more specific search terms or keywords, and perhaps mention specific brands and models. Customer two is in the consideration stage of the customer journey. Correspondingly, they use the keyword 'mid-range camera reviews' to look for reviews and comparisons between various mid-range cameras. Given that customer two is interested in comparisons between digital cameras, they are more likely to click on the following search result. How can we ensure that our website pops up in both customer one and customer two's search results page? To make our web pages appear on the top of the search results page, we need to ensure that the search term or keywords are incorporated into the content of our web pages. This process is called keyword mapping, assigning keywords to specific web pages based on your keyword research. You've learned just now that customer one uses the keyword 'digital cameras' in their search. Thus, create a category web page on digital cameras using this very keyword. This will ensure that your digital camera category page appears high on the results page when customers like customer one searches using keyword 'digital camera'. Similarly, you'll know that customer two is looking for mid-range camera reviews. To ensure that your web page would appear on customer two's search results page, you can create a sub-category page of mid-range cameras, incorporating customer two's keyword. By offering customer two the information they want, such as reviews and comparisons, your web page will appear when customer two is searching for such information. In summary, when creating a website for your brand, it is essential to develop different web pages to address the varying customer needs as they progress along the customer journey. As the customers tend to progress from abstract to a more concrete mindset, as they move along the customer journey, we can create more general web pages that gradually link to more specific ones. For example, we can create a general home page about digital cameras to address customers at the awareness stage of the customer journey, and increasingly specific product pages to address customers at the conversion stage. By mapping broad to specific keywords on these web pages, we make sure we address the varying needs of our target customers as they progress along the customer journey. This process is search engine optimization (SEO): the practice of making changes to web page content to improve its visibility in unpaid search engine results. It is one of the ways we can utilize owned media to meet our marketing needs. In short, we need to prioritize the quality and authority of our content. This can be done by: posting fresh content, for example, a press section or blog; connecting with your customer, by incorporating the keywords they use in your web pages; or, before publishing, asking yourself, how will this help my audience? What information can I offer that my audience can't get elsewhere? How can I make this content more consumable? By tailoring the content on your owned media to the target customers, and meeting their customer journey objectives, you can use owned media as part of a successful, integrated digital marketing campaign. Mantsha: My name is Mantsha Pheeha, I'm from South Africa, based in Johannesburg and I run a business called Talent Unleashed. So, at Talent Unleashed, we are content creators. Most of our content is delivered through books, through coaching and consulting services, and also through speaking engagements. So, that's what we do. We create the content and then deliver it mostly to corporates and organizations, but also to individuals. So, some of the successful owned media or social media platforms that I've had, I think one, the biggest one for me is the website, because it's a SEO-enabled as well, as people are searching just for generic topics, they are able to find my information there. So, I think that has been quite a breath of fresh air because it doesn't mean I have to be there to make every single sale and I think that has happened with the books and with the coaching as well. Well, the most important thing if you want to reach your customers, not just your audience, because I think in the short time that I've used social media I realized that you can have a big audience that won't necessarily translate into customers, into paying customers. You can get lots of likes, lots of comments, lots of engagement, but it may not necessarily turn out to be customers. Building your audience is important, and be patient when you're building your audience. Share information, share content, add value to your clients. And, what I've found is that they have this loyalty to use, such that the minute you put something that is for sale, they want to support you, not only engaging with them as a seller, but engaging with them as a member of the community. So, as slow as engaging may seem, engage with your audience, build your audience, be intentional about it, and then it seems sales become easier. I have not reached that place where the sales happen on their own. Like some of the big stars, when they land a book or they land a CD, it sells itself. I haven't yet reached there, but I can see that I'm building up towards there.</p>
+</template>
+
+<!-- ======================================================================
+     LESSON 6 · Video · Using paid media
+     ====================================================================== -->
+<template id="l6-new">
+  <section class="block" id="l6-video">
+    <div class="video" role="group" aria-label="Video player placeholder">
+      <svg class="bg" viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        <rect width="640" height="360" fill="#1d2b44"/>
+        <rect x="140" y="100" width="360" height="56" rx="12" fill="#fff" opacity=".9"/>
+        <rect x="160" y="122" width="40" height="12" rx="6" fill="#F5A623"/>
+        <rect x="212" y="122" width="200" height="12" rx="6" fill="#1d2b44" opacity=".5"/>
+        <rect x="140" y="172" width="360" height="40" rx="10" fill="#0D719A" opacity=".8"/>
+        <rect x="140" y="224" width="360" height="40" rx="10" fill="#0D719A" opacity=".5"/>
+        <defs><linearGradient id="vg6" x1="0" y1="0" x2="0" y2="1"><stop offset=".5" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".6"/></linearGradient></defs>
+        <rect width="640" height="360" fill="url(#vg6)"/>
+      </svg>
+      <button class="play" type="button" aria-label="Play video" data-toast="Not available in this preview"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>
+      <div class="vmeta"><b>Using paid media</b><span>Captions available</span></div>
+    </div>
+    <details class="disclosure" style="margin-top:14px">
+      <summary>Read the transcript</summary>
+      <div class="inner"><p>Now let’s look at paid media. After creating marketing content tailored to your customers’ needs, you can use paid media to amplify your message. While SEO helps improve your organic search rankings, it’s not always easy to appear at the top of search engine results pages. That’s where paid media comes in. One common form of paid media is Pay-Per-Click (PPC) advertising: sponsored listings on search engines and social media platforms. It is called pay-per-click because you only pay when someone clicks on your ad. Every PPC ad must perform three key actions: attract attention, communicate a value proposition, and invite action with a clear call to action such as “Buy Now”, “Shop”, “Find an Agent”, “Get Inspired” or “Learn More”. Customers respond better when ad content matches their mindset and stage in the customer journey. For Customer 1, at the awareness stage and searching “digital camera”, the ad uses the exact search term, offers a range of cameras from beginner to pro, and includes the extensions “Beginner Digital Camera” and “Get Inspired”. For Customer 2, at the consideration stage, the ad repeats the keyword and offers a detailed review with ratings, but it is missing a strong call to action such as “Buy Now”, “Shop” or “Great Deals”. Paid media isn’t limited to search engines: you can also run ads on Facebook, Instagram, LinkedIn and other platforms. Carousel ads allow up to 10 images or videos in one ad and are useful for building awareness with customers like Customer 1.</p></div>
+    </details>
+  </section>
+
+  <section class="block" data-rail="What is PPC?" id="l6-ppc">
+    <h2 class="block-title">Pay-per-click (PPC) advertising</h2>
+    <p class="lead">After creating content for your customers' needs, paid media <b>amplifies your message</b>. SEO helps, but it isn't always easy to reach the top of search results. That is where paid media comes in.</p>
+    <div class="callout" style="margin-top:16px">
+      <div class="ic" aria-hidden="true">i</div>
+      <div><strong>PPC</strong><p>Sponsored listings on search engines and social media platforms. You only pay when someone clicks your ad. It works alongside your owned media, such as your website, to bring in visitors.</p></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Three things every ad does" id="l6-three">
+    <h2 class="block-title">Three things every ad must do</h2>
+    <div class="cards">
+      <div class="card"><div class="num">1</div><h3>Attract attention</h3><p>Show relevance to what the customer searched for, so the right people notice it.</p></div>
+      <div class="card"><div class="num">2</div><h3>Communicate value</h3><p>Say why it is worth buying: saving money, high ratings or reviews, unique features.</p></div>
+      <div class="card"><div class="num">3</div><h3>Invite action</h3><p>A clear call to action. Ad extensions, the extra links under an ad, make it stronger.</p>
+        <div class="chips-row"><span class="chip">Buy Now</span><span class="chip">Shop</span><span class="chip">Learn More</span><span class="chip">Get Inspired</span></div></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Match the ad to the customer" id="l6-match">
+    <h2 class="block-title">Match the ad to the customer</h2>
+    <p>Ads that match the customer's mindset and journey stage get more impressions, more clicks and more revenue.</p>
+    <div class="cards" style="margin-top:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">
+      <article class="persona">
+        <header><div class="av" aria-hidden="true">1</div><div><small>Awareness · searching “digital camera”</small><b>Customer 1</b></div></header>
+        <dl>
+          <dt>Attracts attention</dt><dd>Uses the exact search term and speaks to beginner hobbyists</dd>
+          <dt>Communicates value</dt><dd>A range of cameras, from beginner to pro</dd>
+          <dt>Invites action</dt><dd><div class="chips-row"><span class="chip">Beginner Digital Camera</span><span class="chip">Get Inspired</span></div></dd>
+        </dl>
+      </article>
+      <article class="persona">
+        <header><div class="av" aria-hidden="true">2</div><div><small>Consideration · comparing reviews</small><b>Customer 2</b></div></header>
+        <dl>
+          <dt>Attracts attention</dt><dd>Repeats the keyword throughout the ad</dd>
+          <dt>Communicates value</dt><dd>A detailed review of the camera, with ratings</dd>
+          <dt>Invites action</dt><dd>
+            <details class="reveal"><summary>What's missing? Think, then reveal</summary><p>A strong call to action. Adding “Buy Now”, “Shop” or “Great Deals” would move Customer 2 toward conversion.</p></details>
+          </dd>
+        </dl>
+      </article>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Social media ads" id="l6-social">
+    <h2 class="block-title">Paid ads on social media</h2>
+    <p>The same three principles apply on Facebook, Instagram, LinkedIn and other platforms, and their ad formats can match different journey stages.</p>
+    <div class="callout good" style="margin-top:16px">
+      <div class="ic" aria-hidden="true">★</div>
+      <div><strong>Example: carousel ads</strong><p>Up to 10 images or videos in one ad. Good for building awareness with customers like Customer 1, for example placed in the photography hobby groups they visit.</p></div>
+    </div>
+  </section>
+</template>
+
+<template id="l6-old">
+  
+  <div class="video" style="margin-bottom:18px"><svg class="bg" viewBox="0 0 640 360" aria-hidden="true"><rect width="640" height="360" fill="#000"/></svg><button class="play" type="button" aria-label="Play video" data-toast="Not available in this preview"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></button></div>
+  <div class="legacy">
+    <p>Paid Media in Digital Marketing</p>
+    <p>Now let’s look at paid media. After creating marketing content tailored to your customers’ needs, you can use paid media to amplify your message. While SEO helps improve your organic search rankings, it’s not always easy to appear at the top of search engine results pages. That’s where paid media comes in. One common form of paid media is Pay-Per-Click (PPC) advertising.</p>
+    <p>What is PPC?</p>
+    <p>PPC (Pay-Per-Click) refers to sponsored listings on:</p><p>Search engines</p><p>Social media platforms</p>
+    <p>It is called pay-per-click because you only pay when someone clicks on your ad. PPC works alongside your owned media (such as your website) to increase visibility and drive traffic.</p>
+    <p>How to Design an Effective PPC Ad</p>
+    <p>Every PPC ad — whether on a search engine or social media platform — must perform three key actions:</p>
+    <p>1. Attract Attention</p><p>Your ad should:</p><p>Capture the interest of your target audience</p><p>Maximize reach</p><p>Highlight relevance</p><p>One of the most effective ways to attract attention is by showing relevance to the customer’s search term.</p>
+    <p>2. Communicate a Value Proposition</p><p>Explain clearly:</p><p>Why your product or service is worth purchasing</p><p>What benefit the customer will receive</p><p>For example:</p><p>Saving money</p><p>High ratings or reviews</p><p>Unique features</p>
+    <p>3. Invite Action (Call to Action)</p><p>Encourage users to take the next step with a clear call to action (CTA) such as:</p><p>“Buy Now”</p><p>“Shop”</p><p>“Find an Agent”</p><p>“Get Inspired”</p><p>“Learn More”</p><p>Ad extensions (extra links below the main ad) can also strengthen the call to action.</p>
+    <p>Matching PPC Ads to the Customer Journey</p>
+    <p>Research shows that customers respond better when ad content matches their mindset and stage in the customer journey. When ads align with customer intent, businesses see:</p><p>More impressions</p><p>More clicks</p><p>Higher expected revenue</p><p>Let’s revisit our two personas.</p>
+    <p>Persona-Based PPC Examples</p>
+    <p>Customer 1 – Awareness Stage</p><p>Mindset: Abstract<br>Intent: Searching for information<br>Keyword: “digital camera”</p><p>How the PPC Ad Works:</p><p>Attracts Attention</p><p>Uses the exact search term “digital camera”</p><p>Speaks directly to beginner hobbyists</p><p>Communicates Value</p><p>Offers a range of cameras (beginner to pro)</p><p>Invites Action</p><p>Includes relevant ad extensions:</p><p>“Beginner Digital Camera”</p><p>“Get Inspired”</p><p>By matching the ad content to Customer 1’s awareness stage, the business increases the likelihood of engagement and moves them closer to conversion.</p>
+    <p>Customer 2 – Consideration Stage</p><p>Mindset: Concrete<br>Intent: Comparing options<br>Looking for: Reviews and ratings</p><p>How the PPC Ad Works:</p><p>Attracts Attention</p><p>Repeats the relevant keyword throughout the ad copy</p><p>Communicates Value</p><p>Offers a detailed review of the target camera</p><p>Includes ratings</p><p>What’s Missing?</p><p>A strong call to action</p><p>To move Customer 2 toward conversion, you could include:</p><p>“Buy Now”</p><p>“Shop”</p><p>“Great Deals”</p><p>Matching ad content to the persona’s journey stage increases conversion potential.</p>
+    <p>Paid Media on Social Media Platforms</p>
+    <p>Paid media isn’t limited to search engines. You can also run ads on:</p><p>Facebook</p><p>Instagram</p><p>LinkedIn</p><p>Other social platforms</p><p>The same three principles apply:</p><p>Attract attention</p><p>Communicate value</p><p>Include a clear call to action</p>
+    <p>Social Media Ad Formats</p>
+    <p>Social media platforms offer various ad formats that can be matched to different customer journey stages.</p><p>Example: Carousel Ads</p><p>Allow up to 10 images or videos in one ad</p><p>Useful for building awareness</p><p>Ideal for customers like Customer 1</p><p>You can also place these ads in:</p><p>Photography hobby groups</p><p>Other communities your persona frequently visits</p>
+    <p>Conclusion</p>
+    <p>By:</p><p>Attracting attention</p><p>Communicating value</p><p>Inviting action</p><p>And aligning ad content with your personas’ customer journey stages, you can effectively use paid media as part of an integrated digital marketing campaign.</p>
+  </div>
+</template>
+
+
+<!-- ======================================================================
+     LESSON 7 · Article · Using earned media
+     ====================================================================== -->
+<template id="l7-new">
+  <section class="block" data-rail="What is earned media?" id="l7-what">
+    <p class="lead">Earned media is any publicity you receive from <b>unpaid</b> promotional efforts, often from opinion leaders and third parties such as journalists, bloggers and influencers.</p>
+    <div class="cards" style="margin-top:18px;grid-template-columns:repeat(auto-fit,minmax(170px,1fr))">
+      <div class="card" style="padding:16px 18px"><h3 style="font-size:15.5px">Customer reviews</h3><p>Left by previous customers on shopping platforms</p></div>
+      <div class="card" style="padding:16px 18px"><h3 style="font-size:15.5px">Video reviews</h3><p>Detailed reviews of your product</p></div>
+      <div class="card" style="padding:16px 18px"><h3 style="font-size:15.5px">Social media posts</h3><p>People posting about your product or service</p></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Word-of-mouth" id="l7-wom">
+    <h2 class="block-title">Why word-of-mouth matters</h2>
+    <p>Word-of-mouth (WOM) marketing is any verbal, informal, person-to-person communication, and one of the most common forms of earned media.</p>
+    <div class="stat-grid" style="margin-top:16px">
+      <div class="stat"><b style="font-size:28px;color:var(--primary-ink)">91%</b><span>of customers regularly read online reviews</span></div>
+      <div class="stat"><b style="font-size:28px;color:var(--primary-ink)">20–50%</b><span>of all purchasing decisions are driven by word-of-mouth</span></div>
+    </div>
+    <div class="callout note" style="margin-top:16px">
+      <div class="ic" aria-hidden="true">!</div>
+      <div><strong>The catch</strong><p>You can't easily control what customers say about you. One way to shape it is to <b>incentivize</b> word-of-mouth, for example through influencer marketing.</p></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Working with influencers" id="l7-influencers">
+    <h2 class="block-title">Working with influencers</h2>
+    <p>Influencer marketing means working with people who influence potential buyers, so they carry your brand message to a larger market.</p>
+    <div class="define" style="margin-top:16px">
+      <div class="box">
+        <h3>How you can reward them</h3>
+        <ul class="ticks"><li>Payment</li><li>Gifts or free products</li><li>Free services, such as hotel stays or trips</li></ul>
+      </div>
+      <div class="box hl">
+        <h3>What you can agree on</h3>
+        <ul class="ticks"><li>Approving content before it goes out</li><li>Hashtags to use</li><li>Timing and how often they post</li><li>Key themes, images and style</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Be transparent" id="l7-label">
+    <h2 class="block-title">Be transparent: label it</h2>
+    <p>Ask your influencer to disclose any incentive. The label depends on who controlled the content.</p>
+    <div class="define" style="margin-top:16px">
+      <div class="box"><div class="eyebrow">Paid + you controlled the content</div><h3>“Advertisement” or “Ad”</h3></div>
+      <div class="box"><div class="eyebrow">You did not control the content</div><h3>“Sponsorship”</h3></div>
+    </div>
+    <div class="callout good" style="margin-top:16px">
+      <div class="ic" aria-hidden="true">★</div>
+      <div><strong>Keep it credible</strong><p>Customers can react badly when they learn a review was paid for. Let influencers give a balanced review, with positives and negatives, and pick people genuinely interested in what you offer.</p></div>
+    </div>
+    <details class="reveal" style="margin-top:16px">
+      <summary>Quick check: a bakery gives a food blogger free cakes and approves her post before it goes live. Which label? Think, then reveal</summary>
+      <p>“Advertisement” or “Ad”: she received an incentive, and the bakery controlled the content.</p>
+    </details>
+  </section>
+
+  <section class="block" data-rail="Choosing an influencer" id="l7-choose">
+    <h2 class="block-title">Choosing an influencer</h2>
+    <p>One thing to consider is how many followers they have.</p>
+    <div class="define" style="margin-top:16px">
+      <div class="box"><div class="eyebrow">Mega influencer · 1 million+ followers</div><h3>Great for awareness</h3><p style="font-size:15px">Spreads the word about your brand widely.</p></div>
+      <div class="box hl"><div class="eyebrow">Nano influencer · up to 1,000 followers</div><h3>Closer and more credible</h3><p style="font-size:15px">A more meaningful connection with their audience, so their messages suffer less from the incentive. Useful later in the customer journey.</p></div>
+    </div>
+    <p class="muted" style="margin-top:14px;font-size:14.5px"><b>Example:</b> Customer 2, the camera enthusiast, follows a professional photographer online. Rewarding a photographer who genuinely likes your camera, perhaps with discount codes to share, can move customers like Customer 2 to buy.</p>
+  </section>
+</template>
+
+<template id="l7-old">
+  
+  <div class="legacy">
+    <p>You will now explore earned media and how this can be used in your digital marketing strategy.</p>
+    <p>You will learn about different types of earned media, how to incentivize earned media effectively, the role that influencers can play and how to choose a suitable influencer to increase interest in your product and attract your product personas.</p>
+    <p>What is earned media?</p>
+    <p>Earned media refers to any publicity a company receives from unpaid promotional efforts. It is often generated by opinion leaders and other third party sources like journalists, bloggers, and influencers.</p>
+    <p>Earned media can come in many forms, such as:</p><p>reviews left by previous customers on shopping platforms</p><p>detailed video reviews</p><p>social media posts on the product/service.</p>
+    <p>How can you incentivize earned media?</p>
+    <p>One of the most common forms of earned media is word-of-mouth (WOM) marketing which is any verbal, informal, person-to-person communication. Earned media is an important aspect of an integrated digital marketing campaign, as 91% of customers regularly read online reviews and 20%-50% of all purchasing decisions are driven by WOM marketing. However, it isn't easy to control what customers say about your brand, product or service.</p>
+    <p>To solve the issue, you can incentivize WOM marketing. One of the ways of doing this is through influencer marketing. Influencer marketing means leveraging individuals who have influence over potential buyers and creating marketing activities around these individuals to drive a brand message to the larger market.</p>
+    <p>In addition to monetary payment, there are many other ways of incentivizing influencers to provide favorable WOM. In the UK, payment can also be in-kind, including any type of incentive from gifts to free products and services such as hotel stays or free trips.</p>
+    <p>How can influencers help?</p>
+    <p>Marketers can have control over the content which influencers put out. This can include everything from the pre-approval of content, specific use of hashtags, timing and frequency of posts to specifying key themes and messages including images and styles. In short, you can incentivize influencers to amplify the messages you have generated in your owned and paid media.</p>
+    <p>It is important to be transparent and get your chosen influencer to disclose these incentives accordingly. When they have received payment for the WOM and you have control, the post should be labelled as an “Advertisement" or "Ad”. However, if you didn’t have control over the content, the post should be labelled as a “Sponsorship”.</p>
+    <p>Customers could respond negatively once they’ve learnt that the influencer was incentivized to provide a positive review. One way of mitigating this is to allow the influencers to provide a balanced review, containing both positive and negative aspects. Consumers also react positively to incentivized reviews if they believe that the influencers are driven by their inner desires and passions. It could be beneficial to pick influencers who are genuinely interested in the product or service that you are offering.</p>
+    <p>How do you choose an influencer?</p>
+    <p>When you are choosing an influencer, one of the things to consider is the number of followers they have. A 'nano-influencer' can have up to 1,000 followers while 'mega influencers' can have more than 1 million followers.</p>
+    <p>While mega influencers are great at raising awareness of your brand/product/service, influencers with smaller followings can often establish a closer and more meaningful connection with their audience. Therefore, they are more likely to appear to be genuinely interested in a particular product, so their messages could be less affected by incentivization. This means that influencers with smaller followers could be deemed more credible and thus more useful at the later stages of the customer journey.</p>
+    <p>As an example, let’s return to our marketing persona, Customer 2 (the camera enthusiast).</p>
+    <p>As a camera enthusiast, Customer 2 'follows' an influencer who is a professional photographer online. Considering the role that influencers can play in the customer journey, it might be worthwhile to incentivize such influencers, especially if they are genuinely interested in your product and can provide detailed reviews. You could even offer discount codes for them to disseminate to help push customers like Customer 2 further along their customer journey and purchase your product.</p>
+    <p>By making the most of earned marketing approaches such as WOM marketing and identifying appropriate influencers to attract customers, you can use earned media as part of a successful integrated digital marketing campaign.</p>
+  </div>
+</template>
+
+<!-- ======================================================================
+     LESSON 8 · Scenario · Exercise 2: Using viral marketing
+     ====================================================================== -->
+<template id="l8-new">
+  <section class="block" data-rail="What is viral marketing?" id="l8-what">
+    <p class="lead">Viral marketing gets customers to <b>pass your marketing message along</b> to friends, family and colleagues. Usually a video, ad or post so infectious that people seek it out or share it.</p>
+  </section>
+
+  <section class="block" data-rail="What makes content spread" id="l8-traits">
+    <h2 class="block-title">What makes content spread</h2>
+    <div class="cards">
+      <div class="card"><div class="num">1</div><h3>Emotional connection</h3><p>The trait all viral content shares.</p></div>
+      <div class="card"><div class="num">2</div><h3>Surprise</h3><p>Captures the imagination of the people you want to reach.</p></div>
+      <div class="card"><div class="num">3</div><h3>Humour</h3><p>Works well, especially when it relates to the product.</p></div>
+      <div class="card"><div class="num">4</div><h3>Easy to share</h3><p>Embed social media links and talk with your audience in the comments.</p></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Weigh it up" id="l8-weigh">
+    <h2 class="block-title">Weigh it up</h2>
+    <div class="define">
+      <div class="box hl">
+        <h3>Why marketers want it</h3>
+        <ul class="ticks"><li>Lots of awareness and reach at a very low cost</li><li>Shared by friends and family, so the message feels more credible</li></ul>
+      </div>
+      <div class="box">
+        <h3>What to watch out for</h3>
+        <ul class="ticks"><li>It is hard to predict what will go viral</li><li>Content can go viral for the wrong reasons, and poor content can cause a strong backlash</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Your task" id="l8-task">
+    <div class="task">
+      <div class="task-head">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>
+        <div><b>Your task: viral media for your business</b><small>Answer briefly.</small></div>
+      </div>
+      <div class="task-body">
+        <div class="field"><label for="viralAns">What are the key things you would need to consider when using viral media in a campaign for your products or services?</label><small>Think about your product, your customers, and what could go wrong.</small><textarea id="viralAns" data-save="atlas-proto-viral" style="min-height:120px"></textarea></div>
+        <details class="reveal">
+          <summary>Compare with the points from this lesson</summary>
+          <ul class="ticks" style="margin-top:8px"><li>Will it create an emotional connection with my personas?</li><li>Does the surprise or humour relate to my product?</li><li>Have I made it easy to share, and will I reply in the comments?</li><li>Could it be misread, or go viral for the wrong reasons?</li><li>What is my plan if it doesn't spread? It is hard to predict.</li></ul>
+        </details>
+      </div>
+    </div>
+  </section>
+</template>
+
+<template id="l8-old">
+  
+  <div class="legacy">
+    <p>Another common form of earned media is viral marketing which is the process of getting customers to pass along a company’s marketing messages to friends, family, and colleagues. This often comes in the form of videos, ads, and other marketing content that are so infectious that customers will seek it out or pass it along to friends.</p>
+    <p>A common trait of all viral content is an emotional connection with their audience.<br>Viral ads often evoke surprise and other emotions, capturing the imagination of their target personas. Humor also works well, especially if it’s related to the product.</p>
+    <p>You can also promote content sharing by embedding social media links in your content and connecting with your audience in the comments.</p>
+    <p>Unsurprisingly, many marketers would love their content to go viral as it generates a great deal of awareness and reach at a very low cost. Furthermore, as the content is often shared by friends and family, it also lends the persuasive message some credibility.</p>
+    <p>However, it is hard to predict whether marketing content will go viral, and it is important to be aware that sometimes marketing content can go viral for the wrong reasons and generate a considerable reaction as a result of poor content.</p>
+    <p>Task</p>
+    <p>In a document or notepad, briefly answer the following question:</p>
+    <p>What are some of the key things you would need to consider when using viral media in a marketing campaign for your products or services?</p>
+  </div>
+</template>
+
+<!-- ======================================================================
+     LESSON 9 · Article · Monitoring the success of your digital marketing campaign
+     ====================================================================== -->
+<template id="l9-new">
+  <section class="block" data-rail="Where you are" id="l9-where">
+    <div class="eyebrow">Four key considerations</div>
+    <ol class="stepper" aria-label="Campaign planning steps">
+      <li class="done">What are my marketing objectives?</li>
+      <li class="done">Who is my audience and where are they located?</li>
+      <li class="done">How do I promote the content?</li>
+      <li class="now">How can I measure the success of my campaign?<br><span class="here">You are here</span></li>
+    </ol>
+    <p class="lead" style="margin-top:18px">You know how to use owned, paid and earned media. The last consideration: how do you know it is working? You track <b>key performance indicators (KPIs)</b>.</p>
+  </section>
+
+  <section class="block" data-rail="Owned media KPIs" id="l9-owned">
+    <h2 class="block-title">Owned media: your web pages</h2>
+    <div class="stat-grid">
+      <div class="stat"><b>Average position</b><span>Where your page ranks in search results. The smaller the number, the better.</span></div>
+      <div class="stat"><b>Page views</b><span>How often a page is viewed, and when and which events drove the views. Those moments are touchpoints to reach more customers.</span></div>
+      <div class="stat"><b>Bounce rate</b><span>The percentage of visitors who leave after viewing one page.</span></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Reading bounce rate" id="l9-bounce">
+    <h2 class="block-title">Reading the bounce rate</h2>
+    <div class="callout">
+      <div class="ic" aria-hidden="true">i</div>
+      <div><strong>For reference</strong><p>An <b>excellent</b> bounce rate is 26–40%. An <b>average</b> one is 41–55%. A high rate can mean the content doesn't match your customers' needs, the content is low quality, or visitors found what they needed quickly.</p></div>
+    </div>
+    <div class="define" style="margin-top:16px">
+      <div class="box"><div class="eyebrow">Awareness page · Customer 1</div><h3>Aim for a low bounce rate</h3><p style="font-size:15px">You want the hobbyist to keep browsing more pages, moving down the funnel.</p></div>
+      <div class="box hl"><div class="eyebrow">Conversion page · Customer 2</div><h3>A higher rate can be fine</h3><p style="font-size:15px">A page with comparisons and a clear “Buy Now” can give the enthusiast everything on one page.</p></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Paid media KPIs" id="l9-paid">
+    <h2 class="block-title">Paid media: PPC and social media ads</h2>
+    <div class="stat-grid">
+      <div class="stat"><b>Impressions</b><span>How often your ad is shown. A sense of the awareness you generate, not proof your customer saw it.</span></div>
+      <div class="stat"><b>Clicks</b><span>How often the ad is clicked: the level of engagement.</span></div>
+      <div class="stat"><b>Click-through rate (CTR)</b><span>The share of impressions that led to a click. Low CTR: the ad doesn't match the customer's needs.</span></div>
+      <div class="stat"><b>Cost per click (CPC)</b><span>The average cost of each click.</span></div>
+      <div class="stat"><b>Cost</b><span>Budget spent: CPC × number of clicks.</span></div>
+      <div class="stat"><b>Conversions</b><span>Purchases or sign-ups: a sign of the quality of your traffic.</span></div>
+      <div class="stat"><b>Conversion ratio</b><span>The percentage of visitors who converted.</span></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Try the numbers" id="l9-calc">
+    <h2 class="block-title">Try the numbers</h2>
+    <p class="muted" style="margin-bottom:14px">Start with the lesson's example, then put in your own ad's numbers.</p>
+    <div class="calc" id="kpiCalc">
+      <div class="calc-in">
+        <label>Cost per click ($)<input type="number" inputmode="decimal" min="0" step="0.01" value="0.83" data-calc="cpc"></label>
+        <label>Clicks<input type="number" inputmode="numeric" min="0" step="1" value="2101" data-calc="clicks"></label>
+        <label>Purchases or sign-ups<input type="number" inputmode="numeric" min="0" step="1" value="140" data-calc="conv"></label>
+      </div>
+      <div class="calc-out" id="kpiOut" role="status" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Pick KPIs for your goal" id="l9-choose">
+    <h2 class="block-title">Pick the KPIs that match your goal</h2>
+    <div class="define">
+      <div class="box"><div class="eyebrow">Goal: awareness · Customer 1</div><h3>Impressions, clicks, CTR</h3><p style="font-size:15px">You want the hobbyist to notice your product.</p></div>
+      <div class="box hl"><div class="eyebrow">Goal: purchase · Customer 2</div><h3>Conversions, conversion ratio</h3><p style="font-size:15px">You want the enthusiast to buy.</p></div>
+    </div>
+    <p class="muted" style="margin-top:16px;font-size:14.5px">To learn more about evaluating your marketing and sales activities, you can complete one of the other 10,000 Women courses: <a class="link" href="#" data-toast="Not available in this preview">Fundamentals of Sales and Marketing</a>.</p>
+  </section>
+</template>
+
+<template id="l9-old">
+  
+  <div class="legacy">
+    <p>Now that you have learned how to use owned, paid, and earned media in a digital marketing campaign, you come to the final key consideration of your digital marketing campaign: how to measure its success.</p>
+    <p>Owned media (Webpages)</p>
+    <p>You have learned how to optimize your website to market your brand, product or service using owned media. Specifically, you explored mapping the relevant keywords to the webpages based on your various customer journey objectives. Now let’s go through the key performance indicators (KPIs) to measure its effectiveness.</p>
+    <p>Owned media KPIs include the following:</p><p>average position</p><p>page views</p><p>bounce rate.</p>
+    <p>Average position</p><p>Average position indicates how well your webpage is positioned on search engine results pages. Since your aim is to rank high on the results page, the smaller the number, the better.</p>
+    <p>Page views</p><p>Page views displays the number of views you have had for a particular page on your website. You can also find out when and which events drove page views. These times and events can serve as potential touchpoints to reach out to more customers.</p>
+    <p>Bounce rate</p><p>The bounce rate is the percentage of visitors who navigate away after viewing one page.</p>
+    <p>A high bounce rate can mean:</p><p>your content does not match your target customer’s needs</p><p>the page has low quality content</p><p>visitors found the information they needed quickly and exited the page. For reference, an excellent bounce rate is between 26 to 40% while an average is between 41 and 55%.</p>
+    <p>You could expect the bounce rates to differ across different type of webpages. When your webpage is awareness-driven and aimed at customers like Customer 1 (hobbyist), who is searching for more information, you will want to achieve an excellent bounce rate as you want Customer 1 to stay on your website viewing different pages to push them along the customer journey funnel.</p>
+    <p>On the other hand, for Customer 2 (camera enthusiast), who is at the later stages of the customer journey, and debating between cameras, a conversion-driven webpage with a clear call-to-action like “Buy Now” and product comparisons could provide Customer 2 with all the information they need on one page, boosting the bounce rate. In other words, a higher bounce rate might not always be a bad sign. It depends on your customer journey objectives.</p>
+    <p>Paid media (PPC and social media ads)</p>
+    <p>Earlier, you learned about how to use paid media in your digital marketing campaign.</p>
+    <p>Specifically, you explored how to use PPC ads to promote your marketing content. What are the KPIs you can use to gauge how effective these ads were?</p>
+    <p>Paid media KPIs include the following:</p><p>impressions</p><p>clicks</p><p>click-through-rate</p><p>cost per click</p><p>cost</p><p>conversions</p><p>conversion ratio.</p>
+    <p>Impressions</p><p>Impressions refer to the number of times your ad is displayed on the search engine results pages or social media platform. This KPI gives you an idea of the amount of traffic that the ad is receiving. Put differently, it gives you an idea on the amount of awareness you are generating.</p>
+    <p>While impressions give you an idea if the ad is appearing on the search engine results page or social media platform, it does not mean that your target customer sees it. For that, you can rely on clicks.</p>
+    <p>Clicks</p><p>Clicks are the number of times the PPC ad is clicked on. This KPI indicates the level of engagement the ad is receiving.</p>
+    <p>Click-through-rate (CTR)</p><p>The click-through-rate is the number of impressions that attracted a click. Just like clicks, this KPI also gives you an idea about the level of engagement the ad is receiving. If the CTR is low, it suggests that the ad content does not really match the target customer’s needs and needs to be revised.</p>
+    <p>Cost per click (CPC)</p><p>This is the average cost per click on the ad.</p>
+    <p>Cost</p><p>This is the budget spent on the ad. Recall that you do not pay for PPC ads unless they are clicked on. Thus, the budget spent is the CPC x the number of clicks. For example, if the ad’s CPC is $0.83 and was clicked on 2,101 times, then its cost amounts to $0.83 x 2,101 = $1,742.</p>
+    <p>Conversions</p><p>Conversions are the number of purchases or sign-ups. This KPI is a good indication of the quality of your traffic.</p>
+    <p>Conversion ratio</p><p>This is the percentage of visitors who converted. For example, if 2,101 people clicked on your ad and 140 people purchased the product, then your conversion ratio is 6.66%.</p>
+    <p>Which measures should you select?</p>
+    <p>Ultimately, which KPIs you refer to should match your objectives. If your PPC ad was aimed at Customer 1 (hobbyist) and you just wanted to generate awareness of your product, then KPIs like impressions, clicks and CTR will serve as good indicators.</p>
+    <p>If your ad was aimed at Customer 2 (camera enthusiast) and you intended to push him further down the funnel to convert and purchase your product, conversions and conversion-rates will serve as better indicators of your ad’s success.</p>
+    <p>In this step you have learned about measuring the success of your digital marketing activities. If you would like to learn more about evaluating your marketing and sales activities, you can choose to complete one of the other 10,000 Women courses, Fundamentals of Sales and Marketing.</p>
+  </div>
+</template>
+
+
+<!-- ======================================================================
+     LESSON 10 · Article · Using social listening
+     ====================================================================== -->
+<template id="l10-new">
+  <section class="block" data-rail="What is social listening?" id="l10-what">
+    <p class="lead">Social listening means <b>tracking your social media</b> for mentions and conversations related to your brand, then using what you learn.</p>
+    <ol class="flow" aria-label="Two steps of social listening">
+      <li><b>Monitor</b><span>your channels for mentions of your brand, competitors, products and keywords that matter to your business</span></li>
+      <li><b>Analyze</b><span>what you find, and use the insights to shape or improve your marketing strategy</span></li>
+    </ol>
+  </section>
+
+  <section class="block" data-rail="Why it matters" id="l10-why">
+    <h2 class="block-title">What it tells you</h2>
+    <div class="cards">
+      <div class="card"><div class="num">1</div><h3>Campaign and sentiment</h3><p>How your audience reacts to your content, in real time, at every stage of the journey.</p></div>
+      <div class="card"><div class="num">2</div><h3>Content research</h3><p>Which content types your audience likes. A video with the most potential impressions is a strong signal.</p></div>
+      <div class="card"><div class="num">3</div><h3>Influencer recognition</h3><p>Who talks about you, your industry and your competitors.</p></div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Sentiment analysis" id="l10-sentiment">
+    <h2 class="block-title">With sentiment analysis you can</h2>
+    <ul class="ticks">
+      <li>Track impressions and engagement on your campaign posts</li>
+      <li>Quickly gather the general feeling about a specific campaign</li>
+      <li>Identify the top influencers discussing your campaigns</li>
+      <li>See which audience groups the campaign resonates with</li>
+      <li>Note the key themes in the campaign, and whether they are positive or negative</li>
+    </ul>
+  </section>
+
+  <section class="block" data-rail="Finding influencers" id="l10-influencers">
+    <h2 class="block-title">Finding influencers</h2>
+    <div class="define">
+      <div class="box">
+        <h3>Use social listening to</h3>
+        <ul class="ticks"><li>Find your current top influencers and help them keep advocating for you</li><li>List the influencers in your industry you want to work with</li><li>Find your competitors’ top influencers and try to win them over</li><li>Spot the best networks for influencer marketing, and create more for them</li></ul>
+      </div>
+      <div class="box hl">
+        <div class="eyebrow">Example</div>
+        <h3>A fashion designer's product launch</h3>
+        <p style="font-size:15px">Listen to the industry on YouTube, compile the research, find the most engaged influencer, and partner with them to reach more people.</p>
+      </div>
+    </div>
+  </section>
+</template>
+
+<template id="l10-old">
+  
+  <div class="legacy">
+    <p>Using social listening</p>
+    <p>Social listening is the monitoring of your brand's social media channels for any customer feedback and direct mentions of your brand, or discussions regarding specific keywords, topics, competitors, or industries. This is then followed by an analysis to gain insights and action on these opportunities.</p>
+    <p>In other words, social listening means tracking your social media platforms for any mentions or conversations related to your brand.</p>
+    <p>You can do this in two steps:</p>
+    <p>Monitor your social media channels for mentions of your brand, competitors, products, and any keywords relevant for your business.</p>
+    <p>Analyze the information and use these insights to shape or optimize your marketing strategy.</p>
+    <p>Why does it matter?</p>
+    <p>Social listening provides you with insights into the following areas:</p><p>campaign and sentiment analysis</p><p>content research</p><p>influencer recognition.</p>
+    <p>Campaign and sentiment analysis</p>
+    <p>As mentioned previously, sentiment analysis is imperative for understanding how your audience reacts to your content at every stage of the customer journey. You can find out how your digital marketing campaign is doing by capturing your audience’s reaction, in real-time. You can also explore customers’ feelings and opinions about specific topics, products, competitors, and more.</p>
+    <p>With sentiment analysis, you can do the following:</p><p>track the impressions and engagements around your campaign posts</p><p>quickly gather general sentiment around specific campaigns.</p><p>identify the top influencers discussing your campaigns</p><p>understand which of your audience demographic the campaign resonates with</p><p>note the key themes within the campaign and whether they are positive or negative.</p>
+    <p>Content research</p>
+    <p>With social listening, you can also identify the content type that your audience likes. For instance, you can see here that this video attracts the most potential impressions, suggesting that this is the content type that your audience likes.</p>
+    <p>Influencer recognition</p>
+    <p>You can also use social listening to do the following:</p><p>find your current top influencers and decide how to empower them to continue to advocate for you</p><p>identify the influencers in your industry and create a list of those you want to work with</p><p>find out your competitors’ top influencers and attempt to win them over</p><p>identify the best social networks for your influencer marketing and create more content for those channels.</p>
+    <p>Let’s say that you are a fashion designer and want to find all of the top YouTube influencers to partner with on your next product launch. In this scenario, you can listen to the industry, compile your research as above, and find out who is the most engaged influencer, and partner with them to increase your reach.</p>
+  </div>
+</template>
+
+<!-- ======================================================================
+     LESSON 11 · Scenario · Exercise 3: Reflect on your learning
+     ====================================================================== -->
+<template id="l11-new">
+  <section class="block" data-rail="Take stock" id="l11-intro">
+    <div class="eyebrow">Exercise 3</div>
+    <h2 class="block-title">Take stock of your business</h2>
+    <p class="lead">You know the KPIs and how they fit each stage of the customer journey. Now check what you already do: which media and content you use at each stage, and whether the KPIs you track suit your objectives.</p>
+  </section>
+
+  <section class="block" data-rail="Your customer journey plan" id="l11-plan">
+    <div class="task">
+      <div class="task-head">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18M3 12h18M3 19h18"/></svg>
+        <div><b>Your customer journey plan</b><small>Fill in what you use today. Leave a field empty if you do nothing at that stage yet.</small></div>
+      </div>
+      <div class="task-body plan">
+        <div class="plan-stage">
+          <h3><i>1</i>Awareness</h3>
+          <div class="plan-row">
+            <label>Media you use<input type="text" data-save="atlas-proto-plan-0-media" placeholder="e.g. Instagram page"></label>
+            <label>Content<input type="text" data-save="atlas-proto-plan-0-content" placeholder="e.g. tips, behind the scenes"></label>
+            <label>KPI you track<input type="text" data-save="atlas-proto-plan-0-kpi" placeholder="e.g. impressions"></label>
+          </div>
+          <p class="plan-hint">From lesson 9: impressions, clicks and click-through rate suit awareness goals.</p>
+        </div>
+        <div class="plan-stage">
+          <h3><i>2</i>Consideration</h3>
+          <div class="plan-row">
+            <label>Media you use<input type="text" data-save="atlas-proto-plan-1-media" placeholder="e.g. website product pages"></label>
+            <label>Content<input type="text" data-save="atlas-proto-plan-1-content" placeholder="e.g. comparisons, reviews"></label>
+            <label>KPI you track<input type="text" data-save="atlas-proto-plan-1-kpi" placeholder="e.g. page views"></label>
+          </div>
+        </div>
+        <div class="plan-stage">
+          <h3><i>3</i>Conversion</h3>
+          <div class="plan-row">
+            <label>Media you use<input type="text" data-save="atlas-proto-plan-2-media" placeholder="e.g. search ads"></label>
+            <label>Content<input type="text" data-save="atlas-proto-plan-2-content" placeholder="e.g. offer with “Buy Now”"></label>
+            <label>KPI you track<input type="text" data-save="atlas-proto-plan-2-kpi" placeholder="e.g. conversion ratio"></label>
+          </div>
+          <p class="plan-hint">From lesson 9: conversions and conversion ratio suit purchase goals.</p>
+        </div>
+        <div class="plan-stage">
+          <h3><i>4</i>Post-sale: loyalty</h3>
+          <div class="plan-row">
+            <label>Media you use<input type="text" data-save="atlas-proto-plan-3-media" placeholder="e.g. email newsletter"></label>
+            <label>Content<input type="text" data-save="atlas-proto-plan-3-content" placeholder="e.g. care tips, new arrivals"></label>
+            <label>KPI you track<input type="text" data-save="atlas-proto-plan-3-kpi" placeholder="e.g. repeat purchases"></label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="Resources" id="l11-res">
+    <h2 class="block-title">Resources</h2>
+    <ul class="res">
+      <li><span class="res-ic" aria-hidden="true">DOC</span><div><b>Customer Journey Plan</b><small>Word document · the same plan to fill in offline</small></div><button class="btn" type="button" data-res="Customer Journey Plan">Download</button></li>
+    </ul>
+  </section>
+</template>
+
+<template id="l11-old">
+  
+  <div class="legacy">
+    <p>Now that you understand what the various KPIs are and how they correspond to each stage of the customer journey, it is time to take stock of what you are currently doing in your business.</p>
+    <p>Select and save the document below. This is the Customer Journey Plan, and you can use this to take stock of which media and content you are already using and how they correspond to various customer journey objectives. By doing so, you can check if the KPIs you are currently using are suitable for your desired objectives.</p>
+    <p style="border-top:1px solid #ddd;padding-top:6px">Resources</p>
+    <p>📎 1772381961313.docx</p>
+  </div>
+</template>
+
+<!-- ======================================================================
+     LESSON 12 · Article · Key tips for successfully managing a digital marketing campaign
+     ====================================================================== -->
+<template id="l12-new">
+  <section class="block" data-rail="Bring it together" id="l12-intro">
+    <p class="lead">You have explored all four key considerations. Here they are side by side, with what you wrote along the way, so you can create your own campaign.</p>
+  </section>
+
+  <section class="block" data-rail="1 · Objectives" id="l12-obj">
+    <div class="recap">
+      <div class="num">1</div>
+      <div>
+        <h2 class="block-title">What are my marketing objectives?</h2>
+        <p>Set objectives for your campaign that satisfy your target customers’ needs at each stage.</p>
+        <button class="go-link" type="button" data-go="1">Revisit lesson 2 · the customer journey ›</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="2 · Audience" id="l12-aud">
+    <div class="recap">
+      <div class="num">2</div>
+      <div>
+        <h2 class="block-title">Who and where is my audience?</h2>
+        <p>Reflect on your personas: demographic, motivation and needs, what you can do, and digital touchpoints.</p>
+        <div id="recapPersonas"></div>
+        <button class="go-link" type="button" data-go="2">Revisit lesson 3 · personas ›</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="3 · Promotion" id="l12-promo">
+    <div class="recap">
+      <div class="num">3</div>
+      <div>
+        <h2 class="block-title">How do I promote the content?</h2>
+        <p>Match the digital channels to your customers’ touchpoints at each stage. Ask yourself:</p>
+        <ul class="checklist" style="margin-top:12px">
+          <li><label><input type="checkbox" data-persist="atlas-proto-l12-q1"> What paid, earned and owned media am I already using?</label></li>
+          <li><label><input type="checkbox" data-persist="atlas-proto-l12-q2"> Does this content meet my customers’ needs at each stage?</label></li>
+          <li><label><input type="checkbox" data-persist="atlas-proto-l12-q3"> Could other forms of media complement it?</label></li>
+        </ul>
+        <div id="recapPeo"></div>
+        <button class="go-link" type="button" data-go="3">Revisit lesson 4 · the PEO model ›</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" data-rail="4 · Measurement" id="l12-measure">
+    <div class="recap">
+      <div class="num">4</div>
+      <div>
+        <h2 class="block-title">How can I measure the success of my campaign?</h2>
+        <p>Once you know which media you will use, note the KPIs to monitor for each customer journey objective.</p>
+        <div id="recapPlan"></div>
+        <button class="go-link" type="button" data-go="8">Revisit lesson 9 · KPIs ›</button>
+      </div>
+    </div>
+  </section>
+</template>
+
+<template id="l12-old">
+  
+  <div class="legacy">
+    <p>Now that you have explored all four key considerations you need to make, let’s review these considerations and reflect on what is required to create your own digital marketing campaign.</p>
+    <p>Key considerations for developing your digital marketing campaign:</p>
+    <p>1. What are my marketing objectives?</p><p>Set your objectives for your digital marketing campaign.</p>
+    <p>2. Who and where is my audience?</p><p>Reflect on the personas you created in lesson 1.</p>
+    <p>Persona</p><p>Demographic</p><p>Motivation and needs</p><p>What can you do?</p><p>Digital touchpoints</p>
+    <p>With your target customer’s needs in mind, specify marketing objectives to satisfy these customer needs and set specific objectives for your digital marketing campaign to meet.</p>
+    <p>3. How do I promote the content?</p>
+    <p>After identifying the digital touchpoints that match your target customer, highlight the digital channels you can use to address their needs at each stage of the customer journey.</p>
+    <p>Consider the following questions:</p><p>What paid, earned, and owned media are you already using?</p><p>Is the content of this media addressing the needs of your target customers at each stage of the customer journey?</p><p>Can they be complemented with other forms of media?</p>
+    <p>Use the following list of possible content across paid, earned, and owned media to help with your considerations:</p>
+    <p>4. How can I measure the success of my campaign?</p>
+    <p>Once you know which media you’d like to use to promote your content, make note of the KPIs you will need to monitor based on your customer journey objectives.</p>
+  </div>
+</template>
+
 <script>
 /* Keep the Current / Enhanced choice when moving between pages. */
 (function () {
@@ -1171,7 +2000,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     { title: 'Quiz', type: 'Quiz' }
   ];
   var QUIZ_IDX = 12;  // the course quiz is lesson 13
-  function isBuilt(i) { return i < 3 || i === QUIZ_IDX; } // only these lessons have prototype content
+  function isBuilt(i) { return i >= 0 && i < COURSE.length; } // every lesson has prototype content
   var ICONS = {
     Quiz: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D719A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01"/></svg>',
     Article: '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0D719A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
@@ -1191,9 +2020,9 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       { q: 'Which types of promotional approaches are mentioned for content promotion in the lesson?',
         opts: ['Only paid approaches like search engine optimization.', 'Earned and owned approaches, excluding paid methods.', 'Paid, earned, and owned approaches, including influencer marketing.', 'Just a single, undifferentiated approach for all content.'],
         a: 2, why: 'The lesson names paid, earned and owned approaches, such as search engine optimization and influencer marketing.' },
-      { q: 'What documentation is suggested as helpful to gather before starting the course exercises?',
-        opts: ['Financial statements from the last five years.', 'Documentation related to current marketing and sales activities.', 'Personal identification documents for registration.', 'Future business plans and projections.'],
-        a: 1, why: 'Gather the documentation you already have on your marketing and sales activities. It is fine if it is limited.' }
+      { q: 'What are the three things this course teaches you to do with a campaign?',
+        opts: ['Design, print and post it.', 'Plan, promote and measure it.', 'Budget, hire and outsource it.', 'Copy, paste and schedule it.'],
+        a: 1, why: 'The course covers how to plan a campaign, promote it with paid, earned and owned approaches, and measure how successful it is.' }
     ],
     [
       { q: 'How does the video define digital marketing?',
@@ -1216,6 +2045,102 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       { q: 'Creating multiple personas helps you to…',
         opts: ['Use fewer channels.', 'Better understand your target customers and design the best experience across all digital touchpoints.', 'Skip market research.', 'Replace your marketing objectives.'],
         a: 1, why: 'Several personas help you understand different customers and design the best experience across all digital touchpoints.' }
+    ],
+    [
+      { q: 'Your own website, brand pages and email newsletter are examples of…',
+        opts: ['Paid media', 'Owned media', 'Earned media', 'Shared media'],
+        a: 1, why: 'Owned media is the digital channels and content you control, such as your website, brand pages, newsletters and apps.' },
+      { q: 'A customer leaves a positive review of your shop on a review website. This is…',
+        opts: ['Earned media', 'Paid media', 'Owned media', 'Not media at all'],
+        a: 0, why: 'Earned media is publicity you receive without paying, such as online reviews or electronic word-of-mouth.' },
+      { q: 'In an integrated campaign, what is paid media mainly used for?',
+        opts: ['Setting the tone of your brand', 'Amplifying the message', 'Writing customer reviews', 'Replacing your website'],
+        a: 1, why: 'Owned media sets the tone, paid media amplifies the message, and earned media builds relationships with opinion leaders.' }
+    ],
+    [
+      { q: 'Customer 1 is at the awareness stage. Which search term are they most likely to use?',
+        opts: ['“digital camera”', '“mid-range camera reviews”', '“buy model X 24mm lens kit”', '“camera store opening hours”'],
+        a: 0, why: 'At the awareness stage people have an abstract mindset and use broad, general terms.' },
+      { q: 'What is keyword mapping?',
+        opts: ['Buying keywords from a search engine', 'Assigning keywords to specific web pages based on your keyword research', 'Listing your competitors\' keywords', 'Adding as many keywords as possible to one page'],
+        a: 1, why: 'Keyword mapping assigns keywords to specific pages so each page appears for the searches it is meant for.' },
+      { q: 'How should your website pages be organised for customers at different stages?',
+        opts: ['One page for everything', 'General pages that gradually link to more specific ones', 'Only product pages', 'Only a blog'],
+        a: 1, why: 'A general home page serves awareness, and increasingly specific product pages serve customers ready to convert.' }
+    ],
+    [
+      { q: 'With pay-per-click (PPC) advertising, when do you pay?',
+        opts: ['Every time the ad is shown', 'Only when someone clicks the ad', 'Once a month, whatever happens', 'Only when someone buys'],
+        a: 1, why: 'It is called pay-per-click because you only pay when someone clicks on your ad.' },
+      { q: 'Which three things must every PPC ad do?',
+        opts: ['Be long, be funny, be cheap', 'Attract attention, communicate value, invite action', 'Show the price, the logo and the address', 'Target everyone, everywhere, all the time'],
+        a: 1, why: 'Every PPC ad must attract attention, communicate a value proposition and invite action with a clear call to action.' },
+      { q: 'The example ad for Customer 2 shows reviews and ratings. What does it lack?',
+        opts: ['A relevant keyword', 'A strong call to action, such as “Buy Now”', 'A product image', 'A price comparison'],
+        a: 1, why: 'Adding a strong call to action such as “Buy Now”, “Shop” or “Great Deals” would move Customer 2 toward conversion.' }
+    ],
+    [
+      { q: 'Which of these is earned media?',
+        opts: ['A search ad you pay for', 'A detailed video review of your product by a customer', 'Your own email newsletter', 'A banner on your website'],
+        a: 1, why: 'Earned media is publicity you receive without paying for it, such as reviews, video reviews and social posts by others.' },
+      { q: 'You paid an influencer and approved the post before it went live. How should it be labelled?',
+        opts: ['Sponsorship', 'Advertisement or “Ad”', 'No label is needed', 'Customer review'],
+        a: 1, why: 'When the influencer is paid and you control the content, the post should be labelled “Advertisement” or “Ad”. Without control, it is a “Sponsorship”.' },
+      { q: 'Why can influencers with smaller followings be useful later in the customer journey?',
+        opts: ['They are always cheaper', 'They seem more genuine and credible to their audience', 'They reach more people', 'They never need to disclose incentives'],
+        a: 1, why: 'Smaller influencers often have a closer connection with their audience, so they seem more genuinely interested and more credible.' }
+    ],
+    [
+      { q: 'What do all viral marketing messages have in common?',
+        opts: ['A large advertising budget', 'An emotional connection with their audience', 'A celebrity in them', 'A discount code'],
+        a: 1, why: 'A common trait of all viral content is an emotional connection with the audience.' },
+      { q: 'Why can a shared message feel more credible?',
+        opts: ['It is shared by friends and family', 'It has more hashtags', 'It is longer', 'It is paid for'],
+        a: 0, why: 'Because viral content is often shared by friends and family, the message gains some credibility.' },
+      { q: 'What is a risk of relying on viral marketing?',
+        opts: ['It is always expensive', 'It is hard to predict, and content can go viral for the wrong reasons', 'It only works on email', 'It cannot be shared'],
+        a: 1, why: 'You cannot predict what will go viral, and poor content can go viral for the wrong reasons.' }
+    ],
+    [
+      { q: 'For average position in search results, which number is better?',
+        opts: ['A bigger number', 'A smaller number', 'Exactly 50', 'It does not matter'],
+        a: 1, why: 'Average position shows where your page ranks. You want to rank high, so the smaller the number, the better.' },
+      { q: 'Your ad aims to make hobbyists aware of a new camera. Which KPIs fit best?',
+        opts: ['Conversions and conversion ratio', 'Impressions, clicks and click-through rate', 'Bounce rate only', 'Cost only'],
+        a: 1, why: 'For an awareness goal, impressions, clicks and CTR are good indicators. Conversions suit a purchase goal.' },
+      { q: '2,101 people clicked your ad and 140 bought. What is the conversion ratio?',
+        opts: ['About 1.5%', 'About 6.66%', 'About 14%', 'About 66%'],
+        a: 1, why: '140 ÷ 2,101 = 0.0666, so the conversion ratio is about 6.66%.' }
+    ],
+    [
+      { q: 'What are the two steps of social listening?',
+        opts: ['Post and boost', 'Monitor, then analyze', 'Buy ads, then measure', 'Write, then publish'],
+        a: 1, why: 'First monitor your channels for mentions and keywords, then analyze what you find to shape your strategy.' },
+      { q: 'You want to know how people feel about your new campaign. What helps most?',
+        opts: ['Sentiment analysis', 'Keyword mapping', 'Bounce rate', 'Average position'],
+        a: 0, why: 'Sentiment analysis captures how your audience reacts to your content and campaigns, in real time.' },
+      { q: 'How can social listening help with influencers?',
+        opts: ['It pays them automatically', 'It finds who talks about you, your industry and your competitors', 'It writes their posts', 'It replaces influencers'],
+        a: 1, why: 'Social listening helps you find your top influencers, those in your industry, and your competitors’ influencers.' }
+    ],
+    [
+      { q: 'What is the Customer Journey Plan for?',
+        opts: ['Booking your marketing budget', 'Taking stock of the media and content you use at each stage, and whether your KPIs fit', 'Writing ad copy', 'Choosing a logo'],
+        a: 1, why: 'The plan helps you see which media and content you use at each stage, and check whether your KPIs suit your objectives.' },
+      { q: 'You track only conversions for a page meant to build awareness. What is the problem?',
+        opts: ['Nothing, conversions always work', 'The KPI does not match the objective: awareness is better tracked with impressions, clicks and CTR', 'You should track bounce rate only', 'You need more pages'],
+        a: 1, why: 'KPIs should match the objective. For awareness, impressions, clicks and click-through rate are better indicators.' }
+    ],
+    [
+      { q: 'Which is NOT one of the four key considerations for a campaign?',
+        opts: ['What are my marketing objectives?', 'Who and where is my audience?', 'Which logo colour should I use?', 'How can I measure the success of my campaign?'],
+        a: 2, why: 'The four are objectives, audience, how to promote the content, and how to measure success.' },
+      { q: 'What should you decide before choosing which KPIs to monitor?',
+        opts: ['Which media you will use to promote your content', 'Your next year’s budget', 'Your competitors’ prices', 'Nothing, KPIs come first'],
+        a: 0, why: 'Once you know which media you will use, you note the KPIs to monitor based on your customer journey objectives.' },
+      { q: 'When reviewing your promotion, which question does the lesson ask?',
+        opts: ['Can the media be complemented with other forms of media?', 'How many followers do my competitors have?', 'Which ad is the cheapest?', 'How often should I post?'],
+        a: 0, why: 'Check what paid, earned and owned media you use, whether it meets customers’ needs at each stage, and whether other media could complement it.' }
     ]
   ];
   function needed(n) { return Math.ceil((PASS_MARK / 100) * n); }
@@ -1745,6 +2670,10 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     $$('[data-persist]').forEach(function (c) { c.checked = !!load(c.dataset.persist, false); });
     if ($('#funnel')) showStage(0);
     if ($('#personaForm')) renderPersonas();
+    // Free-text answers in the new lessons save as the learner types
+    $$('[data-save]').forEach(function (f) { f.value = load(f.dataset.save, ''); });
+    if ($('#kpiCalc')) renderCalc();
+    if ($('#recapPersonas')) renderRecap();
     renderFlash();
     renderFundCard();
     renderCommunity();
@@ -1831,6 +2760,10 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       if (c) { $$('.stage-btn')[c.stage].classList.add('is-start'); showStage(c.stage, c.text); } else { showStage(0); }
       return;
     }
+    var panel = e.target.closest('[data-open-panel]');
+    if (panel) { openPanel(panel.dataset.openPanel); return; }
+    var go = e.target.closest('[data-go]');
+    if (go) { goTo(+go.dataset.go); return; }
     var rm = e.target.closest('[data-remove]');
     if (rm) { var data = load('atlas-proto-personas', []); data.splice(+rm.dataset.remove, 1); save('atlas-proto-personas', data); renderPersonas(); return; }
     var t = e.target.closest('[data-toast]');
@@ -1839,6 +2772,40 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   $('#lessonBody').addEventListener('change', function (e) {
     if (e.target.matches('[data-persist]')) save(e.target.dataset.persist, e.target.checked);
   });
+  $('#lessonBody').addEventListener('input', function (e) {
+    if (e.target.matches('[data-save]')) save(e.target.dataset.save, e.target.value);
+    if (e.target.matches('[data-calc]')) renderCalc();
+  });
+
+  // Lesson 12: what the learner wrote in lessons 3 (personas), 4 (PEO) and 11 (journey plan)
+  function renderRecap() {
+    function box(title, rows, emptyText, lessonIdx) {
+      rows = rows.filter(function (r) { return r[1]; });
+      if (!rows.length) return '<div class="mine empty">' + emptyText + ' <button class="go-link" style="margin:0" type="button" data-go="' + lessonIdx + '">Go to lesson ' + (lessonIdx + 1) + '</button></div>';
+      return '<div class="mine"><small>' + title + '</small><dl>' + rows.map(function (r) { return '<dt>' + esc(r[0]) + '</dt><dd>' + esc(r[1]) + '</dd>'; }).join('') + '</dl></div>';
+    }
+    var personas = load('atlas-proto-personas', []);
+    $('#recapPersonas').innerHTML = box('Your personas', personas.map(function (p) {
+      return [p.name, [p.needs, (p.touch || []).join(', ')].filter(Boolean).join(' · ')];
+    }), 'You have not written a persona yet.', 2);
+    $('#recapPeo').innerHTML = box('Your media today (lesson 4)', [['Owned', load('atlas-proto-peo-owned', '')], ['Paid', load('atlas-proto-peo-paid', '')], ['Earned', load('atlas-proto-peo-earned', '')]],
+      'You have not listed your media yet.', 3);
+    $('#recapPlan').innerHTML = box('KPIs in your journey plan (lesson 11)', ['Awareness', 'Consideration', 'Conversion', 'Loyalty'].map(function (s, i) {
+      return [s, load('atlas-proto-plan-' + i + '-kpi', '')];
+    }), 'Your journey plan has no KPIs yet.', 10);
+  }
+
+  // Lesson 9 calculator: cost = CPC × clicks, conversion ratio = conversions ÷ clicks
+  function renderCalc() {
+    var val = function (k) { var n = parseFloat($('[data-calc="' + k + '"]').value); return isFinite(n) && n >= 0 ? n : 0; };
+    var cpc = val('cpc'), clicks = val('clicks'), conv = val('conv');
+    var cost = cpc * clicks, ratio = clicks ? conv / clicks * 100 : 0;
+    var money = cost.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+    $('#kpiOut').innerHTML =
+      '<div><small>Cost</small><b>' + money + '</b><span>$' + cpc.toFixed(2) + ' × ' + clicks.toLocaleString('en-US') + ' clicks</span></div>' +
+      '<div><small>Conversion ratio</small><b>' + (clicks ? ratio.toFixed(2) + '%' : '–') + '</b><span>' + (clicks ? conv.toLocaleString('en-US') + ' ÷ ' + clicks.toLocaleString('en-US') + ' clicks' : 'Add the number of clicks') + '</span></div>' +
+      '<div><small>Cost per purchase</small><b>' + (conv ? (cost / conv).toLocaleString('en-US', { style: 'currency', currency: 'USD' }) : '–') + '</b><span>Cost ÷ purchases or sign-ups</span></div>';
+  }
   $('#lessonBody').addEventListener('submit', function (e) {
     if (e.target.id !== 'personaForm') return;
     e.preventDefault();
@@ -1875,7 +2842,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     closeDrawer(); $('#outlineBtn').focus();
   });
 
-  $$('[data-lesson]').forEach(function (b) { b.addEventListener('click', function () { state.lesson = +b.dataset.lesson; render(); }); });
+  $$('[data-lesson]').forEach(function (b) { b.addEventListener('click', function () { goTo(+b.dataset.lesson); }); });
   $$('[data-mode]').forEach(function (b) { b.addEventListener('click', function () { state.mode = b.dataset.mode; render(); }); });
   $('#resetBtn').addEventListener('click', function () {
     save('atlas-proto-done', {}); reviews = {}; gates = {}; resetQuiz(); render(); toast('Progress reset');
@@ -2083,8 +3050,6 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   var JEN_SECTIONS = {
     'l1-welcome': 'This opening sets the goal: using digital campaigns to reach your target customers and grow your business.',
     'l1-learn': 'These are the three things you will learn: how to plan, promote and measure a campaign.',
-    'l1-before': 'Gather the marketing and sales documents you already have. If you have very little, the course will guide you.',
-    'l1-community': '10,000 Women is a community with discussion forums and webinars. To register you must identify as a woman.',
     'l2-video': 'The video walks through how to plan a digital marketing campaign, using two camera shoppers as examples.',
     'l2-what': 'Digital marketing uses digital technologies to create integrated, targeted and measurable communications that acquire and retain customers.',
     'l2-four': 'When you plan a campaign, ask four questions: your objectives, your audience, how you will promote, and how you will measure success.',
@@ -2095,17 +3060,57 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     'l3-persona': 'A persona is a semi-fictional ideal customer based on real data and market research. Several personas help you design for different customers.',
     'l3-touch': 'Digital touchpoints are the places customers meet your business online. Knowing them lets you match content to the right stage.',
     'l3-examples': 'Two example personas: a hobbyist at the awareness stage and a camera enthusiast at the consideration stage.',
-    'l3-task': 'Your task: write a persona for your own business with the four parts, then save it.'
+    'l3-task': 'Your task: write a persona for your own business with the four parts, then save it.',
+    'l4-peo': 'The PEO model sorts your marketing into three kinds of media: owned (yours), paid (you pay for reach) and earned (others talk about you).',
+    'l4-together': 'Each kind does a different job: owned sets the tone, paid amplifies, earned builds relationships with opinion leaders.',
+    'l4-task': 'Write down the owned, paid and earned media you already use, then compare notes with other participants in the discussion.',
+    'l5-video': 'The video shows how to use your own website and channels so customers at each stage find you in search results.',
+    'l5-search': 'People at the awareness stage search with broad words. People comparing options search with specific words, even brand names.',
+    'l5-map': 'Keyword mapping gives each page the words its customers search for, from a general home page to specific product pages. This is SEO.',
+    'l5-check': 'Three questions to ask before you publish anything, so your content is useful and worth finding.',
+    'l5-story': 'A business owner explains why her SEO-enabled website brings customers to her even when she is not selling actively.',
+    'l6-video': 'The video explains how to use paid advertising, mainly pay-per-click ads, to amplify your content.',
+    'l6-ppc': 'PPC ads are sponsored listings on search engines and social media. You pay only when someone clicks.',
+    'l6-three': 'A good ad gets noticed by the right people, says why the offer is worth it, and tells them what to do next.',
+    'l6-match': 'An ad works better when it fits where the customer is: broad and inspiring at awareness, detailed with a clear call to action at consideration.',
+    'l6-social': 'Social media ads follow the same three rules. Formats like carousel ads suit customers who are still exploring.',
+    'l7-what': 'Earned media is publicity you do not pay for: reviews, video reviews and posts that other people make about you.',
+    'l7-wom': 'Word-of-mouth drives many buying decisions, but you cannot control it. Influencer marketing is one way to encourage it.',
+    'l7-influencers': 'You can reward influencers with money, gifts or free services, and agree on content, hashtags, timing and themes.',
+    'l7-label': 'Tell people when a post was incentivized. Paid and approved by you: “Ad”. Not controlled by you: “Sponsorship”.',
+    'l7-choose': 'Big influencers spread awareness; small ones are closer to their followers and more believable when people are about to buy.',
+    'l8-what': 'Viral marketing is when customers pass your message on to friends, family and colleagues.',
+    'l8-traits': 'Content spreads when it creates an emotional connection, surprises, makes people laugh, and is easy to share.',
+    'l8-weigh': 'Viral content is cheap reach with built-in credibility, but it is unpredictable and can backfire.',
+    'l8-task': 'Your task: write what you would need to think about before using viral media for your own products.',
+    'l9-where': 'This is the last of the four planning questions: how to measure whether your campaign is working.',
+    'l9-owned': 'For your web pages, watch where you rank, how many views each page gets, and how many visitors leave after one page.',
+    'l9-bounce': 'A bounce rate is only good or bad compared with what the page is for: browsing pages want it low, buying pages can have it higher.',
+    'l9-paid': 'For ads, track how often they are shown and clicked, what each click costs, and how many clicks turn into sales.',
+    'l9-calc': 'Change the numbers to see the cost of an ad and its conversion ratio for your own campaign.',
+    'l9-choose': 'Choose KPIs that match your goal: awareness goals use impressions, clicks and CTR; purchase goals use conversions.',
+    'l10-what': 'Social listening means watching what people say about your brand online, then using what you learn.',
+    'l10-why': 'It shows how people feel about your campaigns, which content they like, and who influences them.',
+    'l10-sentiment': 'Sentiment analysis turns comments and mentions into a picture of whether people react well or badly, and why.',
+    'l10-influencers': 'Listening also finds the influencers worth working with: yours, your industry’s and your competitors’.',
+    'l11-intro': 'This exercise is a stock-take: what you already do at each stage of the journey, and whether you measure the right things.',
+    'l11-plan': 'Fill in the media, content and KPI you use at each stage. Empty rows show where you have gaps.',
+    'l11-res': 'The same plan as a Word document, if you prefer to work offline.',
+    'l12-intro': 'This lesson brings the four planning questions together, with your own notes from earlier lessons.',
+    'l12-obj': 'Step 1: set objectives that meet your customers’ needs at each stage of the journey.',
+    'l12-aud': 'Step 2: your personas tell you who to reach and where.',
+    'l12-promo': 'Step 3: check which owned, paid and earned media you use, and whether they meet customers’ needs at each stage.',
+    'l12-measure': 'Step 4: choose the KPIs to monitor for each objective.'
   };
 
   var JEN_LESSONS = {
     0: {
       chips: [['summary', 'Summarise this lesson'], ['simple', 'Explain it simply'], ['example', 'Give me an example'], ['focus', 'What should I focus on?']],
       answers: {
-        summary: '<p>Here is the short version of <b>Getting started</b>:</p><ul><li><b>Plan</b> a digital marketing campaign with a clear understanding of how it works.</li><li><b>Promote</b> your content using paid, earned and owned approaches, such as search engine optimization and influencer marketing.</li><li><b>Measure</b> how successful your campaign is with your customers.</li></ul><p>Before you start, gather the marketing and sales documents you already have. It is fine if they are limited.</p>',
+        summary: '<p>Here is the short version of <b>Getting started</b>:</p><ul><li><b>Plan</b> a digital marketing campaign with a clear understanding of how it works.</li><li><b>Promote</b> your content using paid, earned and owned approaches, such as search engine optimization and influencer marketing.</li><li><b>Measure</b> how successful your campaign is with your customers.</li></ul>',
         simple: '<p>Think of the course as three moves: <b>plan it, promote it, check if it worked</b>.</p><ul><li><b>Paid</b>: you pay for reach, like an advertisement.</li><li><b>Earned</b>: other people talk about you, like reviews or shares.</li><li><b>Owned</b>: channels you control, like your website or email list.</li></ul>',
         example: '<p>Say you run a small bakery.</p><ul><li><b>Plan</b>: aim for 50 new regulars this month.</li><li><b>Promote</b>: a paid social ad (paid), a customer review (earned), a post on your own page (owned).</li><li><b>Measure</b>: count how many people who saw the posts came in and bought.</li></ul>',
-        focus: '<p>Two things matter most right now. First, <b>gather your marketing and sales documents</b>, even if you only have a little. Second, keep your own business in mind, because the exercises ask you to apply each idea to it.</p>'
+        focus: '<p>Keep your own business in mind from the start. Every lesson asks you to apply its idea to your customers, so the course ends with a plan you can use.</p>'
       }
     },
     1: {
@@ -2125,6 +3130,74 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
         example: '<p>A persona for a neighbourhood bakery might be <b>Weekend baker</b>:</p><ul><li><b>Demographic</b>: home bakers, 25 to 40.</li><li><b>Motivation and needs</b>: reliable ingredients, comparing suppliers.</li><li><b>What you can do</b>: bundle flour, yeast and recipes.</li><li><b>Digital touchpoints</b>: Instagram, search results, online reviews.</li></ul>',
         focus: '<p>Spend your time on the <b>task</b> at the end. Start with one real customer you know, write the four parts, then save it. You can add more personas afterwards.</p>',
         help: '<p>Start with a real person you serve well, then answer four questions:</p><ol><li>Who are they? Age, role, situation.</li><li>What do they want, and which stage are they at?</li><li>What can you offer them?</li><li>Where do they spend time online?</li></ol><p>Put those four answers in the form below and you have your first persona.</p>'
+      }
+    },
+    3: {
+      chips: [['summary', 'Summarise this lesson'], ['example', 'Give me an example'], ['focus', 'What should I focus on?']],
+      answers: {
+        summary: '<p>The <b>PEO model</b> has three kinds of media:</p><ul><li><b>Owned</b>: channels you control, like your website, brand pages and newsletter.</li><li><b>Paid</b>: you pay third parties to show your message, like search or display ads.</li><li><b>Earned</b>: publicity you do not pay for, like reviews and word-of-mouth.</li></ul><p>Combine them: owned sets the tone, paid amplifies, earned builds relationships.</p>',
+        example: '<p>A small bakery could use all three:</p><ul><li><b>Owned</b>: its Instagram page and a weekly email with new bakes.</li><li><b>Paid</b>: a boosted post to people nearby.</li><li><b>Earned</b>: a local food blogger reviewing the croissants.</li></ul>',
+        focus: '<p>Focus on the <b>Your turn</b> task: list what you already use in each column. Most businesses already have some owned media without calling it that.</p>'
+      }
+    },
+    4: {
+      chips: [['summary', 'Summarise this lesson'], ['simple', 'What is SEO?'], ['focus', 'What should I focus on?']],
+      answers: {
+        summary: '<p>Use your <b>owned media</b>, especially your website, to meet customers where they are:</p><ul><li>People at awareness search with <b>broad</b> terms, people comparing options with <b>specific</b> ones.</li><li><b>Keyword mapping</b> puts those terms on the right pages, from general to specific.</li><li>Keep content fresh, use your customers’ words, and ask how it helps them.</li></ul>',
+        simple: '<p><b>SEO</b> (search engine optimization) means writing your pages so search engines show them for the words your customers type. It costs time, not ad money.</p>',
+        focus: '<p>Think about one product you sell. What would a beginner type into a search engine, and what would an expert type? Each answer deserves its own page.</p>'
+      }
+    },
+    5: {
+      chips: [['summary', 'Summarise this lesson'], ['simple', 'What is PPC?'], ['example', 'Give me an example']],
+      answers: {
+        summary: '<p><b>Paid media</b> amplifies your content. The main tool is <b>pay-per-click (PPC)</b> ads on search engines and social media.</p><ul><li>Every ad must <b>attract attention</b>, <b>communicate value</b> and <b>invite action</b>.</li><li>Match the ad to the customer’s stage: inspire at awareness, compare and push to buy at consideration.</li></ul>',
+        simple: '<p><b>PPC</b> is advertising where you only pay when someone clicks your ad. If nobody clicks, it costs you nothing.</p>',
+        example: '<p>A shoe shop runs a search ad for “running shoes for beginners”: it repeats those words (attention), mentions free fitting advice (value) and ends with “Find your first pair” (action).</p>'
+      }
+    },
+    6: {
+      chips: [['summary', 'Summarise this lesson'], ['example', 'Give me an example'], ['focus', 'What should I focus on?']],
+      answers: {
+        summary: '<p><b>Earned media</b> is publicity you do not pay for, such as reviews and social posts.</p><ul><li>Word-of-mouth drives many purchases, but is hard to control, so you can <b>incentivize</b> it with influencers.</li><li>Be transparent: label paid, approved posts “Ad”; posts you did not control “Sponsorship”.</li><li>Big influencers raise awareness; small ones are more credible later in the journey.</li></ul>',
+        example: '<p>A handmade jewellery shop sends a piece to a local stylist with 800 followers, lets her write an honest review, and gives her a discount code for her followers. Because the shop did not approve the post, it is labelled “Sponsorship”.</p>',
+        focus: '<p>Think about who already talks about your business. Is there a small, genuine voice your customers trust? That is often a better first partner than a big name.</p>'
+      }
+    },
+    7: {
+      chips: [['summary', 'Summarise this lesson'], ['help', 'Help me with the task']],
+      answers: {
+        summary: '<p><b>Viral marketing</b> is when customers pass your message on.</p><ul><li>It works through <b>emotion</b>: surprise and humour related to the product.</li><li>Make sharing easy and reply in the comments.</li><li>It is cheap and credible, but <b>unpredictable</b>, and can spread for the wrong reasons.</li></ul>',
+        help: '<p>Try answering these for one product:</p><ol><li>What feeling should people have when they see it?</li><li>How is the joke or surprise linked to the product?</li><li>Where will people share it?</li><li>What is the worst way it could be misread?</li></ol>'
+      }
+    },
+    8: {
+      chips: [['summary', 'Summarise this lesson'], ['simple', 'What is a KPI?'], ['example', 'Work through an example']],
+      answers: {
+        summary: '<p>Measure success with <b>KPIs</b> that match your goal.</p><ul><li><b>Web pages</b>: average position, page views, bounce rate.</li><li><b>Ads</b>: impressions, clicks, CTR, cost per click, cost, conversions, conversion ratio.</li><li>Awareness goals: impressions, clicks, CTR. Purchase goals: conversions.</li></ul>',
+        simple: '<p>A <b>KPI</b> (key performance indicator) is a number you watch to see if a goal is being met, like how many people clicked your ad or bought after clicking.</p>',
+        example: '<p>Your ad costs $0.83 per click and gets 2,101 clicks: <b>cost = $0.83 × 2,101 = $1,743.83</b>. If 140 of those people buy, <b>conversion ratio = 140 ÷ 2,101 ≈ 6.66%</b>. Try your own numbers in the calculator on this page.</p>'
+      }
+    },
+    9: {
+      chips: [['summary', 'Summarise this lesson'], ['example', 'Give me an example']],
+      answers: {
+        summary: '<p><b>Social listening</b> has two steps: <b>monitor</b> mentions of your brand, competitors and keywords, then <b>analyze</b> them.</p><ul><li>Sentiment: how people feel about your campaigns.</li><li>Content research: which content types they like.</li><li>Influencers: who is worth working with.</li></ul>',
+        example: '<p>A café notices many posts praising its iced drinks but complaining about queues. It shares more iced-drink videos (the content people like) and posts about a new pre-order option (acting on the negative theme).</p>'
+      }
+    },
+    10: {
+      chips: [['help', 'Help me fill in the plan'], ['summary', 'Why this exercise?']],
+      answers: {
+        help: '<p>Go stage by stage and be honest, even if a row stays empty:</p><ol><li><b>Awareness</b>: where do new people first see you?</li><li><b>Consideration</b>: where do they compare you with others?</li><li><b>Conversion</b>: where do they buy?</li><li><b>Loyalty</b>: how do you stay in touch afterwards?</li></ol><p>Then check each KPI fits its goal.</p>',
+        summary: '<p>Most businesses already market at some stages and not others. Writing it down shows the gaps, and whether you measure the right thing at each stage.</p>'
+      }
+    },
+    11: {
+      chips: [['summary', 'Summarise this lesson'], ['focus', 'What should I do next?']],
+      answers: {
+        summary: '<p>Four questions make a campaign plan:</p><ol><li><b>Objectives</b> for each stage.</li><li><b>Audience</b>: your personas and their touchpoints.</li><li><b>Promotion</b>: owned, paid and earned media at each stage.</li><li><b>Measurement</b>: the KPIs that match each objective.</li></ol>',
+        focus: '<p>Fill any gaps in your notes from lessons 3, 4 and 11, then take the quiz. Your notes are already on this page.</p>'
       }
     },
     12: {
@@ -2475,6 +3548,18 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       { id: 's2a', who: person('Lia M.', 0), ago: 5760, kind: 'comment', likes: 3, text: 'Sharing my first persona: Weekend baker, 25 to 40, finds me on Instagram. Feedback welcome.', replies: [] },
       { id: 's2b', who: person('Nadia R.', 1), ago: 720, kind: 'question', likes: 2, text: 'Can one business have more than one persona?',
         replies: [{ id: 's2b1', who: person('Anita R.', 2), role: 'fac', ago: 600, likes: 2, text: 'Yes, and it helps. Different customers need different messages and different touchpoints.' }] }
+    ],
+    3: [
+      { id: 's3a', who: person('Putri A.', 3), ago: 2160, kind: 'comment', likes: 5, text: 'Owned: my Instagram shop and a WhatsApp catalogue. Paid: nothing yet. Earned: Google reviews from regulars. Paid is my gap.',
+        replies: [{ id: 's3a1', who: person('Anita R.', 2), role: 'fac', ago: 1900, likes: 2, text: 'Good start. Your reviews are earned media you can reuse on your own page. A small boosted post could amplify the best one.' }] },
+      { id: 's3b', who: person('Grace O.', 4), ago: 480, kind: 'question', likes: 1, text: 'Is a post that a customer shares from my page owned or earned?', replies: [] }
+    ],
+    10: [
+      { id: 's10a', who: person('Siti N.', 1), ago: 300, kind: 'comment', likes: 2, text: 'Filling in the plan showed me I do nothing at the loyalty stage. Starting a simple monthly email to past customers.', replies: [] }
+    ],
+    7: [
+      { id: 's7a', who: person('Mei L.', 5), ago: 1440, kind: 'comment', likes: 3, text: 'My first thought for the task: anything funny must still look like our brand. A joke that confuses people about what we sell is a risk.',
+        replies: [{ id: 's7a1', who: person('Anita R.', 2), role: 'fac', ago: 1200, likes: 2, text: 'Exactly the point about humour related to the product. Also plan who answers the comments if it does spread.' }] }
     ]
   };
 

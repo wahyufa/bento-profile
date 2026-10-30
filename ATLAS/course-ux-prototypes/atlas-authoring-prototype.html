@@ -339,6 +339,7 @@ details.orig .txt { padding: 0 16px 14px; font-size: 13.5px; color: var(--muted)
 .chk .d { flex: none; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; font-size: 12px; font-weight: 700; color: #fff; margin-top: 1px; }
 .chk .d.ok { background: var(--green); } .chk .d.warn { background: var(--accent); color: #3b2600; } .chk .d.bad { background: var(--red); }
 .chk .fix { margin-left: auto; flex: none; }
+.chk .fixes { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
 .pub { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 14px 16px; }
 .pub .sp { flex: 1; min-width: 160px; font-size: 13.5px; color: var(--muted); }
 .pub b { color: var(--ink); }
@@ -620,6 +621,9 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     ['Key tips for successfully managing a digital marketing campaign', 'Article'], ['Quiz', 'Quiz']
   ];
   var YT = 'https://youtu.be/OpGsOTBUshI';
+  // Lesson 10 stays as rich text so the "Convert with AI" flow can be shown on this course.
+  // In the learner prototype it is already converted (the result that flow is meant to produce).
+  var AI_DEMO_IDX = 9;
   var LEGACY = {
     0: 'In this course, you will explore how digital marketing campaigns can be used to effectively communicate with your target customers to support your business and develop your business growth. You will develop a clear and comprehensive understanding of how to develop a digital marketing campaign. You will also examine ways of promoting your content using paid, earned and owned approaches such as search engine optimization and influencer marketing. You will then learn how to measure how successful your campaign is with your customers. Are you ready to start? To complete all the exercises in this course, it will be helpful for you to gather the documentation that you currently have on your marketing and sales activities. Do not worry if this documentation is limited – this course will provide guidance on how to develop and record digital marketing strategies for your business. If you are not yet confident with your market and customers, or these are changing, you may wish to first complete one of the other 10,000 Women courses, Fundamentals of Sales and Marketing. Register with 10,000 Women As well as sharing ideas with other participants in the discussion forums, you can register with 10,000 Women today to learn from other participants and graduates. […]',
     1: 'What is digital marketing? Digital marketing is everywhere, from social media ads, search engines and websites, to emails and, even, online reviews. So, what exactly is digital marketing? Digital marketing is the use of digital technologies to create integrated, targeted and measurable communications with the purpose of acquiring and retaining customers. [MUSIC] Take customer one, for example. They just picked up photography as a hobby. […]',
@@ -730,19 +734,118 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
         { name: 'Customer 2', demographic: 'Camera enthusiast, very interested in photography', needs: 'Comparing digital cameras. Consideration stage.', can: 'Provide detailed digital camera comparisons', touch: 'Search engine results, Influencer marketing' }] }),
       B('task', { title: 'Your task: write a persona for your business', prompt: 'Use your customer knowledge and data.', fields: [{ label: 'Persona name', hint: 'A short label, for example "Weekend baker"' }, { label: 'Demographic', hint: 'Who are they?' }, { label: 'Motivation and needs', hint: 'What do they want, and where are they in the buying journey?' }, { label: 'What you can do for them', hint: 'How can your business help?' }, { label: 'Digital touchpoints', hint: 'Separate with commas' }] })
     ];
+    // Lessons 4 to 12, matching the learner prototype. Blocks the authoring tool cannot express
+    // (the KPI calculator, the journey-plan cards, the lesson 12 recap of the learner's own notes)
+    // are shown here as the closest block: a worked example, a practice task, numbered cards.
+    if (i === 3) return [
+      B('lead', { text: 'Given the range of digital content available, you can use the paid, earned and owned media (PEO) model to build a digital marketing strategy that brings these approaches together.' }),
+      B('cards', { title: 'The PEO model', numbered: false, cards: [
+        { title: 'Owned media', text: 'Digital channels and content you control: your website, brand pages on social media, email newsletters, your own apps.', more: '' },
+        { title: 'Paid media', text: 'External marketing you pay for: paid search ads, display and shopping ads. You still control the content.', more: '' },
+        { title: 'Earned media', text: 'Publicity you receive without paying, such as online reviews, word-of-mouth and influencer posts.', more: '' }] }),
+      B('cards', { title: 'Use them together', numbered: true, cards: [
+        { title: 'Owned', text: 'sets the tone with content you create', more: '' }, { title: 'Paid', text: 'amplifies the message', more: '' },
+        { title: 'Earned', text: 'builds relationships with opinion leaders who share your content with their followers', more: '' }] }),
+      B('task', { title: 'Your turn: which media do you already use?', prompt: 'Note what you use today, then share it in the discussion and read what others use.', fields: [{ label: 'Owned', hint: 'e.g. your website, Instagram page, newsletter' }, { label: 'Paid', hint: 'e.g. boosted posts, search ads' }, { label: 'Earned', hint: 'e.g. customer reviews, a local blogger\'s post' }] })
+    ];
+    if (i === 4) return [
+      B('video', { url: YT, title: 'Using owned media', transcript: 'Now that you have a general idea of the PEO Model, let\'s go into detail about how to use paid, owned and earned media in an integrated digital campaign. Let\'s begin with owned media. [MUSIC] At the awareness stage, individuals are often in an abstract mindset and use broad terms such as \'digital camera\'. Customer two is in the consideration stage and uses the keyword \'mid-range camera reviews\'. […] This process is search engine optimization (SEO): the practice of making changes to web page content to improve its visibility in unpaid search engine results.', clean: true }),
+      B('define', { title: 'Search like your customer', intro: 'Before your website can reach a customer, you need to understand how they search.', leftTitle: 'Customer 1 · Awareness', leftLead: 'Abstract mindset, broad terms:', left: ['“digital camera”'], rightTitle: 'Customer 2 · Consideration', rightLead: 'Concrete mindset, specific terms:', right: ['“mid-range camera reviews”'] }),
+      B('callout', { variant: 'info', title: 'Keyword mapping', text: 'Assigning keywords to specific web pages, based on your keyword research, so each page appears for the searches it is meant for.' }),
+      B('cards', { title: 'From general to specific pages', numbered: true, cards: [
+        { title: 'Home page', text: '“Digital cameras”, for customers at the awareness stage', more: '' }, { title: 'Category page', text: 'Mid-range cameras, with reviews and comparisons for customer 2', more: '' },
+        { title: 'Product pages', text: 'Increasingly specific, for customers ready to convert', more: '' }] }),
+      B('task', { title: 'Before you publish, ask yourself', prompt: 'Quality and authority come from fresh content and from using the words your customers use.', fields: [{ label: 'How will this help my audience?', hint: '' }, { label: 'What can I offer that they can\'t get elsewhere?', hint: '' }, { label: 'How can I make this content easier to take in?', hint: '' }] }),
+      B('callout', { variant: 'note', title: 'Mantsha Pheeha, Talent Unleashed, South Africa', text: '“My website is the biggest one for me, because it\'s SEO-enabled.” Her advice: a big audience doesn\'t always mean paying customers. Share useful content, engage, be patient, and sales become easier.' })
+    ];
+    if (i === 5) return [
+      B('video', { url: YT, title: 'Using paid media', transcript: 'Now let’s look at paid media. After creating marketing content tailored to your customers’ needs, you can use paid media to amplify your message. While SEO helps improve your organic search rankings, it’s not always easy to appear at the top of search engine results pages. That’s where paid media comes in. One common form of paid media is Pay-Per-Click (PPC) advertising: sponsored listings on search engines and social media platforms. It is called pay-per-click because you only pay when someone clicks on your ad. Every PPC ad must perform three key actions: attract attention, communicate a value proposition, and invite action with a clear call to action such as “Buy Now”, “Shop”, “Find an Agent”, “Get Inspired” or “Learn More”. Customers respond better when ad content matches their mindset and stage in the customer journey. For Customer 1, at the awareness stage and searching “digital camera”, the ad uses the exact search term, offers a range of cameras from beginner to pro, and includes the extensions “Beginner Digital Camera” and “Get Inspired”. For Customer 2, at the consideration stage, the ad repeats the keyword and offers a detailed review with ratings, but it is missing a strong call to action such as “Buy Now”, “Shop” or “Great Deals”. Paid media isn’t limited to search engines: you can also run ads on Facebook, Instagram, LinkedIn and other platforms. Carousel ads allow up to 10 images or videos in one ad and are useful for building awareness with customers like Customer 1.', clean: true }),
+      B('lead', { text: 'After creating content for your customers\' needs, paid media amplifies your message. SEO helps, but it isn\'t always easy to reach the top of search results.' }),
+      B('callout', { variant: 'info', title: 'PPC', text: 'Sponsored listings on search engines and social media platforms. You only pay when someone clicks your ad.' }),
+      B('cards', { title: 'Three things every ad must do', numbered: true, cards: [
+        { title: 'Attract attention', text: 'Show relevance to what the customer searched for.', more: '' }, { title: 'Communicate value', text: 'Saving money, high ratings or reviews, unique features.', more: '' },
+        { title: 'Invite action', text: 'A clear call to action, such as “Buy Now”, “Shop” or “Learn More”.', more: '' }] }),
+      B('personas', { title: 'Match the ad to the customer', intro: 'Ads that match the customer\'s stage get more impressions, clicks and revenue.', personas: [
+        { name: 'Customer 1 · Awareness', demographic: 'Searching “digital camera”', needs: 'Uses the exact search term, speaks to beginner hobbyists', can: 'Range of cameras from beginner to pro', touch: 'Beginner Digital Camera, Get Inspired' },
+        { name: 'Customer 2 · Consideration', demographic: 'Comparing reviews', needs: 'Repeats the keyword throughout the ad', can: 'Detailed review with ratings. Missing: a strong call to action', touch: 'Buy Now, Shop, Great Deals' }] }),
+      B('callout', { variant: 'good', title: 'Example: carousel ads', text: 'Up to 10 images or videos in one ad. Good for building awareness with customers like Customer 1, for example in photography hobby groups.' })
+    ];
+    if (i === 6) return [
+      B('lead', { text: 'Earned media is any publicity you receive from unpaid promotional efforts, often from opinion leaders and third parties such as journalists, bloggers and influencers.' }),
+      B('cards', { title: 'Forms of earned media', numbered: false, cards: [{ title: 'Customer reviews', text: 'Left on shopping platforms', more: '' }, { title: 'Video reviews', text: 'Detailed reviews of your product', more: '' }, { title: 'Social media posts', text: 'People posting about your product', more: '' }] }),
+      B('callout', { variant: 'note', title: 'Why word-of-mouth matters', text: '91% of customers regularly read online reviews, and 20–50% of all purchasing decisions are driven by word-of-mouth. You can\'t easily control it, so you can incentivize it, for example through influencer marketing.' }),
+      B('define', { title: 'Working with influencers', intro: 'Influencer marketing means working with people who influence potential buyers.', leftTitle: 'How you can reward them', leftLead: '', left: ['Payment', 'Gifts or free products', 'Free services, such as hotel stays or trips'], rightTitle: 'What you can agree on', rightLead: '', right: ['Approving content before it goes out', 'Hashtags to use', 'Timing and how often they post', 'Key themes, images and style'] }),
+      B('define', { title: 'Be transparent: label it', intro: 'The label depends on who controlled the content.', leftTitle: '“Advertisement” or “Ad”', leftLead: 'Paid, and you controlled the content', left: [], rightTitle: '“Sponsorship”', rightLead: 'You did not control the content', right: [] }),
+      B('define', { title: 'Choosing an influencer', intro: 'One thing to consider is how many followers they have.', leftTitle: 'Mega influencer · 1 million+', leftLead: 'Great for awareness', left: [], rightTitle: 'Nano influencer · up to 1,000', rightLead: 'Closer and more credible, useful later in the customer journey', right: [] })
+    ];
+    if (i === 7) return [
+      B('lead', { text: 'Viral marketing gets customers to pass your marketing message along to friends, family and colleagues.' }),
+      B('cards', { title: 'What makes content spread', numbered: true, cards: [
+        { title: 'Emotional connection', text: 'The trait all viral content shares.', more: '' }, { title: 'Surprise', text: 'Captures the imagination of the people you want to reach.', more: '' },
+        { title: 'Humour', text: 'Works well, especially when it relates to the product.', more: '' }, { title: 'Easy to share', text: 'Embed social media links and talk with your audience in the comments.', more: '' }] }),
+      B('define', { title: 'Weigh it up', intro: '', leftTitle: 'Why marketers want it', leftLead: '', left: ['Lots of awareness and reach at a very low cost', 'Shared by friends and family, so it feels more credible'], rightTitle: 'What to watch out for', rightLead: '', right: ['It is hard to predict what will go viral', 'Content can go viral for the wrong reasons'] }),
+      B('task', { title: 'Your task: viral media for your business', prompt: 'Answer briefly.', fields: [{ label: 'What are the key things you would need to consider when using viral media in a campaign for your products or services?', hint: 'Think about your product, your customers, and what could go wrong.' }] })
+    ];
+    if (i === 8) return [
+      B('steps', { title: 'Four key considerations', steps: ['What are my marketing objectives?', 'Who is my audience and where are they located?', 'How do I promote the content?', 'How can I measure the success of my campaign?'], current: 4 }),
+      B('cards', { title: 'Owned media: your web pages', numbered: false, cards: [
+        { title: 'Average position', text: 'Where your page ranks. The smaller the number, the better.', more: '' }, { title: 'Page views', text: 'How often a page is viewed, and which events drove the views.', more: '' },
+        { title: 'Bounce rate', text: 'The percentage of visitors who leave after viewing one page.', more: 'An excellent bounce rate is 26–40%, an average one 41–55%. A higher rate can be fine on a conversion page.' }] }),
+      B('cards', { title: 'Paid media: PPC and social media ads', numbered: false, cards: [
+        { title: 'Impressions', text: 'How often your ad is shown.', more: '' }, { title: 'Clicks', text: 'How often the ad is clicked.', more: '' }, { title: 'Click-through rate (CTR)', text: 'The share of impressions that led to a click.', more: '' },
+        { title: 'Cost per click (CPC)', text: 'The average cost of each click.', more: '' }, { title: 'Cost', text: 'CPC × number of clicks.', more: '' }, { title: 'Conversions', text: 'Purchases or sign-ups.', more: '' }, { title: 'Conversion ratio', text: 'The percentage of visitors who converted.', more: '' }] }),
+      B('callout', { variant: 'info', title: 'Worked example (an interactive calculator in the learner view)', text: '$0.83 per click × 2,101 clicks = $1,743.83. If 140 of them buy, the conversion ratio is 140 ÷ 2,101 ≈ 6.66%.' }),
+      B('define', { title: 'Pick the KPIs that match your goal', intro: '', leftTitle: 'Goal: awareness · Customer 1', leftLead: 'Impressions, clicks, CTR', left: [], rightTitle: 'Goal: purchase · Customer 2', rightLead: 'Conversions, conversion ratio', right: [] })
+    ];
+    if (i === 10) return [
+      B('lead', { text: 'You know the KPIs and how they fit each stage of the customer journey. Now take stock of what you already do, and whether the KPIs you track suit your objectives.' }),
+      B('task', { title: 'Your customer journey plan', prompt: 'For each stage, note the media, content and KPI you use today. Leave it empty if you do nothing at that stage yet.', fields: [{ label: 'Awareness', hint: 'Media · content · KPI (impressions, clicks and CTR suit awareness)' }, { label: 'Consideration', hint: 'Media · content · KPI' }, { label: 'Conversion', hint: 'Media · content · KPI (conversions suit purchase goals)' }, { label: 'Post-sale: loyalty', hint: 'Media · content · KPI' }] })
+    ];
+    if (i === 11) return [
+      B('lead', { text: 'You have explored all four key considerations. Here they are side by side, so you can create your own campaign. Learners also see their own notes from lessons 3, 4 and 11 here.' }),
+      B('cards', { title: 'Key considerations for your campaign', numbered: true, cards: [
+        { title: 'What are my marketing objectives?', text: 'Set objectives that satisfy your customers’ needs at each stage.', more: '' },
+        { title: 'Who and where is my audience?', text: 'Reflect on your personas: demographic, motivation and needs, what you can do, digital touchpoints.', more: '' },
+        { title: 'How do I promote the content?', text: 'Which paid, earned and owned media do you use? Do they meet customers’ needs at each stage? Could other media complement them?', more: '' },
+        { title: 'How can I measure the success of my campaign?', text: 'Note the KPIs to monitor for each customer journey objective.', more: '' }] })
+    ];
     return [];
   }
 
   var REVIEW_SEED = {
     0: [['What is the primary focus of this course regarding digital marketing campaigns?', ['To exclusively learn about social media advertising.', 'To develop effective communication with target customers and foster business growth.', 'To only measure campaign success without prior planning.', 'To understand traditional marketing methods.'], 1, 'The course is about using digital campaigns to communicate with your target customers, supporting your business and its growth.'],
         ['Which types of promotional approaches are mentioned for content promotion in the lesson?', ['Only paid approaches like search engine optimization.', 'Earned and owned approaches, excluding paid methods.', 'Paid, earned, and owned approaches, including influencer marketing.', 'Just a single, undifferentiated approach for all content.'], 2, 'The lesson names paid, earned and owned approaches, such as search engine optimization and influencer marketing.'],
-        ['What documentation is suggested as helpful to gather before starting the course exercises?', ['Financial statements from the last five years.', 'Documentation related to current marketing and sales activities.', 'Personal identification documents for registration.', 'Future business plans and projections.'], 1, 'Gather the documentation you already have on your marketing and sales activities. It is fine if it is limited.']],
+        ['What are the three things this course teaches you to do with a campaign?', ['Design, print and post it.', 'Plan, promote and measure it.', 'Budget, hire and outsource it.', 'Copy, paste and schedule it.'], 1, 'The course covers how to plan a campaign, promote it with paid, earned and owned approaches, and measure how successful it is.']],
     1: [['How does the video define digital marketing?', ['Posting on social media as often as possible.', 'Using digital technologies to create integrated, targeted and measurable communications that acquire and retain customers.', 'Buying advertising space on websites.', 'Sending marketing emails only.'], 1, 'Digital marketing is the use of digital technologies to create integrated, targeted and measurable communications to acquire and retain customers.'],
         ['Customer 2 is a camera enthusiast comparing different cameras. Where does their journey start?', ['Awareness', 'Consideration', 'Conversion', 'Post-sale'], 1, 'Customer 2 is already debating between cameras, so their journey starts at the consideration stage.'],
         ['What happens at the post-sale stage of the funnel?', ['The customer first hears about your product.', 'The customer compares several options.', 'You try to retain the customer and make them loyal.', 'The customer buys for the first time.'], 2, 'Post-sale is where you work to retain the customer and turn them into a loyal customer.']],
     2: [['A marketing persona is a semi-fictional representation of your ideal customer, based on…', ['Guesses about everyone who might buy.', 'Real data from existing customers and market research.', 'Your own personal preferences.', 'Your competitors’ price lists.'], 1, 'Personas are built from real data from existing customers and from market research.'],
         ['Which of these is a digital touchpoint?', ['Online reviews', 'A printed flyer', 'A radio advert', 'A shop window display'], 0, 'Digital touchpoints include social media, search engines, websites and online reviews.'],
-        ['Creating multiple personas helps you to…', ['Use fewer channels.', 'Better understand your target customers and design the best experience across all digital touchpoints.', 'Skip market research.', 'Replace your marketing objectives.'], 1, 'Several personas help you understand different customers and design the best experience across all digital touchpoints.']]
+        ['Creating multiple personas helps you to…', ['Use fewer channels.', 'Better understand your target customers and design the best experience across all digital touchpoints.', 'Skip market research.', 'Replace your marketing objectives.'], 1, 'Several personas help you understand different customers and design the best experience across all digital touchpoints.']],
+    // Lessons 4 to 12: the same questions as the learner prototype
+    3: [['Your own website, brand pages and email newsletter are examples of…', ['Paid media', 'Owned media', 'Earned media', 'Shared media'], 1, 'Owned media is the digital channels and content you control.'],
+        ['A customer leaves a positive review of your shop on a review website. This is…', ['Earned media', 'Paid media', 'Owned media', 'Not media at all'], 0, 'Earned media is publicity you receive without paying, such as online reviews.'],
+        ['In an integrated campaign, what is paid media mainly used for?', ['Setting the tone of your brand', 'Amplifying the message', 'Writing customer reviews', 'Replacing your website'], 1, 'Owned media sets the tone, paid media amplifies the message, and earned media builds relationships with opinion leaders.']],
+    4: [['Customer 1 is at the awareness stage. Which search term are they most likely to use?', ['“digital camera”', '“mid-range camera reviews”', '“buy model X 24mm lens kit”', '“camera store opening hours”'], 0, 'At the awareness stage people use broad, general terms.'],
+        ['What is keyword mapping?', ['Buying keywords from a search engine', 'Assigning keywords to specific web pages based on your keyword research', 'Listing your competitors’ keywords', 'Adding as many keywords as possible to one page'], 1, 'Keyword mapping assigns keywords to specific pages so each page appears for the searches it is meant for.'],
+        ['How should your website pages be organised for customers at different stages?', ['One page for everything', 'General pages that gradually link to more specific ones', 'Only product pages', 'Only a blog'], 1, 'A general home page serves awareness, and increasingly specific product pages serve customers ready to convert.']],
+    5: [['With pay-per-click (PPC) advertising, when do you pay?', ['Every time the ad is shown', 'Only when someone clicks the ad', 'Once a month, whatever happens', 'Only when someone buys'], 1, 'You only pay when someone clicks on your ad.'],
+        ['Which three things must every PPC ad do?', ['Be long, be funny, be cheap', 'Attract attention, communicate value, invite action', 'Show the price, the logo and the address', 'Target everyone, everywhere, all the time'], 1, 'Every PPC ad must attract attention, communicate value and invite action.'],
+        ['The example ad for Customer 2 shows reviews and ratings. What does it lack?', ['A relevant keyword', 'A strong call to action, such as “Buy Now”', 'A product image', 'A price comparison'], 1, 'A strong call to action would move Customer 2 toward conversion.']],
+    6: [['Which of these is earned media?', ['A search ad you pay for', 'A detailed video review of your product by a customer', 'Your own email newsletter', 'A banner on your website'], 1, 'Earned media is publicity you receive without paying for it.'],
+        ['You paid an influencer and approved the post before it went live. How should it be labelled?', ['Sponsorship', 'Advertisement or “Ad”', 'No label is needed', 'Customer review'], 1, 'Paid and controlled by you: “Ad”. Without control: “Sponsorship”.'],
+        ['Why can influencers with smaller followings be useful later in the customer journey?', ['They are always cheaper', 'They seem more genuine and credible to their audience', 'They reach more people', 'They never need to disclose incentives'], 1, 'Smaller influencers often have a closer, more credible connection with their audience.']],
+    7: [['What do all viral marketing messages have in common?', ['A large advertising budget', 'An emotional connection with their audience', 'A celebrity in them', 'A discount code'], 1, 'A common trait of all viral content is an emotional connection with the audience.'],
+        ['Why can a shared message feel more credible?', ['It is shared by friends and family', 'It has more hashtags', 'It is longer', 'It is paid for'], 0, 'Content shared by friends and family gains credibility.'],
+        ['What is a risk of relying on viral marketing?', ['It is always expensive', 'It is hard to predict, and content can go viral for the wrong reasons', 'It only works on email', 'It cannot be shared'], 1, 'You cannot predict what will go viral, and poor content can go viral for the wrong reasons.']],
+    8: [['For average position in search results, which number is better?', ['A bigger number', 'A smaller number', 'Exactly 50', 'It does not matter'], 1, 'The smaller the number, the higher you rank.'],
+        ['Your ad aims to make hobbyists aware of a new camera. Which KPIs fit best?', ['Conversions and conversion ratio', 'Impressions, clicks and click-through rate', 'Bounce rate only', 'Cost only'], 1, 'For an awareness goal, impressions, clicks and CTR are good indicators.'],
+        ['2,101 people clicked your ad and 140 bought. What is the conversion ratio?', ['About 1.5%', 'About 6.66%', 'About 14%', 'About 66%'], 1, '140 ÷ 2,101 ≈ 6.66%.']],
+    10: [['What is the Customer Journey Plan for?', ['Booking your marketing budget', 'Taking stock of the media and content you use at each stage, and whether your KPIs fit', 'Writing ad copy', 'Choosing a logo'], 1, 'The plan shows which media and content you use at each stage, and whether your KPIs suit your objectives.'],
+        ['You track only conversions for a page meant to build awareness. What is the problem?', ['Nothing, conversions always work', 'The KPI does not match the objective: awareness is better tracked with impressions, clicks and CTR', 'You should track bounce rate only', 'You need more pages'], 1, 'KPIs should match the objective.']],
+    11: [['Which is NOT one of the four key considerations for a campaign?', ['What are my marketing objectives?', 'Who and where is my audience?', 'Which logo colour should I use?', 'How can I measure the success of my campaign?'], 2, 'The four are objectives, audience, promotion and measurement.'],
+        ['What should you decide before choosing which KPIs to monitor?', ['Which media you will use to promote your content', 'Your next year’s budget', 'Your competitors’ prices', 'Nothing, KPIs come first'], 0, 'Once you know which media you will use, you note the KPIs to monitor.'],
+        ['When reviewing your promotion, which question does the lesson ask?', ['Can the media be complemented with other forms of media?', 'How many followers do my competitors have?', 'Which ad is the cheapest?', 'How often should I post?'], 0, 'Check whether other forms of media could complement what you use.']]
   };
   function toQuestions(rows, confirmed) { return rows.map(function (r) { return { id: uid(), stem: r[0], options: r[1].slice(), correct: r[2], confirmed: confirmed, why: r[3] }; }); }
 
@@ -765,10 +868,15 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   }
 
   function jenSeed(i) {
-    var chips = { 0: ['Summarise this lesson', 'Explain it simply', 'Give me an example', 'What should I focus on?'], 1: ['Summarise this lesson', 'Explain the funnel simply', 'Give me an example', 'What should I focus on?'], 2: ['Help me start my persona', 'Summarise this lesson', 'What is a persona?', 'Show me an example'] }[i] || [];
+    var chips = { 0: ['Summarise this lesson', 'Explain it simply', 'Give me an example', 'What should I focus on?'], 1: ['Summarise this lesson', 'Explain the funnel simply', 'Give me an example', 'What should I focus on?'], 2: ['Help me start my persona', 'Summarise this lesson', 'What is a persona?', 'Show me an example'],
+      3: ['Summarise this lesson', 'Give me an example', 'What should I focus on?'], 4: ['Summarise this lesson', 'What is SEO?', 'What should I focus on?'],
+      5: ['Summarise this lesson', 'What is PPC?', 'Give me an example'], 6: ['Summarise this lesson', 'Give me an example', 'What should I focus on?'],
+      7: ['Summarise this lesson', 'Help me with the task'], 8: ['Summarise this lesson', 'What is a KPI?', 'Work through an example'],
+      10: ['Help me fill in the plan', 'Why this exercise?'], 11: ['Summarise this lesson', 'What should I do next?'] }[i] || [];
     return { on: true, chips: chips, glossary: [] };
   }
-  var STARTERS = { 0: 'What is one thing you hope to change in your marketing after this course?', 1: 'Which stage of the funnel are most of your customers in today?', 2: 'Share the first persona you wrote. What does your customer want most?' };
+  var STARTERS = { 0: 'What is one thing you hope to change in your marketing after this course?', 1: 'Which stage of the funnel are most of your customers in today?', 2: 'Share the first persona you wrote. What does your customer want most?',
+    3: 'Which paid, earned and owned media are you already using? Which approaches work well, and how could you build on them?', 7: 'What would you need to consider before using viral media for your products?', 10: 'Which stage of your customer journey has the biggest gap?' };
 
   // Title, description (it includes the learning objectives text) and difficulty are from production.
   // Industry is empty in production. The two linked assessments are samples chosen to show the relevance check.
@@ -782,10 +890,11 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   }
   function buildSeed() {
     var lessons = LESSONS.map(function (l, i) {
-      var conv = i <= 2, isQuiz = l[1] === 'Quiz';
-      var les = { id: 'l' + (i + 1), title: l[0], type: l[1], mins: 5, minsManual: true, legacy: LEGACY[i] || '', url: i === 1 ? YT : '', blocks: conv ? blocksFor(i) : [], converted: conv,
+      var isQuiz = l[1] === 'Quiz', conv = !isQuiz && i !== AI_DEMO_IDX;
+      var les = { id: 'l' + (i + 1), title: l[0], type: l[1], mins: 5, minsManual: true, legacy: LEGACY[i] || '', url: (l[1] === 'Video') ? YT : '', blocks: conv ? blocksFor(i) : [], converted: conv,
         // Sample files, matching the learner prototype's Resources section on lesson 3
-        resources: i === 2 ? [{ id: uid(), name: 'Customer Journey Plan', kind: 'DOC', size: '84 KB', sample: true }, { id: uid(), name: 'Marketing persona template', kind: 'PDF', size: '120 KB', sample: true }] : [],
+        resources: i === 2 ? [{ id: uid(), name: 'Customer Journey Plan', kind: 'DOC', size: '84 KB', sample: true }, { id: uid(), name: 'Marketing persona template', kind: 'PDF', size: '120 KB', sample: true }]
+          : (i === 10 ? [{ id: uid(), name: 'Customer Journey Plan', kind: 'DOC', size: '84 KB', sample: true }] : []),
         review: { mode: conv ? 'authored' : 'ai', pass: 80, later: true, questions: conv ? toQuestions(REVIEW_SEED[i], true) : [] },
         jen: conv ? jenSeed(i) : { on: true, chips: [], glossary: [] }, disc: { on: true, starter: STARTERS[i] || '' } };
       if (isQuiz) { les.quiz = { pass: 70, questions: quizSeed(), checked: false }; les.converted = true; }
@@ -809,11 +918,12 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
 
   // ---- Reading time and checks ----
   function blockWords(b) { return words(JSON.stringify(b.data).replace(/"[a-zA-Z]+":/g, ' ').replace(/[{}\[\]",]/g, ' ')); }
+  var ACTIVE_TYPES = ['task', 'stages', 'personas', 'flashcards'];   // blocks that give learners something to do
   function estMins(l) {
     if (l.quiz) return Math.max(3, l.quiz.questions.length * 2);
     if (!l.converted) return Math.max(1, Math.round(words(l.legacy) / 200));
     var w = l.blocks.reduce(function (n, b) { return n + (b.type === 'video' ? 0 : blockWords(b)); }, 0);
-    var active = l.blocks.filter(function (b) { return ['stages', 'task', 'personas', 'flashcards'].indexOf(b.type) !== -1; }).length;
+    var active = l.blocks.filter(function (b) { return ACTIVE_TYPES.indexOf(b.type) !== -1; }).length;
     var video = l.blocks.some(function (b) { return b.type === 'video'; }) ? 3 : 0;
     return Math.max(2, Math.round(w / 200 + active * 1.5 + video + (l.review.mode === 'off' ? 0 : 1)));
   }
@@ -852,14 +962,16 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     var n = needsReview(l);
     add(n ? 'bad' : 'ok', n ? n + ' AI draft block' + (n > 1 ? 's need' : ' needs') + ' your review before publishing.' : 'Every block has been reviewed', n ? { act: 'approveall', label: 'Approve all' } : null);
     add(l.blocks.some(function (b) { return b.type === 'lead'; }) || l.blocks.some(function (b) { return b.type === 'video'; }) ? 'ok' : 'warn', l.blocks.some(function (b) { return b.type === 'lead'; }) || l.blocks.some(function (b) { return b.type === 'video'; }) ? 'Opens with a short introduction or a video' : 'No introduction. Start with a short intro paragraph so learners know what this is.');
-    var active = l.blocks.filter(function (b) { return ['stages', 'task', 'personas', 'flashcards'].indexOf(b.type) !== -1; }).length;
-    add(active ? 'ok' : 'warn', active ? active + ' interactive block' + (active > 1 ? 's give' : ' gives') + ' learners something to do' : 'Nothing for the learner to do. Add a task or a stage explorer so this is not only reading.');
+    var active = l.blocks.filter(function (b) { return ACTIVE_TYPES.indexOf(b.type) !== -1; }).length;
+    if (active) add('ok', active + ' interactive block' + (active > 1 ? 's give' : ' gives') + ' learners something to do');
+    else if (l.readingOnly) add('ok', 'Reading only, as you chose for this lesson', { act: 'readingundo', label: 'Undo' });
+    else add('warn', 'Nothing for the learner to do. Add a practice task, stage explorer, persona cards or flashcards, or keep it as reading if that suits this lesson.',
+      [{ act: 'addactive', label: 'Add an activity' }, { act: 'readingok', label: 'Reading only is fine' }]);
     var long = l.blocks.filter(function (b) { return (b.type === 'text' || b.type === 'lead') && words(b.data.body || b.data.text) > 90; });
     add(long.length ? 'warn' : 'ok', long.length ? long.length + ' text block' + (long.length > 1 ? 's are' : ' is') + ' over 90 words. Split them or turn them into cards.' : 'No long walls of text');
     var v = l.blocks.filter(function (b) { return b.type === 'video'; })[0];
     if (v) { add(v.data.url ? 'ok' : 'bad', v.data.url ? 'Video link is set' : 'The video block has no link'); add(v.data.transcript.trim() ? 'ok' : 'bad', v.data.transcript.trim() ? 'Transcript provided for people who cannot play the video' : 'No transcript. Add one so the lesson works without sound.'); }
-    var est = estMins(l);
-    add(Math.abs(est - l.mins) <= 2 ? 'ok' : 'warn', 'Estimated ' + est + ' min from the content; set to ' + l.mins + ' min.', Math.abs(est - l.mins) > 2 ? { act: 'usedur', label: 'Use ' + est + ' min' } : null);
+    // Lesson length is the author's call: the estimate is only a suggestion next to the Minutes field, not a check.
     if (l.review.mode === 'authored') { var un = unconfirmed(l.review.questions); add(un ? 'bad' : 'ok', un ? un + ' check question' + (un > 1 ? 's have' : ' has') + ' no confirmed correct answer' : 'Check-yourself questions are confirmed'); }
     return c;
   }
@@ -1117,7 +1229,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     return '<div class="card lh"><div class="top"><div class="fld" style="margin:0"><label class="lbl" for="lt">Lesson title</label><input id="lt" class="in" value="' + esc(l.title) + '" data-lf="title"></div>' +
       '<div class="fld" style="margin:0"><label class="lbl" for="ltype">Type</label><select id="ltype" class="sel" data-lf="type">' + ['Article', 'Video', 'Scenario', 'Quiz'].map(function (t) { return '<option' + (t === l.type ? ' selected' : '') + '>' + t + '</option>'; }).join('') + '</select></div>' +
       '<div class="fld" style="margin:0"><label class="lbl" for="lmin">Minutes</label><input id="lmin" class="in" type="number" min="1" value="' + l.mins + '" data-lf="mins"></div></div>' +
-      '<div class="meta">' + statusChip(l, true) + '<span>Estimated from the content: <b>' + est + ' min</b></span>' + (l.mins !== est ? '<button class="btn sm" type="button" data-act="usedur">Use ' + est + ' min</button>' : '') + '<span style="flex:1"></span>' +
+      '<div class="meta">' + statusChip(l, true) + (l.mins !== est ? '<span class="mini">Optional: the content reads in about ' + est + ' min</span><button class="btn sm" type="button" data-act="usedur">Use ' + est + ' min</button>' : '<span class="mini">Matches the estimate from the content</span>') + '<span style="flex:1"></span>' +
       (D.modules.length > 1 ? '<label class="sr" for="lmod">Module</label><select id="lmod" class="sel" data-lm="1" style="width:auto;padding:5px 10px;font-size:13px">' + D.modules.map(function (m, i) { return '<option value="' + m.id + '"' + (m.id === l.mod ? ' selected' : '') + '>Module ' + (i + 1) + ': ' + esc(m.title) + '</option>'; }).join('') + '</select>' : '') +
       '<button class="ico" type="button" data-act="lessonup" aria-label="Move lesson up">↑</button><button class="ico" type="button" data-act="lessondn" aria-label="Move lesson down">↓</button><button class="ico dng" type="button" data-act="lessondel" aria-label="Delete lesson">✕</button></div></div>';
   }
@@ -1144,7 +1256,8 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   function qualityCard(l) {
     var cs = checks(l), bad = cs.filter(function (c) { return c.level === 'bad'; }).length, warn = cs.filter(function (c) { return c.level === 'warn'; }).length;
     return '<div class="card pub"><div class="sp"><b>' + (bad ? bad + ' to fix before publishing' : (warn ? 'Ready, with ' + warn + ' suggestion' + (warn > 1 ? 's' : '') : 'Ready to publish')) + '</b><br>Checked against what learners experience.</div>' + (bad ? '<span class="chip bad"' + tipA(bad + ' must-fix item' + (bad > 1 ? 's' : '') + ' below (marked ✕) ' + (bad > 1 ? 'stop' : 'stops') + ' this lesson from being published. Suggestions (!) never block publishing.', true) + '>Blocked</span>' : '<span class="chip ok"' + tipA('Nothing here stops publishing. Suggestions (!), if any, are optional.', true) + '>Ready</span>') + '</div>' +
-      '<div class="card" style="padding:14px 16px"><ul class="chk" aria-label="Lesson checks">' + cs.map(function (c) { return '<li><span class="d ' + c.level + '" aria-hidden="true">' + (c.level === 'ok' ? '✓' : (c.level === 'warn' ? '!' : '✕')) + '</span><span>' + (c.level !== 'ok' ? '<span class="sr">' + (c.level === 'bad' ? 'Must fix: ' : 'Suggestion: ') + '</span>' : '') + esc(c.text) + '</span>' + (c.fix ? '<button class="btn sm fix" type="button" data-act="' + c.fix.act + '">' + esc(c.fix.label) + '</button>' : '') + '</li>'; }).join('') + '</ul></div>';
+      '<div class="card" style="padding:14px 16px"><ul class="chk" aria-label="Lesson checks">' + cs.map(function (c) { return '<li><span class="d ' + c.level + '" aria-hidden="true">' + (c.level === 'ok' ? '✓' : (c.level === 'warn' ? '!' : '✕')) + '</span><span>' + (c.level !== 'ok' ? '<span class="sr">' + (c.level === 'bad' ? 'Must fix: ' : 'Suggestion: ') + '</span>' : '') + esc(c.text) + (Array.isArray(c.fix) ? '<span class="fixes">' + c.fix.map(function (f, i) { return '<button class="btn sm' + (i === 0 ? ' primary' : '') + '" type="button" data-act="' + f.act + '">' + esc(f.label) + '</button>'; }).join('') + '</span>' : '') + '</span>' +
+        (c.fix && !Array.isArray(c.fix) ? '<button class="btn sm fix" type="button" data-act="' + c.fix.act + '">' + esc(c.fix.label) + '</button>' : '') + '</li>'; }).join('') + '</ul></div>';
   }
 
   function resourcesCard(l) {
@@ -1851,15 +1964,17 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     toast(msg);
   }
 
-  function openPicker(at) {
-    $('#pickBody').innerHTML = '<div class="hd"><div><h2 id="pickTitle" tabindex="-1">Add a block</h2><p>Each block is shown to learners as you see it in the preview.</p></div><span class="sp"></span><button class="ico" type="button" data-pk="close" aria-label="Close">✕</button></div><div class="blkgrid">' + BLOCK_ORDER.map(function (k) { var d = BLOCKS[k]; return '<button type="button" data-pk="' + k + '" data-at="' + at + '"><span class="ic" aria-hidden="true">' + d.icon + '</span><b>' + d.name + '</b><span>' + d.desc + '</span></button>'; }).join('') + '</div>';
+  function openPicker(at, only) {
+    var types = only ? BLOCK_ORDER.filter(function (k) { return only.indexOf(k) !== -1; }) : BLOCK_ORDER;
+    var head = only ? ['Add an activity', 'Blocks that give learners something to do. It is added at the end of the lesson; move it with the arrows.'] : ['Add a block', 'Each block is shown to learners as you see it in the preview.'];
+    $('#pickBody').innerHTML = '<div class="hd"><div><h2 id="pickTitle" tabindex="-1">' + head[0] + '</h2><p>' + head[1] + '</p></div><span class="sp"></span><button class="ico" type="button" data-pk="close" aria-label="Close">✕</button></div><div class="blkgrid">' + types.map(function (k) { var d = BLOCKS[k]; return '<button type="button" data-pk="' + k + '" data-at="' + at + '"><span class="ic" aria-hidden="true">' + d.icon + '</span><b>' + d.name + '</b><span>' + d.desc + '</span></button>'; }).join('') + '</div>';
     var d = $('#pickDlg'); if (!d.open) d.showModal(); $('#pickTitle').focus();
   }
 
   var bulkTimer;
   function openBulk() {
     var left = D.lessons.filter(function (l) { return !l.converted; });
-    $('#bulkBody').innerHTML = '<div class="hd"><div><h2 id="bulkTitle" tabindex="-1">Convert ' + left.length + ' lessons with AI</h2><p>Each lesson is restructured into blocks and marked as an AI draft. Nothing is published, and nothing is rewritten.</p></div><span class="sp"></span><button class="ico" type="button" data-bk="close" aria-label="Close">✕</button></div>' +
+    $('#bulkBody').innerHTML = '<div class="hd"><div><h2 id="bulkTitle" tabindex="-1">Convert ' + left.length + ' lesson' + (left.length === 1 ? '' : 's') + ' with AI</h2><p>Each lesson is restructured into blocks and marked as an AI draft. Nothing is published, and nothing is rewritten.</p></div><span class="sp"></span><button class="ico" type="button" data-bk="close" aria-label="Close">✕</button></div>' +
       '<ul class="bulk" id="bulkList">' + left.map(function (l) { return '<li data-id="' + l.id + '"><span class="d"></span><span>' + esc(l.title) + '</span><span class="chip" style="margin-left:auto">' + l.type + '</span></li>'; }).join('') + '</ul>' +
       '<p class="mini">You will then review each lesson. The count on every lesson shows how many blocks still need you.</p><div class="dft" id="bulkFt"><button class="btn" type="button" data-bk="close">Cancel</button><button class="btn primary" type="button" data-bk="go">✦ Convert all</button></div>';
     var d = $('#bulkDlg'); if (!d.open) d.showModal(); $('#bulkTitle').focus();
@@ -1868,7 +1983,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     var left = D.lessons.filter(function (l) { return !l.converted; }), i = 0, total = 0;
     $('#bulkFt').innerHTML = '<span class="sp" role="status" aria-live="polite" id="bulkSt">Converting…</span>';
     function step() {
-      if (i >= left.length) { $('#bulkSt').textContent = 'Done. ' + total + ' blocks drafted.'; $('#bulkFt').innerHTML += '<button class="btn primary" type="button" data-bk="close">Review the lessons</button>'; render(); saveState(); return; }
+      if (i >= left.length) { $('#bulkSt').textContent = 'Done. ' + total + ' block' + (total === 1 ? '' : 's') + ' drafted.'; $('#bulkFt').innerHTML += '<button class="btn primary" type="button" data-bk="close">Review the lessons</button>'; render(); saveState(); return; }
       var l = left[i], li = $('#bulkList [data-id="' + l.id + '"]'); if (li) li.className = 'on';
       bulkTimer = setTimeout(function () {
         var plan = generate(l.legacy, { title: l.title, type: l.type, url: l.url }, { task: false });
@@ -1958,6 +2073,8 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
       var di = D.lessons.indexOf(l); D.lessons.splice(di, 1); P.lid = D.lessons[Math.min(di, D.lessons.length - 1)].id; render(); saveState(); toast('Lesson deleted'); return;
     }
     if (k === 'usedur') { l.mins = estMins(l); render(); saveState(); return; }
+    if (k === 'addactive') { openPicker(l.blocks.length, ACTIVE_TYPES); return; }
+    if (k === 'readingok' || k === 'readingundo') { l.readingOnly = k === 'readingok'; render(); saveState(); return; }
     if (k === 'approve') { var b0 = blk(); if (b0) { b0.state = 'reviewed'; render(); saveState(); } return; }
     if (k === 'approveall') { l.blocks.forEach(function (x) { if (x.state === 'draft') x.state = 'reviewed'; }); render(); saveState(); toast('All blocks approved'); return; }
     if (k === 'mvup' || k === 'mvdn') { var ix = l.blocks.indexOf(blk()), to = ix + (k === 'mvup' ? -1 : 1); if (ix > -1 && to >= 0 && to < l.blocks.length) { var t = l.blocks[ix]; l.blocks[ix] = l.blocks[to]; l.blocks[to] = t; render(); saveState(); var el = $('[data-bid="' + bid + '"]'); if (el) { el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); var btn = el.querySelector('[data-act="' + k + '"]'); if (btn) btn.focus({ preventScroll: true }); } } return; }

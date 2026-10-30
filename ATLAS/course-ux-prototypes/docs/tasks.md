@@ -335,3 +335,23 @@ Update (authoring prototype, round 13: objectives list removed from Details)
 - [x] Quiz editor: the "Correct" marker no longer overflows its 32px column; it is a pill next to each option and turns green when chosen.
 - [x] Tested in the browser at 1440px: lesson 1 → 2 via Next, jump to the quiz via the outline, Phone mode, Edit this lesson; no console errors.
 - [ ] Long option texts are cut off in the single-line option fields (already the case before); consider multi-line fields if authors need to see full options.
+
+## Lessons 4 to 12 in the learner prototype + authoring sync (started 30 Oct 2026)
+Real text read from demo.atlaslearn.ai (lessons 4 to 12).
+- [x] Batch 1: lessons 4 (Promoting your content), 5 (Using owned media), 6 (Using paid media) built in `atlas-lesson-blocks-prototype.html`, Enhanced + Current. Each has a 3-question lesson review, Jen section explanations and lesson answers. Lesson 4 has a "Your turn" task (owned / paid / earned, saves as you type) with "Share in the discussion" and sample discussion posts.
+- [x] New block styles: flow (numbered steps), search-term pill, self-check list, think-then-reveal, number tiles, calculator, journey-plan cards (the last three are for batches 2 and 3).
+- [x] Lesson switcher in the prototype bar shows all 13 lessons (scrolls on phones) and goes through the same "not available" check.
+- [x] Lesson 1 review question 3 and Jen's lesson 1 answers no longer refer to the removed "gather your documentation" section.
+- [x] Batch 2: lessons 7 (earned media: WOM stats, influencer rewards, Ad vs Sponsorship with a quick check, nano vs mega), 8 (viral marketing: four traits, pros and risks, task with "compare with the lesson" reveal), 9 (KPIs for owned and paid media, bounce-rate guide, live calculator for cost / conversion ratio / cost per purchase, KPIs by goal).
+- [x] Batch 3: lessons 10 (social listening), 11 (customer journey plan: media, content and KPI per funnel stage, saves as you type, plus the Word resource), 12 (the four considerations, each showing what the learner wrote in lessons 3, 4 and 11, with links back).
+- [x] Lesson 6 now has a transcript (the production text) so the video passes the authoring transcript check.
+- [x] Every lesson opens from the outline, Next/Previous and the switcher; the "not available in this preview" toast no longer appears. `clean/lesson.html` rebuilt.
+- [x] Authoring prototype synced: lessons 4 to 12 seeded as converted lessons with matching blocks, review questions, Jen chips and discussion starters; video lessons get the sample video link; lesson 11 has the Customer Journey Plan resource. Learner-only blocks are approximated: calculator → worked-example callout, journey plan → practice task, lesson 12 recap → numbered cards.
+- [x] Tested: lessons 4 to 12 at 1280px and 375px (no horizontal scroll, no console errors), calculator, saving, recap, clean build, authoring preview of all 13 lessons.
+- [x] Authoring: lesson 10 (Using social listening) stays as rich text in the seed (`AI_DEMO_IDX`), so "Convert remaining 1 with AI" can still be demonstrated on Digital Marketing. Tested: the bulk conversion drafts it without errors. In the learner prototype lesson 10 is already converted (the intended result).
+- [x] AI dialog copy: "Convert 1 lesson with AI" and "1 block drafted" now use the singular for one.
+- [ ] People who already used the authoring prototype keep their saved copy; "Reset demo" loads the new seed.
+- [ ] Content team: lesson 9 says $0.83 × 2,101 = $1,742 (correct: $1,743.83). Lesson 12 says "the personas you created in lesson 1" (they are created in lesson 3).
+- [ ] Samples, not production: review questions, Jen answers, discussion posts, the "quick check" and "compare" reveals, the cost-per-purchase figure in the calculator.
+- [x] Authoring: the estimated lesson time is no longer a warning in the quality checklist. The author sets Minutes in the lesson header; next to it an optional hint shows the estimate from the content with "Use n min".
+- [x] Authoring: "Nothing for the learner to do" now names all four interactive blocks and offers two buttons: "Add an activity" (block picker limited to practice task, stage explorer, persona cards, flashcards; added at the end of the lesson) and "Reading only is fine" (turns the suggestion into a green "Reading only, as you chose" with Undo, saved per lesson). Tested in the browser.
