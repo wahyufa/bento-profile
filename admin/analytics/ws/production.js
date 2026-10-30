@@ -36,7 +36,9 @@ function completionPercent(stats) {
 
 // Production always pluralises Students/Branches/Classes but only pluralises Teacher above 1,
 // e.g. "1 Students (1 Branches, 1 Classes, 0 Teacher)". Mirrored as-is.
-function assignedHtml(stats) {
+// A teacher's own worksheet goes to their class only, so branch and teacher counts are left out.
+function assignedHtml(stats, isTeacherWorksheet) {
+  if (isTeacherWorksheet) return `<strong>${stats.total} Students</strong><br> (${stats.classes} Classes)`;
   const teacherLabel = stats.teachers > 1 ? "Teachers" : "Teacher";
   return `<strong>${stats.total} Students</strong><br> (${stats.branches} Branches, ${stats.classes} Classes, ${stats.teachers} ${teacherLabel})`;
 }
@@ -72,7 +74,7 @@ function rowHtml(worksheet) {
         </div>
       </td>
       <td><span class="badge ${tierClass(stats.avgScore)}">${stats.avgScore}%</span></td>
-      <td>${assignedHtml(stats)}</td>
+      <td>${assignedHtml(stats, worksheet.creator.role === "Tutor")}</td>
       <td><button type="button" class="btn-primary" data-insight="${worksheet.id}">${featherSvg(FEATHER_PATHS.barChart2)} View Insight</button></td>
     </tr>`;
 }

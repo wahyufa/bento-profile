@@ -20,12 +20,14 @@ const QUESTIONS = WORKSHEET ? QUESTION_RESULTS[WORKSHEET.id] || [] : [];
 const TOPICS = [...new Set(QUESTIONS.map((question) => question.topic))];
 
 const PAGE_SIZES = [5, 10, 25, 50, 100];
+const IS_TEACHER_WORKSHEET = Boolean(WORKSHEET) && WORKSHEET.creator.role === "Tutor";
+// A teacher's worksheet belongs to their own class, so "Branch" and "Teacher" breakdowns are dropped.
 const PIVOTS = [
   { key: "branch", label: "Branch" },
   { key: "class", label: "Class" },
   { key: "teacher", label: "Teacher" },
   { key: "student", label: "Student" },
-];
+].filter((pivot) => !(IS_TEACHER_WORKSHEET && (pivot.key === "branch" || pivot.key === "teacher")));
 const CARD_TITLES = {
   completion: { overview: "Overview", detail: "Detail" },
   question: { overview: "Question Response Overview", detail: "Question Detail" },
@@ -51,7 +53,7 @@ const NO_DATA_IMAGE_URL = "https://elb-onlinequiz.smartjen.com/images/no-data.pn
 const state = {
   tab: "completion",
   view: "overview",
-  pivot: "branch",
+  pivot: PIVOTS[0].key,
   classKeys: [],
   dateRange: null,
   pageSize: 10,
@@ -158,6 +160,7 @@ function assignedText() {
   const classes = new Set(SCOPED_STUDENTS.map(classKey)).size;
   const teachers = new Set(SCOPED_STUDENTS.map((student) => classTeacher(studentBranch(student), student.class)).filter(Boolean)).size;
   const branches = IS_HQ ? worksheetBranchIds(WORKSHEET).length : 1;
+  if (IS_TEACHER_WORKSHEET) return `${SCOPED_STUDENTS.length} students (${classes} classes)`;
   return `${SCOPED_STUDENTS.length} students (${branches} branches, ${classes} classes, ${teachers} teachers)`;
 }
 
