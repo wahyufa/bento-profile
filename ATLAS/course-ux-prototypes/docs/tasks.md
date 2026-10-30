@@ -323,3 +323,9 @@ Update (authoring prototype, round 13: objectives list removed from Details)
 - [x] Removed the separate "What learners will be able to do" list (not in production). The objectives text is back inside Description, as in production. Removed its check; the Learning Objectives tab banner now only says competencies are separate from the Description
 - [ ] The learner course page prototype still shows objectives as a checklist from sample data; how production builds it from the Description was not checked
 - [x] Removed the "Open this lesson in the learner prototype" link from the learner preview dialog
+
+## Lesson 1: remove "Before you start" and 10,000 Women registration (team feedback, 30 Oct 2026)
+- [x] Removed both sections from lesson 1 (Enhanced) in `atlas-lesson-blocks-prototype.html`; rebuilt `clean/lesson.html`. Lesson 1 now: Welcome → What you will learn → Lesson review.
+- [x] The Current (production) layout of lesson 1 is unchanged. The Fundamentals dialog and registration scripts stay in the file but do nothing without these sections, so they can be restored from git.
+- [x] Authoring prototype: removed the "Before you start" and "Community invitation" block types (definitions, add-block list, lesson 1 sample, learner-preview renderers and styles). Older saved copies in localStorage drop those blocks on load (`dropRemovedBlocks`). Tested: no console errors, lesson 1 preview shows intro + What you will learn.
+- [ ] If the "gather your documentation" advice is still wanted, it may fit the course page ("What you need") rather than inside a lesson.
