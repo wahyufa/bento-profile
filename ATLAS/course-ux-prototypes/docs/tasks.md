@@ -355,3 +355,18 @@ Real text read from demo.atlaslearn.ai (lessons 4 to 12).
 - [ ] Samples, not production: review questions, Jen answers, discussion posts, the "quick check" and "compare" reveals, the cost-per-purchase figure in the calculator.
 - [x] Authoring: the estimated lesson time is no longer a warning in the quality checklist. The author sets Minutes in the lesson header; next to it an optional hint shows the estimate from the content with "Use n min".
 - [x] Authoring: "Nothing for the learner to do" now names all four interactive blocks and offers two buttons: "Add an activity" (block picker limited to practice task, stage explorer, persona cards, flashcards; added at the end of the lesson) and "Reading only is fine" (turns the suggestion into a green "Reading only, as you chose" with Undo, saved per lesson). Tested in the browser.
+
+## In-context authoring — `atlas-authoring-incontext-prototype.html` (30 Oct 2026)
+From Zhi: move the admin side to in-context editing instead of form fields + a separate preview. Scope agreed: lesson content only; block cards with toolbars (Rise-like). The current authoring prototype is unchanged.
+- [x] The canvas is the learner lesson page. Every text (titles, paragraphs, card items, persona fields, transcript, captions…) is edited in place; paste arrives as plain text; single-line fields end on Enter.
+- [x] Each block: hover toolbar (type, style options such as callout style / numbered cards / "you are here" step / replace image, move up/down, duplicate, delete with Undo). Items inside blocks: × to remove, "+ Add card / point / step / answer box / stage / persona" in place.
+- [x] "+" line between blocks opens the block menu inline (12 types, including a new Image block: drop or choose a file, caption editable).
+- [x] Video: paste the link on the player itself; transcript editable underneath.
+- [x] Edit / Preview switch in the top bar; Preview hides every control, makes funnel and flashcards interactive, Desktop / Phone width.
+- [x] Lesson settings panel (opens on demand): quality checks with "Add an activity" / "Reading only is fine", minutes with the optional estimate, review count, Jen and discussion toggles.
+- [x] Rich-text lesson 10: "Convert with AI" banner on the page; AI draft blocks get an inline "AI draft · Approve" bar and "Approve all".
+- [x] Same seed as the current authoring prototype (generated from it). Autosaves in the browser; "Reset demo" in the prototype bar.
+- [x] Tested in the browser: editing and saving, insert, duplicate, move, delete + undo, add/remove items, numbered cards, video link, Preview (no editable fields, funnel), Phone width, settings + add activity, AI convert + approve all, quiz lesson message; no console errors.
+- [ ] Out of scope for now: quiz editing, course details / cover / outline structure (add, reorder, delete lessons), resources, review-question editing. They link to the current authoring prototype.
+- [x] Linked: index.html walkthrough has a 7th step "Course authoring (admin)" (in-context editor + form-based authoring); the current authoring prototype's yellow bar has "Try in-context editing →".
+- [x] Switching views keeps the lesson: "✎ Edit on page" in the form-based lesson header (Digital Marketing only) opens the in-context editor at the same lesson (`?lesson=N`); "Form view" in the in-context top bar goes back to the same lesson in the form view. Tested both ways. The two prototypes still save their edits separately.

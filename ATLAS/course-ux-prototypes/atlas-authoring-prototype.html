@@ -543,6 +543,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     <button data-mode="new" aria-pressed="true">Enhanced</button>
   </div>
   <button class="plain" type="button" id="resetBtn">Reset demo</button>
+  <a href="atlas-authoring-incontext-prototype.html" style="font-size:13px;color:var(--primary-ink)">Try in-context editing →</a>
 </div>
 
 <div class="shell">
@@ -1193,7 +1194,8 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   function header() {
     var left = courseBlockers(), pub = D.status === 'published';
     return '<div class="ch"><button class="back" type="button" data-act="tolist" aria-label="Back to courses">←</button><div><h1>' + esc(D.details.title || 'Untitled course') + '</h1><div class="sub">' + (pub ? 'Edit course · <span class="chip ok"' + tipA('Learners can see this course.', true) + '>Published</span> <span class="chip info"' + tipA('The version learners see now.', true) + '>' + esc(D.ver || 'V1') + '</span> <span class="chip warn"' + tipA('Changes made since the last publish. Choose Publish update to release them to learners.', true) + '>Unsaved changes</span>' : 'New course · <span class="chip draft"' + tipA('Only you and other admins can see this course. Learners see it after you publish.', true) + '>Draft</span>') + '</div></div>' +
-      '<div class="acts"><button class="btn" type="button" data-act="learner"' + (D.lessons.length ? '' : ' disabled') + '>▶ Preview as learner</button><button class="btn primary" type="button" data-act="publish"' + (left ? ' title="' + left + ' things need fixing first"' : '') + '>' + (pub ? 'Publish update' : 'Publish') + (left ? ' (' + left + ')' : '') + '</button>' +
+      // "Edit on page" opens the in-context editor at the same lesson (it only has the Digital Marketing course)
+      '<div class="acts">' + (P.course === 'dm' && cur() ? '<a class="btn" style="text-decoration:none" href="atlas-authoring-incontext-prototype.html?lesson=' + (D.lessons.indexOf(cur()) + 1) + '" title="Edit this lesson directly on the page learners see">✎ Edit on page</a>' : '') + '<button class="btn" type="button" data-act="learner"' + (D.lessons.length ? '' : ' disabled') + '>▶ Preview as learner</button><button class="btn primary" type="button" data-act="publish"' + (left ? ' title="' + left + ' things need fixing first"' : '') + '>' + (pub ? 'Publish update' : 'Publish') + (left ? ' (' + left + ')' : '') + '</button>' +
       '<button class="ico" type="button" data-act="menu" aria-haspopup="menu" aria-expanded="' + P.menu + '" aria-label="More actions">⋯</button><div class="menu' + (P.menu ? ' show' : '') + '" role="menu"><button type="button" role="menuitem" data-toast="Unpublish (not part of this preview)">Unpublish</button><button type="button" role="menuitem" data-toast="Archive (not part of this preview)">Archive</button><button type="button" role="menuitem" class="dng" data-toast="Delete (not part of this preview)">Delete…</button></div></div></div>' +
       '<div class="tabs" role="tablist">' + [['details', 'Details'], ['content', 'Content'], ['obj', 'Learning Objectives'], ['km', 'Knowledge Mapping']].map(function (t) { return '<button type="button" role="tab" data-tab="' + t[0] + '" aria-selected="' + (P.tab === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</div>';
   }
