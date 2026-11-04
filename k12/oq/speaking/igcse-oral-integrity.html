@@ -418,7 +418,6 @@
   .setup-foot{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-top:22px;}
   .setup-foot p{margin:0 0 4px; font:600 16px 'Nunito Sans',sans-serif; color:#e63757;}
   .setup-foot p.ok{color:var(--success);}
-  .setup-help{padding:0; border:0; background:none; color:#53caff; font:400 15px 'Montserrat',sans-serif; text-decoration:underline; cursor:pointer;}
   .setup-start{padding:8px 22px; border:1px solid #0fb0f8; border-radius:16px; background:#0fb0f8; color:#fff; font:700 16px 'Montserrat',sans-serif; cursor:pointer; white-space:nowrap; transition:background .15s;}
   .setup-start:hover:not(:disabled){background:#0a9be0; border-color:#0a9be0;}
   /* Disabled reads as clearly inactive: grey, not a paler blue */
@@ -451,19 +450,8 @@
   .verify-modal .phrase{margin:18px 0;}
   .verify-status{margin:6px 0 14px !important;}
   .verify-status.fail{color:#e63757 !important; font-weight:600 !important;}
-  .verify-buttons{display:flex; justify-content:center; gap:8px;}
+  .verify-buttons{display:flex; flex-wrap:wrap; justify-content:center; gap:8px;}
   .verify-modal h3{margin:0 0 14px; font:700 24px 'Montserrat',sans-serif; color:#302574;}
-  @keyframes spin{to{transform:rotate(360deg);}}
-  .verify-checks{margin:4px 0 6px; padding:0; list-style:none; text-align:left; display:grid; gap:8px;}
-  .verify-checks li{display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid #e0e0e0; border-radius:12px; font:600 14px 'Montserrat',sans-serif; color:#98a2ad;}
-  .verify-checks li i{width:18px; height:18px; flex:0 0 auto; border:3px solid #e4f6fe; border-top-color:#0fb0f8; border-radius:50%; animation:spin .8s linear infinite;}
-  .verify-checks li.ok{color:#12263f;}
-  .verify-checks li.ok i{animation:none; border:0; background:var(--success); border-radius:50%; position:relative;}
-  .verify-checks li.ok i::after{content:'\2713'; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:11px; font-style:normal;}
-  .verify-checks li.bad{color:#e63757; border-color:#f5c2cc;}
-  .verify-checks li.bad i{animation:none; border:0; background:#e63757; border-radius:50%;}
-  .verify-checks li.wait{opacity:.45;}
-  .verify-checks li.wait i{animation:none;}
   /* Plain microphone test (as on the live page): record, see the level, play back */
   .mic-test{margin-top:14px;}
   .mic-test .setup-outline{width:100%;}
@@ -478,7 +466,6 @@
   .mic-stop{display:inline-flex; align-items:center; gap:6px; height:46px; padding:0 18px; background:#0fb0f8; border-color:#0fb0f8;}
   .mic-stop svg{width:16px; height:16px;}
   .mic-stop.again{background:#fff; color:#0fb0f8; border:2px solid #0fb0f8;}
-  .vcheck-list{margin:10px 0 4px; padding:0; list-style:none; text-align:left; display:grid; gap:8px;}
   .setup-outline.verified{border-color:var(--success); background:var(--success-soft); color:var(--success);}
   .integrity-bar{display:flex; align-items:center; gap:9px; margin:0 0 clamp(6px,1.2vh,12px); padding:8px 12px; border-radius:10px; background:#e9fcf7; color:#198b70; font:600 12.5px 'Montserrat',sans-serif;}
   .integrity-bar b{display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:var(--success); color:#fff; font-size:11px;}
@@ -683,7 +670,6 @@
     <div class="setup-foot">
       <div>
         <p id="setupStatus">Check your input device to continue.</p>
-        <button class="setup-help" id="btnMicHelp" type="button">How to enable microphone?</button>
       </div>
       <div class="setup-actions">
         <button class="setup-outline" id="btnVerify" type="button" disabled>Verify Voice</button>
@@ -716,14 +702,12 @@
     <h3 id="verifyTitle">Voice verification</h3>
     <p>Read this unique phrase aloud. It is generated for this session and cannot be reused.</p>
     <div class="phrase">&ldquo;The purple elephant danced on the ceiling.&rdquo;</div>
-    <div class="voice-count" id="voiceCount">5</div>
+    <div class="voice-count" id="voiceCount">30</div>
     <div class="voice-wave" id="voiceWave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-    <ul class="verify-checks vcheck-list" id="verifyChecks" hidden></ul>
     <p class="verify-status" id="voiceText">Press record when you are ready.</p>
     <div class="verify-buttons">
       <button class="setup-start" id="btnVoiceRecord" type="button">&#9679; Record voice sample</button>
       <button class="setup-outline" id="btnVerifyDone" type="button" hidden>Complete setup</button>
-      <button class="setup-outline" id="btnVerifyCancel" type="button">Cancel</button>
     </div>
   </div>
 </div>
@@ -896,7 +880,7 @@
   const els = {};
   ['stages','timerChip','timerValue','stageTitle','stageMeta','splitLayout','cardPane','cardPaper',
    'conversation','examinerBubble','examinerAvatar','examinerLine','examinerText','studentBubble','studentLine',
-   'countdownNumber','prepTimer','btnSkipPrep','btnReplay','btnContinue','modelCard','stageOverlay','stageHead','stageChips','stageBrief','stageSteps','btnStageReady','setupScreen','btnSetupExit','btnMicHelp','micHelpOverlay','btnMicHelpClose','micSelect','setupStatus','btnStartQuiz','btnMicTest','micRow','micTrack','micTime','micLine','btnMicStop','btnVerify','verifyOverlay','voiceCount','verifyChecks','btnVerifyDone','btnVerifyCancel','voiceWave','voiceText','btnVoiceRecord','btnStartRecord','btnReRecord','reviewTime','reviewPlayer','scaffold','modeSwitch','recordTime','btnEnd','hintNote','completion',
+   'countdownNumber','prepTimer','btnSkipPrep','btnReplay','btnContinue','modelCard','stageOverlay','stageHead','stageChips','stageBrief','stageSteps','btnStageReady','setupScreen','btnSetupExit','micHelpOverlay','btnMicHelpClose','micSelect','setupStatus','btnStartQuiz','btnMicTest','micRow','micTrack','micTime','micLine','btnMicStop','btnVerify','verifyOverlay','voiceCount','btnVerifyDone','voiceWave','voiceText','btnVoiceRecord','btnStartRecord','btnReRecord','reviewTime','reviewPlayer','scaffold','modeSwitch','recordTime','btnEnd','hintNote','completion',
    'completionTitle','completionText','btnViewResult','instructionOverlay','structureList','btnReady',
    'btnInstructions','submitOverlay','submitProgressText','btnCancelSubmit','btnConfirmSubmit',
    'btnSetting','btnSaveExit','btnSubmit','btnFeedback','proto','protoToggle','protoPanel',
@@ -1443,11 +1427,10 @@
 
   // ---------- Setup: mic test, then voice verification, then Start Quiz ----------
   // 1. Test Microphone: a plain level check with play-back, as on the live page.
-  // 2. Verify Voice (next to Start Quiz): refuses virtual microphones, records a
-  //    one-time phrase, then runs the integrity checks before declaring a pass.
+  // 2. Verify Voice (next to Start Quiz): refuses virtual microphones, then
+  //    records a one-time phrase, as in the original integrity prototype.
   // 3. Start Quiz unlocks only after a passed verification and the confirmations.
   const VIRTUAL_MIC = /VB-Audio|CABLE|Voicemeeter|Virtual|BlackHole/i;
-  const VERIFY_CHECKS = ['Physical microphone connected', 'Voice profile captured', 'Live speech detected (not a recording)', 'Natural background noise'];
   let micTested = false;
   let verified = false;
   let verifyRun = 0;           // bumped on cancel so a stale run stops
@@ -1641,17 +1624,13 @@
 
   // ---------- Voice verification popup ----------
   const later = (run, ms) => new Promise((resolve, reject) => setTimeout(() => (run === verifyRun ? resolve() : reject(new Cancelled())), ms));
-  const SPEECH_LEVEL = 0.04;   // peak RMS that counts as someone speaking
-  const NOISE_FLOOR = 0.0004;  // below this the input is digitally silent (injected audio)
 
   function resetVerifyPopup() {
     els.voiceCount.hidden = false;
-    els.voiceCount.textContent = '5';
+    els.voiceCount.textContent = '30';
     els.voiceWave.hidden = false;
     els.voiceWave.classList.remove('live');
     [...els.voiceWave.children].forEach((b) => { b.style.height = ''; });
-    els.verifyChecks.hidden = true;
-    els.verifyChecks.textContent = '';
     els.voiceText.className = 'verify-status';
     els.voiceText.style.color = '';
     els.voiceText.textContent = 'Press record when you are ready.';
@@ -1659,14 +1638,12 @@
     els.btnVoiceRecord.disabled = false;
     els.btnVerifyDone.hidden = true;
     els.btnVerifyDone.textContent = 'Complete setup';
-    els.btnVerifyCancel.hidden = false;
   }
 
   function failVerification(message) {
     els.voiceText.className = 'verify-status fail';
     els.voiceText.textContent = message;
     els.btnVoiceRecord.hidden = true;
-    els.btnVerifyCancel.hidden = true;
     els.btnVerifyDone.hidden = false;
     els.btnVerifyDone.textContent = 'Close';
   }
@@ -1690,43 +1667,13 @@
     els.btnVoiceRecord.disabled = true;
     const live = await openMic();
     let recording = true;
-    const levels = [];
-    if (live) {
-      meter([...els.voiceWave.children], () => recording);
-      const sampler = setInterval(() => { if (recording) levels.push(micLevel()); else clearInterval(sampler); }, 100);
-    }
-    els.voiceText.textContent = live ? 'Recording your voice profile\u2026' : 'No microphone detected \u2014 simulating the recording.';
+    if (live) meter([...els.voiceWave.children], () => recording);
+    els.voiceText.textContent = 'Recording your voice profile\u2026';
     try {
-      for (let n = 4; n >= 0; n--) { await later(run, 1000); els.voiceCount.textContent = n || '\u2713'; }
+      for (let n = 29; n >= 26; n--) { await later(run, 650); els.voiceCount.textContent = n; }
       recording = false;
-      els.voiceWave.classList.remove('live');
-
-      // Real measurements when a microphone is open; otherwise every check passes.
-      const sorted = [...levels].sort((a, b) => a - b);
-      const peak = sorted.length ? sorted[sorted.length - 1] : 0;
-      const floor = sorted.length ? sorted[Math.floor(sorted.length * 0.1)] : 0;
-      const results = live ? [true, true, peak > SPEECH_LEVEL, floor > NOISE_FLOOR] : [true, true, true, true];
-
-      els.btnVoiceRecord.hidden = true;
-      els.voiceWave.hidden = true;
-      els.voiceCount.hidden = true;
-      els.verifyChecks.hidden = false;
-      els.voiceText.textContent = 'Verifying your voice\u2026';
-      const items = VERIFY_CHECKS.map((t) => { const li = el('li', 'wait'); li.appendChild(el('i')); li.appendChild(document.createTextNode(t)); els.verifyChecks.appendChild(li); return li; });
-      for (let k = 0; k < items.length; k++) {
-        items[k].classList.remove('wait');
-        await later(run, 700);
-        items[k].classList.add(results[k] ? 'ok' : 'bad');
-        if (!results[k]) {
-          failVerification(k === 2
-            ? '\u2715 We could not hear you. Move closer to the microphone, read the phrase aloud and try again.'
-            : '\u2715 The input sounds digitally silent, which usually means injected audio. Use a physical microphone and try again.');
-          return;
-        }
-      }
-      els.voiceText.textContent = '\u2713 Verification passed. Your voice profile will be compared throughout the test.';
-      els.voiceText.style.color = 'var(--success)';
-      els.btnVerifyCancel.hidden = true;
+      els.voiceCount.textContent = '\u2713';
+      els.voiceText.textContent = 'Voice sample captured. It will be compared throughout the test.';
       els.btnVerifyDone.hidden = false;
       verified = true;
     } catch (err) {
@@ -1735,19 +1682,13 @@
     }
   });
 
-  els.btnVerifyCancel.addEventListener('click', () => {
-    verifyRun++;
-    els.verifyOverlay.classList.remove('open');
-    updateSetup();
-  });
   els.btnVerifyDone.addEventListener('click', () => {
-    els.voiceText.style.color = '';
+    verifyRun++;   // stop a recording still running when the popup closes
     els.verifyOverlay.classList.remove('open');
     updateSetup();
   });
   els.micSelect.addEventListener('change', () => { verified = false; closeMic(); updateSetup(); });
   els.setupScreen.querySelectorAll('.check input').forEach((c) => c.addEventListener('change', updateSetup));
-  els.btnMicHelp.addEventListener('click', () => els.micHelpOverlay.classList.add('open'));
   els.btnMicHelpClose.addEventListener('click', () => els.micHelpOverlay.classList.remove('open'));
   els.btnSetupExit.addEventListener('click', () => showToast('Exit — demo placeholder'));
   els.btnStartQuiz.addEventListener('click', () => {

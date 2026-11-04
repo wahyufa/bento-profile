@@ -533,48 +533,20 @@
   }
 
   // ---------- right: Speaker Verification view ----------
-  // Cards copied from the original integrity prototype
-  // (ai_speaking_test_revamp_prototype.html): speaker verification,
-  // frontend controls and audio integrity analysis.
-  function verificationViewHtml(q) {
+  // Card copied from the original integrity prototype
+  // (ai_speaking_test_revamp_prototype.html): audio integrity analysis.
+  // Its speaker-verification and frontend-controls cards are left out for now.
+  // The check runs on submit, so its result (the prototype's "Run integrity
+  // check" outcome) is shown straight away.
+  function verificationViewHtml() {
     return `
-      <div class="pv-card">
-        <h4>Speaker verification</h4>
-        <p>The submitted response was compared with the voice profile captured during microphone testing.</p>
-        <div class="pv-metric"><div><span>Voice-profile match</span><span>${q.match}% verified</span></div><div class="pv-meter"><i style="width:${q.match}%"></i></div></div>
-        <div class="pv-integrity" style="margin:12px 0 0"><b>\u2713</b> Same speaker detected</div>
-      </div>
-
-      <div class="pv-card">
-        <h4>Controls applied</h4>
-        <p>The browser restricted input routing and controlled when recording began.</p>
-        <div class="pv-metric"><div><span>Input device</span><span>Physical mic \u2713</span></div><div class="pv-meter"><i style="width:100%"></i></div></div>
-        <div class="pv-metric"><div><span>Preparation window</span><span>5 seconds</span></div><div class="pv-meter"><i style="width:8%"></i></div></div>
-        <div class="pv-metric"><div><span>Recording trigger</span><span>Automatic \u2713</span></div><div class="pv-meter"><i style="width:100%"></i></div></div>
-      </div>
-      <div class="pv-pass">Cheating opportunity reduced: there was no virtual audio route and only five seconds to generate external TTS.</div>
-
       <div class="pv-card">
         <h4>Audio integrity analysis</h4>
         <p>AI signal checks are attached to the recording for reviewer context.</p>
-        <div class="pv-metric"><div><span>Natural room noise</span><span data-noise-text>\u2014</span></div><div class="pv-meter"><i data-noise-meter style="width:0"></i></div></div>
-        <div class="pv-metric"><div><span>Digital-silence risk</span><span data-silence-text>\u2014</span></div><div class="pv-meter warn"><i data-silence-meter style="width:0"></i></div></div>
-        <button class="pv-btn" type="button" data-scan>Run integrity check</button>
+        <div class="pv-metric"><div><span>Natural room noise</span><span>\u221242 dB detected</span></div><div class="pv-meter"><i style="width:84%"></i></div></div>
+        <div class="pv-metric"><div><span>Digital-silence risk</span><span>Low risk</span></div><div class="pv-meter warn"><i style="width:12%"></i></div></div>
+        <button class="pv-btn" type="button" disabled>Natural microphone pattern</button>
       </div>`;
-  }
-
-  // Same result the prototype's "Run integrity check" shows.
-  function runIntegrityScan(btn) {
-    const card = btn.closest('.pv-card');
-    btn.disabled = true;
-    btn.textContent = 'Analysing\u2026';
-    setTimeout(() => {
-      card.querySelector('[data-noise-meter]').style.width = '84%';
-      card.querySelector('[data-silence-meter]').style.width = '12%';
-      card.querySelector('[data-noise-text]').textContent = '\u221242 dB detected';
-      card.querySelector('[data-silence-text]').textContent = 'Low risk';
-      btn.textContent = 'Natural microphone pattern';
-    }, 1100);
   }
 
   // ---------- render ----------
@@ -660,9 +632,7 @@
     // Delegated: the card and panel are re-rendered per question.
     document.body.addEventListener('click', (e) => {
       if (e.target.closest('[data-see-result]')) showView('summary');
-      else if (e.target.closest('[data-goto]')) showView(e.target.closest('[data-goto]').dataset.goto);
-      else if (e.target.closest('[data-scan]')) runIntegrityScan(e.target.closest('[data-scan]'));
-      else if (e.target.closest('[data-hear]')) showToast('Model pronunciation — demo placeholder');
+      else if (e.target.closest('[data-goto]')) showView(e.target.closest('[data-goto]').dataset.goto);      else if (e.target.closest('[data-hear]')) showToast('Model pronunciation — demo placeholder');
       else if (e.target.closest('[data-play]')) showToast('No recording file in this prototype');
     });
     $('btnSendFeedback').addEventListener('click', () => showToast('Send Feedback — demo placeholder'));

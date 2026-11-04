@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeyHi — IGCSE Oral Result (interactive)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet" />
+<style>
+  /* Clone of the live interactive speaking result
+     (demo.heyhi.sg/onlinequizv2/quiz-result-speech-interactive), with every
+     size, colour and spacing taken from the live page's computed styles.
+     Content is the IGCSE oral test from igcse-oral-integrity-result.html.
+     The right tool rail keeps the live Score Summary and Rubric Score views
+     and adds a third one, Speaker Verification. */
+  :root {
+    --yellow: #fec53c;
+    --blue: #0fb0f8;
+    --blue-btn: #0cb1f8;
+    --bar: #53caff;
+    --green: #16d8a7;
+    --green-soft: #e3faf4;
+    --red: #ff1744;
+    --slate: #708eb1;
+    --amber: #ffb300;
+
+    --ink: #12263f;
+    --heading: #302574;
+    --text-2: #616161;
+    --muted: #95aac9;
+    --line: #e0e0e0;
+    --track: #edf2f9;
+    --base: #f6f8fa;
+    --rail: #f5f7f9;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  button, select { font-family: inherit; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Poppins", system-ui, sans-serif; font-size: 15px; line-height: 1.5;
+    color: var(--ink); background: #eee; display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* ---------- Top bar + info bar ---------- */
+  .topbar {
+    flex: 0 0 54px; position: relative; display: flex; align-items: center; justify-content: center;
+    background: var(--yellow) url("https://cdn.heyhi.sg/images/bg-smartjen.png");
+  }
+  .topbar__title { font-size: 20px; font-weight: 700; line-height: 24px; color: #fff; }
+  .btn-exit {
+    position: absolute; right: 78px; top: 10px; display: inline-flex; align-items: center; gap: 8px;
+    padding: 4px 16px; border-radius: 16px; background: var(--blue); color: #fff;
+    font-size: 18px; font-weight: 700; line-height: 27px; text-decoration: none;
+  }
+  .info-bar {
+    flex: 0 0 84px; display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+    padding: 8px 70px 8px 150px; background: #fff url("https://cdn.heyhi.sg/images/bg-smartjen-color.png");
+    box-shadow: rgba(0, 0, 0, 0.05) 0 4px 4px 0; position: relative; z-index: 1;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 7px 16px;
+    border: 2px solid var(--blue); border-radius: 16px; background: #fff;
+    color: var(--blue); font-size: 16px; font-weight: 700; white-space: nowrap;
+  }
+  .pill--marked { border-color: var(--green); color: var(--green); }
+
+  /* ---------- Stage ---------- */
+  .stage { flex: 1 1 auto; display: flex; min-height: 0; }
+
+  .qrail {
+    flex: 0 0 67px; padding: 20px 0 20px 15px; background: #fff;
+    box-shadow: rgba(18, 38, 63, 0.03) 0 12px 24px 0; overflow-y: auto;
+  }
+  .step__circle {
+    width: 37px; height: 37px; border-radius: 100%; border: 2px solid var(--green);
+    background: var(--green); color: #fff; font-size: 16px; line-height: 33px; text-align: center;
+    cursor: pointer;
+  }
+  .step--wrong .step__circle { border-color: var(--red); background: var(--red); }
+  .step--active .step__circle { outline: 3px solid rgba(15, 176, 248, 0.5); outline-offset: 2px; }
+  .step__line { width: 2px; height: 20px; margin-left: 17px; background: var(--line); }
+  .step:last-child .step__line { display: none; }
+
+  .q-container { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; background: var(--base); overflow-y: auto; }
+  .q-wrap { margin: 36px 24px 24px; display: flex; flex-direction: column; min-height: 0; }
+
+  .tabs { display: flex; padding: 8px 0 0 46px; background: #e9e9e9; border-radius: 19.2px 19.2px 0 0; border-bottom: 1px solid #e3ebf6; }
+  .tab {
+    padding: 10px 24px; margin-bottom: -1px; border: 0; border-radius: 8px 8px 0 0; background: none;
+    color: var(--muted); font-size: 16px; font-weight: 700; line-height: 24px; cursor: pointer;
+  }
+  .tab + .tab { margin-left: 12px; }
+  .tab--active { background: #fff; color: var(--blue); }
+
+  .card {
+    border-radius: 0 0 19.2px 19.2px; margin-bottom: 15px; padding: 24px;
+    background: #fff url("https://cdn.heyhi.sg/images/main/bg_quiz.jpg");
+    box-shadow: rgba(18, 38, 63, 0.03) 0 12px 24px 0;
+  }
+  .label { margin-bottom: 6px; font-size: 16px; font-weight: 700; line-height: 24px; color: var(--text-2); }
+
+  .examiner-questions {
+    margin-bottom: 12px; padding: 16px 24px; border: 1px solid var(--line); border-radius: 16px; background: #f9fafb;
+  }
+  .examiner-question { display: flex; align-items: center; gap: 12px; font-size: 16px; font-weight: 700; line-height: 24px; color: var(--text-2); }
+  .examiner-question + .examiner-question { margin-top: 12px; }
+  .examiner-question p:nth-child(2) { flex: 1 1 auto; }
+  .icon-btn { display: flex; border: 0; background: none; cursor: pointer; }
+
+  /* Short-talk card (Part 2), kept inside the live page's question box */
+  .talk-card { font-size: 16px; line-height: 24px; color: var(--text-2); }
+  .talk-card b { display: block; margin-bottom: 4px; color: var(--ink); }
+  .talk-card ul { margin: 6px 0 6px 20px; }
+
+  .answers { display: flex; align-items: center; gap: 6px; }
+  .answers h2 { font-size: 16px; font-weight: 700; line-height: 24px; color: var(--text-2); }
+  .answers__actions { flex: 1 1 auto; display: flex; justify-content: flex-end; }
+  .btn-see {
+    display: flex; align-items: center; gap: 10px; margin-top: 6px; height: 44px; padding: 12px 24px;
+    border: 1px solid var(--blue-btn); border-radius: 16px; background: var(--blue-btn);
+    color: #fff; font-size: 16px; font-weight: 700; line-height: 16px; cursor: pointer;
+  }
+  .review-ai {
+    display: flex; align-items: center; justify-content: center; margin: 12px 0; padding: 12px;
+    border: 1px solid #f8eac4; border-radius: 12px; background: #fffaec;
+  }
+  .review-ai p { margin-right: 12px; font-size: 16px; line-height: 24px; color: var(--text-2); }
+
+  .recording { display: flex; align-items: center; margin-bottom: 12px; }
+  .recording__num { margin-right: 12px; font-size: 16px; font-weight: 700; line-height: 24px; color: var(--text-2); }
+  .audio-player { width: 360px; display: flex; align-items: center; gap: 20px; padding: 9px 24px; border-radius: 16px; background: var(--base); }
+  .audio-player .timer { font-size: 16px; font-weight: 700; line-height: 22px; color: var(--text-2); }
+  .audio-player .track { flex: 1 1 auto; height: 10px; border-radius: 4px; background: linear-gradient(to right, var(--blue) 0%, #d0dced 0%); }
+  .audio-player .length { font-size: 15px; }
+  .send-feedback { align-self: flex-end; padding: 1px 6px; border: 0; background: none; color: var(--blue); font-size: 14px; font-weight: 700; cursor: pointer; }
+
+  /* Left "Rubrics" tab */
+  .rb-title { margin-bottom: 15px; font-size: 34px; font-weight: 700; line-height: 40px; color: var(--heading); }
+  .rb-marked { margin-bottom: 16px; font-size: 14px; color: #8a8a8a; }
+  .rb-component { margin-bottom: 40px; }
+  .rb-component__title { font-size: 20px; font-weight: 600; line-height: 28px; color: var(--text-2); }
+  .metrics-container { margin-top: 15px; padding: 40px 23px 45px; border-radius: 16px; background: var(--base); }
+  .metric-title { margin-bottom: 12px; font-size: 14px; font-weight: 600; }
+  .descriptor {
+    margin-bottom: 12px; padding: 20px; border-left: 4px solid var(--amber); border-radius: 0 15px 15px 0; background: #fff;
+  }
+  .descriptor__head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .descriptor__head h4 { font-size: 15px; font-weight: 600; }
+  .form-select {
+    height: 41px; padding: 8px 28px 8px 12px; border: 1px solid #d2ddec; border-radius: 2px; background-color: #fff;
+    font-size: 15px; color: var(--ink);
+  }
+  .descriptor p { font-size: 15px; line-height: 22.5px; }
+  .metric-list { display: flex; flex-wrap: wrap; gap: 20px; }
+  .metric-item {
+    position: relative; width: calc((100% - 40px) / 3); margin-bottom: 15px; padding: 45px 30px 15px;
+    border-radius: 16px; background: #fff; box-shadow: rgba(18, 38, 63, 0.03) 0 12px 24px 0; border: 3px solid transparent;
+  }
+  .metric-item--active { border-color: var(--blue); }
+  .metric-item--active .metric-item__text { font-weight: 600; }
+  .metric-item__score { position: absolute; top: 7px; right: 15px; display: flex; align-items: center; gap: 4px; padding: 5px; font-size: 14px; font-weight: 700; }
+  .metric-item__text { font-size: 15px; line-height: 22.5px; }
+
+  /* ---------- Right panel ---------- */
+  .score-detail { flex: 0 0 502px; display: flex; flex-direction: column; min-height: 0; background: #fff; }
+  .score-detail[hidden] { display: none; }
+  .header-score { position: relative; flex: 0 0 56px; display: flex; align-items: center; gap: 16px; padding: 12px 16px; background: var(--slate); }
+  .q-switch { display: inline-flex; align-items: center; border: 0; background: none; color: #fff; cursor: pointer; }
+  .q-switch__label { font-size: 24px; font-weight: 700; line-height: 29px; }
+  .svg-round { display: flex; margin-left: 6px; padding: 2px 8px; border: 1px solid #fff; border-radius: 8px; }
+  .header-score h4 { flex: 1 1 auto; font-size: 20px; font-weight: 700; line-height: 24px; color: #fff; }
+  .header-score .icon-btn { color: #fff; }
+  .q-menu {
+    position: absolute; top: 50px; left: 12px; z-index: 5; min-width: 160px; padding: 8px 0 15px; list-style: none;
+    background: #fff; border: 1px solid rgba(18, 38, 63, 0.1); border-radius: 2px; box-shadow: 0 8px 24px rgba(18, 38, 63, 0.12);
+  }
+  .q-menu button { width: 100%; padding: 6px 24px; border: 0; background: none; text-align: left; color: #6e84a3; font-size: 15px; cursor: pointer; }
+  .q-menu button:hover, .q-menu button[aria-current="true"] { color: var(--blue); }
+
+  .score-container { flex: 1 1 auto; overflow-y: auto; padding: 12px; }
+  .view[hidden] { display: none; }
+
+  .ie-card { margin-top: 12px; border: 1px solid var(--line); border-radius: 16px; background: #fff; font-size: 16px; }
+  .ie-card__header { display: flex; align-items: center; padding: 16px; border-bottom: 1px solid var(--line); }
+  .ie-card__header h4 { flex: 1 1 auto; font-size: 20px; font-weight: 700; line-height: 24px; }
+  .ie-card__body { padding: 16px; }
+  .link-btn { border: 0; background: none; color: var(--blue-btn); font-size: 16px; font-weight: 700; line-height: 16px; cursor: pointer; }
+  .small-label { font-size: 14px; font-weight: 700; line-height: 17px; color: var(--text-2); }
+  .score-value { margin-top: 2px; font-size: 20px; font-weight: 700; line-height: 24px; }
+  .h5 { margin-top: 3px; font-size: 16px; font-weight: 700; line-height: 20px; }
+
+  .metric-row { display: flex; align-items: center; gap: 12px; margin-top: 12px; }
+  .metric-row__detail { flex: 1 1 auto; display: flex; align-items: center; gap: 16px; margin: 6px 0; }
+  .metric-row__name { width: 50%; font-size: 16px; line-height: 22px; color: var(--text-2); }
+  .progress { width: 50%; height: 16px; border-radius: 200px; background: var(--track); overflow: hidden; }
+  .progress i { display: block; height: 100%; border-radius: 200px; background: var(--bar); }
+  .progress--green i { background: var(--green); }
+  .progress--red i { background: var(--red); }
+  .metric-row__value { font-size: 16px; line-height: 22px; color: var(--text-2); }
+
+  .ie-nav { display: flex; gap: 16px; margin: 12px 0; padding: 8px; border-radius: 12px; background: var(--rail); list-style: none; }
+  .ie-nav button { flex: 1 1 0; padding: 12px 16px; border: 0; border-radius: 12px; background: var(--rail); color: var(--ink); font-size: 16px; cursor: pointer; }
+  .ie-nav button[aria-selected="true"] { background: #fff; }
+
+  .bandscore {
+    position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center;
+    padding: 24px; border-radius: 16px; background: #cddded;
+  }
+  .bandscore p { font-size: 20px; font-weight: 700; line-height: 24px; }
+  .bandscore img { position: absolute; right: 0; top: 11px; width: 100px; }
+
+  .btn-outline {
+    display: flex; align-items: center; justify-content: center; width: 100%; height: 58px; margin: 12px 0;
+    padding: 8px 16px; border: 2px solid var(--blue-btn); border-radius: 16px; background: #fff;
+    color: var(--blue-btn); font-size: 16px; font-weight: 700; cursor: pointer;
+  }
+  .detail-component { margin: 24px 0; }
+  .detail-component .small-label + .h5 + .small-label { margin: 12px 0; }
+  .btn-collapse {
+    width: 100%; display: flex; align-items: center; gap: 10px; padding: 16px; border: 0;
+    border-bottom: 2px solid #e0e4e9; background: var(--rail); color: #000; cursor: pointer; text-align: left;
+  }
+  .btn-collapse span { flex: 1 1 auto; font-size: 16px; font-weight: 700; line-height: 20px; color: var(--ink); }
+  .btn-collapse svg { transition: transform 0.2s ease; }
+  .btn-collapse[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .collapse-body { padding: 12px; }
+  .collapse-body[hidden] { display: none; }
+  .collapse-selects { display: flex; gap: 12px; margin-bottom: 6px; }
+  .collapse-selects label { display: block; margin-bottom: 6px; font-size: 16px; font-weight: 700; }
+  .collapse-selects > div { flex: 1 1 0; }
+  .collapse-selects .form-select { width: 100%; }
+  .collapse-body > p { margin: 3px 0 24px; font-size: 15px; line-height: 22.5px; }
+  .base-card { padding: 16px; border: 1px solid var(--line); border-radius: 16px; background: var(--base); }
+  .base-card b { font-size: 16px; }
+  .base-card p { margin-top: 3px; font-size: 15px; color: var(--text-2); }
+
+  /* Speaker verification view (added) — built from the same ie-card parts */
+  .sv-match { text-align: center; }
+  .sv-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 6px 14px; border-radius: 12px; font-size: 14px; font-weight: 700; }
+  .sv-badge--pass { background: var(--green-soft); color: var(--green); }
+  .sv-note { margin-top: 12px; font-size: 14px; line-height: 21px; color: var(--text-2); }
+  .check-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 15px; color: var(--text-2); }
+  .check-row:last-of-type { border-bottom: 0; }
+  .check-row b { color: var(--green); text-align: right; }
+
+  /* ---------- Tool rail (live page's icon column) ---------- */
+  .sidebar-right { flex: 0 0 72px; background: var(--rail); border-left: 1px solid #d4d4d4; }
+  .ie-nav-score { display: flex; flex-direction: column; gap: 16px; padding: 8px; list-style: none; }
+  .ie-nav-score button {
+    width: 58px; height: 52px; display: grid; place-items: center; border: 0; border-radius: 12px;
+    background: var(--rail); color: var(--muted); cursor: pointer;
+  }
+  .ie-nav-score button:hover:not([aria-pressed="true"]) { color: var(--blue); }
+  .ie-nav-score button[aria-pressed="true"] { background: var(--blue); color: #fff; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; z-index: 300; transform: translate(-50%, 12px);
+    padding: 10px 18px; border-radius: 999px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600;
+    opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  }
+  .toast--show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- Tablet & mobile: panel becomes a bottom sheet ---------- */
+  @media (max-width: 1100px) {
+    .info-bar { padding: 8px 24px; }
+    .btn-exit { right: 16px; }
+  }
+  @media (max-width: 900px) {
+    .stage { flex-direction: column; }
+    .info-bar { flex: 0 0 auto; flex-wrap: wrap; justify-content: flex-start; padding: 10px 16px; }
+    .pill { height: 36px; font-size: 13px; padding: 5px 12px; }
+    .qrail { flex: 0 0 auto; display: flex; padding: 10px 16px; overflow-x: auto; }
+    .step { display: flex; align-items: center; }
+    .step__line { width: 20px; height: 2px; margin: 0; }
+    .q-wrap { margin: 12px; }
+    .tabs { padding: 6px 0 0 12px; }
+    .card { padding: 16px; }
+    .audio-player { width: 100%; padding: 9px 16px; gap: 12px; }
+    .metric-item { width: calc((100% - 20px) / 2); }
+    .score-detail {
+      position: fixed; inset: auto 0 0 0; height: 78vh; z-index: 200;
+      border-radius: 16px 16px 0 0; overflow: hidden; box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.22);
+    }
+    .sidebar-right { display: none; }
+    .score-detail:not([hidden]) ~ .sidebar-right {
+      display: block; position: fixed; right: 12px; bottom: calc(78vh + 10px); z-index: 201; background: none; border: 0;
+    }
+    .score-detail:not([hidden]) ~ .sidebar-right .ie-nav-score { flex-direction: row; gap: 8px; padding: 0; }
+    .ie-nav-score button { width: 44px; height: 44px; background: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); }
+  }
+  @media (max-width: 600px) {
+    .topbar { justify-content: flex-start; padding: 0 12px; }
+    .topbar__title { font-size: 15px; max-width: calc(100% - 100px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .btn-exit { font-size: 14px; padding: 3px 12px; top: 12px; }
+    .rb-title { font-size: 26px; line-height: 32px; }
+    .metric-item { width: 100%; }
+    .metric-row__name { font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="topbar__title" id="quizTitle">IGCSE Oral: Speaking test</h1>
+    <a class="btn-exit" href="igcse-oral-integrity.html">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+      Exit
+    </a>
+  </header>
+
+  <div class="info-bar">
+    <span class="pill pill--marked" id="statusPill">All Questions Marked</span>
+    <span class="pill" id="marksPill">—</span>
+  </div>
+
+  <div class="stage">
+    <nav class="qrail" id="qrail" aria-label="Questions"></nav>
+
+    <main class="q-container">
+      <div class="q-wrap">
+        <div class="tabs" role="tablist">
+          <button class="tab tab--active" type="button" role="tab" data-tab="question" id="tabQuestion" aria-selected="true">Question 1</button>
+          <button class="tab" type="button" role="tab" data-tab="rubrics" aria-selected="false">Rubrics</button>
+        </div>
+        <section class="card">
+          <div data-pane="question" id="paneQuestion"></div>
+          <div data-pane="rubrics" id="paneRubrics" hidden></div>
+        </section>
+        <button class="send-feedback" id="btnFeedback" type="button">Send Feedback</button>
+      </div>
+    </main>
+
+    <aside class="score-detail" id="panel" aria-label="Report">
+      <header class="header-score">
+        <button class="q-switch" id="qSwitch" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span class="q-switch__label" id="qSwitchLabel">Q1</span>
+          <span class="svg-round"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" /></svg></span>
+        </button>
+        <h4 id="panelTitle">Score Summary</h4>
+        <button class="icon-btn" id="panelClose" type="button" aria-label="Close report panel">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none"><path d="M22 5a2 2 0 0 1 2 2v18a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2v-5a1 1 0 0 0-2 0v5a4 4 0 0 0 4 4h8a4 4 0 0 0 4-4V7a4 4 0 0 0-4-4h-8a4 4 0 0 0-4 4v5a1 1 0 0 0 2 0V7a2 2 0 0 1 2-2h8Zm-6.71 6.29a1 1 0 0 0 0 1.42L17.59 15H3a1 1 0 0 0 0 2h14.59l-2.3 2.29a1 1 0 0 0 1.42 1.42l4-4a1 1 0 0 0 0-1.42l-4-4a1 1 0 0 0-1.42 0Z" fill="currentColor" /></svg>
+        </button>
+        <ul class="q-menu" id="qMenu" role="listbox" hidden></ul>
+      </header>
+      <div class="score-container" id="panelScroll">
+        <div class="view" data-view="summary" id="viewSummary"></div>
+        <div class="view" data-view="rubric" id="viewRubric" hidden></div>
+        <div class="view" data-view="verification" id="viewVerification" hidden></div>
+      </div>
+    </aside>
+
+    <aside class="sidebar-right">
+      <ul class="ie-nav-score" aria-label="Report views">
+        <!-- Medal and book icons are the live page's own SVGs -->
+        <li><button type="button" data-view="summary" title="Score Summary" aria-label="Score Summary" aria-pressed="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z" /><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12" /></svg>
+        </button></li>
+        <li><button type="button" data-view="rubric" title="Rubric Score" aria-label="Rubric Score" aria-pressed="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M11.25 4.53A9.7 9.7 0 0 0 6 3c-1.1 0-2.2.19-3.25.56a.75.75 0 0 0-.5.7v14.25a.75.75 0 0 0 1 .71A8.2 8.2 0 0 1 6 18.75c2 0 3.82.71 5.25 1.89V4.53Zm1.5 16.1A8.2 8.2 0 0 1 18 18.75c.97 0 1.89.17 2.75.47a.75.75 0 0 0 1-.71V4.26a.75.75 0 0 0-.5-.7A9.7 9.7 0 0 0 18 3a9.7 9.7 0 0 0-5.25 1.53v16.1Z" /></svg>
+        </button></li>
+        <li><button type="button" data-view="verification" title="Speaker Verification" aria-label="Speaker Verification" aria-pressed="false">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6z" stroke-linejoin="round" /><path d="M9 10.5v3M12 9v6M15 10.5v3" stroke-linecap="round" /></svg>
+        </button></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Result data ----------
+  // Parts and prompts match igcse-oral-integrity-result.html. As there, ONE
+  // rubric is shared by all three parts (an overall mark per criterion), so
+  // the rubric views do not change when another question is selected.
+  // Level descriptors are short prototype summaries of the IGCSE bands.
+  const result = {
+    title: 'IGCSE Oral: Speaking test',
+    status: 'All Questions Marked',
+    questions: [
+      {
+        number: '1', label: 'Part 1: Interview',
+        prompts: [
+          'What things do people recycle, and why?',
+          'Can you tell me about a time when you, or someone you know, repaired something?',
+          'Do you think that we should stop buying new things to protect the environment? Why? Why not?',
+        ],
+        recordings: ['00:17', '00:24', '00:21'],
+      },
+      {
+        number: '2', label: 'Part 2: Short talk',
+        card: {
+          title: 'Party food',
+          intro: 'You are having a party at your home and organising the food for it. You are considering the following options:',
+          options: ['asking your guests to bring their favourite food', 'ordering from a fast food restaurant.'],
+          task: 'Talk about the advantages and disadvantages of each option. Say which option you would prefer, and why.',
+        },
+        recordings: ['01:42'],
+      },
+      {
+        number: '3', label: 'Part 3: Discussion',
+        prompts: [
+          'Do you think that young people enjoy cooking?',
+          'Some people say that healthy food is not very tasty. Do you agree?',
+          'Is it easier to plan a party by yourself or with a group of people?',
+        ],
+        recordings: ['00:19', '00:28', '00:33'],
+      },
+    ],
+    rubric: {
+      name: 'IGCSE Speaking Assessment Criteria',
+      criteria: [
+        {
+          name: 'Grammar', obtained: 7, max: 10,
+          remark: 'Past tense slipped in Part 1 ("someone repair something" instead of "repaired"), but Parts 2 and 3 held complex structures together well. Review irregular past tense forms before the next attempt.',
+          levels: [
+            ['9–10', 'Complex structures used with ease; errors are rare'],
+            ['7–8', 'Simple structures accurate; complex ones attempted with some errors'],
+            ['5–6', 'Simple structures mostly accurate; errors are frequent'],
+            ['3–4', 'Limited range; errors often affect meaning'],
+            ['1–2', 'Very basic structures; meaning is often unclear'],
+            ['0', 'No answer'],
+          ],
+        },
+        {
+          name: 'Vocabulary', obtained: 8, max: 10,
+          remark: 'Good range across all three parts — "over-consumption", "convenience" and "ordering in" all appeared naturally in Part 2. Strongest criterion this attempt.',
+          levels: [
+            ['9–10', 'Wide, precise vocabulary for ideas, facts and opinions'],
+            ['7–8', 'Sufficient range used appropriately for a variety of ideas'],
+            ['5–6', 'Adequate for familiar topics; some repetition'],
+            ['3–4', 'Limited range; frequent gaps'],
+            ['1–2', 'Very basic vocabulary only'],
+            ['0', 'No answer'],
+          ],
+        },
+        {
+          name: 'Development', obtained: 6, max: 10,
+          remark: 'Part 1 answers were on-topic but stayed short until prompted. In the short talk, both options were covered but the comparison could go further — say which you would choose and why.',
+          levels: [
+            ['9–10', 'Ideas fully developed; communication sustained without support'],
+            ['7–8', 'Most ideas developed with reasons and examples'],
+            ['5–6', 'Relevant responses with attempts at development'],
+            ['3–4', 'Short responses; needs frequent support'],
+            ['1–2', 'Very short responses; communication breaks down'],
+            ['0', 'No answer'],
+          ],
+        },
+        {
+          name: 'Pronunciation', obtained: 7, max: 10,
+          remark: 'Clear throughout, with word stress on multi-syllable words ("re-spon-si-ble", "en-vi-ron-ment") as the main thing to keep practising.',
+          levels: [
+            ['9–10', 'Clear and natural; intonation conveys meaning well'],
+            ['7–8', 'Mostly clear; inaccuracies do not impede communication'],
+            ['5–6', 'Understandable with some effort from the listener'],
+            ['3–4', 'Often hard to understand'],
+            ['1–2', 'Pronunciation severely affects understanding'],
+            ['0', 'No answer'],
+          ],
+        },
+      ],
+    },
+    // Every answer is compared with the voice sample recorded on the setup
+    // screen. Prototype values (no real model).
+    verification: {
+      threshold: 80,
+      phrase: 'The purple elephant danced on the ceiling.',
+      matches: { '1': 97, '2': 95, '3': 96 },
+    },
+  };
+
+  // ---------- helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const rubricObtained = () => result.rubric.criteria.reduce((sum, c) => sum + c.obtained, 0);
+  const rubricMax = () => result.rubric.criteria.reduce((sum, c) => sum + c.max, 0);
+  // Which level band a mark falls in, e.g. 7 -> "7–8".
+  const bandOf = (c) => c.levels.find(([range]) => {
+    const [lo, hi = lo] = range.split('–').map(Number);
+    return c.obtained >= lo && c.obtained <= hi;
+  })[0];
+
+  let toastTimer;
+  function showToast(text) {
+    $('toast').textContent = text;
+    $('toast').classList.add('toast--show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $('toast').classList.remove('toast--show'), 1800);
+  }
+
+  // Live page's icons
+  const ICON_SPEAKER = '<svg width="30" height="26" viewBox="0 0 30 26" fill="none"><rect width="29.3" height="25.4" rx="8" fill="#F6F8FA" /><path d="M14 8.05 10.67 10.71H8v4h2.67L14 17.38V8.05Z" stroke="#0FB0F8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /><path d="M19.35 8a6.67 6.67 0 0 1 0 9.43M17 10.35a3.33 3.33 0 0 1 0 4.72" stroke="#0FB0F8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" /></svg>';
+  const ICON_PLAY = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="12" fill="#0FB0F8" /><path d="M8.54 9.07c0-.66.7-1.07 1.28-.76l5.33 2.93c.6.33.6 1.19 0 1.52l-5.33 2.93c-.58.31-1.28-.1-1.28-.76V9.07Z" fill="white" /></svg>';
+  const sparkle = (fill) => `<svg width="22" height="20" viewBox="0 0 22 20" fill="none"><path d="M9.42 4.08c.12-.31.6-.31.72 0 .5 1.33 1.48 3.64 2.46 4.6.98.97 3.19 1.94 4.45 2.45.3.12.3.58 0 .7-1.26.5-3.47 1.47-4.45 2.44-.98.97-1.95 3.28-2.46 4.6-.12.32-.6.32-.72 0-.5-1.32-1.48-3.63-2.46-4.6-.98-.97-3.3-1.94-4.64-2.44-.32-.12-.32-.6 0-.71 1.34-.5 3.66-1.47 4.64-2.44.98-.97 1.95-3.28 2.46-4.6Z" fill="${fill}" /><path opacity=".7" d="M16.45 1.28c.13-.31.62-.31.75 0 .27.64.65 1.44 1.03 1.81.39.38 1.15.77 1.77 1.03.3.14.3.6 0 .74-.62.27-1.38.65-1.77 1.03-.38.38-.76 1.17-1.03 1.81-.13.31-.62.31-.75 0-.27-.64-.65-1.43-1.03-1.81-.39-.38-1.19-.76-1.84-1.03-.31-.13-.31-.61 0-.74.65-.27 1.45-.65 1.84-1.03.38-.37.76-1.17 1.03-1.81Z" fill="${fill}" /></svg>`;
+  const ICON_TAG = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41 13.42 20.58a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82Z" /><path d="M7 7h.01" /></svg>';
+  const ICON_CHEVRON = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="#12263F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>';
+  const LANGUAGES = ['Select Language', 'English', 'Mongolia', 'Vietnamese', 'Malay', 'Indonesia', 'Turkish', 'Japanese', 'Korean', 'Chinese (Simplified)', 'Chinese (Traditional)'];
+  const languageSelect = () => `<select class="form-select" aria-label="Remark language">${LANGUAGES.map((l) => `<option>${l}</option>`).join('')}</select>`;
+
+  const metricRow = (name, value, max, extra = '') => `
+    <div class="metric-row">
+      <div class="metric-row__detail">
+        <p class="metric-row__name">${escapeHtml(name)}</p>
+        <div class="progress${extra}"><i style="width:${(value / max) * 100}%"></i></div>
+      </div>
+      <p class="metric-row__value">${value}/${max}</p>
+    </div>`;
+
+  // ---------- state ----------
+  let current = 0;
+
+  // ---------- left: Question tab ----------
+  function questionPaneHtml(q) {
+    const questions = q.card
+      ? `<div class="talk-card"><b>${escapeHtml(q.card.title)}</b>${escapeHtml(q.card.intro)}
+           <ul>${q.card.options.map((o) => `<li>${escapeHtml(o)}</li>`).join('')}</ul>${escapeHtml(q.card.task)}</div>`
+      : q.prompts.map((p, i) => `
+          <div class="examiner-question">
+            <p>${i + 1}.</p><p>${escapeHtml(p)}</p>
+            <button class="icon-btn" type="button" data-hear aria-label="Hear question">${ICON_SPEAKER}</button>
+          </div>`).join('');
+    return `
+      <p class="label">Questions:</p>
+      <div class="examiner-questions">${questions}</div>
+      <div class="answers">
+        <h2>Answers:</h2>
+        <div class="answers__actions"><button class="btn-see" type="button" data-see-result>${sparkle('white')}<span>See result</span></button></div>
+      </div>
+      <div class="review-ai"><p>This answer has been reviewed by AI!</p>${sparkle('#FFB300')}</div>
+      ${q.recordings.map((d, i) => `
+        <div class="recording">
+          <p class="recording__num">${i + 1}</p>
+          <div class="audio-player">
+            <button class="icon-btn" type="button" data-play aria-label="Play recording ${i + 1}">${ICON_PLAY}</button>
+            <span class="timer">00:00</span>
+            <span class="track"></span>
+            <span class="length">${escapeHtml(d)}</span>
+          </div>
+        </div>`).join('')}`;
+  }
+
+  // ---------- left: Rubrics tab ----------
+  function rubricsPaneHtml() {
+    const r = result.rubric;
+    return `
+      <h1 class="rb-title">${escapeHtml(r.name)}</h1>
+      <p class="rb-marked">Score : ${rubricObtained()} / ${rubricMax()} Marks</p>
+      ${r.criteria.map((c) => `
+        <div class="rb-component">
+          <strong class="rb-component__title">${escapeHtml(c.name)}</strong>
+          <div class="metrics-container">
+            <div class="metric-title"><strong>${escapeHtml(c.name)} (${c.max} Marks)</strong></div>
+            <div class="descriptor">
+              <div class="descriptor__head"><h4>Remark</h4>${languageSelect()}</div>
+              <p>${escapeHtml(c.remark)}</p>
+            </div>
+            <div class="metric-list">
+              ${c.levels.map(([range, text]) => `
+                <div class="metric-item${range === bandOf(c) ? ' metric-item--active' : ''}">
+                  <span class="metric-item__score">${ICON_TAG}${range} Marks</span>
+                  <div class="metric-item__text">${escapeHtml(text)}</div>
+                </div>`).join('')}
+            </div>
+          </div>
+        </div>`).join('')}`;
+  }
+
+  // ---------- right: Score Summary ----------
+  function summaryViewHtml() {
+    return `
+      <div class="ie-card">
+        <div class="ie-card__header"><h4>Rubric Score</h4><button class="link-btn" type="button" data-goto="rubric">See more</button></div>
+        <div class="ie-card__body">
+          <div style="text-align:center"><p class="small-label">Score</p><h4 class="score-value">${rubricObtained()} Marks</h4></div>
+          ${result.rubric.criteria.map((c) => metricRow(c.name, c.obtained, c.max)).join('')}
+        </div>
+      </div>`;
+  }
+
+  // ---------- right: Rubric Score (Overview / Details) ----------
+  function rubricViewHtml() {
+    const r = result.rubric;
+    const overview = `
+      <div data-rb="overview">
+        <div class="bandscore">
+          <p>Score ${rubricObtained()} Marks</p>
+          <img src="https://demo.heyhi.sg/images/png/elipse-74.png" alt="">
+          <img src="https://demo.heyhi.sg/images/png/notebook.png" alt="">
+        </div>
+        ${r.criteria.map((c, i) => `
+          <div class="ie-card">
+            <div class="ie-card__body">
+              <div style="margin:6px 0"><p class="small-label">COMPONENT ${i + 1}</p><h4 class="h5">${escapeHtml(c.name)}</h4></div>
+              <div style="margin-top:12px">${metricRow(c.name, c.obtained, c.max)}</div>
+            </div>
+          </div>`).join('')}
+        <div style="margin-top:6px; text-align:center"><button class="link-btn" type="button" data-rb-tab="detail" style="padding:8px 16px">See Details</button></div>
+      </div>`;
+    const details = `
+      <div data-rb="detail" hidden>
+        <button class="btn-outline" type="button" data-expand-all>See all metrics</button>
+        ${r.criteria.map((c, i) => `
+          <div class="detail-component">
+            <p class="small-label">COMPONENT ${i + 1}</p>
+            <h4 class="h5">${escapeHtml(r.name)}</h4>
+            <p class="small-label" style="margin:12px 0">METRICS LIST</p>
+            <button class="btn-collapse" type="button" aria-expanded="false" data-collapse>
+              <span>${escapeHtml(c.name)}</span>${ICON_CHEVRON}
+            </button>
+            <div class="collapse-body" hidden>
+              <div class="collapse-selects">
+                <div><label>Remark Style</label><select class="form-select"><option>Simplified</option><option>Detailed</option></select></div>
+                <div><label>Language</label>${languageSelect()}</div>
+              </div>
+              <p>${escapeHtml(c.remark)}</p>
+              <div class="base-card"><b>${c.obtained} Marks</b><p>${escapeHtml(c.levels.find(([range]) => range === bandOf(c))[1])}</p></div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    return `
+      <div>
+        <p class="small-label">Rubrics Name</p>
+        <h4 class="h5">${escapeHtml(r.name)}</h4>
+      </div>
+      <ul class="ie-nav" role="tablist">
+        <li style="flex:1"><button type="button" role="tab" data-rb-tab="overview" aria-selected="true" style="width:100%">Overview</button></li>
+        <li style="flex:1"><button type="button" role="tab" data-rb-tab="detail" aria-selected="false" style="width:100%">Details</button></li>
+      </ul>
+      ${overview}${details}`;
+  }
+
+  // ---------- right: Speaker Verification (added view) ----------
+  function verificationViewHtml(q) {
+    const v = result.verification;
+    const match = v.matches[q.number];
+    return `
+      <div class="ie-card">
+        <div class="ie-card__header"><h4>Speaker Verification</h4></div>
+        <div class="ie-card__body">
+          <div class="sv-match">
+            <p class="small-label">Voice-profile match · Question ${escapeHtml(q.number)}</p>
+            <h4 class="score-value">${match}%</h4>
+            <span class="sv-badge sv-badge--pass">✓ Same speaker detected</span>
+          </div>
+          <p class="sv-note">Every answer was compared with the voice sample recorded before the test: “${escapeHtml(v.phrase)}”</p>
+        </div>
+      </div>
+
+      <div class="ie-card">
+        <div class="ie-card__header"><h4>Match by Question</h4></div>
+        <div class="ie-card__body">
+          ${result.questions.map((item) => metricRow(item.label, v.matches[item.number], 100, ' progress--green').replace(`${v.matches[item.number]}/100`, `${v.matches[item.number]}%`)).join('')}
+          <p class="sv-note">Pass threshold: ${v.threshold}% match</p>
+        </div>
+      </div>
+
+      <div class="ie-card">
+        <div class="ie-card__header"><h4>Session Checks</h4></div>
+        <div class="ie-card__body">
+          <div class="check-row"><span>Input device</span><b>Physical microphone ✓</b></div>
+          <div class="check-row"><span>Recording start</span><b>Auto-start within 5 s ✓</b></div>
+          <div class="check-row"><span>Natural room noise</span><b>−42 dB detected ✓</b></div>
+          <div class="check-row"><span>Digital-silence risk</span><b>Low ✓</b></div>
+        </div>
+      </div>`;
+  }
+
+  // ---------- render ----------
+  const PANEL_TITLES = { summary: 'Score Summary', rubric: 'Rubric Score', verification: 'Speaker Verification' };
+
+  function renderShell() {
+    $('quizTitle').textContent = result.title;
+    $('statusPill').textContent = result.status;
+    const pct = Math.round((rubricObtained() / rubricMax()) * 100);
+    $('marksPill').innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" stroke-linecap="round" /></svg>
+      Score: ${rubricObtained()}/${rubricMax()} Marks (${pct}%)`;
+    $('qrail').innerHTML = result.questions.map((q, i) => `
+      <div class="step" data-index="${i}">
+        <div class="step__circle" role="button" tabindex="0" aria-label="${escapeHtml(q.label)}">${q.number}</div>
+        <div class="step__line"></div>
+      </div>`).join('');
+    $('qMenu').innerHTML = result.questions.map((q, i) => `
+      <li><button type="button" role="option" data-index="${i}">Question ${q.number}</button></li>`).join('');
+    $('paneRubrics').innerHTML = rubricsPaneHtml();
+    $('viewSummary').innerHTML = summaryViewHtml();
+    $('viewRubric').innerHTML = rubricViewHtml();
+  }
+
+  function render() {
+    const q = result.questions[current];
+    $('tabQuestion').textContent = `Question ${q.number}`;
+    $('paneQuestion').innerHTML = questionPaneHtml(q);
+    $('qSwitchLabel').textContent = `Q${q.number}`;
+    $('viewVerification').innerHTML = verificationViewHtml(q);
+    document.querySelectorAll('.step').forEach((s, i) => s.classList.toggle('step--active', i === current));
+    document.querySelectorAll('#qMenu button').forEach((b, i) => b.setAttribute('aria-current', String(i === current)));
+  }
+
+  function showView(view) {
+    document.querySelectorAll('.ie-nav-score button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.view === view)));
+    document.querySelectorAll('.view').forEach((v) => { v.hidden = v.dataset.view !== view; });
+    $('panelTitle').textContent = PANEL_TITLES[view];
+    $('panelScroll').scrollTop = 0;
+    $('panel').hidden = false;
+  }
+
+  function showRubricTab(name) {
+    document.querySelectorAll('[data-rb-tab][role="tab"]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.rbTab === name)));
+    document.querySelectorAll('[data-rb]').forEach((p) => { p.hidden = p.dataset.rb !== name; });
+  }
+
+  function closeMenu() { $('qMenu').hidden = true; $('qSwitch').setAttribute('aria-expanded', 'false'); }
+
+  function selectQuestion(index) {
+    current = index;
+    closeMenu();
+    render();
+  }
+
+  // ---------- wiring ----------
+  document.addEventListener('DOMContentLoaded', () => {
+    renderShell();
+    render();
+    if (window.matchMedia('(max-width: 900px)').matches) $('panel').hidden = true;
+
+    $('qrail').addEventListener('click', (e) => {
+      const step = e.target.closest('.step');
+      if (step) selectQuestion(Number(step.dataset.index));
+    });
+    $('qrail').addEventListener('keydown', (e) => {
+      const step = e.target.closest('.step');
+      if (step && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); selectQuestion(Number(step.dataset.index)); }
+    });
+    $('qMenu').addEventListener('click', (e) => {
+      const item = e.target.closest('button[data-index]');
+      if (item) selectQuestion(Number(item.dataset.index));
+    });
+    $('qSwitch').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = $('qMenu').hidden;
+      $('qMenu').hidden = !open;
+      $('qSwitch').setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e) => { if (!e.target.closest('#qMenu')) closeMenu(); });
+
+    document.querySelectorAll('.tab').forEach((tab) => tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach((t) => {
+        const on = t === tab;
+        t.classList.toggle('tab--active', on);
+        t.setAttribute('aria-selected', String(on));
+      });
+      document.querySelectorAll('[data-pane]').forEach((p) => { p.hidden = p.dataset.pane !== tab.dataset.tab; });
+    }));
+
+    document.querySelectorAll('.ie-nav-score button').forEach((btn) => btn.addEventListener('click', () => showView(btn.dataset.view)));
+    $('panelClose').addEventListener('click', () => { $('panel').hidden = true; });
+    $('btnFeedback').addEventListener('click', () => showToast('Send Feedback — demo placeholder'));
+
+    // Delegated: question card and panel views are re-rendered.
+    document.body.addEventListener('click', (e) => {
+      const t = e.target;
+      if (t.closest('[data-see-result]')) showView('summary');
+      else if (t.closest('[data-goto]')) showView(t.closest('[data-goto]').dataset.goto);
+      else if (t.closest('[data-rb-tab]')) showRubricTab(t.closest('[data-rb-tab]').dataset.rbTab);
+      else if (t.closest('[data-collapse]')) {
+        const btn = t.closest('[data-collapse]');
+        const open = btn.getAttribute('aria-expanded') !== 'true';
+        btn.setAttribute('aria-expanded', String(open));
+        btn.nextElementSibling.hidden = !open;
+      } else if (t.closest('[data-expand-all]')) {
+        document.querySelectorAll('[data-collapse]').forEach((btn) => { btn.setAttribute('aria-expanded', 'true'); btn.nextElementSibling.hidden = false; });
+      } else if (t.closest('[data-hear]')) showToast('Examiner audio — demo placeholder');
+      else if (t.closest('[data-play]')) showToast('No recording file in this prototype');
+    });
+  });
+})();
+</script>
+</body>
+</html>
