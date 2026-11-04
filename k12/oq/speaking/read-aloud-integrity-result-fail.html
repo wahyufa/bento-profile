@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HeyHi — Read Aloud Result (verification failed)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
+<style>
+  /* Clone of the live read-aloud result page
+     (demo.heyhi.sg/onlinequizv2/quiz-result-speech-read-aloud), measured
+     from its computed styles. One question is shown at a time; the left
+     rail and the panel's "Q1A" dropdown switch between them. The right
+     tool rail adds a Speaker Verification view next to the live page's
+     Score Summary. Shell assets are shared with igcse-oral-*.html. */
+  :root {
+    --amber: #fec53c;
+    --blue: #0fb0f8;
+    --blue-ink: #0a93d4;
+    --green: #16d8a7;
+    --green-soft: #e3faf4;
+    --red: #ff1744;
+    --slate: #708eb1;
+
+    --ink: #12263f;
+    --ink-2: #2d415f;
+    --ink-soft: #616161;
+    --muted: #95aac9;
+    --line: #e0e0e0;
+    --page-bg: #f5f7f9;
+    --card: #ffffff;
+    --track: #edf2f9;
+    --highlight: #f6f8fa;
+
+    --shadow-card: 0 1px 3px rgba(33, 43, 54, 0.06), 0 8px 24px rgba(33, 43, 54, 0.05);
+    --font-body: "Poppins", system-ui, sans-serif;
+    --font-mont: "Montserrat", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  button { font-family: inherit; font-size: inherit; }
+  html, body { height: 100%; }
+  body {
+    font-family: var(--font-body); color: var(--ink); background: var(--page-bg);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* ---------- Top bar + sub bar ---------- */
+  .topbar {
+    position: relative; flex: 0 0 auto; height: 55px;
+    background: var(--amber) url("assets/topbar-pattern.png") repeat;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .topbar__title { font-weight: 700; font-size: 20px; color: #fff; }
+  .btn-exit {
+    position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--blue); color: #fff; text-decoration: none;
+    font-weight: 700; font-size: 16px; padding: 7px 16px; border-radius: 16px;
+  }
+  .subbar {
+    flex: 0 0 auto; min-height: 84px;
+    display: flex; align-items: center; justify-content: flex-end; gap: 14px; padding: 0 70px 0 24px;
+    background: #fff url("assets/result-subbar-pattern.png") repeat;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 8px; background: #fff;
+    border: 2px solid var(--green); color: var(--green);
+    font-family: var(--font-mont); font-weight: 700; font-size: 15px;
+    padding: 9px 18px; border-radius: 16px; white-space: nowrap;
+  }
+  .pill--info { border-color: var(--blue); color: var(--blue); }
+  .pill--flag { border-color: var(--red); color: var(--red); }
+  .pill[hidden] { display: none; }
+
+  /* ---------- Stage ---------- */
+  .stage { flex: 1 1 auto; display: flex; min-height: 0; }
+
+  .qrail {
+    flex: 0 0 58px; display: flex; flex-direction: column; align-items: center;
+    padding: 18px 0; gap: 20px; background: #fff; overflow-y: auto; scrollbar-width: none;
+  }
+  .qrail::-webkit-scrollbar { display: none; }
+  /* Node colour carries the result, as on the live page: red = not
+     passed, green = passed. */
+  .qnode {
+    position: relative; width: 37px; height: 37px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; background: var(--red); border: 0; box-shadow: 0 0 0 3px #fff;
+    font-size: 14px; cursor: pointer; transition: transform 0.12s ease;
+  }
+  .qnode--pass { background: var(--green); }
+  .qnode:hover { transform: scale(1.08); }
+  .qnode--active { outline: 3px solid rgba(15, 176, 248, 0.5); outline-offset: 2px; }
+  /* Flagged answer: grey node (mark on hold) with a red "!" badge */
+  .qnode--flag { background: #98a2ad; }
+  .qnode--flag::before {
+    content: "!"; position: absolute; top: -4px; right: -5px;
+    width: 16px; height: 16px; border-radius: 50%; border: 2px solid #fff;
+    background: var(--red); color: #fff; font-size: 10px; font-weight: 700; line-height: 12px; text-align: center;
+  }
+  .qnode:not(:last-child)::after {
+    content: ""; position: absolute; top: 100%; left: 50%; width: 2px; height: 20px;
+    background: #e8e8e8; transform: translateX(-50%);
+  }
+
+  .main { flex: 1 1 auto; min-width: 0; overflow-y: auto; padding: 16px 24px; scrollbar-width: none; }
+  .main::-webkit-scrollbar { display: none; }
+
+  .tabs { display: flex; background: #e8e8e8; border-radius: 16px 16px 0 0; padding: 8px 46px 0; }
+  .tab { padding: 10px 24px; border-radius: 8px 8px 0 0; background: #fff; color: var(--blue); font-weight: 700; font-size: 16px; }
+  .card {
+    background: var(--card) url("assets/result-card-texture.jpg") repeat;
+    border-radius: 0 0 16px 16px; box-shadow: var(--shadow-card); padding: 24px 24px 32px;
+  }
+
+  .prompt {
+    background: #f6f8fa; border-radius: 24px; padding: 24px 12px 28px; text-align: center;
+    box-shadow: 0 4px 16px rgba(18, 38, 63, 0.05);
+  }
+  .prompt__head { display: flex; align-items: center; justify-content: center; gap: 16px; }
+  .prompt__head img { width: 72px; height: 72px; object-fit: contain; }
+  .btn-hear {
+    display: inline-flex; align-items: center; gap: 10px; height: 44px; padding: 7px 16px;
+    border: 2px solid var(--blue); border-radius: 16px; background: #fff;
+    color: var(--blue); font-weight: 700; font-size: 16px; cursor: pointer;
+  }
+  .prompt__text { margin-top: 24px; font-weight: 700; font-size: 28px; color: var(--ink-2); line-height: 1.3; }
+
+  .answers__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 28px; }
+  .answers__label { font-weight: 700; font-size: 16px; color: var(--ink-soft); }
+  .btn-see {
+    display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 12px 24px;
+    border: 0; border-radius: 16px; background: #0cb1f8; color: #fff; font-weight: 700; font-size: 16px; cursor: pointer;
+  }
+  .ai-review {
+    display: flex; align-items: center; justify-content: center; gap: 12px; margin: 16px 0;
+    padding: 12px; border: 1px solid #f8eac4; border-radius: 12px; background: #fffaec;
+    color: var(--ink-soft); font-size: 16px;
+  }
+  .ai-review img { width: 24px; height: 24px; }
+
+  /* Stand-in for the native <audio> control; the prototype has no files. */
+  .player {
+    display: inline-flex; align-items: center; gap: 12px; padding: 10px 18px;
+    background: #f1f3f4; border-radius: 999px; font-size: 13px; color: #202124;
+  }
+  .player__btn { border: 0; background: none; cursor: pointer; display: grid; place-items: center; color: #202124; }
+  .player__track { width: 120px; height: 4px; border-radius: 4px; background: #c4c7c5; }
+  .marks { margin-top: 28px; font-weight: 600; font-size: 18px; color: var(--ink-soft); }
+  .marks b { font-weight: 600; color: var(--ink-2); }
+  .marks b.marks--hold { color: var(--red); }
+
+  .flag-banner {
+    display: flex; align-items: flex-start; gap: 12px; margin: 0 0 16px;
+    padding: 14px 16px; border: 1px solid #ffc2cd; border-radius: 12px; background: #fff0f3; color: var(--red);
+  }
+  .flag-banner svg { flex: 0 0 auto; margin-top: 1px; }
+  .flag-banner b { display: block; font-size: 15px; }
+  .flag-banner span { display: block; margin-top: 2px; font-size: 14px; line-height: 1.55; color: var(--ink-soft); }
+  .flag-banner button { margin-top: 8px; padding: 0; border: 0; background: none; color: var(--red); font-weight: 700; font-size: 14px; text-decoration: underline; cursor: pointer; }
+  .send-feedback { display: block; margin: 14px 4px 0 auto; border: 0; background: none; color: var(--blue); font-weight: 700; font-size: 14px; cursor: pointer; }
+
+  /* ---------- Panel ---------- */
+  .panel {
+    flex: 0 0 502px; display: flex; flex-direction: column; min-height: 0;
+    background: var(--page-bg); border-left: 1px solid #e8e8e8;
+  }
+  .panel[hidden] { display: none; }
+  .panel__head {
+    position: relative; flex: 0 0 56px; display: flex; align-items: center; gap: 16px;
+    padding: 12px 16px; background: var(--slate); color: #fff;
+  }
+  .q-switch {
+    display: inline-flex; align-items: center; gap: 8px; border: 0; background: none;
+    color: #fff; font-weight: 700; font-size: 20px; cursor: pointer;
+  }
+  .q-switch svg { border: 1.5px solid #fff; border-radius: 6px; padding: 1px 4px; width: 26px; height: 16px; }
+  .panel__title { flex: 1 1 auto; font-weight: 700; font-size: 20px; }
+  .panel__close { border: 0; background: none; color: #fff; cursor: pointer; display: grid; place-items: center; }
+  .q-menu {
+    position: absolute; top: 52px; left: 12px; z-index: 5; min-width: 150px; padding: 8px 0 12px;
+    list-style: none; background: #fff; border: 1px solid rgba(18, 38, 63, 0.1); border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(18, 38, 63, 0.12);
+  }
+  .q-menu button { width: 100%; padding: 6px 24px; border: 0; background: none; text-align: left; color: #6e84a3; font-size: 15px; cursor: pointer; }
+  .q-menu button:hover, .q-menu button[aria-current="true"] { color: var(--blue); }
+
+  .panel__scroll { flex: 1 1 auto; overflow-y: auto; padding: 4px 12px 24px; scrollbar-width: none; }
+  .panel__scroll::-webkit-scrollbar { display: none; }
+  .panel__view[hidden] { display: none; }
+
+  .ie-card { margin-top: 16px; background: #fff; border: 1px solid var(--line); border-radius: 16px; }
+  .ie-card__head { display: flex; align-items: center; gap: 12px; padding: 16px; border-bottom: 1px solid var(--line); }
+  .ie-card__head h4 { flex: 1 1 auto; font-weight: 700; font-size: 20px; color: var(--ink); }
+  .ie-card__body { padding: 16px; }
+
+  .fb-label { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; color: var(--ink); margin-bottom: 16px; }
+  .fb-label img { width: 18px; height: 18px; }
+  .highlight-box { padding: 16px; border-radius: 16px; background: var(--highlight); text-align: center; font-size: 16px; line-height: 1.8; }
+  .word { font-weight: 700; }
+  .word--ok { color: var(--green); }
+  .word--miss { color: var(--red); text-decoration: underline; }
+  .fb-message { margin-top: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; font-size: 15px; line-height: 1.6; color: var(--ink); }
+  .fb-legend { display: flex; justify-content: center; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--ink-soft); }
+  .fb-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+
+  .overall { text-align: center; margin-bottom: 12px; }
+  .overall small { display: block; font-weight: 700; font-size: 14px; color: var(--ink-soft); line-height: 17px; }
+  .overall b { font-weight: 700; font-size: 20px; color: var(--ink); }
+  .metric { display: flex; align-items: center; gap: 12px; margin: 8px 0; }
+  .metric__name { flex: 0 0 48%; font-size: 16px; line-height: 22px; color: var(--ink-soft); }
+  .metric__bar { flex: 1 1 auto; height: 11px; border-radius: 200px; background: var(--track); overflow: hidden; }
+  .metric__bar i { display: block; height: 100%; border-radius: 200px; background: var(--blue); }
+  .metric__val { flex: 0 0 40px; text-align: right; font-size: 15px; color: var(--ink-soft); }
+
+  /* Speaker verification view */
+  .sv-verdict { display: flex; align-items: center; gap: 14px; }
+  .sv-ring {
+    flex: 0 0 auto; width: 66px; height: 66px; border-radius: 50%; display: grid; place-items: center;
+    background: conic-gradient(var(--ring) calc(var(--pct) * 1%), #e8edf3 0);
+  }
+  .sv-ring span { width: 52px; height: 52px; border-radius: 50%; background: #fff; display: grid; place-items: center; font-weight: 700; font-size: 15px; color: var(--ink); }
+  .sv-verdict__title { font-weight: 700; font-size: 16px; color: var(--ink); }
+  .sv-verdict__note { margin-top: 2px; font-size: 13px; line-height: 1.5; color: var(--ink-soft); }
+  .sv-status { display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .sv-status--pass { background: var(--green-soft); color: var(--green); }
+  .sv-status--fail { background: #ffe8ec; color: var(--red); }
+  .sv-phrase { font-style: italic; font-size: 15px; color: var(--ink); margin-bottom: 12px; }
+  .metric__bar.sv i { background: var(--green); }
+  .metric__bar.sv.low i { background: var(--red); }
+  .metric--current .metric__name { color: var(--ink); font-weight: 700; }
+  .sv-threshold { margin-top: 10px; font-size: 13px; color: var(--ink-soft); }
+
+  .ie-card--alert { border-color: #ffc2cd; }
+  .ie-card--alert .ie-card__head h4 { color: var(--red); }
+  .mm-reasons { margin: 0 0 16px 18px; font-size: 14px; line-height: 1.6; color: var(--ink); }
+  .mm-label { margin-bottom: 8px; font-weight: 700; font-size: 13px; color: var(--ink-soft); }
+  .mm-timeline { position: relative; height: 12px; border-radius: 200px; background: var(--green); overflow: hidden; }
+  .mm-timeline i { position: absolute; top: 0; bottom: 0; background: var(--red); }
+  .mm-scale { display: flex; justify-content: space-between; margin-top: 4px; font-size: 12px; color: var(--ink-soft); }
+  .mm-next { margin-top: 16px; padding: 12px 14px; border-left: 3px solid var(--slate); border-radius: 8px; background: #f1f5fa; font-size: 13.5px; line-height: 1.6; color: var(--ink-soft); }
+  .mm-next b { display: block; color: var(--ink); }
+  .check-row { display: flex; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--line); font-size: 14px; color: var(--ink-soft); }
+  .check-row:last-child { border-bottom: 0; }
+  .check-row b { color: var(--green); font-weight: 700; text-align: right; }
+
+  /* ---------- Tool rail (live page's icon column) ---------- */
+  .tool-rail {
+    flex: 0 0 71px; display: flex; flex-direction: column; align-items: center; gap: 16px;
+    padding: 8px; background: var(--page-bg); border-left: 1px solid #d4d4d4;
+  }
+  .tool-btn {
+    width: 58px; height: 52px; border-radius: 12px; display: grid; place-items: center;
+    border: 0; background: transparent; color: var(--muted); cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .tool-btn:hover:not(.tool-btn--active) { color: var(--blue); }
+  .tool-btn--active { background: var(--blue); color: #fff; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 26px; z-index: 300; transform: translate(-50%, 12px);
+    padding: 10px 18px; border-radius: 999px; background: var(--ink); color: #fff;
+    font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s;
+  }
+  .toast--show { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- Tablet & mobile: panel becomes a bottom sheet ---------- */
+  @media (max-width: 900px) {
+    .stage { flex-direction: column; }
+    .subbar { justify-content: flex-start; padding: 12px 16px; min-height: 0; flex-wrap: wrap; }
+    .qrail { flex: 0 0 auto; flex-direction: row; gap: 18px; padding: 10px 16px; overflow-x: auto; border-bottom: 1px solid #e8e8e8; }
+    .qnode:not(:last-child)::after { top: 50%; left: 100%; width: 18px; height: 2px; transform: translateY(-50%); }
+    .main { padding: 12px; }
+    .tabs { padding: 6px 12px 0; }
+    .card { padding: 16px 14px 24px; }
+    .prompt__text { font-size: 22px; }
+    .panel {
+      position: fixed; inset: auto 0 0 0; height: 78vh; z-index: 200; border-left: 0;
+      border-radius: 16px 16px 0 0; overflow: hidden; box-shadow: 0 -6px 32px rgba(0, 0, 0, 0.22);
+    }
+    .tool-rail { display: none; }
+    .panel:not([hidden]) ~ .tool-rail {
+      display: flex; flex-direction: row; position: fixed; right: 12px; bottom: calc(78vh + 10px);
+      z-index: 201; padding: 0; gap: 8px; background: none; border: 0;
+    }
+    .tool-btn { width: 44px; height: 44px; background: #fff; box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18); }
+    .tool-btn--active { background: var(--blue); }
+  }
+  @media (max-width: 600px) {
+    .topbar { justify-content: flex-start; padding: 0 12px; height: 48px; }
+    .topbar__title { font-size: 15px; }
+    .btn-exit { right: 12px; font-size: 13px; padding: 6px 12px; }
+    .pill { font-size: 12px; padding: 6px 12px; }
+    .answers__head { flex-wrap: wrap; }
+    .metric__name { flex-basis: 42%; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+  <header class="topbar">
+    <h1 class="topbar__title" id="quizTitle">Speech for Teens</h1>
+    <a class="btn-exit" href="igcse-oral-integrity.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+      Exit
+    </a>
+  </header>
+
+  <div class="subbar">
+    <span class="pill" id="statusPill">All Questions Marked</span>
+    <span class="pill pill--flag" id="flagPill" hidden></span>
+    <span class="pill pill--info" id="marksPill">—</span>
+  </div>
+
+  <div class="stage">
+    <nav class="qrail" id="qrail" aria-label="Questions"></nav>
+
+    <main class="main">
+      <div class="tabs"><span class="tab" id="qTab">Question 1A</span></div>
+      <section class="card" id="qCard"></section>
+      <button class="send-feedback" id="btnSendFeedback" type="button">Send Feedback</button>
+    </main>
+
+    <aside class="panel" id="panel" aria-label="Report">
+      <header class="panel__head">
+        <button class="q-switch" id="qSwitch" type="button" aria-haspopup="listbox" aria-expanded="false">
+          <span id="qSwitchLabel">Q1A</span>
+          <svg viewBox="0 0 24 14" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 4l5 5 5-5" /></svg>
+        </button>
+        <span class="panel__title" id="panelTitle">Score Summary</span>
+        <button class="panel__close" id="panelClose" type="button" aria-label="Close report panel">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" /></svg>
+        </button>
+        <ul class="q-menu" id="qMenu" role="listbox" hidden></ul>
+      </header>
+      <div class="panel__scroll" id="panelScroll">
+        <div class="panel__view" data-view="summary" id="viewSummary"></div>
+        <div class="panel__view" data-view="verification" id="viewVerification" hidden></div>
+      </div>
+    </aside>
+
+    <nav class="tool-rail" aria-label="Report views">
+      <!-- Medal icon is the live page's own SVG -->
+      <button class="tool-btn tool-btn--active" type="button" data-view="summary" title="Score Summary" aria-label="Score Summary" aria-pressed="true">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z" /><path d="M8.21 13.89 7 23l5-3 5 3-1.21-9.12" /></svg>
+      </button>
+      <button class="tool-btn" type="button" data-view="verification" title="Speaker Verification" aria-label="Speaker Verification" aria-pressed="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6z" stroke-linejoin="round" /><path d="M9 10.5v3M12 9v6M15 10.5v3" stroke-linecap="round" /></svg>
+      </button>
+    </nav>
+  </div>
+
+  <div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Result data ----------
+  // Prompts are the live "Speech for Teens" quiz (quiz_id=4054224). Scores,
+  // word flags and voice matches are sample values for the prototype.
+  // `words` marks each word of the prompt: true = pronounced correctly.
+  const PASS_MARK = 70;            // overall % that earns the question's mark
+  const result = {
+    title: 'Speech for Teens',
+    status: 'All Questions Marked',
+    verification: {
+      threshold: 80,
+      phrase: 'The purple elephant danced on the ceiling.',
+      sampleDuration: '0:05',
+    },
+    questions: [
+      {
+        id: '1A', text: 'Technology', duration: '0:04', match: 97,
+        words: [false],
+        scores: { Accuracy: 62, Pronunciation: 58, Articulation: 65, Fluency: 70, Prosody: 60 },
+        feedback: 'The stress belongs on the second syllable: tech-NOL-o-gy. Try saying it slowly, then at normal speed.',
+      },
+      {
+        id: '1B', text: 'Environment', duration: '0:03', match: 96,
+        words: [true],
+        scores: { Accuracy: 88, Pronunciation: 85, Articulation: 90, Fluency: 84, Prosody: 80 },
+        feedback: 'Clear and well paced. Every syllable of en-VI-ron-ment was easy to hear.',
+      },
+      {
+        id: '1C', text: 'Confident', duration: '0:03', match: 98,
+        words: [true],
+        scores: { Accuracy: 92, Pronunciation: 90, Articulation: 88, Fluency: 91, Prosody: 86 },
+        feedback: 'Great job. The first syllable is stressed correctly: CON-fi-dent.',
+      },
+      {
+        id: '1D', text: 'Responsible', duration: '0:04', match: 95,
+        words: [false],
+        scores: { Accuracy: 64, Pronunciation: 60, Articulation: 66, Fluency: 72, Prosody: 62 },
+        feedback: 'The middle syllable was swallowed. Make "SPON" clearly louder: re-SPON-si-ble.',
+      },
+      {
+        id: '1E', text: 'Six sleek swans swam swiftly south.', duration: '0:06', match: 94,
+        words: [true, true, false, true, false, true],
+        scores: { Accuracy: 74, Pronunciation: 70, Articulation: 68, Fluency: 76, Prosody: 72 },
+        feedback: 'Watch the "sw" blend in "swans" and "swiftly". Round your lips for the "w" before moving to the vowel.',
+      },
+      {
+        id: '1F', text: 'Brisk brave bears bring bright blue berries.', duration: '0:07', match: 62,
+        words: [true, false, true, true, false, true, true],
+        scores: { Accuracy: 71, Pronunciation: 69, Articulation: 73, Fluency: 75, Prosody: 70 },
+        feedback: 'Keep the "br" blend crisp in "brave" and "bright". Press your lips together before releasing the sound.',
+        // Sample of a failed verification: why it was flagged and which part
+        // of the recording did not match (seconds from the start).
+        mismatch: {
+          reasons: [
+            'Voice pitch and timbre differ from the voice sample',
+            'A second voice was detected from 0:02',
+            'Speaking rate changed sharply mid-answer',
+          ],
+          segments: [{ from: 2, to: 7 }],
+        },
+      },
+    ],
+  };
+
+  // ---------- helpers ----------
+  const $ = (id) => document.getElementById(id);
+  const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const overallOf = (q) => {
+    const values = Object.values(q.scores);
+    return Math.round(values.reduce((a, b) => a + b, 0) / values.length);
+  };
+  const passed = (q) => overallOf(q) >= PASS_MARK;
+  const verified = (q) => q.match >= result.verification.threshold;
+  // A flagged answer keeps its score, but its mark is held until a
+  // teacher reviews it, so it is not counted in the total.
+  const markOf = (q) => (verified(q) && passed(q) ? 1 : 0);
+  const toSeconds = (t) => { const [m, s] = t.split(':').map(Number); return m * 60 + s; };
+
+  let toastTimer;
+  function showToast(text) {
+    const t = $('toast');
+    t.textContent = text;
+    t.classList.add('toast--show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove('toast--show'), 1800);
+  }
+
+  // ---------- state ----------
+  let current = 0;
+  let view = 'summary';
+
+  // ---------- left: question card ----------
+  function questionCardHtml(q) {
+    const flagged = !verified(q);
+    const marks = flagged
+      ? `<p class="marks">Marks obtained : <b class="marks--hold">On hold (pending teacher review)</b></p>`
+      : `<p class="marks">Marks obtained : <b>${markOf(q)} Mark</b></p>`;
+    return `
+      <div class="prompt">
+        <div class="prompt__head">
+          <img src="https://elb-onlinequiz.heyhi.sg/images/jen-head.png" alt="Jen, the speaking coach">
+          <button class="btn-hear" type="button" data-hear>Hear
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4V5zM15.5 8.5a5 5 0 0 1 0 7M19 5a10 10 0 0 1 0 14" /></svg>
+          </button>
+        </div>
+        <h3 class="prompt__text">${escapeHtml(q.text)}</h3>
+      </div>
+
+      <div class="answers__head">
+        <h2 class="answers__label">Answers:</h2>
+        <button class="btn-see" type="button" data-see-result>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10 2l1.8 5.2L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.8zM18 13l.9 2.6 2.6.9-2.6.9L18 20l-.9-2.6-2.6-.9 2.6-.9z" /></svg>
+          See Result
+        </button>
+      </div>
+      <div class="ai-review">
+        <span>This answer has been reviewed by AI!</span>
+        <img src="https://elb-onlinequiz.heyhi.sg/images/adaptive-learning/ai-icon.png" alt="">
+      </div>
+      ${flagged ? `
+      <div class="flag-banner" role="alert">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6z" /><path d="M12 8v5M12 16.5v.5" /></svg>
+        <div>
+          <b>Speaker verification failed (${q.match}% match)</b>
+          <span>This voice does not match the sample recorded before the quiz. The answer is flagged and its mark is on hold until a teacher reviews it.</span>
+          <button type="button" data-goto="verification">View details</button>
+        </div>
+      </div>` : ''}
+      <div class="player" aria-label="Recorded answer">
+        <button class="player__btn" type="button" data-play aria-label="Play recording">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4v16l14-8z" /></svg>
+        </button>
+        <span>0:00 / ${escapeHtml(q.duration)}</span>
+        <span class="player__track"></span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 8v8a4.5 4.5 0 0 0 2.5-4z" /></svg>
+      </div>
+      ${marks}`;
+  }
+
+  // ---------- right: Score Summary view ----------
+  function summaryViewHtml(q) {
+    const tokens = q.text.split(' ');
+    const words = tokens.map((w, i) => `<span class="word ${q.words[i] ? 'word--ok' : 'word--miss'}">${escapeHtml(w)}</span>`).join(' ');
+    return `
+      <section class="ie-card">
+        <div class="ie-card__head"><h4>Speech Analysis</h4></div>
+        <div class="ie-card__body">
+          <p class="fb-label"><img src="https://elb-onlinequiz.heyhi.sg/images/svg/feedback.svg" alt="">Feedback</p>
+          <div class="highlight-box">${words}</div>
+          <div class="fb-legend"><span><i style="background:var(--green)"></i>Correct</span><span><i style="background:var(--red)"></i>Needs practice</span></div>
+          <p class="fb-message">${escapeHtml(q.feedback)}</p>
+        </div>
+      </section>
+
+      <section class="ie-card">
+        <div class="ie-card__head"><h4>Speech Practice Score</h4></div>
+        <div class="ie-card__body">
+          <div class="overall"><small>Overall Score</small><b>${overallOf(q)}%</b></div>
+          ${Object.entries(q.scores).map(([name, value]) => `
+            <div class="metric">
+              <span class="metric__name">${escapeHtml(name)}</span>
+              <span class="metric__bar"><i style="width:${value}%"></i></span>
+              <span class="metric__val">${value}%</span>
+            </div>`).join('')}
+        </div>
+      </section>`;
+  }
+
+  // ---------- right: Speaker Verification view ----------
+  function verificationViewHtml(q) {
+    const v = result.verification;
+    const ok = verified(q);
+    return `
+      <section class="ie-card">
+        <div class="ie-card__head"><h4>Speaker Verification</h4></div>
+        <div class="ie-card__body">
+          <div class="sv-verdict">
+            <div class="sv-ring" style="--pct:${q.match}; --ring:${ok ? 'var(--green)' : 'var(--red)'}"><span>${q.match}%</span></div>
+            <div>
+              <p class="sv-verdict__title">${ok ? 'Same speaker as the voice sample' : 'Voice does not match the sample'}</p>
+              <p class="sv-verdict__note">Question ${escapeHtml(q.id)} was compared with the voice sample recorded before the quiz.</p>
+              <span class="sv-status ${ok ? 'sv-status--pass' : 'sv-status--fail'}">${ok ? 'Verified' : 'Flagged for review'}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      ${!ok && q.mismatch ? mismatchHtml(q) : ''}
+
+      <section class="ie-card">
+        <div class="ie-card__head"><h4>Voice Sample</h4></div>
+        <div class="ie-card__body">
+          <p class="sv-phrase">“${escapeHtml(v.phrase)}”</p>
+          <div class="player" aria-label="Voice sample">
+            <button class="player__btn" type="button" data-play aria-label="Play voice sample">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4v16l14-8z" /></svg>
+            </button>
+            <span>0:00 / ${escapeHtml(v.sampleDuration)}</span>
+            <span class="player__track"></span>
+          </div>
+        </div>
+      </section>
+
+      <section class="ie-card">
+        <div class="ie-card__head"><h4>Match by Question</h4></div>
+        <div class="ie-card__body">
+          ${result.questions.map((item) => `
+            <div class="metric${item === q ? ' metric--current' : ''}">
+              <span class="metric__name">Question ${escapeHtml(item.id)}</span>
+              <span class="metric__bar sv${verified(item) ? '' : ' low'}"><i style="width:${item.match}%"></i></span>
+              <span class="metric__val">${item.match}%</span>
+            </div>`).join('')}
+          <p class="sv-threshold">Pass threshold: ${v.threshold}% match</p>
+        </div>
+      </section>
+
+      <section class="ie-card">
+        <div class="ie-card__head"><h4>Session Checks</h4></div>
+        <div class="ie-card__body">
+          <div class="check-row"><span>Input device</span><b>Physical microphone ✓</b></div>
+          <div class="check-row"><span>Recording start</span><b>Auto-start within 5 s ✓</b></div>
+          <div class="check-row"><span>Natural room noise</span><b>−42 dB detected ✓</b></div>
+          <div class="check-row"><span>Digital-silence risk</span><b>Low ✓</b></div>
+        </div>
+      </section>`;
+  }
+
+  // Failed-verification detail: reasons, where in the answer the voice
+  // stopped matching, and what happens to the mark.
+  function mismatchHtml(q) {
+    const length = toSeconds(q.duration);
+    const segments = q.mismatch.segments.map((s) => `
+      <i style="left:${(s.from / length) * 100}%; width:${((s.to - s.from) / length) * 100}%"></i>`).join('');
+    const ranges = q.mismatch.segments.map((s) => `0:${String(s.from).padStart(2, '0')}–0:${String(s.to).padStart(2, '0')}`).join(', ');
+    return `
+      <section class="ie-card ie-card--alert">
+        <div class="ie-card__head"><h4>Why it was flagged</h4></div>
+        <div class="ie-card__body">
+          <ul class="mm-reasons">${q.mismatch.reasons.map((r) => `<li>${escapeHtml(r)}</li>`).join('')}</ul>
+          <p class="mm-label">Mismatch in the recording</p>
+          <div class="mm-timeline" aria-label="Mismatched part: ${ranges}">${segments}</div>
+          <div class="mm-scale"><span>0:00</span><span>${escapeHtml(q.duration)}</span></div>
+          <div class="mm-next">
+            <b>What happens next</b>
+            The teacher listens to this answer and the voice sample, then either accepts the mark or asks the student to retake the question.
+          </div>
+        </div>
+      </section>`;
+  }
+
+  // ---------- render ----------
+  const PANEL_TITLES = { summary: 'Score Summary', verification: 'Speaker Verification' };
+
+  function renderShell() {
+    $('quizTitle').textContent = result.title;
+    $('statusPill').textContent = result.status;
+    const marks = result.questions.reduce((sum, q) => sum + markOf(q), 0);
+    const total = result.questions.length;
+    const flaggedCount = result.questions.filter((q) => !verified(q)).length;
+    $('marksPill').innerHTML = `
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5v.5" stroke-linecap="round" /></svg>
+      Score: ${marks}/${total} Marks (${Math.round((marks / total) * 100)}%)`;
+    $('flagPill').hidden = flaggedCount === 0;
+    $('flagPill').textContent = `${flaggedCount} Flagged for Review`;
+    $('qrail').innerHTML = result.questions.map((q, i) => `
+      <button class="qnode${passed(q) ? ' qnode--pass' : ''}${verified(q) ? '' : ' qnode--flag'}" type="button" data-index="${i}"
+        aria-label="Question ${q.id}${verified(q) ? '' : ', flagged: speaker not verified'}">${q.id}</button>`).join('');
+    $('qMenu').innerHTML = result.questions.map((q, i) => `
+      <li><button type="button" role="option" data-index="${i}">Question ${q.id}</button></li>`).join('');
+  }
+
+  function render() {
+    const q = result.questions[current];
+    $('qTab').textContent = `Question ${q.id}`;
+    $('qCard').innerHTML = questionCardHtml(q);
+    $('qSwitchLabel').textContent = `Q${q.id}`;
+    $('viewSummary').innerHTML = summaryViewHtml(q);
+    $('viewVerification').innerHTML = verificationViewHtml(q);
+    document.querySelectorAll('.qnode').forEach((n, i) => n.classList.toggle('qnode--active', i === current));
+    document.querySelectorAll('#qMenu button').forEach((b, i) => b.setAttribute('aria-current', String(i === current)));
+  }
+
+  function showView(next) {
+    view = next;
+    document.querySelectorAll('.tool-btn').forEach((b) => {
+      const on = b.dataset.view === view;
+      b.classList.toggle('tool-btn--active', on);
+      b.setAttribute('aria-pressed', String(on));
+    });
+    document.querySelectorAll('.panel__view').forEach((v) => { v.hidden = v.dataset.view !== view; });
+    $('panelTitle').textContent = PANEL_TITLES[view];
+    $('panelScroll').scrollTop = 0;
+    openPanel();
+  }
+
+  function openPanel() { $('panel').hidden = false; }
+  function closeMenu() { $('qMenu').hidden = true; $('qSwitch').setAttribute('aria-expanded', 'false'); }
+
+  function selectQuestion(index) {
+    current = index;
+    closeMenu();
+    render();
+    $('panelScroll').scrollTop = 0;
+  }
+
+  // ---------- wiring ----------
+  document.addEventListener('DOMContentLoaded', () => {
+    renderShell();
+    render();
+    if (window.matchMedia('(max-width: 900px)').matches) $('panel').hidden = true;
+
+    $('qrail').addEventListener('click', (e) => {
+      const node = e.target.closest('.qnode');
+      if (node) selectQuestion(Number(node.dataset.index));
+    });
+    $('qMenu').addEventListener('click', (e) => {
+      const item = e.target.closest('button[data-index]');
+      if (item) selectQuestion(Number(item.dataset.index));
+    });
+    $('qSwitch').addEventListener('click', (e) => {
+      e.stopPropagation();
+      const open = $('qMenu').hidden;
+      $('qMenu').hidden = !open;
+      $('qSwitch').setAttribute('aria-expanded', String(open));
+    });
+    document.addEventListener('click', (e) => { if (!e.target.closest('#qMenu')) closeMenu(); });
+
+    document.querySelectorAll('.tool-btn').forEach((btn) => btn.addEventListener('click', () => showView(btn.dataset.view)));
+    $('panelClose').addEventListener('click', () => { $('panel').hidden = true; });
+
+    // Delegated: the card and panel are re-rendered per question.
+    document.body.addEventListener('click', (e) => {
+      if (e.target.closest('[data-see-result]')) showView('summary');
+      else if (e.target.closest('[data-goto]')) showView(e.target.closest('[data-goto]').dataset.goto);
+      else if (e.target.closest('[data-hear]')) showToast('Model pronunciation — demo placeholder');
+      else if (e.target.closest('[data-play]')) showToast('No recording file in this prototype');
+    });
+    $('btnSendFeedback').addEventListener('click', () => showToast('Send Feedback — demo placeholder'));
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGCSE Oral: Speaking test (integrity)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Montserrat:wght@400;600;700&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  /* Enhancement prototype for the IGCSE oral (speaking) format described in
+     "igcse oral platform requirements.docx". Same tokens and assets as
+     index.html / split.html. Part 2 is the only stage with a card the candidate
+     keeps until the end of the talk, so the card lives in the split layout and
+     the layout collapses to one column everywhere else. */
+  :root{
+    --brand:#0fb0f8;
+    --brand-dark:#0c94d1;
+    --brand-light:#53caff;
+    --topbar-bg:#fec53c;
+    --topbar-bg-dark:#f2ab16;
+    --examiner-bg:#effaff;
+    --student-bg:#f6f8fa;
+    --bubble-border:#e0e0e0;
+    --progress-track:#edf2f9;
+    --heading:#302574;
+    --text:#12263f;
+    --text-muted:#5c6a7e;
+    --text-faint:#8a94a6;
+    --end-red:#f0645c;
+    --success:#16d8a7;
+    --success-soft:#e3faf4;
+    --page-bg:#f6f8fa;
+    --card-bg:#ffffff;
+    --shadow-soft: 0 1px 2px rgba(20,30,60,.06), 0 8px 24px -12px rgba(20,30,60,.12);
+    --shadow-modal: 0 20px 60px -12px rgba(10,15,30,.45);
+    color-scheme: light;
+  }
+
+  *{box-sizing:border-box;}
+  [hidden]{display:none !important;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    background:var(--page-bg);
+    color:var(--text);
+    font-family:'Montserrat',ui-sans-serif,system-ui,-apple-system,sans-serif;
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--brand); outline-offset:2px; border-radius:4px;}
+  h1,h2,h3{font-family:'Poppins',sans-serif;}
+
+  .shell{display:flex; flex-direction:column; min-height:100vh;}
+
+  /* ---------- Topbar ---------- */
+  .topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:8px 20px;
+    padding:10px 24px;
+    background:
+      url('assets/topbar-pattern.png') repeat,
+      linear-gradient(135deg, var(--topbar-bg), var(--topbar-bg-dark));
+    background-size: auto, cover;
+    color:#fff;
+    flex:0 0 auto;
+  }
+  .topbar h1{
+    margin:0;
+    flex:1 1 auto;
+    min-width:200px;
+    text-align:center;
+    font-size:20px;
+    font-weight:700;
+    letter-spacing:-.4px;
+  }
+  .topbar-actions{flex:0 0 auto; display:flex; flex-wrap:wrap; justify-content:flex-end; gap:10px;}
+  .btn{
+    appearance:none;
+    border:none;
+    cursor:pointer;
+    font-family:'Poppins',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    padding:8px 16px;
+    border-radius:16px;
+    transition:transform .12s ease, opacity .12s ease, background .15s ease;
+  }
+  .btn:active{transform:scale(.97);}
+  .btn-ghost{background:#fff; color:var(--topbar-bg-dark);}
+  .btn-primary{background:var(--brand); color:#fff;}
+  .btn-primary:hover{background:var(--brand-dark);}
+  .btn-light{background:var(--brand-light); color:#fff;}
+  .btn-outline{background:var(--card-bg); color:var(--text-muted); border:1px solid var(--bubble-border);}
+  .btn-red{background:var(--end-red); color:#fff; display:inline-flex; align-items:center; gap:6px;}
+  .btn-red svg{width:14px;height:14px;}
+  .btn-skip{display:none; font-size:13px; padding:6px 14px; margin-top:4px;}
+  /* Practice mode: manual record / replay / record-again moments */
+  .examiner-actions{margin-top:10px; display:flex; justify-content:center; gap:10px;}
+  .btn-start{display:none; font-size:15px; padding:10px 26px;}
+  .review-row{display:none; align-items:center; justify-content:center; gap:12px; flex-wrap:wrap;}
+  .mini-player{display:inline-flex; align-items:center; gap:10px; padding:8px 14px; border-radius:999px; background:#eef1f5; font:600 12.5px 'Montserrat',sans-serif; color:var(--text-muted); font-variant-numeric:tabular-nums;}
+  .mini-player{cursor:pointer;}
+  .mini-player svg{width:12px; height:12px; color:var(--text);}
+  .mini-player i{display:block; width:110px; height:4px; border-radius:4px; background:linear-gradient(90deg,var(--text-muted) 0 12%, #d3d9e0 12%);}
+
+  /* Test / practice switch (instruction modal) */
+  .mode-switch{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin:0 0 16px;}
+  .mode-opt{
+    appearance:none; cursor:pointer; text-align:left;
+    border:2px solid var(--bubble-border); background:#fff; border-radius:14px; padding:10px 14px;
+    font:700 14px 'Poppins',sans-serif; color:var(--text);
+  }
+  .mode-opt small{display:block; margin-top:2px; font:500 12px 'Montserrat',sans-serif; color:var(--text-muted);}
+  .mode-opt.on{border-color:var(--brand); background:var(--examiner-bg);}
+
+  /* Practice-mode planning help */
+  .scaffold{margin-top:clamp(8px,1.6vh,14px); padding:12px 16px; border:1px dashed var(--brand); border-radius:16px; background:#fbfeff;}
+  .scaffold-title{margin:0 0 8px; font:700 12px 'Poppins',sans-serif; text-transform:uppercase; letter-spacing:.05em; color:var(--brand-dark);}
+  .scaffold-steps{display:flex; flex-wrap:wrap; align-items:center; gap:6px 8px; margin:0 0 8px; padding:0; list-style:none;}
+  .scaffold-steps li{padding:3px 12px; border-radius:999px; background:var(--examiner-bg); color:var(--brand-dark); font:600 12.5px 'Poppins',sans-serif;}
+  .scaffold-steps li + li::before{content:'→'; margin-right:8px; margin-left:-4px; color:var(--text-faint);}
+  .scaffold-steps li{position:relative;}
+  .scaffold-phrases{margin:0; font-size:12.5px; line-height:1.6; color:var(--text-muted);}
+  .scaffold-phrases b{color:var(--text);}
+  .chip.practice{background:#f1edff; color:var(--heading);}
+  /* Guided practice: tickable plan + model answer after each answer */
+  .scaffold.is-guided .scaffold-steps li{cursor:pointer; user-select:none; border:1px solid var(--brand-light);}
+  .scaffold.is-guided .scaffold-steps li::after{content:'\25CB'; margin-left:6px; opacity:.5;}
+  .scaffold.is-guided .scaffold-steps li.done{background:var(--success-soft); border-color:var(--success); color:var(--success);}
+  .scaffold.is-guided .scaffold-steps li.done::after{content:'\2713'; opacity:1;}
+  .model-card{margin-top:clamp(8px,1.6vh,14px); padding:12px 16px; border-radius:16px; background:var(--success-soft); border:1px solid #a8eed9;}
+  .model-card .scaffold-title{color:var(--success);}
+  .model-card p{margin:0; font-size:13.5px; line-height:1.6; color:var(--text);}
+  .model-card .model-tip{margin-top:6px; font-size:12.5px; color:var(--text-muted);}
+
+  /* ---------- Progress row: one labelled segment per stage ---------- */
+  .progress-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:7px 24px;
+    background:var(--card-bg);
+    border-bottom:1px solid var(--bubble-border);
+    flex:0 0 auto;
+  }
+  .progress-row .label{font-weight:700; color:var(--text-muted); font-size:13px; flex:0 0 auto;}
+  .stages{flex:1 1 auto; min-width:0; display:flex; gap:10px;}
+  .stage{flex:1 1 0; min-width:0;}
+  .stage-name{
+    display:block; margin-bottom:3px;
+    font:600 11px/1.2 'Poppins',sans-serif; color:var(--text-faint);
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .stage.is-current .stage-name{color:var(--heading);}
+  .segment{height:8px; background:var(--progress-track); border-radius:999px; overflow:hidden;}
+  .segment-fill{height:100%; width:0%; background:var(--brand-light); border-radius:999px; transition:width .4s ease;}
+
+  .timer-chip{
+    flex:0 0 auto;
+    display:inline-flex;
+    align-items:center;
+    cursor:pointer;
+    border:none;
+    padding:0;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:var(--shadow-soft);
+  }
+  .timer-chip .icon{display:inline-flex; align-items:center; justify-content:center; width:32px; height:30px; background:var(--brand); color:#fff;}
+  .timer-chip .icon svg{width:15px;height:15px;}
+  .timer-chip .value{
+    padding:0 10px; height:30px; display:inline-flex; align-items:center;
+    background:#fff; color:var(--text); font-weight:700; font-size:13px; font-variant-numeric:tabular-nums;
+  }
+
+  /* ---------- Body card ---------- */
+  .quiz-body{flex:1 1 auto; max-width:1320px; width:100%; margin:0 auto; padding:clamp(10px,2vh,20px) 24px;}
+  .card{
+    background:var(--card-bg);
+    border-radius:18px;
+    box-shadow:var(--shadow-soft);
+    padding:clamp(12px,2.2vh,22px) 28px;
+  }
+  .section-head{display:flex; align-items:center; gap:8px 14px; margin-bottom:clamp(6px,1.4vh,14px); flex-wrap:wrap;}
+  .section-head h2{margin:0; font-size:clamp(20px,3.4vh,30px); font-weight:700; color:var(--heading);}
+  .stage-meta{display:flex; align-items:center; gap:8px; flex-wrap:wrap; flex:1 1 auto;}
+  .chip{
+    display:inline-flex; align-items:center; padding:2px 10px; border-radius:999px;
+    font:600 12px/1.6 'Poppins',sans-serif; white-space:nowrap;
+    background:var(--progress-track); color:var(--text-muted);
+  }
+  .chip.assessed{background:var(--success-soft); color:var(--success);}
+  .chip.time{background:var(--examiner-bg); color:var(--brand-dark);}
+  .chip.topic{background:#f1edff; color:var(--heading);}
+  .instructions-link{
+    display:inline-flex; align-items:center; gap:6px; margin-left:auto;
+    background:none; border:none; color:var(--brand); font-weight:700; font-size:14px; cursor:pointer;
+    font-family:'Poppins',sans-serif;
+  }
+  .instructions-link svg{width:16px;height:16px;}
+
+  /* ---------- Split layout (card column only exists during Part 2) ---------- */
+  .split-layout{
+    display:grid;
+    grid-template-columns:minmax(220px,36%) 1fr;
+    gap:clamp(14px,2.4vw,26px);
+    align-items:stretch;
+  }
+  .split-layout.no-card{grid-template-columns:1fr;}
+  .split-layout.no-card .card-pane{display:none;}
+
+  .card-pane{
+    display:flex; flex-direction:column;
+    background:var(--student-bg);
+    border:1px solid var(--bubble-border);
+    border-radius:16px;
+    overflow:hidden;
+    min-height:clamp(200px,46vh,420px);
+  }
+  .pane-label{flex:0 0 auto; padding:8px 14px; font:700 12.5px 'Poppins',sans-serif; color:var(--text-muted);}
+  .card-paper{
+    flex:1 1 auto; min-height:0; overflow:auto;
+    margin:0 12px 12px; padding:clamp(12px,2vh,18px);
+    background:#fff; border:1px solid var(--bubble-border); border-radius:12px;
+    transition:filter .7s ease;
+  }
+  .card-pane.is-locked .card-paper{filter:blur(7px); user-select:none; pointer-events:none;}
+  .card-paper h3{margin:0 0 8px; font-size:clamp(15px,2.2vh,18px); font-weight:700; color:var(--heading);}
+  .card-paper p, .card-paper li{font-size:clamp(12.5px,1.8vh,14.5px); line-height:1.5;}
+  .card-paper p{margin:0 0 8px;}
+  .card-paper ul{margin:0 0 8px; padding-left:18px;}
+  .card-paper .task{font-weight:700;}
+
+  .main-pane{min-width:0; display:flex; flex-direction:column;}
+
+  /* ---------- Conversation ---------- */
+  .conversation{display:flex; flex-direction:column; gap:clamp(10px,2vh,20px); flex:1 1 auto; justify-content:center;}
+  .bubble{
+    position:relative;
+    display:flex;
+    align-items:center;
+    min-height:clamp(96px,17vh,190px);
+    background:var(--student-bg);
+    border:1px solid var(--bubble-border);
+    border-radius:140px;
+    transition:background .3s ease, border-radius .35s ease;
+    padding:clamp(6px,1.2vh,14px) clamp(18px,3vw,40px);
+  }
+  .examiner-bubble{background:var(--examiner-bg); justify-content:flex-start;}
+  .student-bubble{justify-content:flex-end;}
+  /* Light blue marks whoever's turn it is: it sits on the examiner while the
+     examiner talks, then moves to the student while they prepare and answer. */
+  .conversation[data-turn="student"] .examiner-bubble{background:var(--student-bg);}
+  .conversation[data-turn="student"] .student-bubble{background:var(--examiner-bg);}
+
+  .avatar{
+    flex:0 0 auto;
+    width:clamp(60px,12vh,130px); height:clamp(60px,12vh,130px);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    transition:box-shadow .3s ease;
+  }
+  .avatar svg{width:55%;height:55%;}
+  .examiner-bubble .avatar{background:none; order:1; position:relative;}
+  .examiner-bubble .avatar img{
+    position:absolute; inset:0; width:100%; height:100%; border-radius:50%;
+    object-fit:cover; opacity:0; transition:opacity .25s ease;
+  }
+  .examiner-bubble .avatar img.idle{opacity:1;}
+  .examiner-bubble .avatar.is-active img.idle{opacity:0;}
+  .examiner-bubble .avatar.is-active img.active{opacity:1;}
+  .student-bubble .avatar{background:#eae6fb; order:2;}
+  .student-bubble .avatar svg{color:var(--heading);}
+  .student-bubble[data-phase="recording"] .avatar{animation:pulse-ring 1.4s ease-out infinite;}
+  @keyframes pulse-ring{
+    0%{box-shadow:0 0 0 0 rgba(240,100,92,.35);}
+    100%{box-shadow:0 0 0 16px rgba(240,100,92,0);}
+  }
+
+  .bubble-copy{flex:1 1 auto; min-width:0; text-align:center; padding:0 clamp(12px,2.2vw,26px); font-family:'Poppins',sans-serif;}
+  .examiner-bubble .bubble-copy{order:2;}
+  .student-bubble .bubble-copy{order:1;}
+
+  .examiner-line{margin:0; font-size:clamp(14px,2vh,19px); font-weight:600; color:var(--text);}
+  .examiner-line.is-loading{font-size:clamp(15px,2.2vh,22px); font-weight:700;}
+  .bars{display:none; align-items:flex-end; gap:3px; height:16px; margin-left:6px; vertical-align:middle;}
+  .examiner-bubble.is-speaking .bars{display:inline-flex;}
+  .bars span{width:3px; background:var(--brand-dark); border-radius:2px; animation:bounce 1s ease-in-out infinite;}
+  .bars span:nth-child(1){height:6px; animation-delay:0s;}
+  .bars span:nth-child(2){height:14px; animation-delay:.12s;}
+  .bars span:nth-child(3){height:9px; animation-delay:.24s;}
+  .bars span:nth-child(4){height:16px; animation-delay:.36s;}
+  .bars span:nth-child(5){height:7px; animation-delay:.48s;}
+  @keyframes bounce{0%,100%{transform:scaleY(.4);} 50%{transform:scaleY(1);}}
+
+  .student-line{margin:0 0 clamp(4px,1vh,12px); font-size:clamp(13px,1.8vh,16px); font-weight:600; color:var(--text-muted);}
+  .student-bubble[data-phase="recording"] .student-line{color:var(--end-red);}
+  .student-bubble[data-phase="captured"] .student-line{color:var(--success);}
+
+  /* one student-side widget per phase */
+  .countdown-number, .prep-timer, .prep-note, .record-row{display:none;}
+  .student-bubble[data-phase="countdown"] .countdown-number{display:block;}
+  .student-bubble[data-phase="prep"] .prep-timer, .student-bubble[data-phase="prep"] .prep-note{display:block;}
+  .student-bubble[data-phase="prep"] .btn-skip{display:inline-flex;}
+  .student-bubble[data-phase="ready"] .btn-start{display:inline-flex;}
+  .student-bubble[data-phase="review"] .review-row{display:flex;}
+  .student-bubble[data-phase="recording"] .record-row{display:flex;}
+  .countdown-number, .prep-timer{font-size:clamp(24px,4.5vh,38px); font-weight:700; color:var(--heading); line-height:1; font-variant-numeric:tabular-nums;}
+  .prep-note{margin:6px 0 4px; font-size:12.5px; color:var(--text-muted);}
+  .record-row{align-items:center; justify-content:center; gap:12px;}
+  .record-time{font-variant-numeric:tabular-nums; font-weight:700; color:var(--end-red); font-size:14px;}
+
+  .hint-note{text-align:center; margin:clamp(6px,1.4vh,16px) 0 0; font-size:12.5px; font-weight:700; color:var(--topbar-bg-dark); text-decoration:underline; text-underline-offset:3px;}
+  .card-footer{display:flex; align-items:center; justify-content:flex-end; gap:18px; margin-top:clamp(6px,1.4vh,16px);}
+  .feedback-link{background:none; border:none; color:var(--brand); font-weight:700; font-size:14px; cursor:pointer; font-family:'Poppins',sans-serif;}
+
+  /* ---------- Completion ---------- */
+  .completion{display:none; flex-direction:column; align-items:center; text-align:center; gap:10px; padding:48px 20px;}
+  .completion.show{display:flex;}
+  .completion .check{width:56px;height:56px;border-radius:50%; background:var(--success-soft); color:var(--success); display:flex;align-items:center;justify-content:center; margin-bottom:6px;}
+  .completion .check svg{width:28px;height:28px;}
+  .completion h2{margin:0; font-size:22px; color:var(--text);}
+  .completion p{margin:0 0 6px; color:var(--text-muted); max-width:380px;}
+
+  /* ---------- Modals ---------- */
+  .overlay{position:fixed; inset:0; background:rgba(18,38,63,.55); display:none; align-items:center; justify-content:center; z-index:20; padding:20px;}
+  .overlay.open{display:flex;}
+  .modal{background:var(--card-bg); border-radius:18px; box-shadow:var(--shadow-modal); width:100%; overflow:hidden; display:flex; flex-direction:column; max-height:92vh;}
+  .modal-sm{max-width:340px; padding:26px 28px; text-align:center;}
+  .modal-sm h3{margin:0 0 8px; font-size:17px; color:var(--text);}
+  .modal-sm p{margin:0 0 20px; font-size:13px; color:var(--text-muted);}
+  .modal-actions{display:flex; gap:10px;}
+  .modal-actions .btn{flex:1 1 0;}
+
+  .modal-instruction{max-width:620px;}
+  .modal-head{flex:0 0 auto; display:flex; align-items:center; justify-content:space-between; gap:12px; background:var(--examiner-bg); padding:18px 28px; font-family:'Poppins',sans-serif; font-size:22px; font-weight:700; color:var(--text);}
+  .modal-body{padding:20px 28px 26px; overflow:auto;}
+  .modal-body ol{list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px;}
+  .modal-body li{font-size:14.5px; color:var(--text);}
+  .tag{display:inline-flex; align-items:center; background:var(--brand); color:#fff; font:700 13px 'Poppins',sans-serif; padding:4px 12px; border-radius:16px;}
+  .tag.red{background:var(--end-red);}
+  .tag.outline{background:#fff; color:var(--text-muted); border:1px solid var(--bubble-border);}
+  .lead{margin:0 0 12px; font-size:14.5px; color:var(--text);}
+  .structure{list-style:none; margin:0 0 14px; padding:0; display:grid; gap:8px; counter-reset:stage;}
+  .structure li{display:grid; grid-template-columns:28px 1fr; column-gap:12px; padding:10px 12px; background:var(--student-bg); border-radius:14px; font-size:13.5px; counter-increment:stage;}
+  .structure li::before{content:counter(stage); grid-row:1 / span 2; width:28px; height:28px; border-radius:50%; background:var(--brand); color:#fff; font:700 13px/28px 'Poppins',sans-serif; text-align:center;}
+  .structure li.is-warmup::before{background:var(--text-faint);}
+  .structure .head{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .structure .name{font-weight:700; font-size:14px;}
+  .structure .dur{color:var(--text-muted); white-space:nowrap;}
+  .structure .desc{margin:3px 0 0; color:var(--text-muted); line-height:1.5;}
+  .stage-chips{display:flex; gap:8px; flex-wrap:wrap; margin:0 0 10px;}
+  .howto{padding:12px 14px; border:1px solid var(--bubble-border); border-radius:14px;}
+  .howto-title{margin:0 0 6px; font:700 12px 'Poppins',sans-serif; text-transform:uppercase; letter-spacing:.05em; color:var(--text-faint);}
+  .howto ul{margin:0; padding-left:18px; font-size:13.5px; line-height:1.7;}
+  .modal-body .note{margin:12px 0 0; font-size:13px; color:var(--text-muted);}
+  .modal-body .btn-block{width:100%; margin-top:18px; font-size:16px; padding:12px;}
+
+  /* ---------- Prototype-only tools (not part of the product UI) ---------- */
+  .proto{position:fixed; left:16px; bottom:16px; z-index:15; font-family:'Montserrat',sans-serif;}
+  .proto-toggle{appearance:none; border:none; cursor:pointer; background:var(--text); color:#fff; font:600 12px 'Poppins',sans-serif; padding:7px 14px; border-radius:999px; opacity:.85;}
+  .proto-toggle:hover{opacity:1;}
+  .proto-panel{position:absolute; left:0; bottom:calc(100% + 8px); width:300px; background:#fff; border-radius:14px; box-shadow:var(--shadow-modal); padding:12px 14px 14px;}
+  .proto-title{margin:10px 0 6px; font:700 11px 'Poppins',sans-serif; text-transform:uppercase; letter-spacing:.06em; color:var(--text-faint);}
+  .proto-title:first-child{margin-top:0;}
+  .proto-row{display:flex; flex-wrap:wrap; gap:6px;}
+  .proto-row button{appearance:none; cursor:pointer; border:1px solid var(--bubble-border); background:#fff; color:var(--text); font:600 12px 'Poppins',sans-serif; padding:4px 10px; border-radius:999px;}
+  .proto-row button:hover{border-color:var(--brand);}
+  .proto-row button.on{background:var(--brand); border-color:var(--brand); color:#fff;}
+  .proto-log{list-style:none; margin:0; padding:0; max-height:132px; overflow:auto; font-size:11.5px; line-height:1.4; color:var(--text-muted);}
+  .proto-log li{padding:3px 0; border-bottom:1px dashed var(--bubble-border);}
+  .proto-log li:empty{display:none;}
+
+  /* ---------- Integrity: pre-quiz setup ----------
+     Styled after the live HeyHi pre-quiz page (demo.heyhi.sg/onlinequizv2/quiz),
+     with its real pattern, logo and permission-help image. */
+  .setup-screen{position:fixed; inset:0; z-index:18; overflow:auto; background:var(--page-bg);}
+  .setup-screen[hidden]{display:none;}
+  .setup-top{position:relative; height:100px; background:#0fb0f8 url('https://cdn.heyhi.sg/images/bg-smartjen.png') repeat; display:flex; justify-content:center; padding-top:2px;}
+  .setup-top img{width:68px; height:68px;}
+  .setup-exit{position:absolute; right:80px; top:12px; display:inline-flex; align-items:center; gap:6px; padding:4px 16px; border:0; border-radius:16px; background:#ffb300; color:#fff; font:700 18px 'Montserrat',sans-serif; cursor:pointer;}
+  .setup-exit img{width:12px; height:12px;}
+  .setup-card{position:relative; max-width:708px; margin:-16px auto 40px; background:#fff; border-radius:24px; box-shadow:0 4px 16px rgba(0,0,0,.06); padding:24px 24px 28px;}
+  .setup-eyebrow{font:700 12px 'Montserrat',sans-serif; letter-spacing:.24px; text-transform:uppercase; color:#16d8a7;}
+  .setup-card h2{margin:6px 0 16px; font:700 34px 'Montserrat',sans-serif; letter-spacing:-.68px; color:#302574;}
+  .setup-meta{display:grid; grid-template-columns:1fr 1fr; gap:14px 24px; margin:0 0 22px;}
+  .setup-meta dt{padding-bottom:5px; font:700 12px 'Montserrat',sans-serif; letter-spacing:.24px; text-transform:uppercase; color:#616161;}
+  .setup-meta dd{margin:0; font:400 16px 'Nunito Sans',sans-serif; color:#616161;}
+  .setup-label{margin:0 0 10px; font:700 14px 'Montserrat',sans-serif; letter-spacing:-.28px; color:#12263f;}
+  .device{padding:16px; border:1px solid #dbe4ef; border-radius:8px; background:#f6f8fa;}
+  .device-head{display:flex; align-items:center; gap:12px; margin-bottom:14px;}
+  .device-icon{flex:0 0 auto; width:36px; height:36px; display:grid; place-items:center; border-radius:8px; background:#e4f6fe; color:#0fb0f8;}
+  .device-icon svg{width:16px; height:16px;}
+  .device-head strong{display:block; font:700 16px 'Montserrat',sans-serif; color:#302574;}
+  .device-head span{font:400 15px 'Nunito Sans',sans-serif; color:#616161;}
+  .field-grid{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  .field label{display:block; margin-bottom:6px; font:700 13px 'Montserrat',sans-serif; color:#302574;}
+  .field select{width:100%; padding:11px 12px; border:1px solid #e0e0e0; border-radius:12px; background:#fff; color:#616161; font:400 14px 'Nunito Sans',sans-serif;}
+  .device-actions{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px;}
+  .setup-outline{padding:7px 16px; border:2px solid #0fb0f8; border-radius:16px; background:#fff; color:#0fb0f8; font:700 16px 'Montserrat',sans-serif; cursor:pointer;}
+  .setup-outline:disabled{opacity:.45; cursor:not-allowed;}
+  .setup-outline.done{border-color:var(--success); background:var(--success-soft); color:var(--success);}
+  .device-result{margin-top:12px; padding:10px 12px; border-radius:12px; font:600 14px 'Nunito Sans',sans-serif;}
+  .device-result.pass{background:var(--success-soft); color:var(--success);}
+  .device-result.block{background:#fdecef; color:#e63757;}
+  .confirm{margin-top:24px;}
+  .confirm h3{margin:0 0 6px; font:700 14px 'Montserrat',sans-serif; color:#12263f;}
+  .confirm > p{margin:0 0 12px; font:400 15px 'Nunito Sans',sans-serif; color:#616161;}
+  .confirm-list{padding:16px; border-radius:8px; background:#f6f8fa; display:grid; gap:10px;}
+  .check{display:flex; align-items:flex-start; gap:10px; padding:12px 16px; border:1px solid #e0e0e0; border-radius:12px; background:#fff; font:400 15px 'Montserrat',sans-serif; color:#12263f; cursor:pointer;}
+  .check input{margin-top:3px; accent-color:#0fb0f8;}
+  .setup-foot{display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-top:22px;}
+  .setup-foot p{margin:0 0 4px; font:600 16px 'Nunito Sans',sans-serif; color:#e63757;}
+  .setup-foot p.ok{color:var(--success);}
+  .setup-help{padding:0; border:0; background:none; color:#53caff; font:400 15px 'Montserrat',sans-serif; text-decoration:underline; cursor:pointer;}
+  .setup-start{padding:8px 22px; border:1px solid #0fb0f8; border-radius:16px; background:#0fb0f8; color:#fff; font:700 16px 'Montserrat',sans-serif; cursor:pointer; white-space:nowrap; transition:background .15s;}
+  .setup-start:hover:not(:disabled){background:#0a9be0; border-color:#0a9be0;}
+  /* Disabled reads as clearly inactive: grey, not a paler blue */
+  .setup-start:disabled{background:#d5dbe1; border-color:#d5dbe1; color:#fff; cursor:not-allowed;}
+  .mic-help{max-width:560px; padding:26px 28px 22px;}
+  .mic-help h3{margin:0 0 10px; text-align:center; font:700 28px 'Montserrat',sans-serif; color:#302574;}
+  .mic-help > p{margin:0 0 16px; padding-bottom:16px; border-bottom:1px solid #e5e9f0; font:400 15px 'Montserrat',sans-serif; color:#302574;}
+  .mic-help h4{margin:0 0 8px; text-align:center; font:700 16px 'Montserrat',sans-serif; color:#12263f;}
+  .mic-help-grid{display:grid; grid-template-columns:1fr 1.3fr; gap:14px; align-items:center;}
+  .mic-help-grid ul{margin:0; padding-left:20px; font:400 15px/2 'Nunito Sans',sans-serif; color:#616161;}
+  .mic-help-grid img{width:100%; border-radius:6px;}
+  .mic-help .setup-start{display:block; margin:18px auto 0;}
+  @media (max-width:640px){
+    .setup-meta, .field-grid, .device-actions, .mic-help-grid{grid-template-columns:1fr;}
+    .setup-card{margin:-16px 12px 24px;}
+    .setup-card h2{font-size:26px;}
+    .setup-exit{right:12px;}
+    .setup-foot{flex-direction:column; align-items:stretch;}
+  }
+  .phrase{margin:16px 0; padding:18px; border-radius:14px; background:var(--examiner-bg); color:var(--heading); font:700 19px/1.35 'Poppins',sans-serif;}
+  .voice-count{width:64px; height:64px; margin:12px auto; display:grid; place-items:center; border:7px solid #d5f1fb; border-radius:50%; color:var(--brand); font:700 20px 'Poppins',sans-serif;}
+  .voice-wave{height:34px; display:flex; align-items:center; justify-content:center; gap:4px;}
+  .voice-wave i{display:block; width:4px; height:8px; border-radius:4px; background:#5bd1f5;}
+  @keyframes vw{50%{transform:scaleY(.25);}}
+  /* Verification (button next to Start Quiz) */
+  .setup-actions{display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;}
+  .setup-actions .setup-outline{white-space:nowrap;}
+  .verify-modal{max-width:500px; padding:26px; text-align:center;}
+  .verify-modal > p{margin:0; font:400 13.5px/1.5 'Nunito Sans',sans-serif; color:#616161;}
+  .verify-modal .phrase{margin:18px 0;}
+  .verify-status{margin:6px 0 14px !important;}
+  .verify-status.fail{color:#e63757 !important; font-weight:600 !important;}
+  .verify-buttons{display:flex; justify-content:center; gap:8px;}
+  .verify-modal h3{margin:0 0 14px; font:700 24px 'Montserrat',sans-serif; color:#302574;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .verify-checks{margin:4px 0 6px; padding:0; list-style:none; text-align:left; display:grid; gap:8px;}
+  .verify-checks li{display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid #e0e0e0; border-radius:12px; font:600 14px 'Montserrat',sans-serif; color:#98a2ad;}
+  .verify-checks li i{width:18px; height:18px; flex:0 0 auto; border:3px solid #e4f6fe; border-top-color:#0fb0f8; border-radius:50%; animation:spin .8s linear infinite;}
+  .verify-checks li.ok{color:#12263f;}
+  .verify-checks li.ok i{animation:none; border:0; background:var(--success); border-radius:50%; position:relative;}
+  .verify-checks li.ok i::after{content:'\2713'; position:absolute; inset:0; display:grid; place-items:center; color:#fff; font-size:11px; font-style:normal;}
+  .verify-checks li.bad{color:#e63757; border-color:#f5c2cc;}
+  .verify-checks li.bad i{animation:none; border:0; background:#e63757; border-radius:50%;}
+  .verify-checks li.wait{opacity:.45;}
+  .verify-checks li.wait i{animation:none;}
+  /* Plain microphone test (as on the live page): record, see the level, play back */
+  .mic-test{margin-top:14px;}
+  .mic-test .setup-outline{width:100%;}
+  .mic-row{display:flex; gap:14px; align-items:center;}
+  .mic-track{flex:1 1 auto; min-width:0; display:flex; align-items:center; gap:10px; height:46px; padding:0 14px; border:1px solid #53caff; border-radius:16px; background:#effaff; font:400 15px 'Nunito Sans',sans-serif; color:#12263f; font-variant-numeric:tabular-nums;}
+  .mic-dot{width:8px; height:8px; border-radius:50%; background:#0fb0f8;}
+  .mic-play{display:none; width:22px; height:22px; border:0; border-radius:50%; background:#0fb0f8; color:#fff; font-size:9px; cursor:pointer;}
+  .mic-track.played .mic-dot{display:none;}
+  .mic-track.played .mic-play{display:grid; place-items:center;}
+  .mic-line{flex:1 1 auto; min-width:0; height:24px; display:flex; align-items:center; justify-content:flex-end; gap:2px; overflow:hidden; background:repeating-linear-gradient(90deg,#b9e6fb 0 2px,transparent 2px 5px) center/100% 1px no-repeat;}
+  .mic-line i{flex:0 0 2px; height:2px; border-radius:2px; background:#7fd3f7;}
+  .mic-stop{display:inline-flex; align-items:center; gap:6px; height:46px; padding:0 18px; background:#0fb0f8; border-color:#0fb0f8;}
+  .mic-stop svg{width:16px; height:16px;}
+  .mic-stop.again{background:#fff; color:#0fb0f8; border:2px solid #0fb0f8;}
+  .vcheck-list{margin:10px 0 4px; padding:0; list-style:none; text-align:left; display:grid; gap:8px;}
+  .setup-outline.verified{border-color:var(--success); background:var(--success-soft); color:var(--success);}
+  .integrity-bar{display:flex; align-items:center; gap:9px; margin:0 0 clamp(6px,1.2vh,12px); padding:8px 12px; border-radius:10px; background:#e9fcf7; color:#198b70; font:600 12.5px 'Montserrat',sans-serif;}
+  .integrity-bar b{display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:var(--success); color:#fff; font-size:11px;}
+  @media (max-width:640px){ .field-grid{grid-template-columns:1fr;} .setup-foot{flex-direction:column; align-items:stretch;} }
+
+  /* ---------- Toast ---------- */
+  .toast{
+    position:fixed; left:50%; bottom:26px; transform:translate(-50%, 12px);
+    background:var(--text); color:#fff; padding:10px 18px; border-radius:999px;
+    font-size:13px; font-weight:600; box-shadow:var(--shadow-modal);
+    opacity:0; pointer-events:none; transition:opacity .2s ease, transform .2s ease; z-index:30;
+  }
+  .toast.show{opacity:1; transform:translate(-50%, 0);}
+
+  @media (max-width:860px){
+    .split-layout{grid-template-columns:1fr;}
+    .card-pane{min-height:0; max-height:260px;}
+  }
+  @media (max-width:760px){
+    .bubble{flex-direction:column; padding:24px; text-align:center; border-radius:32px; min-height:0; gap:14px;}
+    .bubble-copy{padding:0;}
+    .examiner-bubble .avatar, .student-bubble .avatar, .examiner-bubble .bubble-copy, .student-bubble .bubble-copy{order:0;}
+    .avatar{width:96px;height:96px;}
+  }
+  @media (max-width:640px){
+    .topbar{justify-content:center;}
+    .topbar h1{font-size:16px; min-width:100%; order:-1;}
+    .stage-name{font-size:10px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="topbar">
+    <h1>IGCSE Oral: Speaking test</h1>
+    <div class="topbar-actions">
+      <button class="btn btn-ghost" id="btnSetting" type="button">Setting</button>
+      <button class="btn btn-primary" id="btnSaveExit" type="button">Save &amp; Exit</button>
+      <button class="btn btn-primary" id="btnSubmit" type="button">Submit Quiz</button>
+    </div>
+  </header>
+
+  <div class="progress-row">
+    <span class="label">Progress</span>
+    <div class="stages" id="stages"></div>
+    <button class="timer-chip" id="timerChip" type="button" aria-label="Toggle timer">
+      <span class="icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+      </span>
+      <span class="value" id="timerValue">-</span>
+    </button>
+  </div>
+
+  <main class="quiz-body">
+
+    <div class="card">
+      <div class="section-head">
+        <h2 id="stageTitle">Warm-up</h2>
+        <div class="stage-meta" id="stageMeta"></div>
+        <button class="instructions-link" id="btnInstructions" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>
+          See Instruction
+        </button>
+      </div>
+
+      <div class="integrity-bar" id="integrityBar"><b>&#10003;</b><span>Voice profile active &mdash; continuously verifying this speaker</span></div>
+
+      <div class="split-layout no-card" id="splitLayout">
+        <aside class="card-pane is-locked" id="cardPane" aria-label="Speaking Assessment card">
+          <div class="pane-label">Card</div>
+          <div class="card-paper" id="cardPaper" aria-hidden="true"></div>
+        </aside>
+
+        <div class="main-pane">
+          <div class="conversation" id="conversation" data-turn="examiner">
+            <div class="bubble examiner-bubble" id="examinerBubble">
+              <div class="avatar" id="examinerAvatar">
+                <img class="idle" src="assets/examiner-idle.png" alt="">
+                <img class="active" src="assets/examiner-active.png" alt="">
+              </div>
+              <div class="bubble-copy">
+                <p class="examiner-line is-loading" id="examinerLine" aria-live="polite"><span id="examinerText">Loading examiner audio&hellip;</span><span class="bars" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span></span></p>
+                <div class="examiner-actions">
+                  <button class="btn btn-outline" id="btnReplay" type="button" hidden>Replay Question</button>
+                  <button class="btn btn-primary" id="btnContinue" type="button" hidden>Continue to Next Question</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="bubble student-bubble" id="studentBubble" data-phase="waiting">
+              <div class="bubble-copy">
+                <p class="student-line" id="studentLine">Please wait &mdash; nothing to click yet</p>
+                <div class="countdown-number" id="countdownNumber">3</div>
+                <button class="btn btn-primary btn-start" id="btnStartRecord" type="button">Start Record</button>
+                <div class="review-row">
+                  <span class="mini-player" id="reviewPlayer" role="button" tabindex="0" title="Play your answer"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M7 4v16l13-8z"/></svg><span id="reviewTime">0:00 / 0:00</span><i></i></span>
+                  <button class="btn btn-outline" id="btnReRecord" type="button">Record Again</button>
+                </div>
+                <div class="prep-timer" id="prepTimer">1:00</div>
+                <p class="prep-note">Written notes are not allowed.</p>
+                <button class="btn btn-light btn-skip" id="btnSkipPrep" type="button">I&rsquo;m ready</button>
+                <div class="record-row">
+                  <span class="record-time" id="recordTime">0:00</span>
+                  <button class="btn btn-red" id="btnEnd" type="button">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><rect x="7" y="7" width="10" height="10" rx="2"/></svg>
+                    End
+                  </button>
+                </div>
+              </div>
+              <div class="avatar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 4-6 8-6s8 2 8 6"/></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="scaffold" id="scaffold" hidden></div>
+          <div class="model-card" id="modelCard" hidden></div>
+        </div>
+      </div>
+
+      <p class="hint-note" id="hintNote">Note: Your audio answer must not exceed 1 minute.</p>
+
+      <div class="completion" id="completion">
+        <div class="check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6 9 17l-5-5"/></svg></div>
+        <h2 id="completionTitle">All parts complete</h2>
+        <p id="completionText">You&rsquo;ve finished all parts of the speaking test. Submit when you&rsquo;re ready.</p>
+        <button class="btn btn-primary" id="btnViewResult" type="button" hidden>View result</button>
+      </div>
+
+      <div class="card-footer">
+        <button class="feedback-link" id="btnFeedback" type="button">Send Feedback</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div class="setup-screen" id="setupScreen">
+  <header class="setup-top">
+    <img src="https://elb-onlinequiz.heyhi.sg/images/main/icon-jangkar.png" alt="HeyHi">
+    <button class="setup-exit" id="btnSetupExit" type="button"><img src="https://cdn.heyhi.sg/images/main/icon-x.png" alt="">Exit</button>
+  </header>
+  <section class="setup-card" aria-labelledby="setupTitle">
+    <div class="setup-eyebrow">IGCSE ESL</div>
+    <h2 id="setupTitle">Speaking test</h2>
+    <dl class="setup-meta">
+      <div><dt>Assigned by</dt><dd>Demo test class</dd></div>
+      <div><dt>Assigned on</dt><dd>2026-11-04</dd></div>
+      <div><dt>Max no of attempts</dt><dd>Unlimited</dd></div>
+      <div><dt>No of parts</dt><dd>4 (Warm-up + Parts 1&ndash;3)</dd></div>
+      <div><dt>Quiz time</dt><dd>About 10&ndash;13 minutes</dd></div>
+    </dl>
+
+    <p class="setup-label">Setup Your Devices</p>
+    <section class="device">
+      <div class="device-head">
+        <span class="device-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></svg></span>
+        <div><strong>MICROPHONE &amp; SPEAKER TEST</strong><span>Only a physical microphone can be used for this test.</span></div>
+      </div>
+      <div class="field-grid">
+        <div class="field">
+          <label for="micSelect">Choose Microphone (Input Device)</label>
+          <select id="micSelect">
+            <option>Default - Microphone (Realtek(R) Audio)</option>
+            <option>USB Microphone</option>
+            <option data-demo>VB-Audio Virtual Cable</option>
+            <option data-demo>Voicemeeter Output</option>
+            <option data-demo>BlackHole 2ch</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="speakerSelect">Choose Speaker (Output Device)</label>
+          <select id="speakerSelect"><option>Default - Speakers (Realtek(R) Audio)</option></select>
+        </div>
+      </div>
+      <div class="mic-test">
+        <button class="setup-outline" id="btnMicTest" type="button">Test Microphone</button>
+        <div class="mic-row" id="micRow" hidden>
+          <div class="mic-track" id="micTrack">
+            <span class="mic-dot"></span>
+            <button class="mic-play" type="button" aria-label="Play back">&#9654;</button>
+            <span id="micTime">00:00</span>
+            <span class="mic-line" id="micLine"></span>
+          </div>
+          <button class="setup-start mic-stop" id="btnMicStop" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg><span>Stop</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="confirm">
+      <h3>Confirm Your Setup</h3>
+      <p>Please confirm all items below before you can start the quiz.</p>
+      <div class="confirm-list">
+        <label class="check"><input type="checkbox"> I can see the sound waves move when I speak</label>
+        <label class="check"><input type="checkbox"> I can hear my own voice when I play back the recording. If can&rsquo;t, please try recording again</label>
+        <label class="check"><input type="checkbox"> I&rsquo;m ready and in a good environment for the test</label>
+      </div>
+    </section>
+
+    <div class="setup-foot">
+      <div>
+        <p id="setupStatus">Check your input device to continue.</p>
+        <button class="setup-help" id="btnMicHelp" type="button">How to enable microphone?</button>
+      </div>
+      <div class="setup-actions">
+        <button class="setup-outline" id="btnVerify" type="button" disabled>Verify Voice</button>
+        <button class="setup-start" id="btnStartQuiz" type="button" disabled>Start Quiz</button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="micHelpOverlay" role="dialog" aria-modal="true" aria-labelledby="micHelpTitle">
+  <div class="modal mic-help">
+    <h3 id="micHelpTitle">Microphone Access Required</h3>
+    <p>If your browser has not been given permission to use the microphone, the test cannot start.</p>
+    <h4>Fix This</h4>
+    <div class="mic-help-grid">
+      <ul>
+        <li>Click the &#128274; Secure icon in the address bar</li>
+        <li>Select &ldquo;Microphone&rdquo;</li>
+        <li>Choose &ldquo;Allow&rdquo;</li>
+        <li>Reload the page</li>
+      </ul>
+      <img src="https://elb-onlinequiz.heyhi.sg/images/microphone/enable_permission.png" alt="Browser site settings with the Microphone permission switched on">
+    </div>
+    <button class="setup-start" id="btnMicHelpClose" type="button">Close</button>
+  </div>
+</div>
+
+<div class="overlay" id="verifyOverlay" role="dialog" aria-modal="true" aria-labelledby="verifyTitle">
+  <div class="modal verify-modal">
+    <h3 id="verifyTitle">Voice verification</h3>
+    <p>Read this unique phrase aloud. It is generated for this session and cannot be reused.</p>
+    <div class="phrase">&ldquo;The purple elephant danced on the ceiling.&rdquo;</div>
+    <div class="voice-count" id="voiceCount">5</div>
+    <div class="voice-wave" id="voiceWave"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <ul class="verify-checks vcheck-list" id="verifyChecks" hidden></ul>
+    <p class="verify-status" id="voiceText">Press record when you are ready.</p>
+    <div class="verify-buttons">
+      <button class="setup-start" id="btnVoiceRecord" type="button">&#9679; Record voice sample</button>
+      <button class="setup-outline" id="btnVerifyDone" type="button" hidden>Complete setup</button>
+      <button class="setup-outline" id="btnVerifyCancel" type="button">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="instructionOverlay" role="dialog" aria-modal="true" aria-labelledby="instructionHead">
+  <div class="modal modal-instruction">
+    <div class="modal-head" id="instructionHead">Speaking test instruction</div>
+    <div class="modal-body">
+      <div class="mode-switch" id="modeSwitch" role="radiogroup" aria-label="Mode">
+        <button class="mode-opt on" type="button" role="radio" aria-checked="true" data-mode="test">Test mode<small>Just like the real exam</small></button>
+        <button class="mode-opt" type="button" role="radio" aria-checked="false" data-mode="practice">Practice &middot; Self-paced<small>Start, replay and record again when you want</small></button>
+        <button class="mode-opt" type="button" role="radio" aria-checked="false" data-mode="guided">Practice &middot; Guided<small>Tick a plan, then compare with a model answer</small></button>
+      </div>
+      <p class="lead">This speaking test has four stages. The examiner leads each one &mdash; you only need to listen and answer.</p>
+      <ol class="structure" id="structureList"></ol>
+
+      <div class="howto">
+        <p class="howto-title">How to answer</p>
+        <ul>
+          <li><b>Listen.</b> While the examiner speaks, there is nothing to click.</li>
+          <li><b>Speak.</b> Press <span class="tag">Start Record</span> when you are ready. Missed the question? Press <span class="tag outline">Replay Question</span> first. Press <span class="tag red">End</span> when you have finished.</li>
+          <li><b>Check.</b> Listen to your answer. Press <span class="tag outline">Record Again</span> to redo it, or <span class="tag">Continue to Next Question</span>.</li>
+          <li><b>Limit.</b> Up to 1 minute per answer (2 minutes for the Part 2 talk). Written notes are not allowed.</li>
+        </ul>
+      </div>
+      <button class="btn btn-primary btn-block" id="btnReady" type="button">Ready</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="stageOverlay" role="dialog" aria-modal="true" aria-labelledby="stageHead">
+  <div class="modal modal-instruction">
+    <div class="modal-head" id="stageHead">Part instruction</div>
+    <div class="modal-body">
+      <div class="stage-chips" id="stageChips"></div>
+      <p class="lead" id="stageBrief"></p>
+      <div class="howto">
+        <p class="howto-title">What to do</p>
+        <ul id="stageSteps"></ul>
+      </div>
+      <button class="btn btn-primary btn-block" id="btnStageReady" type="button">Ready</button>
+    </div>
+  </div>
+</div>
+
+<div class="overlay" id="submitOverlay" role="dialog" aria-modal="true" aria-labelledby="submitTitle">
+  <div class="modal modal-sm">
+    <h3 id="submitTitle">Submit quiz?</h3>
+    <p id="submitProgressText">You have completed 0 of 4 parts.</p>
+    <div class="modal-actions">
+      <button class="btn btn-outline" id="btnCancelSubmit" type="button">Cancel</button>
+      <button class="btn btn-primary" id="btnConfirmSubmit" type="button">Submit</button>
+    </div>
+  </div>
+</div>
+
+<div class="proto" id="proto">
+  <button class="proto-toggle" id="protoToggle" type="button" aria-expanded="false">Prototype</button>
+  <div class="proto-panel" id="protoPanel" hidden>
+    <div class="proto-title">Jump to</div>
+    <div class="proto-row" id="protoJump"></div>
+    <div class="proto-title">Simulated answer length</div>
+    <div class="proto-row" id="protoLength"></div>
+    <div class="proto-title">Examiner decisions</div>
+    <ol class="proto-log" id="protoLog"></ol>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  // ---------- Test content (scripts, questions and card from the requirements doc) ----------
+  const STAGES = [
+    {
+      id: 'warmup', brief: 'The examiner asks three easy questions about you, such as films, holidays and school. This part is not marked; it is there to help you relax.', label: 'Warm-up', title: 'Warm-up', assessed: false, duration: '1–2 min',
+      questions: [
+        { text: 'What kind of films do you enjoy watching?' },
+        { text: 'What did you do during your last holiday?' },
+        { text: 'What subject do you most enjoy at school?' },
+      ],
+    },
+    {
+      id: 'part1', steps: ['Listen to each question, then press <b>Start Record</b> and answer as fully as you can.', 'If you say very little, the examiner may ask you to say more. This is normal.', 'Missed a question? Press <b>Replay Question</b> before you record.'],
+      brief: 'The examiner introduces one everyday topic and asks you a few questions about it. Answer as fully as you can. If you say very little, the examiner may ask you to say more.', label: 'Part 1', title: 'Part 1: Interview', assessed: true, duration: '2–3 min',
+      topic: 'Recycling and repairing',
+      intro: 'The first assessed part of the test is an interview. I am going to ask you some questions about recycling and repairing. Try to say as much as you can for each question. Before we start, do you have any questions?',
+      questions: [
+        { text: 'What things do people recycle, and why?',
+          focus: { more: 'what people recycle', why: 'people recycle those things', examples: 'things people recycle' } },
+        { text: 'Can you tell me about a time when you, or someone you know, repaired something?',
+          focus: { more: 'what was repaired', why: 'it was repaired instead of replaced', examples: 'things that people repair' } },
+        { text: 'Do you think that we should stop buying new things to protect the environment? Why? Why not?',
+          focus: { more: 'buying new things', why: 'you think that', examples: 'ways to protect the environment' } },
+      ],
+    },
+    {
+      id: 'part2', steps: ['The card appears next to the conversation. Read it carefully; it stays on screen for the whole talk.', 'You have 1 minute to plan. Written notes are not allowed. Press <b>I’m ready</b> to start earlier.', 'Then talk for up to 2 minutes about every point on the card, and say which option you prefer.'],
+      brief: 'You are given a card with a topic. You have 1 minute to read it and plan what to say (no notes; press I\u2019m ready to start early). Then talk on your own for up to 2 minutes.', label: 'Part 2', title: 'Part 2: Short talk', assessed: true, duration: '3–4 min',
+      prepSeconds: 60, talkSeconds: 120,
+      script: 'The second assessed part of the test is a short talk. I will give you a card and you will have one minute to read it and think about what you want to say. You should talk about the points on the card. You can’t make any written notes, but you can ask me if there is anything you do not understand. You may keep the card until the end of the short talk. Here is your card.',
+      start: 'You now have up to two minutes to talk about the topic on the card. I will stop you after two minutes, but do not worry if you have not finished your talk. Would you like to start?',
+      card: {
+        title: 'Party food',
+        intro: 'You are having a party at your home and organising the food for it. You are considering the following options:',
+        options: ['asking your guests to bring their favourite food', 'ordering from a fast food restaurant.'],
+        task: 'Talk about the advantages and disadvantages of each option. Say which option you would prefer, and why.',
+      },
+    },
+    {
+      id: 'part3', steps: ['The questions follow the topic on your Part 2 card.', 'Give your opinion, then a reason. You can mention another point of view.', 'You may not need to answer every question if you speak at length.'],
+      brief: 'A two-way discussion with the examiner. The questions follow the topic on your Part 2 card and go a little deeper.', label: 'Part 3', title: 'Part 3: Discussion', assessed: true, duration: '3–4 min',
+      intro: 'Now I am going to ask you a few questions related to the topic you have just talked about. This part of the test will last approximately three minutes. Before we start, do you have any questions?',
+      questions: [
+        { text: 'Do you think that young people enjoy cooking?',
+          focus: { more: 'young people and cooking', why: 'you think that', examples: 'foods young people like to cook' } },
+        { text: 'Some people say that healthy food is not very tasty. Do you agree?',
+          focus: { more: 'healthy food', why: 'you think that', examples: 'healthy food that tastes good' } },
+        { text: 'Is it easier to plan a party by yourself or with a group of people?',
+          focus: { more: 'planning a party', why: 'you think that', examples: 'things you would need to plan' } },
+        { text: 'Some people think that a party must have music. What do you think?',
+          focus: { more: 'music at parties', why: 'you think that', examples: 'music you would choose' } },
+      ],
+    },
+  ];
+
+  // Follow-up prompts for Parts 1 and 3 (lead-ins are the doc's; the blanks are filled per question)
+  const FOLLOW_UPS = [
+    (f) => `Can you tell me more about ${f.more}?`,
+    (f) => `Can you tell me why ${f.why}?`,
+    () => 'Can you explain what you mean by that?',
+    (f) => `Can you give me any examples of ${f.examples}?`,
+  ];
+
+  // The result is its own page (a clone of the live quiz result); the earlier
+  // inline version of the result is kept in igcse-oral-v1.html.
+  const RESULT_PAGE = 'igcse-oral-integrity-result.html';
+  const showResults = () => { window.location.href = RESULT_PAGE; };
+
+  // Guided practice: sample high-level answers shown after the candidate's own take.
+  const MODEL_ANSWERS = {
+    'What things do people recycle, and why?': 'People mostly recycle paper, plastic bottles and glass. I think they do it because it reduces waste and saves natural resources. For example, at my school we have separate bins, and the paper we collect is turned into new notebooks.',
+    'Can you tell me about a time when you, or someone you know, repaired something?': 'Last year my brother\u2019s bicycle broke because the chain snapped. Instead of buying a new one, we watched a video and replaced the chain ourselves. It took an afternoon, but it saved money and the bike still works well.',
+    'Do you think that we should stop buying new things to protect the environment? Why? Why not?': 'I partly agree. Buying fewer new things would certainly reduce waste, but stopping completely is unrealistic. A better idea is to repair things and buy second-hand when possible.',
+    'Do you think that young people enjoy cooking?': 'Many of them do, especially when they cook with friends. It feels creative and social. However, some find it a chore if they have to do it every day.',
+    'Some people say that healthy food is not very tasty. Do you agree?': 'Not really. Healthy food can be delicious if it is prepared well. For instance, a fresh salad with a good dressing is far better than many snacks I have tried.',
+    'Is it easier to plan a party by yourself or with a group of people?': 'I think a group is easier, because the work is shared. On the other hand, with a group there are more opinions, so deciding can take longer.',
+    PART2_START: 'I would like to talk about two ways to organise food for a party. First, asking guests to bring their favourite food. One advantage is that there is a lot of variety, and it costs me less. However, I cannot control what arrives. Second, ordering from a fast food restaurant. This is quick and convenient, but it can be expensive and not very healthy. Overall, I would prefer asking my guests to bring food, because it feels more personal.',
+  };
+  MODEL_ANSWERS[STAGES.find((x) => x.id === 'part2').start] = MODEL_ANSWERS.PART2_START;
+  delete MODEL_ANSWERS.PART2_START;
+
+  // Practice mode only: a plan to follow and phrases to borrow, per part.
+  const SCAFFOLDS = {
+    warmup: { steps: ['Answer', 'Add one detail'], phrases: ['I really enjoy … because …', 'Last holiday, I …'] },
+    part1: { steps: ['Answer directly', 'Give a reason', 'Give an example'], phrases: ['I think … because …', 'For example, …', 'Once, I …'] },
+    part2: { steps: ['Option 1: good and bad', 'Option 2: good and bad', 'My choice and why'], phrases: ['One advantage of … is …', 'On the other hand, …', 'I would prefer … because …'] },
+    part3: { steps: ['My opinion', 'Reason', 'Another point of view'], phrases: ['In my opinion, …', 'That is because …', 'However, some people think …'] },
+  };
+
+  // ---------- Prototype timings ----------
+  const LOADING_MS = 600;
+  const ANSWER_LIMIT = 60;
+  const BRIEF_BELOW = 4;       // seconds: "very little to say"
+  const LONG_FROM = 15;        // seconds: "responds at length"
+
+  const $ = (id) => document.getElementById(id);
+  const els = {};
+  ['stages','timerChip','timerValue','stageTitle','stageMeta','splitLayout','cardPane','cardPaper',
+   'conversation','examinerBubble','examinerAvatar','examinerLine','examinerText','studentBubble','studentLine',
+   'countdownNumber','prepTimer','btnSkipPrep','btnReplay','btnContinue','modelCard','stageOverlay','stageHead','stageChips','stageBrief','stageSteps','btnStageReady','setupScreen','btnSetupExit','btnMicHelp','micHelpOverlay','btnMicHelpClose','micSelect','setupStatus','btnStartQuiz','btnMicTest','micRow','micTrack','micTime','micLine','btnMicStop','btnVerify','verifyOverlay','voiceCount','verifyChecks','btnVerifyDone','btnVerifyCancel','voiceWave','voiceText','btnVoiceRecord','btnStartRecord','btnReRecord','reviewTime','reviewPlayer','scaffold','modeSwitch','recordTime','btnEnd','hintNote','completion',
+   'completionTitle','completionText','btnViewResult','instructionOverlay','structureList','btnReady',
+   'btnInstructions','submitOverlay','submitProgressText','btnCancelSubmit','btnConfirmSubmit',
+   'btnSetting','btnSaveExit','btnSubmit','btnFeedback','proto','protoToggle','protoPanel',
+   'protoJump','protoLength','protoLog','toast'].forEach((id) => { els[id] = $(id); });
+
+  class Cancelled extends Error {}
+
+  let session = 0;             // bumped to cancel whatever the examiner flow is doing
+  const timers = new Set();
+  let endHandler = null;
+  let skipHandler = null;
+  let introHandler = null;     // resolves the part-introduction popup
+  let choiceHandler = null;    // practice mode: resolves the pending button choice
+  let mode = 'test';           // 'test', 'practice' (self-paced) or 'guided'
+  const isPractice = () => mode !== 'test';
+  const SHOW_MODES = false;    // practice modes are built but switched off for now
+  let simulate = 'auto';
+  let followUpCursor = 0;
+  let completedParts = 0;
+  let currentStage = -1;
+  let testStarted = false;
+
+  // ---------- Small helpers ----------
+  const fmt = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+
+  function el(tag, cls, text) {
+    const node = document.createElement(tag);
+    if (cls) node.className = cls;
+    if (text !== undefined) node.textContent = text;
+    return node;
+  }
+
+  function showToast(msg) {
+    els.toast.textContent = msg;
+    els.toast.classList.add('show');
+    clearTimeout(showToast.t);
+    showToast.t = setTimeout(() => els.toast.classList.remove('show'), 2200);
+  }
+
+  function pause(token, ms) {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => (token === session ? resolve() : reject(new Cancelled())), ms);
+    });
+  }
+
+  function cancelRun() {
+    session++;
+    timers.forEach(clearInterval);
+    timers.clear();
+    endHandler = null;
+    skipHandler = null;
+    choiceHandler = null;
+    introHandler = null;
+    els.stageOverlay.classList.remove('open');
+  }
+
+  function log(msg) {
+    const li = el('li', '', msg);
+    els.protoLog.appendChild(li);
+    els.protoLog.scrollTop = els.protoLog.scrollHeight;
+  }
+
+  // ---------- Progress stepper ----------
+  const stageFills = [];
+  const stageEls = [];
+  STAGES.forEach((stage) => {
+    const wrap = el('div', 'stage');
+    wrap.title = stage.label + (stage.assessed ? '' : ' (not assessed)');
+    wrap.appendChild(el('span', 'stage-name', stage.label));
+    const seg = el('div', 'segment');
+    const fill = el('div', 'segment-fill');
+    seg.appendChild(fill);
+    wrap.appendChild(seg);
+    els.stages.appendChild(wrap);
+    stageFills.push(fill);
+    stageEls.push(wrap);
+  });
+
+  function setStageProgress(i, fraction) {
+    stageFills[i].style.width = Math.round(Math.min(1, fraction) * 100) + '%';
+  }
+
+  function setCurrentStage(i) {
+    stageEls.forEach((node, k) => node.classList.toggle('is-current', k === i));
+  }
+
+  // ---------- Stage header ----------
+  function renderStageHeader(stage) {
+    els.stageMeta.textContent = '';
+    if (!stage) { els.stageTitle.textContent = 'Speaking test'; return; }
+    els.stageTitle.textContent = stage.title;
+    els.stageMeta.appendChild(el('span', 'chip' + (stage.assessed ? ' assessed' : ''), stage.assessed ? 'Assessed' : 'Not assessed'));
+    els.stageMeta.appendChild(el('span', 'chip time', stage.duration));
+    if (stage.topic) els.stageMeta.appendChild(el('span', 'chip topic', stage.topic));
+  }
+
+  // ---------- Card (Part 2) ----------
+  function buildCard(card) {
+    els.cardPaper.textContent = '';
+    els.cardPaper.appendChild(el('h3', '', card.title));
+    els.cardPaper.appendChild(el('p', '', card.intro));
+    const ul = el('ul');
+    card.options.forEach((o) => ul.appendChild(el('li', '', o)));
+    els.cardPaper.appendChild(ul);
+    els.cardPaper.appendChild(el('p', 'task', card.task));
+  }
+
+  function setCardVisible(visible) {
+    els.splitLayout.classList.toggle('no-card', !visible);
+  }
+
+  function setCardLocked(locked) {
+    els.cardPane.classList.toggle('is-locked', locked);
+    els.cardPaper.setAttribute('aria-hidden', String(locked));
+  }
+
+  // ---------- Conversation UI ----------
+  // 'waiting' is the examiner's turn; every other phase (countdown, prep,
+  // recording, captured) belongs to the student.
+  function setStudentPhase(phase, label) {
+    els.studentBubble.dataset.phase = phase;
+    els.studentLine.textContent = label;
+    els.conversation.dataset.turn = phase === 'waiting' ? 'examiner' : 'student';
+  }
+
+  // No transcript is shown while the examiner talks — only that audio is
+  // playing — matching the live product. `text` still drives how long the
+  // "speaking" state lasts, so longer scripts take proportionally longer.
+  async function examinerSpeaks(token, text) {
+    setStudentPhase('waiting', 'Please wait — nothing to click yet');
+    els.examinerBubble.classList.remove('is-speaking');
+    els.examinerLine.classList.add('is-loading');
+    els.examinerText.textContent = 'Loading examiner audio…';
+    await pause(token, LOADING_MS);
+
+    els.examinerLine.classList.remove('is-loading');
+    els.examinerText.textContent = 'The examiner is speaking';
+    els.examinerBubble.classList.add('is-speaking');
+    els.examinerAvatar.classList.add('is-active');
+
+    const duration = Math.min(6000, Math.max(1400, text.length * 24));
+    await pause(token, duration);
+
+    els.examinerBubble.classList.remove('is-speaking');
+    els.examinerAvatar.classList.remove('is-active');
+    // Examiner is done: leave the bubble empty while the student's turn runs.
+    els.examinerText.textContent = '';
+  }
+
+  // The candidate may press Start Record, but recording also begins by itself
+  // once the window closes: this caps the time available to produce external
+  // audio (e.g. text-to-speech) between the question and the answer.
+  const AUTO_START_SECONDS = 5;
+  function chooseWithin(seconds) {
+    return new Promise((resolve) => {
+      let left = seconds;
+      const paint = () => { els.studentLine.textContent = `Recording starts automatically in ${left}s`; };
+      paint();
+      const id = setInterval(() => {
+        left--;
+        if (left <= 0) { if (choiceHandler) choiceHandler('start'); } else paint();
+      }, 1000);
+      timers.add(id);
+      choiceHandler = (key) => { clearInterval(id); timers.delete(id); choiceHandler = null; resolve(key); };
+    });
+  }
+
+  // Practice mode: wait for one of several buttons; resolves with its key.
+  function choose() {
+    return new Promise((resolve) => { choiceHandler = (key) => { choiceHandler = null; resolve(key); }; });
+  }
+
+  // All modes: the candidate starts recording themselves, may replay the
+  // question first, and may listen back and record again before moving on.
+  async function answerManually(token, text, limit) {
+    await examinerSpeaks(token, text);
+    for (;;) {
+      const guided = mode === 'guided';
+      setStudentPhase('ready', guided ? 'Plan your answer' : 'Ready when you are');
+      els.examinerText.textContent = guided
+        ? 'Tick the steps of your plan, then press Start Answering'
+        : 'Click Start Record to answer the question';
+      els.btnStartRecord.textContent = guided ? 'Start Answering' : 'Start Record';
+      els.modelCard.hidden = true;
+      els.scaffold.querySelectorAll('.scaffold-steps li.done').forEach((li) => li.classList.remove('done'));
+      els.btnReplay.hidden = false;
+      const act = await chooseWithin(AUTO_START_SECONDS);
+      els.btnReplay.hidden = true;
+      if (act === 'replay') {
+        log('Question replayed at the candidate’s request');
+        await examinerSpeaks(token, text);
+        continue;
+      }
+      els.examinerText.textContent = '';
+      const seconds = await record(token, limit);
+      setStudentPhase('review', 'Listen to your answer');
+      els.reviewTime.textContent = '0:00 / ' + fmt(seconds);
+      els.btnContinue.hidden = false;
+      if (mode === 'guided') showModelAnswer(text);
+      const next = await choose();
+      els.btnContinue.hidden = true;
+      els.modelCard.hidden = true;
+      if (next === 'next') return seconds;
+      log('Candidate chose to record the answer again');
+    }
+  }
+
+  function showModelAnswer(question) {
+    els.modelCard.textContent = '';
+    els.modelCard.appendChild(el('p', 'scaffold-title', 'Model answer'));
+    const answer = MODEL_ANSWERS[question];
+    els.modelCard.appendChild(el('p', '', answer || 'No model answer for this follow-up. Compare your take with the plan above: did you cover every step?'));
+    if (answer) els.modelCard.appendChild(el('p', 'model-tip', 'Notice the pattern: direct answer, a reason, then an example or contrast. Listen to your take again and compare.'));
+    els.modelCard.hidden = false;
+  }
+
+  // Examiner asks, candidate answers. Resolves with the answer length in seconds.
+  async function ask(token, text, limit = ANSWER_LIMIT) {
+    return answerManually(token, text, limit);
+  }
+
+  function record(token, limit) {
+    return new Promise((resolve, reject) => {
+      setStudentPhase('recording', 'Recording your answer…');
+      let seconds = 0;
+      const paint = () => { els.recordTime.textContent = fmt(seconds) + (limit > ANSWER_LIMIT ? ' / ' + fmt(limit) : ''); };
+      paint();
+      const id = setInterval(() => { seconds++; paint(); if (seconds >= limit) done(); }, 1000);
+      timers.add(id);
+      lastAnswerUrl = null;
+      const stopCapture = startCapture();
+      function done() {
+        clearInterval(id);
+        timers.delete(id);
+        endHandler = null;
+        if (stopCapture) stopCapture().then((url) => { lastAnswerUrl = url; });
+        if (token === session) resolve(seconds); else reject(new Cancelled());
+      }
+      endHandler = done;
+    });
+  }
+
+  function prepare(token, seconds) {
+    return new Promise((resolve, reject) => {
+      setStudentPhase('prep', 'Preparation time');
+      let left = seconds;
+      els.prepTimer.textContent = fmt(left);
+      const id = setInterval(() => { left--; els.prepTimer.textContent = fmt(left); if (left <= 0) done(); }, 1000);
+      timers.add(id);
+      function done() {
+        clearInterval(id);
+        timers.delete(id);
+        skipHandler = null;
+        if (token === session) resolve(); else reject(new Cancelled());
+      }
+      skipHandler = done;
+    });
+  }
+
+  // One examiner turn: examiner speaks, short pause, candidate answers.
+  async function turn(token, text, limit = ANSWER_LIMIT) {
+    const seconds = await ask(token, text, limit);
+    return seconds;
+  }
+
+  // ---------- Examiner rules for Parts 1 and 3 ----------
+  function classify(seconds) {
+    if (simulate !== 'auto') return simulate;
+    if (seconds < BRIEF_BELOW) return 'brief';
+    return seconds >= LONG_FROM ? 'long' : 'adequate';
+  }
+
+  function nextFollowUp(question) {
+    const text = FOLLOW_UPS[followUpCursor % FOLLOW_UPS.length](question.focus);
+    followUpCursor++;
+    return text;
+  }
+
+  // Ask the question; unless the candidate already answered at length, use one
+  // follow-up prompt to draw out more, then move on either way.
+  async function askWithPrompt(token, question, tag) {
+    const first = await turn(token, question.text);
+    const kind = classify(first);
+    const measured = `${first}s${simulate !== 'auto' ? ', simulated' : ''}`;
+    if (kind === 'long') {
+      log(`${tag} · ${measured} · answered at length → no prompt needed`);
+      return { long: true };
+    }
+    log(`${tag} · ${measured} · ${kind === 'brief' ? 'very little to say' : 'could be developed'} → follow-up prompt`);
+    const second = await turn(token, nextFollowUp(question));
+    const after = classify(second);
+    log(`${tag} · after prompt · ${after === 'brief' ? 'very little again → moving on' : 'developed → moving on'}`);
+    return { long: false };
+  }
+
+  // ---------- Stage runners ----------
+  async function runWarmup(token, stage, i) {
+    for (let n = 0; n < stage.questions.length; n++) {
+      await turn(token, stage.questions[n].text);
+      setStageProgress(i, (n + 1) / stage.questions.length);
+    }
+  }
+
+  async function runInterview(token, stage, i) {
+    const total = stage.questions.length + 1;
+    await turn(token, stage.intro);
+    setStageProgress(i, 1 / total);
+    for (let n = 0; n < stage.questions.length; n++) {
+      await askWithPrompt(token, stage.questions[n], `${stage.label} · Q${n + 1}`);
+      setStageProgress(i, (n + 2) / total);
+    }
+  }
+
+  async function runShortTalk(token, stage, i) {
+    setCardVisible(true);
+    setCardLocked(false);
+    setStageProgress(i, 0.3);
+    log('Part 2 · card shown (examiner silent) → up to 1 min preparation, no written notes');
+    // The examiner does not speak here: a short prompt asks the candidate to read the card.
+    els.examinerLine.classList.remove('is-loading');
+    els.examinerText.textContent = 'Read the card and prepare what you want to say. You have 1 minute. Written notes are not allowed.';
+    await prepare(token, stage.prepSeconds);
+    els.examinerText.textContent = '';
+    setStageProgress(i, 0.5);
+    const seconds = await ask(token, stage.start, stage.talkSeconds);
+    log(`Part 2 · talk ${fmt(seconds)} (stops at ${fmt(stage.talkSeconds)})`);
+
+  }
+
+  async function runDiscussion(token, stage, i) {
+    // "may not be necessary to use all the questions" if the candidate speaks at length:
+    // each long answer makes one remaining question unnecessary (at least two are asked).
+    let planned = stage.questions.length;
+    let longAnswers = 0;
+    await turn(token, stage.intro);
+    setStageProgress(i, 0.1);
+    for (let n = 0; n < planned; n++) {
+      const res = await askWithPrompt(token, stage.questions[n], `${stage.label} · Q${n + 1}`);
+      if (res.long) {
+        longAnswers++;
+        const reduced = Math.max(2, stage.questions.length - longAnswers);
+        if (reduced < planned) {
+          planned = reduced;
+          log('Part 3 · at length → one question no longer needed');
+        }
+      }
+      setStageProgress(i, 0.1 + 0.9 * ((n + 1) / planned));
+    }
+  }
+
+  const RUNNERS = { warmup: runWarmup, part1: runInterview, part2: runShortTalk, part3: runDiscussion };
+
+  function renderScaffold(stage) {
+    els.scaffold.textContent = '';
+    els.scaffold.hidden = !isPractice();
+    els.scaffold.classList.toggle('is-guided', mode === 'guided');
+    els.modelCard.hidden = true;
+    if (!isPractice()) return;
+    els.stageMeta.appendChild(el('span', 'chip practice', mode === 'guided' ? 'Practice · Guided' : 'Practice · Self-paced'));
+    const s = SCAFFOLDS[stage.id];
+    els.scaffold.appendChild(el('p', 'scaffold-title', stage.id === 'part2' ? 'Plan your talk' : 'Structure your answer'));
+    const steps = el('ol', 'scaffold-steps');
+    s.steps.forEach((t) => {
+      const li = el('li', '', t);
+      if (mode === 'guided') li.addEventListener('click', () => li.classList.toggle('done'));
+      steps.appendChild(li);
+    });
+    els.scaffold.appendChild(steps);
+    const phrases = el('p', 'scaffold-phrases');
+    phrases.appendChild(el('b', '', 'Useful phrases: '));
+    phrases.appendChild(document.createTextNode(s.phrases.join('  ·  ')));
+    els.scaffold.appendChild(phrases);
+  }
+
+  // Popup shown when the test moves on to the next part.
+  function showStageIntro(stage) {
+    els.examinerText.textContent = '';
+    setStudentPhase('waiting', 'Please wait — nothing to click yet');
+    els.stageHead.textContent = stage.title + ' instruction';
+    els.stageChips.textContent = '';
+    els.stageChips.appendChild(el('span', 'chip' + (stage.assessed ? ' assessed' : ''), stage.assessed ? 'Assessed' : 'Not assessed'));
+    els.stageChips.appendChild(el('span', 'chip time', stage.duration));
+    els.stageBrief.textContent = stage.brief;
+    els.stageSteps.textContent = '';
+    stage.steps.forEach((t) => { const li = el('li'); li.innerHTML = t; els.stageSteps.appendChild(li); });
+    els.stageOverlay.classList.add('open');
+    return new Promise((resolve) => {
+      introHandler = () => { introHandler = null; els.stageOverlay.classList.remove('open'); resolve(); };
+    });
+  }
+
+  function enterStage(i) {
+    const stage = STAGES[i];
+    currentStage = i;
+    setCurrentStage(i);
+    renderStageHeader(stage);
+    renderScaffold(stage);
+    setCardVisible(false);
+    els.hintNote.textContent = stage.id === 'part2'
+      ? 'Note: Your audio answer must not exceed 2 minutes.'
+      : 'Note: Your audio answer must not exceed 1 minute.';
+    log(`${stage.label} — ${stage.assessed ? 'assessed' : 'not assessed'}`);
+  }
+
+  function resetConversation() {
+    els.examinerBubble.classList.remove('is-speaking');
+    els.examinerAvatar.classList.remove('is-active');
+    els.examinerLine.classList.add('is-loading');
+    els.examinerText.textContent = 'Loading examiner audio…';
+    setStudentPhase('waiting', 'Please wait — nothing to click yet');
+    els.completion.classList.remove('show');
+    els.splitLayout.hidden = false;
+    els.hintNote.hidden = false;
+    setCardVisible(false);
+  }
+
+  async function runTest(startIndex) {
+    cancelRun();
+    const token = session;
+    resetConversation();
+    els.protoLog.textContent = '';
+    followUpCursor = 0;
+    completedParts = startIndex;
+    stageFills.forEach((f, k) => setStageProgress(k, k < startIndex ? 1 : 0));
+    testStarted = true;
+    try {
+      for (let i = startIndex; i < STAGES.length; i++) {
+        enterStage(i);
+        if (i > 0) await showStageIntro(STAGES[i]);
+        await RUNNERS[STAGES[i].id](token, STAGES[i], i);
+        setStageProgress(i, 1);
+        completedParts = i + 1;
+      }
+      showCompletion(false);
+    } catch (err) {
+      if (!(err instanceof Cancelled)) throw err;
+    }
+  }
+
+  function showCompletion(submitted) {
+    cancelRun();
+    setCurrentStage(-1);
+    renderStageHeader(null);
+    els.splitLayout.hidden = true;
+    els.hintNote.hidden = true;
+    els.completionTitle.textContent = submitted ? 'Quiz submitted' : 'All parts complete';
+    els.completionText.textContent = submitted
+      ? 'Thanks — your responses have been recorded.'
+      : 'You’ve finished all parts of the speaking test. Submit when you’re ready.';
+    els.btnViewResult.hidden = !submitted;
+    els.completion.classList.add('show');
+  }
+
+  // ---------- Overlays ----------
+  function openInstructions(atStart) {
+    els.btnReady.textContent = atStart ? 'Ready' : 'Close';
+    els.btnReady.dataset.start = atStart ? 'yes' : 'no';
+    els.modeSwitch.hidden = !(atStart && SHOW_MODES);
+    els.instructionOverlay.classList.add('open');
+  }
+
+  els.modeSwitch.querySelectorAll('.mode-opt').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      mode = btn.dataset.mode;
+      els.modeSwitch.querySelectorAll('.mode-opt').forEach((b) => {
+        b.classList.toggle('on', b === btn);
+        b.setAttribute('aria-checked', String(b === btn));
+      });
+    });
+  });
+  [['btnStartRecord', 'start'], ['btnReplay', 'replay'], ['btnReRecord', 'again'], ['btnContinue', 'next']].forEach(([id, key]) => {
+    els[id].addEventListener('click', () => { if (choiceHandler) choiceHandler(key); });
+  });
+
+  els.btnStageReady.addEventListener('click', () => { if (introHandler) introHandler(); });
+
+  els.btnReady.addEventListener('click', () => {
+    els.instructionOverlay.classList.remove('open');
+    if (els.btnReady.dataset.start === 'yes') runTest(0);
+  });
+  els.btnInstructions.addEventListener('click', () => openInstructions(!testStarted));
+
+  els.btnSubmit.addEventListener('click', () => {
+    els.submitProgressText.textContent = `You have completed ${completedParts} of ${STAGES.length} parts.`;
+    els.submitOverlay.classList.add('open');
+  });
+  els.btnCancelSubmit.addEventListener('click', () => els.submitOverlay.classList.remove('open'));
+  els.btnConfirmSubmit.addEventListener('click', () => {
+    els.submitOverlay.classList.remove('open');
+    showCompletion(true);
+    showToast('Quiz submitted');
+  });
+  els.btnViewResult.addEventListener('click', showResults);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') els.submitOverlay.classList.remove('open');
+  });
+
+  // ---------- Candidate controls ----------
+  els.btnEnd.addEventListener('click', () => { if (endHandler) endHandler(); });
+  els.btnSkipPrep.addEventListener('click', () => { if (skipHandler) skipHandler(); });
+
+  els.timerChip.addEventListener('click', () => {
+    els.timerChip.dataset.on = els.timerChip.dataset.on === 'yes' ? 'no' : 'yes';
+    els.timerValue.textContent = els.timerChip.dataset.on === 'yes' ? fmt(elapsed) : '-';
+  });
+  let elapsed = 0;
+  setInterval(() => {
+    elapsed++;
+    if (els.timerChip.dataset.on === 'yes') els.timerValue.textContent = fmt(elapsed);
+  }, 1000);
+
+  els.btnSetting.addEventListener('click', () => showToast('Settings — demo placeholder'));
+  els.btnSaveExit.addEventListener('click', () => showToast('Progress saved'));
+  els.btnFeedback.addEventListener('click', () => showToast('Feedback form — demo placeholder'));
+
+  // ---------- Prototype tools ----------
+  els.protoToggle.addEventListener('click', () => {
+    const open = els.protoPanel.hidden;
+    els.protoPanel.hidden = !open;
+    els.protoToggle.setAttribute('aria-expanded', String(open));
+  });
+
+  STAGES.forEach((stage, i) => {
+    const b = el('button', '', stage.label);
+    b.type = 'button';
+    b.addEventListener('click', () => { runTest(i); });
+    els.protoJump.appendChild(b);
+  });
+  const resultBtn = el('button', '', 'Result');
+  resultBtn.type = 'button';
+  resultBtn.addEventListener('click', showResults);
+  els.protoJump.appendChild(resultBtn);
+
+  [['auto', 'Auto'], ['brief', 'Brief'], ['adequate', 'Adequate'], ['long', 'At length']].forEach(([value, label]) => {
+    const b = el('button', value === simulate ? 'on' : '', label);
+    b.type = 'button';
+    b.addEventListener('click', () => {
+      simulate = value;
+      [...els.protoLength.children].forEach((c) => c.classList.toggle('on', c === b));
+    });
+    els.protoLength.appendChild(b);
+  });
+
+  // ---------- Setup: mic test, then voice verification, then Start Quiz ----------
+  // 1. Test Microphone: a plain level check with play-back, as on the live page.
+  // 2. Verify Voice (next to Start Quiz): refuses virtual microphones, records a
+  //    one-time phrase, then runs the integrity checks before declaring a pass.
+  // 3. Start Quiz unlocks only after a passed verification and the confirmations.
+  const VIRTUAL_MIC = /VB-Audio|CABLE|Voicemeeter|Virtual|BlackHole/i;
+  const VERIFY_CHECKS = ['Physical microphone connected', 'Voice profile captured', 'Live speech detected (not a recording)', 'Natural background noise'];
+  let micTested = false;
+  let verified = false;
+  let verifyRun = 0;           // bumped on cancel so a stale run stops
+  let micTimer = null;
+
+  function updateSetup() {
+    const ticked = els.setupScreen.querySelectorAll('.check input:checked').length === 3;
+    els.btnVerify.disabled = !micTested;
+    els.btnStartQuiz.disabled = !(verified && ticked);
+    els.setupStatus.classList.toggle('ok', verified && ticked);
+    els.setupStatus.textContent = !micTested ? 'Test your microphone first.'
+      : !verified ? 'Verify your voice to start the quiz.'
+      : !ticked ? 'Verified. Now tick all three confirmations.'
+      : 'Verified. You can now start the quiz.';
+    els.btnVerify.textContent = verified ? 'Voice Verified \u2713' : 'Verify Voice';
+    els.btnVerify.classList.toggle('verified', verified);
+  }
+
+  // ---------- Real microphone (getUserMedia + Web Audio + MediaRecorder) ----------
+  // When the browser refuses or has no microphone (e.g. embedded previews), the
+  // prototype falls back to simulated audio so the flow can still be shown.
+  const audio = { stream: null, ctx: null, analyser: null, buf: null, deviceId: null, simulated: false };
+  let lastAnswerUrl = null;
+  let player = null;
+
+  const selectedOption = () => els.micSelect.selectedOptions[0];
+  const selectedLabel = () => (selectedOption() ? selectedOption().textContent : '');
+  const isDemoDevice = () => !!(selectedOption() && selectedOption().hasAttribute('data-demo'));
+  const selectedDeviceId = () => (selectedOption() && selectedOption().dataset.real ? selectedOption().value : undefined);
+
+  function closeMic() {
+    if (audio.stream) audio.stream.getTracks().forEach((t) => t.stop());
+    audio.stream = null;
+    audio.analyser = null;
+  }
+
+  async function openMic() {
+    const deviceId = selectedDeviceId();
+    if (audio.simulated || !navigator.mediaDevices) return false;
+    if (audio.stream && audio.deviceId === deviceId) return true;
+    try {
+      closeMic();
+      audio.stream = await navigator.mediaDevices.getUserMedia({ audio: deviceId ? { deviceId: { exact: deviceId } } : true });
+      audio.deviceId = deviceId;
+      audio.ctx = audio.ctx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audio.ctx.state === 'suspended') await audio.ctx.resume();
+      audio.analyser = audio.ctx.createAnalyser();
+      audio.analyser.fftSize = 1024;
+      audio.buf = new Float32Array(audio.analyser.fftSize);
+      audio.ctx.createMediaStreamSource(audio.stream).connect(audio.analyser);
+      await refreshDevices();
+      return true;
+    } catch (err) {
+      audio.simulated = true;
+      showToast('Microphone not available \u2014 using simulated audio');
+      els.micHelpOverlay.classList.add('open');
+      return false;
+    }
+  }
+
+  // Display level 0..1 with a noise gate: silence and room hiss draw a flat
+  // line; only real sound from the microphone makes the bars move.
+  const GATE = 0.012;
+  function displayLevel() {
+    const rms = micLevel();
+    return rms < GATE ? 0 : Math.min(1, (rms - GATE) * 9);
+  }
+
+  // Root-mean-square level of the current audio frame (0 = silence).
+  function micLevel() {
+    if (!audio.analyser) return 0;
+    audio.analyser.getFloatTimeDomainData(audio.buf);
+    let sum = 0;
+    for (const v of audio.buf) sum += v * v;
+    return Math.sqrt(sum / audio.buf.length);
+  }
+
+  // Starts recording the open stream; returns a function that stops it and
+  // resolves with a playable object URL (or null when no microphone is open).
+  function startCapture() {
+    if (!audio.stream || typeof MediaRecorder === 'undefined') return null;
+    const chunks = [];
+    const rec = new MediaRecorder(audio.stream);
+    rec.ondataavailable = (e) => { if (e.data.size) chunks.push(e.data); };
+    rec.start();
+    return () => new Promise((resolve) => {
+      rec.onstop = () => resolve(chunks.length ? URL.createObjectURL(new Blob(chunks, { type: rec.mimeType })) : null);
+      rec.stop();
+    });
+  }
+
+  // Moves a row of bars with the live level while active() stays true.
+  function meter(bars, active) {
+    const tick = () => {
+      if (!active()) return;
+      const lvl = displayLevel();
+      const t = performance.now() / 160;
+      bars.forEach((b, k) => { b.style.height = (lvl ? 4 + lvl * (10 + 16 * Math.abs(Math.sin(k * 1.7 + t))) : 4) + 'px'; });
+      requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function playUrl(url) {
+    if (!url) { showToast('No recording to play (simulated audio)'); return; }
+    if (player) player.pause();
+    player = new Audio(url);
+    player.play();
+  }
+
+  // After permission is granted the browser exposes real device names.
+  async function refreshDevices() {
+    const devices = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'audioinput' && d.label);
+    if (!devices.length) return;
+    const demo = [...els.micSelect.querySelectorAll('option[data-demo]')];
+    const keep = selectedDeviceId();
+    els.micSelect.textContent = '';
+    const real = document.createElement('optgroup');
+    real.label = 'Your microphones';
+    devices.forEach((d) => {
+      const o = el('option', '', d.label);
+      o.value = d.deviceId;
+      o.dataset.real = '1';
+      real.appendChild(o);
+    });
+    const sim = document.createElement('optgroup');
+    sim.label = 'Demo: virtual devices';
+    demo.forEach((o) => sim.appendChild(o));
+    els.micSelect.append(real, sim);
+    if (keep && [...real.children].some((o) => o.value === keep)) els.micSelect.value = keep;
+  }
+
+  els.reviewPlayer.addEventListener('click', () => playUrl(lastAnswerUrl));
+
+  // ---------- Mic test row ----------
+  // Running level trace: a new bar enters on the right every tick and older
+  // bars scroll left, like a recorder's timeline.
+  const TRACE_MS = 70;
+  function startTrace(live, active) {
+    els.micLine.textContent = '';
+    let last = performance.now();
+    const id = setInterval(() => {
+      if (!active()) { clearInterval(id); return; }
+      // Add one bar per elapsed tick so the trace keeps pace even if timers are throttled.
+      const now = performance.now();
+      const due = Math.floor((now - last) / TRACE_MS);
+      if (!due) return;
+      last += due * TRACE_MS;
+      const max = Math.max(10, Math.floor(els.micLine.clientWidth / 4));
+      for (let k = 0; k < Math.min(due, max); k++) {
+        const lvl = live ? displayLevel() : 0;   // no microphone, no sound: stay flat
+        const bar = el('i');
+        bar.style.height = (2 + Math.round(lvl * 20)) + 'px';
+        els.micLine.appendChild(bar);
+      }
+      while (els.micLine.children.length > max) els.micLine.firstElementChild.remove();
+    }, TRACE_MS);
+  }
+  const mmss = (n) => '00:' + String(n).padStart(2, '0');
+  let micStopCapture = null;
+  let micUrl = null;
+
+  async function startMicTest() {
+    const live = !isDemoDevice() && await openMic();
+    let n = 0;
+    els.btnMicTest.hidden = true;
+    els.micRow.hidden = false;
+    els.micTrack.classList.remove('played');
+    els.micTime.textContent = mmss(0);
+    els.btnMicStop.classList.remove('again');
+    els.btnMicStop.querySelector('span').textContent = 'Stop';
+    clearInterval(micTimer);
+    micTimer = setInterval(() => { n = Math.min(n + 1, 59); els.micTime.textContent = mmss(n); }, 1000);
+    micUrl = null;
+    micStopCapture = live ? startCapture() : null;
+    startTrace(live, () => micTimer !== null);
+  }
+  async function stopMicTest() {
+    clearInterval(micTimer);
+    micTimer = null;
+    els.micTrack.classList.add('played');
+    els.btnMicStop.classList.add('again');
+    els.btnMicStop.querySelector('span').textContent = 'Test Again';
+    if (micStopCapture) { micUrl = await micStopCapture(); micStopCapture = null; }
+    micTested = true;
+    updateSetup();
+  }
+  els.btnMicTest.addEventListener('click', startMicTest);
+  els.btnMicStop.addEventListener('click', () => { if (micTimer) stopMicTest(); else startMicTest(); });
+  els.micTrack.querySelector('.mic-play').addEventListener('click', () => playUrl(micUrl));
+
+  // ---------- Voice verification popup ----------
+  const later = (run, ms) => new Promise((resolve, reject) => setTimeout(() => (run === verifyRun ? resolve() : reject(new Cancelled())), ms));
+  const SPEECH_LEVEL = 0.04;   // peak RMS that counts as someone speaking
+  const NOISE_FLOOR = 0.0004;  // below this the input is digitally silent (injected audio)
+
+  function resetVerifyPopup() {
+    els.voiceCount.hidden = false;
+    els.voiceCount.textContent = '5';
+    els.voiceWave.hidden = false;
+    els.voiceWave.classList.remove('live');
+    [...els.voiceWave.children].forEach((b) => { b.style.height = ''; });
+    els.verifyChecks.hidden = true;
+    els.verifyChecks.textContent = '';
+    els.voiceText.className = 'verify-status';
+    els.voiceText.style.color = '';
+    els.voiceText.textContent = 'Press record when you are ready.';
+    els.btnVoiceRecord.hidden = false;
+    els.btnVoiceRecord.disabled = false;
+    els.btnVerifyDone.hidden = true;
+    els.btnVerifyDone.textContent = 'Complete setup';
+    els.btnVerifyCancel.hidden = false;
+  }
+
+  function failVerification(message) {
+    els.voiceText.className = 'verify-status fail';
+    els.voiceText.textContent = message;
+    els.btnVoiceRecord.hidden = true;
+    els.btnVerifyCancel.hidden = true;
+    els.btnVerifyDone.hidden = false;
+    els.btnVerifyDone.textContent = 'Close';
+  }
+
+  els.btnVerify.addEventListener('click', () => {
+    verifyRun++;
+    verified = false;
+    updateSetup();
+    resetVerifyPopup();
+    els.verifyOverlay.classList.add('open');
+    const label = selectedLabel();
+    if (VIRTUAL_MIC.test(label)) {
+      els.voiceCount.hidden = true;
+      els.voiceWave.hidden = true;
+      failVerification(`\u2715 Virtual microphone detected: \u201c${label}\u201d. Choose a physical microphone and try again.`);
+    }
+  });
+
+  els.btnVoiceRecord.addEventListener('click', async () => {
+    const run = verifyRun;
+    els.btnVoiceRecord.disabled = true;
+    const live = await openMic();
+    let recording = true;
+    const levels = [];
+    if (live) {
+      meter([...els.voiceWave.children], () => recording);
+      const sampler = setInterval(() => { if (recording) levels.push(micLevel()); else clearInterval(sampler); }, 100);
+    }
+    els.voiceText.textContent = live ? 'Recording your voice profile\u2026' : 'No microphone detected \u2014 simulating the recording.';
+    try {
+      for (let n = 4; n >= 0; n--) { await later(run, 1000); els.voiceCount.textContent = n || '\u2713'; }
+      recording = false;
+      els.voiceWave.classList.remove('live');
+
+      // Real measurements when a microphone is open; otherwise every check passes.
+      const sorted = [...levels].sort((a, b) => a - b);
+      const peak = sorted.length ? sorted[sorted.length - 1] : 0;
+      const floor = sorted.length ? sorted[Math.floor(sorted.length * 0.1)] : 0;
+      const results = live ? [true, true, peak > SPEECH_LEVEL, floor > NOISE_FLOOR] : [true, true, true, true];
+
+      els.btnVoiceRecord.hidden = true;
+      els.voiceWave.hidden = true;
+      els.voiceCount.hidden = true;
+      els.verifyChecks.hidden = false;
+      els.voiceText.textContent = 'Verifying your voice\u2026';
+      const items = VERIFY_CHECKS.map((t) => { const li = el('li', 'wait'); li.appendChild(el('i')); li.appendChild(document.createTextNode(t)); els.verifyChecks.appendChild(li); return li; });
+      for (let k = 0; k < items.length; k++) {
+        items[k].classList.remove('wait');
+        await later(run, 700);
+        items[k].classList.add(results[k] ? 'ok' : 'bad');
+        if (!results[k]) {
+          failVerification(k === 2
+            ? '\u2715 We could not hear you. Move closer to the microphone, read the phrase aloud and try again.'
+            : '\u2715 The input sounds digitally silent, which usually means injected audio. Use a physical microphone and try again.');
+          return;
+        }
+      }
+      els.voiceText.textContent = '\u2713 Verification passed. Your voice profile will be compared throughout the test.';
+      els.voiceText.style.color = 'var(--success)';
+      els.btnVerifyCancel.hidden = true;
+      els.btnVerifyDone.hidden = false;
+      verified = true;
+    } catch (err) {
+      recording = false;
+      if (!(err instanceof Cancelled)) throw err;
+    }
+  });
+
+  els.btnVerifyCancel.addEventListener('click', () => {
+    verifyRun++;
+    els.verifyOverlay.classList.remove('open');
+    updateSetup();
+  });
+  els.btnVerifyDone.addEventListener('click', () => {
+    els.voiceText.style.color = '';
+    els.verifyOverlay.classList.remove('open');
+    updateSetup();
+  });
+  els.micSelect.addEventListener('change', () => { verified = false; closeMic(); updateSetup(); });
+  els.setupScreen.querySelectorAll('.check input').forEach((c) => c.addEventListener('change', updateSetup));
+  els.btnMicHelp.addEventListener('click', () => els.micHelpOverlay.classList.add('open'));
+  els.btnMicHelpClose.addEventListener('click', () => els.micHelpOverlay.classList.remove('open'));
+  els.btnSetupExit.addEventListener('click', () => showToast('Exit — demo placeholder'));
+  els.btnStartQuiz.addEventListener('click', () => {
+    els.setupScreen.hidden = true;
+    openInstructions(true);
+  });
+
+  // ---------- Init ----------
+  STAGES.forEach((stage) => {
+    const li = el('li', stage.assessed ? '' : 'is-warmup');
+    const head = el('div', 'head');
+    head.appendChild(el('span', 'name', stage.title));
+    head.appendChild(el('span', 'dur', stage.duration));
+    head.appendChild(el('span', 'chip' + (stage.assessed ? ' assessed' : ''), stage.assessed ? 'Assessed' : 'Not assessed'));
+    li.appendChild(head);
+    li.appendChild(el('p', 'desc', stage.brief));
+    els.structureList.appendChild(li);
+  });
+  buildCard(STAGES[2].card);
+  setCurrentStage(0);
+  renderStageHeader(STAGES[0]);
+  updateSetup();
+})();
+</script>
+
+</body>
+</html>
