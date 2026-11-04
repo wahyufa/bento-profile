@@ -466,7 +466,10 @@
   .mic-stop{display:inline-flex; align-items:center; gap:6px; height:46px; padding:0 18px; background:#0fb0f8; border-color:#0fb0f8;}
   .mic-stop svg{width:16px; height:16px;}
   .mic-stop.again{background:#fff; color:#0fb0f8; border:2px solid #0fb0f8;}
-  .setup-outline.verified{border-color:var(--success); background:var(--success-soft); color:var(--success);}
+  .setup-outline.verified{display:inline-flex; align-items:center; gap:6px; border-color:var(--success); background:var(--success-soft); color:var(--success);}
+  .icon-check{width:1em; height:1em; flex:0 0 auto;}
+  .voice-count .icon-check{width:24px; height:24px;}
+  .integrity-bar b .icon-check{width:11px; height:11px;}
   .integrity-bar{display:flex; align-items:center; gap:9px; margin:0 0 clamp(6px,1.2vh,12px); padding:8px 12px; border-radius:10px; background:#e9fcf7; color:#198b70; font:600 12.5px 'Montserrat',sans-serif;}
   .integrity-bar b{display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:var(--success); color:#fff; font-size:11px;}
   @media (max-width:640px){ .field-grid{grid-template-columns:1fr;} .setup-foot{flex-direction:column; align-items:stretch;} }
@@ -533,7 +536,7 @@
         </button>
       </div>
 
-      <div class="integrity-bar" id="integrityBar"><b>&#10003;</b><span>Voice profile active &mdash; continuously verifying this speaker</span></div>
+      <div class="integrity-bar" id="integrityBar"><b><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></b><span>Voice profile active &mdash; continuously verifying this speaker</span></div>
 
       <div class="split-layout no-card" id="splitLayout">
         <aside class="card-pane is-locked" id="cardPane" aria-label="Speaking Assessment card">
@@ -1434,6 +1437,8 @@
   let micTested = false;
   let verified = false;
   let verifyRun = 0;           // bumped on cancel so a stale run stops
+  // Feather "check" icon, used for every check mark on this page.
+  const ICON_CHECK = '<svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
   let micTimer = null;
 
   function updateSetup() {
@@ -1445,7 +1450,7 @@
       : !verified ? 'Verify your voice to start the quiz.'
       : !ticked ? 'Verified. Now tick all three confirmations.'
       : 'Verified. You can now start the quiz.';
-    els.btnVerify.textContent = verified ? 'Voice Verified \u2713' : 'Verify Voice';
+    els.btnVerify.innerHTML = verified ? `Voice Verified ${ICON_CHECK}` : 'Verify Voice';
     els.btnVerify.classList.toggle('verified', verified);
   }
 
@@ -1672,7 +1677,7 @@
     try {
       for (let n = 29; n >= 26; n--) { await later(run, 650); els.voiceCount.textContent = n; }
       recording = false;
-      els.voiceCount.textContent = '\u2713';
+      els.voiceCount.innerHTML = ICON_CHECK;
       els.voiceText.textContent = 'Voice sample captured. It will be compared throughout the test.';
       els.btnVerifyDone.hidden = false;
       verified = true;
