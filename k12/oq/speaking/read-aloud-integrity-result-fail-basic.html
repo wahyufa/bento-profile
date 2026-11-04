@@ -262,12 +262,12 @@
   .pv-integrity { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px; background: #e9fcf7; color: #198b70; font-size: 12px; font-weight: 750; }
   .pv-integrity b { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #19c993; color: #fff; }
   .pv-pass { margin-top: 10px; padding: 11px 12px; border-radius: 8px; background: #e9fcf7; color: #168b6e; font-size: 12px; font-weight: 700; }
-  .pv-btn { width: 100%; margin-top: 14px; padding: 10px 17px; border: 2px solid #12a9eb; border-radius: 10px; background: #fff; color: #12a9eb; font-size: 13px; font-weight: 800; cursor: pointer; }
-  .pv-btn:disabled { cursor: default; }
+  .pv-integrity--verdict { margin-top: 14px; }
+  .pv-integrity--fail { background: #fff0f3; color: var(--red); }
+  .pv-integrity--fail b { background: var(--red); }
   .pv-card--fail { border-color: #ffc2cd; }
   .pv-card--fail .pv-metric span:last-child { color: var(--red); }
   .pv-card--fail .pv-meter i { background: var(--red); }
-  .pv-card--fail .pv-btn { border-color: var(--red); color: var(--red); }
 
   /* ---------- Tool rail (live page's icon column) ---------- */
   .tool-rail {
@@ -545,6 +545,9 @@
   // Its speaker-verification and frontend-controls cards are left out for now.
   // A failed answer shows almost no room noise and long stretches of perfect
   // digital silence, the pattern of injected (TTS / virtual cable) audio.
+  // Feather "check" and an alert mark for the verdict line.
+  const ICON_OK = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
+  const ICON_ALERT = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="6" x2="12" y2="13"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
   const SCAN_RESULTS = {
     pass: { noise: 84, noiseText: '\u221242 dB detected', silence: 12, silenceText: 'Low risk', verdict: 'Natural microphone pattern' },
     fail: { noise: 9, noiseText: '\u221291 dB (almost none)', silence: 86, silenceText: 'High risk', verdict: 'Possible injected audio \u2014 flagged for review' },
@@ -558,7 +561,7 @@
         <p>AI signal checks are attached to the recording for reviewer context.</p>
         <div class="pv-metric"><div><span>Natural room noise</span><span>${r.noiseText}</span></div><div class="pv-meter"><i style="width:${r.noise}%"></i></div></div>
         <div class="pv-metric"><div><span>Digital-silence risk</span><span>${r.silenceText}</span></div><div class="pv-meter warn"><i style="width:${r.silence}%"></i></div></div>
-        <button class="pv-btn" type="button" disabled>${r.verdict}</button>
+        <div class="pv-integrity pv-integrity--verdict${verified(q) ? '' : ' pv-integrity--fail'}"><b>${verified(q) ? ICON_OK : ICON_ALERT}</b> ${r.verdict}</div>
       </div>`;
   }
 
