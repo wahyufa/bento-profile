@@ -250,16 +250,14 @@
   .check-row b { color: var(--green); font-weight: 700; text-align: right; }
 
   /* Original prototype's integrity cards */
-  .pv-card { margin-top: 16px; padding: 13px; border: 1px solid #d9e8e9; border-radius: 10px; background: #fff; }
-  .pv-card h4 { margin: 0 0 6px; font-size: 13px; color: #202661; }
-  .pv-card p { margin: 0 0 12px; font-size: 11px; line-height: 1.4; color: #778197; }
-  .pv-metric { margin: 12px 0; }
-  .pv-metric div { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 11px; font-weight: 800; color: #263252; }
+  .pv-card p { margin: 0 0 4px; font-size: 14px; line-height: 1.5; color: var(--ink-soft); }
+  .pv-metric { margin: 14px 0; }
+  .pv-metric div { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 14px; font-weight: 600; color: var(--ink); }
   .pv-metric span:last-child { color: #1b9d79; }
   .pv-meter { height: 7px; border-radius: 8px; background: #edf2f5; overflow: hidden; }
   .pv-meter i { display: block; height: 100%; background: #19c993; transition: .5s; }
   .pv-meter.warn i { background: #edaa32; }
-  .pv-integrity { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px; background: #e9fcf7; color: #198b70; font-size: 12px; font-weight: 750; }
+  .pv-integrity { display: flex; align-items: center; gap: 9px; padding: 9px 12px; border-radius: 8px; background: #e9fcf7; color: #198b70; font-size: 14px; font-weight: 700; }
   .pv-integrity b { display: grid; place-items: center; width: 18px; height: 18px; border-radius: 50%; background: #19c993; color: #fff; }
   .pv-pass { margin-top: 10px; padding: 11px 12px; border-radius: 8px; background: #e9fcf7; color: #168b6e; font-size: 12px; font-weight: 700; }
   .pv-integrity--verdict { margin-top: 14px; }
@@ -539,13 +537,15 @@
   // check" outcome) is shown straight away.
   function verificationViewHtml() {
     return `
-      <div class="pv-card">
-        <h4>Audio integrity analysis</h4>
-        <p>AI signal checks are attached to the recording for reviewer context.</p>
-        <div class="pv-metric"><div><span>Natural room noise</span><span>\u221242 dB detected</span></div><div class="pv-meter"><i style="width:84%"></i></div></div>
-        <div class="pv-metric"><div><span>Digital-silence risk</span><span>Low risk</span></div><div class="pv-meter warn"><i style="width:12%"></i></div></div>
-        <div class="pv-integrity pv-integrity--verdict"><b><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></b> Natural microphone pattern</div>
-      </div>`;
+      <section class="ie-card pv-card">
+        <div class="ie-card__head"><h4>Audio integrity analysis</h4></div>
+        <div class="ie-card__body">
+          <p>AI signal checks are attached to the recording for reviewer context.</p>
+          <div class="pv-metric"><div><span>Natural room noise</span><span>\u221242 dB detected</span></div><div class="pv-meter"><i style="width:84%"></i></div></div>
+          <div class="pv-metric"><div><span>Digital-silence risk</span><span>Low risk</span></div><div class="pv-meter warn"><i style="width:12%"></i></div></div>
+          <div class="pv-integrity pv-integrity--verdict"><b><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></b> Natural microphone pattern</div>
+        </div>
+      </section>`;
   }
 
   // ---------- render ----------

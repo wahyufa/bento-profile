@@ -469,6 +469,7 @@
   .setup-outline.verified{display:inline-flex; align-items:center; gap:6px; border-color:var(--success); background:var(--success-soft); color:var(--success);}
   .icon-check{width:1em; height:1em; flex:0 0 auto;}
   .voice-count .icon-check{width:24px; height:24px;}
+  .voice-count.fail{border-color:#ffd6dc; color:#e63757;}
   .integrity-bar b .icon-check{width:11px; height:11px;}
   .integrity-bar{display:flex; align-items:center; gap:9px; margin:0 0 clamp(6px,1.2vh,12px); padding:8px 12px; border-radius:10px; background:#e9fcf7; color:#198b70; font:600 12.5px 'Montserrat',sans-serif;}
   .integrity-bar b{display:grid; place-items:center; width:18px; height:18px; border-radius:50%; background:var(--success); color:#fff; font-size:11px;}
@@ -1629,9 +1630,15 @@
 
   // ---------- Voice verification popup ----------
   const later = (run, ms) => new Promise((resolve, reject) => setTimeout(() => (run === verifyRun ? resolve() : reject(new Cancelled())), ms));
+  // Demo switch: how many voice samples fail before one passes. 0 here;
+  // igcse-oral-integrity-fail.html sets 1 to show the "record again" state.
+  const DEMO_FAILED_SAMPLES = 0;
+  let samplesRecorded = 0;
+  const ICON_X = '<svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
 
   function resetVerifyPopup() {
     els.voiceCount.hidden = false;
+    els.voiceCount.classList.remove('fail');
     els.voiceCount.textContent = '30';
     els.voiceWave.hidden = false;
     els.voiceWave.classList.remove('live');
@@ -1641,6 +1648,7 @@
     els.voiceText.textContent = 'Press record when you are ready.';
     els.btnVoiceRecord.hidden = false;
     els.btnVoiceRecord.disabled = false;
+    els.btnVoiceRecord.textContent = '● Record voice sample';
     els.btnVerifyDone.hidden = true;
     els.btnVerifyDone.textContent = 'Complete setup';
   }
@@ -1673,10 +1681,24 @@
     const live = await openMic();
     let recording = true;
     if (live) meter([...els.voiceWave.children], () => recording);
+    els.voiceCount.classList.remove('fail');
+    els.voiceCount.textContent = '30';
+    els.voiceText.className = 'verify-status';
     els.voiceText.textContent = 'Recording your voice profile\u2026';
     try {
       for (let n = 29; n >= 26; n--) { await later(run, 650); els.voiceCount.textContent = n; }
       recording = false;
+      samplesRecorded++;
+      if (samplesRecorded <= DEMO_FAILED_SAMPLES) {
+        // Failed sample: ask for the phrase again; Complete setup stays hidden.
+        els.voiceCount.classList.add('fail');
+        els.voiceCount.innerHTML = ICON_X;
+        els.voiceText.className = 'verify-status fail';
+        els.voiceText.textContent = 'We could not verify your voice. Read the phrase again clearly and record another sample.';
+        els.btnVoiceRecord.textContent = '\u25cf Record again';
+        els.btnVoiceRecord.disabled = false;
+        return;
+      }
       els.voiceCount.innerHTML = ICON_CHECK;
       els.voiceText.textContent = 'Voice sample captured. It will be compared throughout the test.';
       els.btnVerifyDone.hidden = false;
