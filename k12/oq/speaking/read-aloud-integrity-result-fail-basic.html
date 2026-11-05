@@ -155,14 +155,6 @@
   .marks b { font-weight: 600; color: var(--ink-2); }
   .marks b.marks--hold { color: var(--red); }
 
-  .flag-banner {
-    display: flex; align-items: flex-start; gap: 12px; margin: 0 0 16px;
-    padding: 14px 16px; border: 1px solid #ffc2cd; border-radius: 12px; background: #fff0f3; color: var(--red);
-  }
-  .flag-banner svg { flex: 0 0 auto; margin-top: 1px; }
-  .flag-banner b { display: block; font-size: 15px; }
-  .flag-banner span { display: block; margin-top: 2px; font-size: 14px; line-height: 1.55; color: var(--ink-soft); }
-  .flag-banner button { margin-top: 8px; padding: 0; border: 0; background: none; color: var(--red); font-weight: 700; font-size: 14px; text-decoration: underline; cursor: pointer; }
   .send-feedback { display: block; margin: 14px 4px 0 auto; border: 0; background: none; color: var(--blue); font-weight: 700; font-size: 14px; cursor: pointer; }
 
   /* ---------- Panel ---------- */
@@ -206,6 +198,7 @@
   .word--ok { color: var(--green); }
   .word--miss { color: var(--red); text-decoration: underline; }
   .fb-message { margin-top: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 12px; font-size: 15px; line-height: 1.6; color: var(--ink); }
+  .fb-message--empty { text-align: center; }
   .fb-legend { display: flex; justify-content: center; gap: 16px; margin-top: 10px; font-size: 12px; color: var(--ink-soft); }
   .fb-legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
 
@@ -263,6 +256,8 @@
   .pv-integrity--verdict { margin-top: 14px; }
   .pv-integrity--fail { background: #fff0f3; color: var(--red); }
   .pv-integrity--fail b { background: var(--red); }
+  .pv-integrity--neutral { background: #f1f3f6; color: var(--ink-soft); }
+  .pv-integrity--neutral b { background: #98a2ad; }
   .pv-card--fail { border-color: #ffc2cd; }
   .pv-card--fail .pv-metric span:last-child { color: var(--red); }
   .pv-card--fail .pv-meter i { background: var(--red); }
@@ -411,10 +406,13 @@
         feedback: 'Great job. The first syllable is stressed correctly: CON-fi-dent.',
       },
       {
-        id: '1D', text: 'Responsible', duration: '0:04', match: 95,
+        // Sample of a silent answer: recorded, but the student said nothing.
+        // Room noise is still there, so it is "no speech", not injected
+        // audio: scored as No Answer and never flagged.
+        id: '1D', text: 'Responsible', duration: '0:05', match: 95, silent: true,
         words: [false],
-        scores: { Accuracy: 64, Pronunciation: 60, Articulation: 66, Fluency: 72, Prosody: 62 },
-        feedback: 'The middle syllable was swallowed. Make "SPON" clearly louder: re-SPON-si-ble.',
+        scores: { Accuracy: 0, Pronunciation: 0, Articulation: 0, Fluency: 0, Prosody: 0 },
+        feedback: 'No answer is detected',
       },
       {
         id: '1E', text: 'Six sleek swans swam swiftly south.', duration: '0:06', match: 94,
@@ -466,7 +464,9 @@
     const isFlagged = flagged(q);
     const marks = isFlagged
       ? `<p class="marks">Marks obtained : <b class="marks--hold">On hold (pending teacher review)</b></p>`
-      : `<p class="marks">Marks obtained : <b>${markOf(q)} Mark</b></p>`;
+      : q.silent
+        ? `<p class="marks">Marks obtained : <b>No Answer</b></p>`
+        : `<p class="marks">Marks obtained : <b>${markOf(q)} Mark</b></p>`;
     return `
       <div class="prompt">
         <div class="prompt__head">
@@ -489,15 +489,6 @@
         <span>This answer has been reviewed by AI!</span>
         <img src="https://elb-onlinequiz.heyhi.sg/images/adaptive-learning/ai-icon.png" alt="">
       </div>
-      ${isFlagged ? `
-      <div class="flag-banner" role="alert">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4.5 6v5.5c0 4.6 3.2 8.4 7.5 9.5 4.3-1.1 7.5-4.9 7.5-9.5V6z" /><path d="M12 8v5M12 16.5v.5" /></svg>
-        <div>
-          <b>Speaker verification failed (${q.match}% match)</b>
-          <span>This voice does not match the sample recorded before the quiz. The answer is flagged and its mark is on hold until a teacher reviews it.</span>
-          <button type="button" data-goto="verification">View details</button>
-        </div>
-      </div>` : ''}
       <div class="player" aria-label="Recorded answer">
         <button class="player__btn" type="button" data-play aria-label="Play recording">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4v16l14-8z" /></svg>
@@ -519,7 +510,7 @@
         <div class="ie-card__body">
           <p class="fb-label"><img src="https://elb-onlinequiz.heyhi.sg/images/svg/feedback.svg" alt="">Feedback</p>
           <div class="highlight-box">${words}</div>
-          <p class="fb-message">${escapeHtml(q.feedback)}</p>
+          <p class="fb-message${q.silent ? ' fb-message--empty' : ''}">${escapeHtml(q.feedback)}</p>
         </div>
       </section>
 
@@ -538,29 +529,29 @@
   }
 
   // ---------- right: Speaker Verification view ----------
-  // Card copied from the original integrity prototype
-  // (ai_speaking_test_revamp_prototype.html): audio integrity analysis.
-  // Its speaker-verification and frontend-controls cards are left out for now.
-  // A failed answer shows almost no room noise and long stretches of perfect
-  // digital silence, the pattern of injected (TTS / virtual cable) audio.
-  // Feather "check" and an alert mark for the verdict line.
+  // The "Speaker verification" card from the original integrity prototype
+  // (ai_speaking_test_revamp_prototype.html), in the live page's ie-card
+  // format. Feather "check", an alert mark and a dash for the verdict line.
   const ICON_OK = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>';
   const ICON_ALERT = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="6" x2="12" y2="13"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
-  const SCAN_RESULTS = {
-    pass: { noise: 84, noiseText: '\u221242 dB detected', silence: 12, silenceText: 'Low risk', verdict: 'Natural microphone pattern' },
-    fail: { noise: 9, noiseText: '\u221291 dB (almost none)', silence: 86, silenceText: 'High risk', verdict: 'Possible injected audio \u2014 flagged for review' },
-  };
+  const ICON_DASH = '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" aria-hidden="true"><line x1="6" y1="12" x2="18" y2="12"/></svg>';
 
   function verificationViewHtml(q) {
-    const r = SCAN_RESULTS[verified(q) ? 'pass' : 'fail'];
+    // A silent answer has no speech to compare, so it is not checked or flagged.
+    const state = q.silent ? 'silent' : verified(q) ? 'pass' : 'fail';
+    const value = { pass: `${q.match}% verified`, fail: `${q.match}% \u2014 not verified`, silent: '\u2014' }[state];
+    const verdict = {
+      pass: `<div class="pv-integrity pv-integrity--verdict"><b>${ICON_OK}</b> Same speaker detected</div>`,
+      fail: `<div class="pv-integrity pv-integrity--verdict pv-integrity--fail"><b>${ICON_ALERT}</b> Different speaker detected</div>`,
+      silent: `<div class="pv-integrity pv-integrity--verdict pv-integrity--neutral"><b>${ICON_DASH}</b> No speech to verify</div>`,
+    }[state];
     return `
-      <section class="ie-card pv-card${verified(q) ? '' : ' pv-card--fail'}">
-        <div class="ie-card__head"><h4>Audio integrity analysis</h4></div>
+      <section class="ie-card pv-card${state === 'fail' ? ' pv-card--fail' : ''}">
+        <div class="ie-card__head"><h4>Speaker verification</h4></div>
         <div class="ie-card__body">
-          <p>AI signal checks are attached to the recording for reviewer context.</p>
-          <div class="pv-metric"><div><span>Natural room noise</span><span>${r.noiseText}</span></div><div class="pv-meter"><i style="width:${r.noise}%"></i></div></div>
-          <div class="pv-metric"><div><span>Digital-silence risk</span><span>${r.silenceText}</span></div><div class="pv-meter warn"><i style="width:${r.silence}%"></i></div></div>
-          <div class="pv-integrity pv-integrity--verdict${verified(q) ? '' : ' pv-integrity--fail'}"><b>${verified(q) ? ICON_OK : ICON_ALERT}</b> ${r.verdict}</div>
+          <p>The submitted response was compared with the voice profile captured during microphone testing.</p>
+          <div class="pv-metric"><div><span>Voice-profile match</span><span>${value}</span></div><div class="pv-meter"><i style="width:${state === 'silent' ? 0 : q.match}%"></i></div></div>
+          ${verdict}
         </div>
       </section>`;
   }

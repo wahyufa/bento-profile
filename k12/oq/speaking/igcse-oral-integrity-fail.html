@@ -151,6 +151,9 @@
   }
   .progress-row .label{font-weight:700; color:var(--text-muted); font-size:13px; flex:0 0 auto;}
   .stages{flex:1 1 auto; min-width:0; display:flex; gap:10px;}
+  /* Part stepper hidden for now; the row keeps only the timer on the right. */
+  .progress-row .label, .progress-row .stages{display:none;}
+  .progress-row .timer-chip{margin-left:auto;}
   .stage{flex:1 1 0; min-width:0;}
   .stage-name{
     display:block; margin-bottom:3px;
@@ -537,7 +540,6 @@
         </button>
       </div>
 
-      <div class="integrity-bar" id="integrityBar"><b><svg class="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg></b><span>Voice profile active &mdash; continuously verifying this speaker</span></div>
 
       <div class="split-layout no-card" id="splitLayout">
         <aside class="card-pane is-locked" id="cardPane" aria-label="Speaking Assessment card">
@@ -746,7 +748,6 @@
   <div class="modal modal-instruction">
     <div class="modal-head" id="stageHead">Part instruction</div>
     <div class="modal-body">
-      <div class="stage-chips" id="stageChips"></div>
       <p class="lead" id="stageBrief"></p>
       <div class="howto">
         <p class="howto-title">What to do</p>
@@ -884,7 +885,7 @@
   const els = {};
   ['stages','timerChip','timerValue','stageTitle','stageMeta','splitLayout','cardPane','cardPaper',
    'conversation','examinerBubble','examinerAvatar','examinerLine','examinerText','studentBubble','studentLine',
-   'countdownNumber','prepTimer','btnSkipPrep','btnReplay','btnContinue','modelCard','stageOverlay','stageHead','stageChips','stageBrief','stageSteps','btnStageReady','setupScreen','btnSetupExit','micHelpOverlay','btnMicHelpClose','micSelect','setupStatus','btnStartQuiz','btnMicTest','micRow','micTrack','micTime','micLine','btnMicStop','btnVerify','verifyOverlay','voiceCount','btnVerifyDone','voiceWave','voiceText','btnVoiceRecord','btnStartRecord','btnReRecord','reviewTime','reviewPlayer','scaffold','modeSwitch','recordTime','btnEnd','hintNote','completion',
+   'countdownNumber','prepTimer','btnSkipPrep','btnReplay','btnContinue','modelCard','stageOverlay','stageHead','stageBrief','stageSteps','btnStageReady','setupScreen','btnSetupExit','micHelpOverlay','btnMicHelpClose','micSelect','setupStatus','btnStartQuiz','btnMicTest','micRow','micTrack','micTime','micLine','btnMicStop','btnVerify','verifyOverlay','voiceCount','btnVerifyDone','voiceWave','voiceText','btnVoiceRecord','btnStartRecord','btnReRecord','reviewTime','reviewPlayer','scaffold','modeSwitch','recordTime','btnEnd','hintNote','completion',
    'completionTitle','completionText','btnViewResult','instructionOverlay','structureList','btnReady',
    'btnInstructions','submitOverlay','submitProgressText','btnCancelSubmit','btnConfirmSubmit',
    'btnSetting','btnSaveExit','btnSubmit','btnFeedback','proto','protoToggle','protoPanel',
@@ -976,8 +977,6 @@
     els.stageMeta.textContent = '';
     if (!stage) { els.stageTitle.textContent = 'Speaking test'; return; }
     els.stageTitle.textContent = stage.title;
-    els.stageMeta.appendChild(el('span', 'chip' + (stage.assessed ? ' assessed' : ''), stage.assessed ? 'Assessed' : 'Not assessed'));
-    els.stageMeta.appendChild(el('span', 'chip time', stage.duration));
     if (stage.topic) els.stageMeta.appendChild(el('span', 'chip topic', stage.topic));
   }
 
@@ -1264,9 +1263,6 @@
     els.examinerText.textContent = '';
     setStudentPhase('waiting', 'Please wait — nothing to click yet');
     els.stageHead.textContent = stage.title + ' instruction';
-    els.stageChips.textContent = '';
-    els.stageChips.appendChild(el('span', 'chip' + (stage.assessed ? ' assessed' : ''), stage.assessed ? 'Assessed' : 'Not assessed'));
-    els.stageChips.appendChild(el('span', 'chip time', stage.duration));
     els.stageBrief.textContent = stage.brief;
     els.stageSteps.textContent = '';
     stage.steps.forEach((t) => { const li = el('li'); li.innerHTML = t; els.stageSteps.appendChild(li); });
@@ -1728,8 +1724,6 @@
     const li = el('li', stage.assessed ? '' : 'is-warmup');
     const head = el('div', 'head');
     head.appendChild(el('span', 'name', stage.title));
-    head.appendChild(el('span', 'dur', stage.duration));
-    head.appendChild(el('span', 'chip' + (stage.assessed ? ' assessed' : ''), stage.assessed ? 'Assessed' : 'Not assessed'));
     li.appendChild(head);
     li.appendChild(el('p', 'desc', stage.brief));
     els.structureList.appendChild(li);
