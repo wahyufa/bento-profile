@@ -153,7 +153,7 @@
   .player__track { width: 120px; height: 4px; border-radius: 4px; background: #c4c7c5; }
   .marks { margin-top: 28px; font-weight: 600; font-size: 18px; color: var(--ink-soft); }
   .marks b { font-weight: 600; color: var(--ink-2); }
-  .marks b.marks--hold { color: var(--red); }
+  .marks b.marks--hold { color: #f5a623; }
 
   .send-feedback { display: block; margin: 14px 4px 0 auto; border: 0; background: none; color: var(--blue); font-weight: 700; font-size: 14px; cursor: pointer; }
 
@@ -256,6 +256,11 @@
   .pv-integrity--verdict { margin-top: 14px; }
   .pv-integrity--fail { background: #fff0f3; color: var(--red); }
   .pv-integrity--fail b { background: var(--red); }
+  .review-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 14px; font-weight: 600; color: var(--ink); }
+  .review-select {
+    min-width: 220px; height: 41px; padding: 8px 28px 8px 12px; border: 1px solid #d2ddec; border-radius: 8px;
+    background: #fff; font-family: inherit; font-size: 14px; color: var(--ink); cursor: pointer;
+  }
   .pv-integrity--neutral { background: #f1f3f6; color: var(--ink-soft); }
   .pv-integrity--neutral b { background: #98a2ad; }
   .pv-card--fail { border-color: #ffc2cd; }
@@ -438,12 +443,20 @@
   };
   const passed = (q) => overallOf(q) >= PASS_MARK;
   const verified = (q) => q.match >= result.verification.threshold;
-  // The audio integrity check runs on submit, so a failed answer is flagged
-  // as soon as the result page opens.
-  const flagged = (q) => !verified(q);
-  // A flagged answer keeps its score, but its mark is held until a
-  // teacher reviews it, so it is not counted in the total.
-  const markOf = (q) => (!flagged(q) && passed(q) ? 1 : 0);
+  // Teacher review of a failed verification, set from the dropdown in the
+  // Speaker Verification view: 'pending' | 'accepted' | 'invalid'.
+  const REVIEW_OPTIONS = [
+    ['pending', 'Pending review'],
+    ['accepted', 'Reviewed — accept mark'],
+    ['invalid', 'Reviewed — mark as invalid'],
+  ];
+  const reviews = {};
+  const reviewOf = (q) => reviews[q.id] || 'pending';
+  // A failed answer stays flagged until it is marked as reviewed.
+  const flagged = (q) => !verified(q) && reviewOf(q) === 'pending';
+  // A flagged answer keeps its score, but its mark is held until a teacher
+  // accepts it; an answer marked invalid scores 0.
+  const markOf = (q) => ((verified(q) || reviewOf(q) === 'accepted') && passed(q) ? 1 : 0);
   const toSeconds = (t) => { const [m, s] = t.split(':').map(Number); return m * 60 + s; };
 
   let toastTimer;
@@ -463,7 +476,7 @@
   function questionCardHtml(q) {
     const isFlagged = flagged(q);
     const marks = isFlagged
-      ? `<p class="marks">Marks obtained : <b class="marks--hold">On hold (pending teacher review)</b></p>`
+      ? `<p class="marks">Marks obtained : <b class="marks--hold">Pending review</b></p>`
       : q.silent
         ? `<p class="marks">Marks obtained : <b>No Answer</b></p>`
         : `<p class="marks">Marks obtained : <b>${markOf(q)} Mark</b></p>`;
@@ -552,6 +565,13 @@
           <p>The submitted response was compared with the voice profile captured during microphone testing.</p>
           <div class="pv-metric"><div><span>Voice-profile match</span><span>${value}</span></div><div class="pv-meter"><i style="width:${state === 'silent' ? 0 : q.match}%"></i></div></div>
           ${verdict}
+          ${state === 'fail' ? `
+          <label class="review-field">
+            <span>Review status</span>
+            <select class="review-select" data-review="${q.id}">
+              ${REVIEW_OPTIONS.map(([value, label]) => `<option value="${value}"${value === reviewOf(q) ? ' selected' : ''}>${label}</option>`).join('')}
+            </select>
+          </label>` : ''}
         </div>
       </section>`;
   }
@@ -639,8 +659,17 @@
     // Delegated: the card and panel are re-rendered per question.
     document.body.addEventListener('click', (e) => {
       if (e.target.closest('[data-see-result]')) showView('summary');
-      else if (e.target.closest('[data-goto]')) showView(e.target.closest('[data-goto]').dataset.goto);      else if (e.target.closest('[data-hear]')) showToast('Model pronunciation — demo placeholder');
+      else if (e.target.closest('[data-goto]')) showView(e.target.closest('[data-goto]').dataset.goto);
+      else if (e.target.closest('[data-hear]')) showToast('Model pronunciation — demo placeholder');
       else if (e.target.closest('[data-play]')) showToast('No recording file in this prototype');
+    });
+    // Review status: re-render so the mark, pills and rail follow it.
+    document.body.addEventListener('change', (e) => {
+      const select = e.target.closest('[data-review]');
+      if (!select) return;
+      reviews[select.dataset.review] = select.value;
+      renderShell();
+      render();
     });
     $('btnSendFeedback').addEventListener('click', () => showToast('Send Feedback — demo placeholder'));
   });
