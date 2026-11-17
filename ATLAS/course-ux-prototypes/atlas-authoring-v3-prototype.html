@@ -652,6 +652,8 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
 <dialog class="dlg" id="outlineDlg" aria-labelledby="olTitle"><div class="dg" id="outlineBody"></div></dialog>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- Sample course shared with the learner prototype (?course=cs) -->
+<script src="assets/courses/customer-service.js"></script>
 <script>
 (function () {
   'use strict';
@@ -994,7 +996,10 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   // ==========================================================================
   // State
   // ==========================================================================
+  // The sample course comes from a shared file, so admin and learner read the same content
+  function sampleCourse() { return window.ATLAS_COURSES && window.ATLAS_COURSES.cs ? JSON.parse(JSON.stringify(window.ATLAS_COURSES.cs)) : null; }
   var STORE = loadState() || { dm: buildSeed(), nw: null };
+  if (!STORE.cs) STORE.cs = sampleCourse();
   var D = STORE.dm;
   var P = { mode: 'new', screen: 'list', course: 'dm', tab: 'content', lid: 'l1', device: 'desktop', pane: 'edit', menu: false, stage: {}, ls: { q: '', lv: 'all', st: 'all', own: 'all' } };
   function cur() { return D.lessons.filter(function (l) { return l.id === P.lid; })[0] || D.lessons[0]; }
@@ -1279,7 +1284,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   function header() {
     var left = courseBlockers(), pub = D.status === 'published';
     return '<div class="ch"><button class="back" type="button" data-act="tolist" aria-label="Back to courses">←</button><div><h1>' + esc(D.details.title || 'Untitled course') + '</h1><div class="sub">' + (pub ? 'Edit course · <span class="chip ok"' + tipA('Learners can see this course.', true) + '>Published</span> <span class="chip info"' + tipA('The version learners see now.', true) + '>' + esc(D.ver || 'V1') + '</span> <span class="chip warn"' + tipA('Changes made since the last publish. Choose Publish update to release them to learners.', true) + '>Unsaved changes</span>' : 'New course · <span class="chip draft"' + tipA('Only you and other admins can see this course. Learners see it after you publish.', true) + '>Draft</span>') + '</div></div>' +
-      '<div class="acts"><button class="btn" type="button" data-act="learner"' + (D.lessons.length ? '' : ' disabled') + '>▶ Preview as learner</button><button class="btn primary" type="button" data-act="publish"' + (left ? ' title="' + left + ' things need fixing first"' : '') + '>' + (pub ? 'Publish update' : 'Publish') + (left ? ' (' + left + ')' : '') + '</button>' +
+      '<div class="acts">' + (P.course === 'cs' ? '<a class="btn" style="text-decoration:none" target="_blank" rel="noopener" href="atlas-lesson-blocks-prototype.html?course=cs&lesson=' + (cur() ? D.lessons.indexOf(cur()) + 1 : 1) + '" title="Opens the learner view in a new tab. It shows what you saved here.">Open learner view ↗</a>' : '') + '<button class="btn" type="button" data-act="learner"' + (D.lessons.length ? '' : ' disabled') + '>▶ Preview as learner</button><button class="btn primary" type="button" data-act="publish"' + (left ? ' title="' + left + ' things need fixing first"' : '') + '>' + (pub ? 'Publish update' : 'Publish') + (left ? ' (' + left + ')' : '') + '</button>' +
       '<button class="ico" type="button" data-act="menu" aria-haspopup="menu" aria-expanded="' + P.menu + '" aria-label="More actions">⋯</button><div class="menu' + (P.menu ? ' show' : '') + '" role="menu"><button type="button" role="menuitem" data-toast="Unpublish (not part of this preview)">Unpublish</button><button type="button" role="menuitem" data-toast="Archive (not part of this preview)">Archive</button><button type="button" role="menuitem" class="dng" data-toast="Delete (not part of this preview)">Delete…</button></div></div></div>' +
       '<div class="tabs" role="tablist">' + [['details', 'Details'], ['content', 'Content'], ['obj', 'Learning Objectives'], ['km', 'Knowledge Mapping']].map(function (t) { return '<button type="button" role="tab" data-tab="' + t[0] + '" aria-selected="' + (P.tab === t[0]) + '">' + t[1] + '</button>'; }).join('') + '</div>';
   }
@@ -1839,6 +1844,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
       return { key: key, title: d.title || 'Untitled course', status: s.status, desc: d.description, level: d.difficulty.toLowerCase(), mins: s.course.durationAuto ? total : s.course.duration, cover: d.cover, lessons: s.lessons.length, modules: s.modules.length, openable: true };
     }
     if (nw) out.push(fromState('nw', nw));
+    if (STORE.cs) out.push(fromState('cs', STORE.cs));
     out.push(fromState('dm', dm));
     out.push({ key: 'tm', title: 'Time Management Essentials', status: 'published', desc: TM_DESC, level: 'beginner', mins: 0, cover: { type: 'image', src: TM_COVER, x: 50, y: 50 }, lessons: 0, modules: 0, openable: false });
     return out;
@@ -2213,7 +2219,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
   document.addEventListener('click', function (e) {
     var m = e.target.closest('[data-mode]');
     if (m) { P.mode = m.dataset.mode; render(); return; }
-    if (e.target.closest('#resetBtn')) { STORE = { dm: buildSeed(), nw: null }; D = STORE.dm; P.course = 'dm'; P.screen = 'list'; P.lid = 'l1'; P.kl = 'l1'; P.stage = {}; P.ls = { q: '', lv: 'all', st: 'all', own: 'all' }; saveState(); render(); toast('Demo reset'); return; }
+    if (e.target.closest('#resetBtn')) { STORE = { dm: buildSeed(), nw: null, cs: sampleCourse() }; D = STORE.dm; P.course = 'dm'; P.screen = 'list'; P.lid = 'l1'; P.kl = 'l1'; P.stage = {}; P.ls = { q: '', lv: 'all', st: 'all', own: 'all' }; saveState(); render(); toast('Demo reset'); return; }
     var lf = e.target.closest('[data-ls]'); if (lf) { var lp = lf.dataset.ls.split(':'); P.ls[lp[0]] = lp[1]; render(); return; }
     var ts = e.target.closest('[data-toast]'); if (ts) { e.preventDefault(); toast(ts.dataset.toast); return; }
     if (P.menu && !e.target.closest('.menu') && !e.target.closest('[data-act="menu"]')) { P.menu = false; render(); }
@@ -2516,7 +2522,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
 
   // Deep links: ?mode=old|new, ?lesson=1..13, ?tab=details|content, ?screen=new (an empty new course)
   (function () {
-    migrate(STORE.dm); if (STORE.nw) migrate(STORE.nw);
+    migrate(STORE.dm); if (STORE.nw) migrate(STORE.nw); if (STORE.cs) migrate(STORE.cs);
     var q = new URLSearchParams(location.search);
     if (q.get('mode') === 'old') P.mode = 'old';
     var n = +q.get('lesson'); if (n >= 1 && n <= D.lessons.length) P.lid = D.lessons[n - 1].id;

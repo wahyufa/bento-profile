@@ -208,6 +208,8 @@ a { color: inherit; }
 <div id="app"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- Sample course shared with the admin prototype -->
+<script src="../assets/courses/customer-service.js"></script>
 <script>
 /* Keep the Current / Enhanced choice when moving between pages. */
 (function () {
@@ -247,14 +249,45 @@ a { color: inherit; }
       summary: 'Learn how to prioritise tasks, set achievable goals, manage distractions, and plan your workload efficiently.' }
   ];
 
+  // ---------- Sample course: Customer Service Essentials ----------
+  // Read from the admin prototype's saved copy in this browser, or the shared sample file. Its status is the
+  // learner's real progress in the lesson player, so the prototype's progress switcher does not change it.
+  var SAMPLE = (function () {
+    if (!window.ATLAS_COURSES || !window.ATLAS_COURSES.cs) return null;
+    try { var s = JSON.parse(localStorage.getItem('atlas-admin-proto-v2') || 'null'); if (s && s.cs && s.cs.lessons) return s.cs; } catch (e) { /* use the shared file */ }
+    return window.ATLAS_COURSES.cs;
+  })();
+  // Files in assets/ sit one folder up when this page is served from the clean/ build
+  function assetUrl(src) { return /^(data:|https?:|\/|\.\.\/)/.test(src) || !/\/clean\//.test(window.location.pathname) ? src : '../' + src; }
+  function lessonMins(L) { return +L.mins > 0 ? +L.mins : 5; }
+  if (SAMPLE) {
+    COURSES.unshift({
+      id: 'cs', title: SAMPLE.details.title, level: SAMPLE.details.difficulty || 'Beginner', adaptive: true,
+      lessons: SAMPLE.lessons.length, mins: SAMPLE.lessons.reduce(function (s, L) { return s + lessonMins(L); }, 0),
+      cover: SAMPLE.details.cover && SAMPLE.details.cover.src ? assetUrl(SAMPLE.details.cover.src) : '', summary: SAMPLE.details.description || ''
+    });
+  }
+  function sampleDone() { try { var v = sessionStorage.getItem('cs:atlas-proto-done'); return v ? JSON.parse(v) : {}; } catch (e) { return {}; } }
+  function sampleDoneCount() { var m = sampleDone(), i = 0; while (SAMPLE && i < SAMPLE.lessons.length && m[i]) i++; return i; }
+  function sampleStatus() {
+    var m = sampleDone(), quiz = SAMPLE.lessons.map(function (L) { return L.type; }).indexOf('Quiz');
+    if ((quiz >= 0 && m[quiz]) || sampleDoneCount() === SAMPLE.lessons.length) return 'done';
+    return Object.keys(m).some(function (k) { return m[k]; }) ? 'some' : 'none';
+  }
+
   var state = { mode: 'new', prog: 'none' };
   var filters = { tab: 'mine', status: 'all', level: 'all', q: '' };
 
-  function statusOf(c) { return c.fixed || state.prog; }           // 'none' | 'some' | 'done'
-  function doneLessons(c) { var s = statusOf(c); return s === 'done' ? c.lessons : (s === 'some' ? 4 : 0); } // 4 lessons = the in-progress sample
+  function statusOf(c) { return c.id === 'cs' ? sampleStatus() : (c.fixed || state.prog); }           // 'none' | 'some' | 'done'
+  function doneLessons(c) {
+    var s = statusOf(c);
+    if (c.id === 'cs') return s === 'done' ? c.lessons : sampleDoneCount();
+    return s === 'done' ? c.lessons : (s === 'some' ? 4 : 0);   // 4 lessons = the in-progress sample
+  }
+  function playable(c) { return c.id === 'dm' || c.id === 'cs'; }
   function pctOf(c) { return Math.round(doneLessons(c) / c.lessons * 100); }
   function fmt(m) { var h = Math.floor(m / 60), r = m % 60; return (h ? h + 'h ' : '') + (r ? r + 'm' : ''); }
-  function hrefOf(c) { return c.id === 'dm' ? COURSE_PAGE + '?prog=' + statusOf(c) : '#'; }
+  function hrefOf(c) { return c.id === 'cs' ? COURSE_PAGE + '?course=cs' : (c.id === 'dm' ? COURSE_PAGE + '?prog=' + statusOf(c) : '#'); }
   var LABEL = { none: 'Not started', some: 'In progress', done: 'Completed' };
   var CTA = { none: 'Start course', some: 'Continue', done: 'Review course' };
 
@@ -279,18 +312,19 @@ a { color: inherit; }
   // ENHANCED
   // ==========================================================================
   function upNext() {
-    var c = COURSES[0], s = statusOf(c);
+    var c = COURSES.filter(function (x) { return playable(x) && statusOf(x) !== 'done'; })[0] || COURSES[0], s = statusOf(c);
     if (s === 'done') {
       return '<div class="caught"><div class="big" aria-hidden="true">✓</div><div><b>You are all caught up</b><span class="muted">All ' + COURSES.length + ' of your courses are complete. New courses assigned to you will appear here.</span></div></div>';
     }
-    var started = s === 'some', d = doneLessons(c), left = (c.lessons - d) * 5;
+    var started = s === 'some', d = doneLessons(c), left = c.id === 'cs' ? SAMPLE.lessons.slice(d).reduce(function (n, L) { return n + lessonMins(L); }, 0) : (c.lessons - d) * 5;
+    var nextTitle = c.id === 'cs' ? SAMPLE.lessons[Math.min(d, c.lessons - 1)].title : DM_LESSON_5;
     return '<section class="upnext" aria-label="' + (started ? 'Continue where you left off' : 'Up next') + '">' + thumb(c) +
       '<div class="body"><div class="eyebrow">' + (started ? 'Continue where you left off' : 'Up next for you') + '</div>' +
       '<div class="tags"><span class="tag level">' + c.level + '</span>' + (c.adaptive ? '<span class="tag adaptive">Adaptive</span>' : '') + '</div>' +
       '<h2>' + esc(c.title) + '</h2><p class="sum">' + esc(c.summary) + '</p>' +
       (started ? '<div class="prog"><div class="row"><span>Your progress</span><span>' + pctOf(c) + '%</span></div><div class="bar" role="progressbar" aria-valuenow="' + pctOf(c) + '" aria-valuemin="0" aria-valuemax="100" aria-label="Course progress"><i style="width:' + pctOf(c) + '%"></i></div></div>' : '') +
       '<div class="cta"><a class="btn primary lg" href="' + hrefOf(c) + '">' + I.play + (started ? 'Continue course' : 'Start course') + '</a>' +
-      '<small>' + (started ? 'Lesson ' + (d + 1) + ' of ' + c.lessons + ': ' + DM_LESSON_5 + '<br>About ' + fmt(left) + ' left' : c.lessons + ' lessons · about ' + fmt(c.mins)) + '</small></div></div></section>';
+      '<small>' + (started ? 'Lesson ' + (d + 1) + ' of ' + c.lessons + ': ' + esc(nextTitle) + '<br>About ' + fmt(left) + ' left' : c.lessons + ' lessons · about ' + fmt(c.mins)) + '</small></div></div></section>';
   }
 
   function renderNew() {
@@ -315,7 +349,7 @@ a { color: inherit; }
     var s = statusOf(c), d = doneLessons(c);
     return '<article class="card ' + s + '"><span class="badge ' + s + '">' + LABEL[s] + '</span>' + thumb(c) + '<div class="body">' +
       '<div class="tags"><span class="tag level">' + c.level + '</span>' + (c.adaptive ? '<span class="tag adaptive">Adaptive</span>' : '') + '</div>' +
-      '<h3><a href="' + hrefOf(c) + '"' + (c.id === 'dm' ? '' : ' data-toast="Not available in this preview"') + '>' + esc(c.title) + '</a></h3>' +
+      '<h3><a href="' + hrefOf(c) + '"' + (playable(c) ? '' : ' data-toast="Not available in this preview"') + '>' + esc(c.title) + '</a></h3>' +
       '<div class="facts">' + c.lessons + ' lessons · ' + fmt(c.mins) + '</div>' +
       (s === 'none' ? '' : '<div class="prog"><div class="row"><span>' + (s === 'done' ? 'Completed' : d + ' of ' + c.lessons + ' lessons') + '</span><span>' + pctOf(c) + '%</span></div><div class="bar" role="progressbar" aria-valuenow="' + pctOf(c) + '" aria-valuemin="0" aria-valuemax="100" aria-label="' + esc(c.title) + ' progress"><i style="width:' + pctOf(c) + '%"></i></div></div>') +
       '<span class="btn ' + (s === 'done' ? '' : 'primary') + '" aria-hidden="true">' + CTA[s] + '</span></div></article>';
@@ -357,7 +391,7 @@ a { color: inherit; }
   function renderOld() {
     var cont = COURSES.filter(function (c) { return statusOf(c) !== 'done'; }), comp = COURSES.filter(function (c) { return statusOf(c) === 'done'; });
     var h = appbar() + '<div class="cur-banner"><div class="in"><div><h1>Courses</h1><p>Your enrolled and available courses</p></div><img src="' + BANNER_IMG + '" alt="" onerror="this.remove()"></div></div><div class="cur-wrap">' +
-      '<div class="cur-tabs"><span class="on">My Courses <em>2</em></span><span>Available Courses <em>0</em></span></div>' +
+      '<div class="cur-tabs"><span class="on">My Courses <em>' + COURSES.length + '</em></span><span>Available Courses <em>0</em></span></div>' +
       '<div class="cur-filters"><div class="f">Search courses</div><div class="f sm">All Levels</div><div class="f sm">All statuses</div></div>';
     if (cont.length) h += '<h2>Continue Learning</h2><div class="cur-grid">' + cont.map(curCard).join('') + '</div>';
     if (comp.length) h += '<h2>Completed</h2><div class="cur-grid">' + comp.map(curCard).join('') + '</div>';

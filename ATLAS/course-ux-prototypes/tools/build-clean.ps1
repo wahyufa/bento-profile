@@ -48,8 +48,14 @@ foreach ($src in $map.Keys) {
   Apply 'script toasts'    "toast\('[^']*(as in production|\(prototype\))[^']*'\)" ("toast('" + $neutralToast + "')")
   Apply 'lesson toasts'    " is not part of this prototype" " is not available in this preview"
 
-  # 6. A fresh walkthrough in every browser session: keep lesson progress in sessionStorage
-  if ($src -eq 'atlas-lesson-blocks-prototype.html') { Apply 'session storage' 'localStorage' 'sessionStorage' }
+  # 6. A fresh walkthrough in every browser session: keep lesson progress in sessionStorage.
+  #    The admin prototype's saved course stays in localStorage, so edits made in the admin still show here.
+  if ($src -eq 'atlas-lesson-blocks-prototype.html') { Apply 'session storage' "localStorage(?!\.getItem\('atlas-admin-proto-v2'\))" 'sessionStorage' }
+  #    The course list and course page read the sample course's progress from the same place
+  Apply 'sample progress' "localStorage(\.getItem\([^)]*:atlas-proto-done'\))" 'sessionStorage$1'
+
+  # 6b. Shared files (sample course data, images) live one folder up
+  Apply 'asset paths' 'src="assets/' 'src="../assets/'
 
   # 7. The Current / Enhanced choice follows the learner from page to page (runs before the page script reads the URL)
   $carry = @'

@@ -1979,6 +1979,8 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   </div>
 </template>
 
+<!-- Sample course shared with the admin prototype. Opened with ?course=cs -->
+<script src="assets/courses/customer-service.js"></script>
 <script>
 (function () {
   'use strict';
@@ -1987,6 +1989,21 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
   function make(tag, cls) { var n = document.createElement(tag); if (cls) n.className = cls; return n; }
+
+  // ---------- External course (?course=cs) ----------
+  // The Digital Marketing lessons below are hand-built templates. A course opened with ?course=<key> is
+  // rendered from data instead: the copy the admin prototype saved in this browser if there is one,
+  // otherwise the shared sample file. Its progress is stored under its own key prefix.
+  var CID = (function () {
+    try { var c = new URLSearchParams(window.location.search).get('course'); return c && window.ATLAS_COURSES && window.ATLAS_COURSES[c] ? c : ''; } catch (e) { return ''; }
+  })();
+  var EXT = null;
+  if (CID) {
+    try { var adminStore = JSON.parse(localStorage.getItem('atlas-admin-proto-v2') || 'null'); if (adminStore && adminStore[CID] && adminStore[CID].lessons) EXT = adminStore[CID]; } catch (e) { /* use the shared file */ }
+    if (!EXT) EXT = JSON.parse(JSON.stringify(window.ATLAS_COURSES[CID]));
+  }
+  var COURSE_TITLE = EXT ? EXT.details.title : 'Digital Marketing Strategy';
+  function courseQuery() { return CID ? '&course=' + CID : ''; }
 
   // ---------- Course data (titles, types and durations match production) ----------
   var COURSE = [
@@ -2150,6 +2167,27 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   ];
   function needed(n) { return Math.ceil((PASS_MARK / 100) * n); }
 
+  if (EXT) {
+    COURSE = EXT.lessons.map(function (L) { return { title: L.title || 'Untitled lesson', type: L.type || 'Article', mins: L.mins }; });
+    QUIZ_IDX = COURSE.map(function (c) { return c.type; }).indexOf('Quiz');
+    // Only questions the author confirmed reach learners; a lesson with review off has none
+    QUIZ = EXT.lessons.map(function (L) {
+      var r = L.review || {};
+      if (L.type === 'Quiz' || r.mode === 'off') return [];
+      return (r.questions || []).filter(function (q) { return q.confirmed !== false && q.options && q.options.length; })
+        .map(function (q) { return { q: q.stem, opts: q.options, a: +q.correct || 0, why: q.why || '' }; });
+    });
+    // The prototype's lesson switcher lists this course's lessons
+    var switcher = document.querySelector('.proto [aria-label="Lesson"]');   // not in the clean build
+    if (switcher) switcher.innerHTML =COURSE.map(function (c, i) {
+      return '<button data-lesson="' + i + '" aria-pressed="' + (i === 0) + '" title="' + esc(c.title) + '" aria-label="Lesson ' + (i + 1) + ': ' + esc(c.title) + '">' + (i + 1) + '</button>';
+    }).join('');
+    document.querySelector('.ol-head h2').textContent = COURSE_TITLE;
+  }
+  function hasReview(i) { return !!(QUIZ[i] && QUIZ[i].length); }
+  function lessonPass(i) { var r = EXT && EXT.lessons[i] && EXT.lessons[i].review; return r && r.pass ? +r.pass : 80; }
+  function minsOf(c) { return (c && +c.mins > 0 ? +c.mins : 5) + 'm'; }
+
   // ---------- State ----------
   var state = { lesson: 0, mode: 'new' };
   var reviews = {};   // enhanced review state per lesson
@@ -2157,11 +2195,14 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
 
   // localStorage can be blocked (private mode, embedded previews): keep an in-memory copy too.
   var memory = {};
+  function storeKey(key) { return CID ? CID + ':' + key : key; }
   function load(key, fallback) {
+    key = storeKey(key);
     if (key in memory) return memory[key];
     try { var v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch (e) { return fallback; }
   }
   function save(key, value) {
+    key = storeKey(key);
     memory[key] = value;
     try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) { /* memory copy is enough */ }
   }
@@ -2178,16 +2219,17 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   // ---------- Rendering ----------
   function render() {
     var l = state.lesson, meta = COURSE[l];
-    var tpl = $('#l' + (l + 1) + '-' + state.mode);
     var body = $('#lessonBody');
     body.innerHTML = '';
-    body.appendChild(tpl.content.cloneNode(true));
+    if (EXT) PASS_MARK = lessonPass(l);
+    if (EXT && l !== QUIZ_IDX) body.innerHTML = state.mode === 'new' ? extLesson(l) : extLessonOld(l);
+    else body.appendChild($((EXT ? '#l13-' : '#l' + (l + 1) + '-') + state.mode).content.cloneNode(true));   // the quiz uses the shared quiz template
 
     document.body.dataset.mode = state.mode;
     $('#lessonTitle').innerHTML = ICONS[meta.type] + '<span></span>';
     $('#lessonTitle span').textContent = meta.title;
-    $('#lessonMeta').innerHTML = '<span class="pill">' + meta.type + '</span><span>5m</span>';
-    $('#counter').textContent = (l + 1) + '/13';
+    $('#lessonMeta').innerHTML = '<span class="pill">' + meta.type + '</span><span>' + minsOf(meta) + '</span>';
+    $('#counter').textContent = (l + 1) + '/' + COURSE.length;
     document.title = meta.title + ' · ATLAS Lesson Blocks Prototype';
 
     $$('[data-lesson]').forEach(function (b) { b.setAttribute('aria-pressed', String(+b.dataset.lesson === l)); });
@@ -2223,13 +2265,13 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       var li = make('li', 'ol-item' + (cur ? ' cur' : '') + (done ? ' done' : ''));
       var b = make('button'); b.type = 'button'; b.dataset.go = String(i);
       if (cur) b.setAttribute('aria-current', 'page');
-      var detail = c.type + ' · 5m' + (done ? ' · Done' : (isPending(i) ? ' · Review pending' : (cur ? (i === QUIZ_IDX ? ' · Pass to finish' : ' · Review to complete') : ''))) + (isBookmarked(i) ? ' · Bookmarked' : '');
+      var detail = c.type + ' · ' + minsOf(c) + (done ? ' · Done' : (isPending(i) ? ' · Review pending' : (cur ? (i === QUIZ_IDX ? ' · Pass to finish' : (hasReview(i) ? ' · Review to complete' : '')) : ''))) + (isBookmarked(i) ? ' · Bookmarked' : '');
       b.innerHTML = '<span class="ol-status" aria-hidden="true"></span><span class="ol-text"><span class="ol-name">' + esc(c.title) + '</span><small>' + esc(detail) + '</small></span>';
       li.appendChild(b);
 
       if (cur) {
         var secs = $$('[data-rail]', $('#lessonBody')).map(function (s) { return { id: s.id, text: s.dataset.rail }; });
-        if (i !== QUIZ_IDX) secs.push({ id: 'review', text: 'Lesson review' });
+        if (i !== QUIZ_IDX && hasReview(i)) secs.push({ id: 'review', text: 'Lesson review' });
         if (secs.length) {
           var ul = make('ul', 'ol-sections');
           secs.forEach(function (s) {
@@ -2281,6 +2323,129 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   var COURSES_PAGE = 'atlas-courses-prototype.html';
   // Tells the course pages how far the learner got: completed once the quiz is passed, in progress after any lesson.
   function progParam() { return isDone(QUIZ_IDX) ? 'done' : (doneCount() > 0 ? 'some' : 'none'); }
+  // An external course's pages read its real progress, so only the course key is passed on
+  function pageLink(page) { return CID ? page + (page === COURSE_PAGE ? '?course=' + CID : '') : page + '?prog=' + progParam(); }
+
+  // ---------- Lessons built from blocks (external course) ----------
+  // Uses the same markup and classes as the hand-built lessons, so both look alike. One interactive
+  // journey and one flashcard deck per lesson; extra ones are shown as plain content.
+  function paras(s) { return String(s || '').split(/\n\s*\n/).filter(function (p) { return p.trim(); }).map(function (p) { return '<p>' + esc(p.trim()).replace(/\n/g, '<br>') + '</p>'; }).join(''); }
+  function blockTitle(s) { return s ? '<h2 class="block-title">' + esc(s) + '</h2>' : ''; }
+  function intro(s) { return s ? '<p class="muted" style="margin-bottom:16px">' + esc(s) + '</p>' : ''; }
+  var PEN = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z"/></svg>';
+  var EXT_BLOCK = {
+    lead: function (d) { return d.text ? '<p class="lead">' + esc(d.text) + '</p>' : ''; },
+    text: function (d) { return blockTitle(d.heading) + '<div class="prose">' + paras(d.body) + '</div>'; },
+    cards: function (d) {
+      return blockTitle(d.title) + '<div class="cards">' + (d.cards || []).map(function (c, i) {
+        return '<div class="card accent-top">' + (d.numbered ? '<div class="num" aria-hidden="true">' + (i + 1) + '</div>' : '') + '<h3>' + esc(c.title) + '</h3><p>' + esc(c.text) + '</p>' +
+          (c.more ? '<details class="disclosure" style="margin-top:10px"><summary>Read more</summary><div class="inner">' + paras(c.more) + '</div></details>' : '') + '</div>';
+      }).join('') + '</div>';
+    },
+    callout: function (d) {
+      var v = d.variant === 'good' ? 'good' : (d.variant === 'note' ? 'note' : '');
+      return '<div class="callout ' + v + '"><div class="ic" aria-hidden="true">' + (v === 'good' ? '★' : (v === 'note' ? '!' : 'i')) + '</div><div>' + (d.title ? '<strong>' + esc(d.title) + '</strong>' : '') + '<p>' + esc(d.text) + '</p></div></div>';
+    },
+    video: function (d, L) {
+      var title = d.title || L.title;
+      return '<div class="video" role="group" aria-label="Video player placeholder"><svg class="bg" viewBox="0 0 640 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><rect width="640" height="360" fill="#1d2b44"/>' +
+        '<circle cx="190" cy="205" r="58" fill="#0D719A"/><rect x="124" y="262" width="132" height="120" rx="50" fill="#0D719A"/><circle cx="450" cy="205" r="58" fill="#F5A623" opacity=".9"/><rect x="384" y="262" width="132" height="120" rx="50" fill="#F5A623" opacity=".9"/></svg>' +
+        '<button class="play" type="button" aria-label="Play video" data-toast="' + (d.url ? 'The video plays here in production' : 'No video link added yet') + '"><svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg></button>' +
+        '<div class="vmeta"><b>' + esc(title) + '</b><span>' + (d.transcript ? 'Transcript below' : 'Video') + '</span></div></div>' +
+        (d.transcript ? '<details class="disclosure" style="margin-top:14px"><summary>Read the transcript</summary><div class="inner">' + paras(d.clean ? String(d.transcript).replace(/\[(music|applause|laughter)\]/gi, '') : d.transcript) + '</div></details>' : '');
+    },
+    stages: function (d, L, first) {
+      var stages = d.stages || [];
+      if (!first || !stages.length) return blockTitle(d.title) + intro(d.intro) + '<ol class="stepper">' + stages.map(function (s) { return '<li><b>' + esc(s.name) + '</b><br>' + esc(s.text) + '</li>'; }).join('') + '</ol>';
+      STAGES = stages.map(function (s) { return { name: s.name, text: s.text }; });
+      CUSTOMERS = {};
+      var starts = (d.starts || []).filter(function (x) { return x.label; });
+      starts.forEach(function (x, i) { CUSTOMERS[String(i + 1)] = { stage: Math.min(Math.max((+x.stage || 1) - 1, 0), stages.length - 1), text: x.label + ': ' + x.text }; });
+      var step = stages.length > 1 ? Math.min(16, 48 / (stages.length - 1)) : 0;
+      return blockTitle(d.title) + intro(d.intro) + '<div class="funnel-wrap" id="funnel">' +
+        (starts.length ? '<div class="who" role="group" aria-label="Show where a customer starts"><span>Start point for:</span><div class="seg"><button type="button" data-who="" aria-pressed="true">None</button>' +
+          starts.map(function (x, i) { return '<button type="button" data-who="' + (i + 1) + '" aria-pressed="false">' + esc(x.label) + '</button>'; }).join('') + '</div></div>' : '') +
+        '<div class="funnel">' + stages.map(function (s, i) {
+          var who = starts.filter(function (x, k) { return CUSTOMERS[String(k + 1)].stage === i; }).map(function (x) { return x.label; });
+          return '<button class="stage-btn" style="--w:' + Math.round(100 - i * step) + '%" data-stage="' + i + '" aria-pressed="' + (i === 0) + '" type="button">' + esc(s.name) + (who.length ? '<span class="start">' + esc(who.join(', ')) + ' starts</span>' : '') + '</button>';
+        }).join('') + '</div><div class="stage-detail" id="stageDetail" role="status" aria-live="polite"></div></div>';
+    },
+    personas: function (d) {
+      return blockTitle(d.title) + intro(d.intro) + '<div class="cards" style="grid-template-columns:repeat(auto-fit,minmax(260px,1fr))">' + (d.personas || []).map(function (p, i) {
+        var touch = String(p.touch || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean);
+        return '<article class="persona"><header><div class="av" aria-hidden="true">' + esc((p.name || 'P').replace(/^(mr|mrs|ms|dr)\.?\s+/i, '').charAt(0)) + '</div><div><small>Persona ' + (i + 1) + '</small><b>' + esc(p.name) + '</b></div></header><dl>' +
+          (p.demographic ? '<dt>Demographic</dt><dd>' + esc(p.demographic) + '</dd>' : '') + (p.needs ? '<dt>Motivation &amp; needs</dt><dd>' + esc(p.needs) + '</dd>' : '') +
+          (p.can ? '<dt>What you can do</dt><dd>' + esc(p.can) + '</dd>' : '') + (touch.length ? '<dt>Touchpoints</dt><dd><div class="chips-row">' + touch.map(function (c) { return '<span class="chip">' + esc(c) + '</span>'; }).join('') + '</div></dd>' : '') + '</dl></article>';
+      }).join('') + '</div>';
+    },
+    define: function (d) {
+      function box(side, hl) {
+        var items = (d[side] || []).filter(Boolean);
+        return '<div class="box' + (hl ? ' hl' : '') + '">' + (d[side + 'Title'] ? '<h3>' + esc(d[side + 'Title']) + '</h3>' : '') + (d[side + 'Lead'] ? '<p style="font-size:15px">' + esc(d[side + 'Lead']) + '</p>' : '') +
+          (items.length ? '<ul class="ticks">' + items.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>' : '') + '</div>';
+      }
+      return blockTitle(d.title) + intro(d.intro) + '<div class="define">' + box('left', true) + box('right', false) + '</div>';
+    },
+    task: function (d, L, first, b) {
+      return '<div class="task"><div class="task-head">' + PEN + '<div><b>' + esc(d.title || 'Your turn') + '</b><small>' + (d.prompt ? esc(d.prompt) + ' ' : '') + 'Saved in this browser only in the prototype.</small></div></div><div class="task-body">' +
+        (d.fields || []).map(function (f, i) {
+          var id = 'f-' + b.id + '-' + i;
+          return '<div class="field"><label for="' + id + '">' + esc(f.label) + '</label>' + (f.hint ? '<small>' + esc(f.hint) + '</small>' : '') + '<textarea id="' + id + '" data-save="atlas-proto-task-' + b.id + '-' + i + '"></textarea></div>';
+        }).join('') +
+        '<div class="task-actions">' + (L.disc && L.disc.on !== false ? '<button class="btn primary" type="button" data-open-panel="disc">Share in the discussion</button>' : '') + '<span class="saved-note">Your answers save as you type.</span></div></div></div>';
+    },
+    steps: function (d) {
+      var cur = +d.current || 0;
+      return blockTitle(d.title) + '<ol class="stepper">' + (d.steps || []).map(function (s, i) {
+        var n = i + 1;
+        return '<li class="' + (n < cur ? 'done' : (n === cur ? 'now' : '')) + '">' + esc(s) + (n === cur ? '<br><span class="here">You are here</span>' : '') + '</li>';
+      }).join('') + '</ol>';
+    },
+    flashcards: function (d, L, first) {
+      var cards = (d.cards || []).filter(function (c) { return c.front; });
+      if (!first || !cards.length) return blockTitle(d.title) + '<div class="cards">' + cards.map(function (c) { return '<div class="card"><h3>' + esc(c.front) + '</h3><p>' + esc(c.back) + '</p></div>'; }).join('') + '</div>';
+      FLASH = cards.map(function (c) { return [c.front, c.back]; });
+      return blockTitle(d.title || 'Test yourself') + '<div class="fc" id="fcRoot"></div>';
+    }
+  };
+  // Outline entry for a block: its title, or "Introduction" for the opening paragraph
+  function railLabel(b, i) {
+    var d = b.data || {};
+    if (b.type === 'lead') return i === 0 ? 'Introduction' : '';
+    if (b.type === 'task') return 'Your turn';
+    if (b.type === 'video' || b.type === 'callout') return '';
+    return d.title || d.heading || '';
+  }
+  function extLesson(l) {
+    var L = EXT.lessons[l], seen = {};
+    var html = (L.blocks || []).filter(function (b) { return EXT_BLOCK[b.type] && b.state !== 'removed'; }).map(function (b, i) {
+      var first = !seen[b.type]; seen[b.type] = true;
+      var inner = EXT_BLOCK[b.type](b.data || {}, L, first, b); if (!inner) return '';
+      var rail = railLabel(b, i);
+      return '<section class="block" id="x-' + esc(b.id) + '"' + (rail ? ' data-rail="' + esc(rail) + '"' : '') + '>' + inner + '</section>';
+    }).join('');
+    if (!html) html = '<section class="block"><p class="muted">This lesson has no content yet.</p></section>';
+    if (!hasReview(l)) html += '<section class="block"><div class="callout good"><div class="ic" aria-hidden="true">✓</div><div><strong>' + (isDone(l) ? 'Lesson complete' : 'No review for this lesson') + '</strong><p>' + (isDone(l) ? 'You can read it again whenever you like.' : 'Select Next lesson when you have read it, and it is marked complete.') + '</p></div></div></section>';
+    return html;
+  }
+  // The current production layout: the same content as one plain column of paragraphs
+  function extLessonOld(l) {
+    var L = EXT.lessons[l], out = [];
+    if (L.legacy) out.push(paras(L.legacy));
+    else (L.blocks || []).forEach(function (b) {
+      var d = b.data || {}, push = function (s) { if (s) out.push('<p>' + esc(s) + '</p>'); };
+      if (b.type === 'video') { out.push(EXT_BLOCK.video(d, L)); return; }
+      push(d.title || d.heading); push(d.text); push(d.intro);
+      if (d.body) out.push(paras(d.body));
+      (d.cards || []).forEach(function (c) { push(c.title || c.front); push(c.text || c.back); });
+      (d.stages || []).forEach(function (s) { push(s.name); push(s.text); });
+      (d.personas || []).forEach(function (p) { push(p.name); push(p.demographic); push(p.needs); push(p.can); });
+      ['leftTitle', 'left', 'rightTitle', 'right'].forEach(function (k) { [].concat(d[k] || []).forEach(push); });
+      push(d.prompt); (d.fields || []).forEach(function (f) { push(f.label); });
+      (d.steps || []).forEach(push);
+    });
+    return '<span class="legacy-tag">Current layout (production)</span><div class="legacy">' + out.join('') + '</div>';
+  }
 
   // ---------- Next / Previous ----------
   function updateNav() {
@@ -2293,7 +2458,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       else if (isDone(l)) n.innerHTML = 'Finish course ›';
       else { n.innerHTML = LOCK + 'Pass the quiz to finish'; n.classList.add('locked'); }
     }
-    else if (state.mode === 'new' && !isDone(l) && !isPending(l)) { n.innerHTML = LOCK + 'Take the review to continue'; n.classList.add('locked'); }
+    else if (state.mode === 'new' && !isDone(l) && !isPending(l) && hasReview(l)) { n.innerHTML = LOCK + 'Take the review to continue'; n.classList.add('locked'); }
     else { n.innerHTML = state.mode === 'new' ? 'Next lesson ›' : 'Next ›'; }
   }
 
@@ -2305,6 +2470,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   function onNext() {
     var l = state.lesson;
     if (l === QUIZ_IDX) { onNextQuiz(); return; }
+    if (!hasReview(l)) { markDone(l); advance(); return; }   // nothing to check: reading the lesson completes it
     if (isDone(l) || (state.mode === 'new' && isPending(l))) { advance(); return; }
     if (state.mode === 'new') {
       var card = $('#review'), r = reviewState(l);
@@ -2326,6 +2492,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   function renderGate() {
     var m = $('#gateMount'); m.innerHTML = '';
     if (state.lesson === QUIZ_IDX) { /* the quiz is its own assessment, no lesson review */ }
+    else if (!hasReview(state.lesson)) { /* no review questions for this lesson */ }
     else if (state.mode === 'new') renderReview(m); else renderGateOld(m);
     renderOutline();
     updateNav();
@@ -2524,6 +2691,12 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       opts: ['Social listening is effective because it can help you to shape or optimize your marketing strategy and monitor your audience engagement, by using campaign and sentiment analysis.', 'Social listening is a form of paid, earned, and owned media and can help you to engage with specific personas in your audience.', 'Social listening is effective because it can help you to identify the top influencers in your industry, and you can also attempt to attract your competitors’ influencers and persuade them to work with you instead.', 'Social listening is effective because it often evokes surprise and other emotions, capturing the imagination of your target personas.'],
       a: 0, why: 'Social listening helps you shape or optimise your strategy and monitor engagement through campaign and sentiment analysis.' }
   ];
+  if (EXT) {
+    var extQuiz = QUIZ_IDX >= 0 ? (EXT.lessons[QUIZ_IDX].quiz || {}) : {};
+    FINAL_QUIZ = (extQuiz.questions || []).filter(function (q) { return q.confirmed !== false && q.options && q.options.length; })
+      .map(function (q) { return { scenario: q.scenario || '', stem: q.stem, opts: q.options, a: +q.correct || 0, why: q.why || '' }; });
+    QUIZ_PASS = +extQuiz.pass || 80;
+  }
   var quiz = { phase: 'intro', idx: 0, answers: [] };
   var qold = { picks: [], done: false };
   function resetQuiz() { quiz = { phase: 'intro', idx: 0, answers: [] }; qold = { picks: [], done: false }; }
@@ -2550,10 +2723,11 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       h += '<div class="rv-actions"><button class="btn primary" type="button" data-qz="start">' + (before ? 'Retake quiz' : 'Start quiz') + '</button>' + (before ? '<button class="btn" type="button" data-qz="finish">Finish course ›</button>' : '') + '</div>';
     } else if (quiz.phase === 'q') {
       var q = qs[quiz.idx], ans = quiz.answers[quiz.idx];
+      if (!q) { root.innerHTML = '<p class="muted">This quiz has no questions yet.</p>'; return; }
       h += '<div class="qz-steps" role="group" aria-label="Questions">';
       for (var i = 0; i < n; i++) h += '<button type="button" class="qz-step' + (quiz.answers[i] != null ? ' ans' : '') + (i === quiz.idx ? ' cur' : '') + '" data-qz-go="' + i + '" aria-label="Question ' + (i + 1) + (quiz.answers[i] != null ? ', answered' : ', not answered') + '"' + (i === quiz.idx ? ' aria-current="step"' : '') + '>' + (i + 1) + '</button>';
       h += '</div><div class="rv-count">Question ' + (quiz.idx + 1) + ' of ' + n + '</div>';
-      h += '<div class="qz-scn"><div class="eyebrow">Scenario</div><p>' + esc(q.scenario) + '</p>' + (q.persona ? personaCard(q.persona) : '') + '</div>';
+      if (q.scenario || q.persona) h += '<div class="qz-scn"><div class="eyebrow">Scenario</div><p>' + esc(q.scenario) + '</p>' + (q.persona ? personaCard(q.persona) : '') + '</div>';
       h += '<h2 class="rv-q" id="qzQ" tabindex="-1">' + esc(q.stem) + '</h2><div class="rv-opts" role="radiogroup" aria-labelledby="qzQ">';
       q.opts.forEach(function (o, j) { h += '<label class="rv-opt"><input type="radio" name="qz" value="' + j + '"' + (ans === j ? ' checked' : '') + '><span class="l">' + letter(j) + '</span><span>' + esc(o) + '</span></label>'; });
       h += '</div><div class="rv-actions"><button class="btn" type="button" data-qz="back"' + (quiz.idx === 0 ? ' disabled' : '') + '>‹ Back</button><button class="btn primary" type="button" data-qz="next"' + (ans == null ? ' disabled' : '') + '>' + (quiz.idx + 1 < n ? 'Next question' : 'Review answers') + '</button></div>';
@@ -2581,8 +2755,8 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
         : '<button class="btn" type="button" data-qz="lessons">Review the lessons</button><button class="btn primary" type="button" data-qz="start">Retake quiz</button>') + '</div>';
     } else if (quiz.phase === 'complete') {
       var sc = quizScore(quiz.answers);
-      h += '<div class="rv-result good" role="status"><div class="big" aria-hidden="true">✓</div><h2 class="qz-title" id="qzH" tabindex="-1">Course complete</h2><p>You finished Digital Marketing Strategy.</p>' +
-        '<div class="chips-row" style="justify-content:center;margin:14px 0 4px"><span class="chip solid">13 lessons</span><span class="chip solid">' + (quiz.answers.length ? 'Quiz ' + sc + '/' + n : 'Quiz passed') + '</span></div>' +
+      h += '<div class="rv-result good" role="status"><div class="big" aria-hidden="true">✓</div><h2 class="qz-title" id="qzH" tabindex="-1">Course complete</h2><p>You finished ' + esc(COURSE_TITLE) + '.</p>' +
+        '<div class="chips-row" style="justify-content:center;margin:14px 0 4px"><span class="chip solid">' + COURSE.length + ' lessons</span><span class="chip solid">' + (quiz.answers.length ? 'Quiz ' + sc + '/' + n : 'Quiz passed') + '</span></div>' +
         '<div class="rv-actions" style="justify-content:center;margin-top:20px"><button class="btn" type="button" data-qz="courses">Browse courses</button><button class="btn primary" type="button" data-qz="back-course">Back to course</button></div></div>';
     }
     root.innerHTML = h;
@@ -2600,8 +2774,8 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     }
     else if (a === 'finish') { quiz.phase = 'complete'; focus = '#qzH'; }
     else if (a === 'lessons') { toast('Opens the lesson list (as in production)'); return; }
-    else if (a === 'courses') { window.location.href = COURSES_PAGE + '?prog=' + progParam(); return; }
-    else if (a === 'back-course') { window.location.href = COURSE_PAGE + '?prog=' + progParam(); return; }
+    else if (a === 'courses') { window.location.href = pageLink(COURSES_PAGE); return; }
+    else if (a === 'back-course') { window.location.href = pageLink(COURSE_PAGE); return; }
     renderQuiz(); renderOutline(); updateNav(); focusEl(focus);
     if (quiz.phase !== 'q') window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -2691,7 +2865,12 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     ['Customer 1 has just picked up photography as a hobby. Which stage does their journey start at?', 'Awareness. They are searching for a suitable camera.'],
     ['What do you try to do at the post-sale stage?', 'Retain the customer and make them loyal.']
   ];
-  function fcState() { return load('atlas-proto-flash', null) || { deck: FLASH.map(function (_, i) { return i; }), p: 0, flip: false, known: {}, done: false }; }
+  function flashKey() { return 'atlas-proto-flash' + (EXT ? '-' + state.lesson : ''); }
+  function fcState() {
+    var s = load(flashKey(), null);
+    if (s && s.deck.some(function (i) { return i >= FLASH.length; })) s = null;   // the author changed the cards
+    return s || { deck: FLASH.map(function (_, i) { return i; }), p: 0, flip: false, known: {}, done: false };
+  }
   function renderFlash(focusCard) {
     var root = $('#fcRoot'); if (!root) return;
     var s = fcState(), knownN = Object.keys(s.known).filter(function (k) { return s.known[k]; }).length;
@@ -2715,7 +2894,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     else if (a === 'again') { s.known[cur] = false; next(); }
     else if (a === 'missed') { s.deck = FLASH.map(function (_, i) { return i; }).filter(function (i) { return !s.known[i]; }); s.p = 0; s.flip = false; s.done = false; }
     else if (a === 'restart') s = { deck: FLASH.map(function (_, i) { return i; }), p: 0, flip: false, known: {}, done: false };
-    save('atlas-proto-flash', s); renderFlash(true);
+    save(flashKey(), s); renderFlash(true);
   }
   document.addEventListener('click', function (e) {
     var f = e.target.closest('[data-fc]'); if (f) { flashAct(f.dataset.fc); return; }
@@ -2857,7 +3036,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     else if (state.lesson > 0) toast('Lesson ' + state.lesson + ' is not part of this prototype');
   });
   $('#nextBtn').addEventListener('click', onNext);
-  $('#backBtn').addEventListener('click', function () { window.location.href = COURSE_PAGE + '?prog=' + progParam(); });
+  $('#backBtn').addEventListener('click', function () { window.location.href = pageLink(COURSE_PAGE); });
 
   // ==========================================================================
   // OPTIONAL FIRST STEP — "Fundamentals of Sales and Marketing"
@@ -3214,6 +3393,29 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     }
   };
 
+  if (EXT) {
+    JEN_TERMS = {}; JEN_SECTIONS = {}; JEN_LESSONS = {};
+    // Chip labels map to the answer kinds Jen already understands, so typed questions find them too
+    var kindOf = function (label) {
+      var s = label.toLowerCase();
+      if (/summar/.test(s)) return 'summary';
+      if (/simpl|explain/.test(s)) return 'simple';
+      if (/example/.test(s)) return 'example';
+      if (/focus/.test(s)) return 'focus';
+      if (/help|task|write/.test(s)) return 'help';
+      return '';
+    };
+    EXT.lessons.forEach(function (L, i) {
+      var j = L.jen || {}; if (j.on === false) return;
+      var chips = [], answers = {};
+      (j.chips || []).forEach(function (label, k) {
+        var key = kindOf(label) || 'c' + k; if (answers[key]) key = 'c' + k;
+        chips.push([key, label]);
+        answers[key] = (j.answers || {})[label] || '<p>In the full product Jen answers this from the lesson content. This sample has no prepared answer for it.</p>';
+      });
+      JEN_LESSONS[i] = { chips: chips, answers: answers };
+    });
+  }
   function jenAllowed() { return !(state.lesson === QUIZ_IDX && state.mode === 'new' && (quiz.phase === 'q' || quiz.phase === 'review')); }
   function jenLesson() { return JEN_LESSONS[state.lesson] || { chips: [], answers: {} }; }
   function jenChat() {
@@ -3568,6 +3770,18 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
     ]
   };
 
+  if (EXT) {
+    DISC_SEED = {};
+    EXT.lessons.forEach(function (L, i) {
+      var d = L.disc || {}; if (d.on === false) return;
+      var posts = (d.posts || []).map(function (p, k) {
+        return { id: 'x' + i + '-' + k, who: person(p.who || 'Learner', i + k), ago: +p.ago || 60, kind: p.kind || 'comment', likes: +p.likes || 0, text: p.text || '', replies: [] };
+      });
+      // The author's conversation starter opens each lesson's discussion
+      if (d.starter) posts.unshift({ id: 'x' + i + '-s', who: person('Anita R.', 2), role: 'fac', ago: 10080, kind: 'question', likes: 0, text: d.starter, replies: [] });
+      DISC_SEED[i] = posts;
+    });
+  }
   function discMine() { return load(KEY_DISC, []); }
   function discLiked() { return load(KEY_LIKES, {}); }
   function agoLabel(m) {

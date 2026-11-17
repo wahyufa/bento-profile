@@ -313,6 +313,8 @@ a { color: inherit; }
 <div id="app"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<!-- Sample course shared with the admin prototype. Opened with ?course=cs -->
+<script src="../assets/courses/customer-service.js"></script>
 <script>
 /* Keep the Current / Enhanced choice when moving between pages. */
 (function () {
@@ -332,7 +334,7 @@ a { color: inherit; }
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
 
   // ---------- Course data (copied from production) ----------
-  var COURSE = {
+  var COURSE = {   // replaced by the external course below when ?course= is set
     title: 'Digital Marketing Strategy',
     level: 'Beginner',
     module: 'Boost your Digital Marketing: Planning Social Media Campaigns',
@@ -358,8 +360,40 @@ a { color: inherit; }
   var MINS = 5; // every lesson is 5 minutes in production
   var PLAYER = 'lesson.html';
   var COURSES_PAGE = 'index.html';
-  function coursesHref() { return COURSES_PAGE + '?prog=' + state.prog; }   // keeps the learner state across pages
+  function coursesHref() { return COURSES_PAGE + (EXT ? '' : '?prog=' + state.prog); }   // keeps the learner state across pages
   var DONE_COUNT = { none: 0, some: 4, done: 13 }; // lessons completed per prototype state
+
+  // ---------- External course (?course=cs) ----------
+  // Read from the admin prototype's saved copy in this browser, or the shared sample file. Progress is the
+  // learner's real progress from the lesson player (stored under the course's key prefix), not the switcher.
+  var CID = (function () {
+    try { var c = new URLSearchParams(window.location.search).get('course'); return c && window.ATLAS_COURSES && window.ATLAS_COURSES[c] ? c : ''; } catch (e) { return ''; }
+  })();
+  var EXT = null;
+  if (CID) {
+    try { var adminStore = JSON.parse(localStorage.getItem('atlas-admin-proto-v2') || 'null'); if (adminStore && adminStore[CID] && adminStore[CID].lessons) EXT = adminStore[CID]; } catch (e) { /* use the shared file */ }
+    if (!EXT) EXT = JSON.parse(JSON.stringify(window.ATLAS_COURSES[CID]));
+    var dt = EXT.details || {}, mod = (EXT.modules || [])[0] || {};
+    COURSE = {
+      title: dt.title || 'Untitled course', level: dt.difficulty || 'Beginner', module: mod.desc || mod.title || 'Module 1',
+      summary: dt.description || '', about: dt.about && dt.about.length ? dt.about : [dt.description || ''], outcomes: dt.outcomes || [],
+      lessons: EXT.lessons.map(function (L) { return [L.title || 'Untitled lesson', L.type || 'Article', +L.mins > 0 ? +L.mins : MINS]; })
+    };
+  }
+  // Files in assets/ sit one folder up when this page is served from the clean/ build
+  function assetUrl(src) { return /^(data:|https?:|\/|\.\.\/)/.test(src) || !/\/clean\//.test(window.location.pathname) ? src : '../' + src; }
+  function extDone() {
+    try { var v = sessionStorage.getItem(CID + ':atlas-proto-done'); return v ? JSON.parse(v) : {}; } catch (e) { return {}; }
+  }
+  // Lessons completed in order from the start (the player opens lessons in order)
+  function extDoneCount() { var m = extDone(), i = 0; while (i < COURSE.lessons.length && m[i]) i++; return i; }
+  function extProg() {
+    var m = extDone(), quiz = COURSE.lessons.map(function (l) { return l[1]; }).indexOf('Quiz');
+    if ((quiz >= 0 && m[quiz]) || extDoneCount() === COURSE.lessons.length) return 'done';
+    return Object.keys(m).some(function (k) { return m[k]; }) ? 'some' : 'none';
+  }
+  function lessonMins(l) { return l[2] || MINS; }
+  function playerHref() { return EXT ? PLAYER + '?course=' + CID + '&lesson=' + (next() + 1) : PLAYER; }
 
   var TYPE_ICON = {
     Article: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg>',
@@ -389,7 +423,7 @@ a { color: inherit; }
   // Adaptive learning: every learner can get a different path. This is an illustrative sample:
   // part-way through the course, one later lesson is shown as optional for this learner.
   var SAMPLE_OPTIONAL = 6;
-  function optional(i) { return state.prog === 'some' && i === SAMPLE_OPTIONAL; }
+  function optional(i) { return !EXT && state.prog === 'some' && i === SAMPLE_OPTIONAL; }
   function optionalCount() { return COURSE.lessons.filter(function (l, i) { return optional(i); }).length; }
 
   function counts() {
@@ -397,9 +431,10 @@ a { color: inherit; }
     COURSE.lessons.forEach(function (l) { c[l[1]]++; });
     return c;
   }
-  function done() { return DONE_COUNT[state.prog]; }
+  function done() { return EXT ? (state.prog === 'done' ? COURSE.lessons.length : extDoneCount()) : DONE_COUNT[state.prog]; }
   function next() { return Math.min(done(), COURSE.lessons.length - 1); }
-  function totalMins() { return COURSE.lessons.length * MINS; }
+  function totalMins() { return COURSE.lessons.reduce(function (s, l) { return s + lessonMins(l); }, 0); }
+  function minsLeft(from) { return COURSE.lessons.slice(from).reduce(function (s, l) { return s + lessonMins(l); }, 0); }
   function fmt(mins) { var h = Math.floor(mins / 60), m = mins % 60; return (h ? h + 'h ' : '') + (m ? m + 'm' : (h ? '' : '0m')); }
   function ctaLabel() { return state.prog === 'none' ? 'Start course' : (state.prog === 'some' ? 'Continue course' : 'Review course'); }
 
@@ -422,14 +457,14 @@ a { color: inherit; }
       var chip = !allDone && i === n && state.prog !== 'none' ? '<span class="chip">Up next</span>' : (optional(i) ? '<span class="chip opt">Optional for you</span>' : '');
       var label = l[1] === 'Scenario' ? 'Exercise' : l[1];
       return '<li class="' + cls + '"><button type="button" data-lesson="' + i + '"><span class="st" aria-hidden="true"></span><span class="ti">' + TYPE_ICON[l[1]] + '</span>' +
-        '<span class="tx"><b>' + esc(l[0]) + '</b><small>' + label + ' · ' + MINS + ' min' + (i < d ? ' · Completed' : '') + (optional(i) ? ' · Optional for you' : '') + '</small></span>' + chip + '</button></li>';
+        '<span class="tx"><b>' + esc(l[0]) + '</b><small>' + label + ' · ' + lessonMins(l) + ' min' + (i < d ? ' · Completed' : '') + (optional(i) ? ' · Optional for you' : '') + '</small></span>' + chip + '</button></li>';
     }).join('');
   }
 
   function renderNew() {
-    var d = done(), total = COURSE.lessons.length, pct = Math.round(d / total * 100), n = next(), c = counts(), left = (total - d) * MINS;
+    var d = done(), total = COURSE.lessons.length, pct = Math.round(d / total * 100), n = next(), c = counts(), left = minsLeft(d);
     var started = state.prog !== 'none', finished = state.prog === 'done';
-    var cta = '<a class="btn primary lg" id="heroCta" href="' + PLAYER + '">' + I.play + ctaLabel() + '</a>';
+    var cta = '<a class="btn primary lg" id="heroCta" href="' + playerHref() + '">' + I.play + ctaLabel() + '</a>';
     var ctaSub = finished ? '<div class="cta-sub"><b>Course completed</b>You can revisit any lesson.</div>'
       : '<div class="cta-sub"><b>' + (started ? 'Lesson ' + (n + 1) + ' of ' + total + ': ' + esc(COURSE.lessons[n][0]) : 'Lesson 1: ' + esc(COURSE.lessons[0][0])) + '</b>' + (started ? 'About ' + fmt(left) + ' left' : 'About ' + fmt(totalMins()) + ' in total') + '</div>';
 
@@ -442,15 +477,15 @@ a { color: inherit; }
       '<div class="facts"><span>' + I.book + '1 module</span><span>' + I.doc + total + ' lessons</span><span>' + I.clock + fmt(totalMins()) + '</span></div>' +
       (started ? '<div class="hero-progress"><div class="row"><span>' + (finished ? 'Completed' : 'Your progress') + '</span><span>' + pct + '%</span></div><div class="bar" role="progressbar" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100" aria-label="Course progress"><i style="width:' + pct + '%"></i></div></div>' : '') +
       '<div class="cta-row">' + cta + ctaSub + '</div></div>' +
-      '<div class="hero-art"><img src="' + COVER + '" alt=""></div></section>';
+      '<div class="hero-art"><img src="' + (EXT && EXT.details.cover && EXT.details.cover.src ? esc(assetUrl(EXT.details.cover.src)) : COVER) + '" alt=""></div></section>';
 
     // The progress card exists twice: in the side column on desktop, above the content on narrow screens.
     var progressCard = !started ? '' : '<div class="card progress-card"><h2>' + (finished ? 'Your result' : 'Your progress') + '</h2><div class="ringrow"><div class="ring" style="--p:' + pct + '" data-label="' + pct + '%" role="img" aria-label="' + pct + ' percent complete"></div><p><b>' + d + ' of ' + total + ' lessons</b>' + (finished ? 'Course completed' : 'About ' + fmt(left) + ' left') + '</p></div>' +
-      '<a class="btn primary" href="' + PLAYER + '">' + ctaLabel() + '</a></div>';
+      '<a class="btn primary" href="' + playerHref() + '">' + ctaLabel() + '</a></div>';
 
     h += '<div class="cols"><div>';
     h += progressCard.replace('card progress-card', 'card progress-card only-narrow');
-    if (finished) h += '<div class="done-banner"><div class="big" aria-hidden="true">✓</div><div><b>You completed this course</b><span class="muted">All 13 lessons done. Nice work.</span></div></div>';
+    if (finished) h += '<div class="done-banner"><div class="big" aria-hidden="true">✓</div><div><b>You completed this course</b><span class="muted">All ' + total + ' lessons done. Nice work.</span></div></div>';
     h += '<section class="section" id="learn"><h2>What you will learn</h2><ul class="outcomes">' + COURSE.outcomes.map(function (o) { return '<li>' + esc(o) + '</li>'; }).join('') + '</ul></section>';
     h += '<section class="section" id="about"><h2>About this course</h2>' + COURSE.about.map(function (p) { return '<p>' + esc(p) + '</p>'; }).join('') + '</section>';
     h += '<section class="section" id="syllabus"><div class="sec-head"><h2>Course content</h2>' +
@@ -472,10 +507,10 @@ a { color: inherit; }
       '<div><dt>What is inside</dt><dd><div class="mix"><span>' + c.Article + ' articles</span><span>' + c.Video + ' videos</span><span>' + c.Scenario + ' exercises</span><span>' + c.Quiz + ' quiz</span></div></dd></div>' +
       '<div><dt>Adaptive learning</dt><dd>Your path is personalised, so it can differ from other learners\'.</dd></div>' +
       '<div><dt>How it works</dt><dd>Each lesson ends with a short review. Pass it to mark the lesson complete.</dd></div></dl>' +
-      (started ? '' : '<a class="btn primary" href="' + PLAYER + '">' + ctaLabel() + '</a>') + '</div>';
+      (started ? '' : '<a class="btn primary" href="' + playerHref() + '">' + ctaLabel() + '</a>') + '</div>';
     h += '</aside></div></main>';
 
-    h += '<div class="stickybar" id="sticky" aria-hidden="true"><div class="in"><div class="t"><b>' + esc(COURSE.title) + '</b><small>' + (started ? pct + '% complete' : total + ' lessons · ' + fmt(totalMins())) + '</small></div><a class="btn primary" href="' + PLAYER + '" tabindex="-1">' + ctaLabel() + '</a></div></div>';
+    h += '<div class="stickybar" id="sticky" aria-hidden="true"><div class="in"><div class="t"><b>' + esc(COURSE.title) + '</b><small>' + (started ? pct + '% complete' : total + ' lessons · ' + fmt(totalMins())) + '</small></div><a class="btn primary" href="' + playerHref() + '" tabindex="-1">' + ctaLabel() + '</a></div></div>';
     return h;
   }
 
@@ -491,7 +526,7 @@ a { color: inherit; }
         '<div class="lbl"><span>Progress</span><span>' + pct + '%</span></div><div class="bar"><i style="width:' + pct + '%"></i></div></div>';
       h += '<div class="cur-toggle"><div class="seg"><button type="button" aria-pressed="true">List</button><button type="button" aria-pressed="false" data-toast="Not available in this preview">Path</button></div></div>';
       h += '<div class="cur-syl cur-list"><b style="font-size:15px">Module 1</b><div class="muted" style="font-size:12.5px">' + d + '/' + total + ' lessons · ' + totalMins() + 'm</div><ul>' +
-        COURSE.lessons.map(function (l, i) { return '<li><i class="circle' + (i < d ? ' on' : '') + '"></i>' + esc(l[0]) + '<span>' + l[1] + ' · ' + MINS + 'm</span></li>'; }).join('') + '</ul></div>';
+        COURSE.lessons.map(function (l, i) { return '<li><i class="circle' + (i < d ? ' on' : '') + '"></i>' + esc(l[0]) + '<span>' + l[1] + ' · ' + lessonMins(l) + 'm</span></li>'; }).join('') + '</ul></div>';
       h += '</div>';
       return h;
     }
@@ -501,7 +536,7 @@ a { color: inherit; }
       '<div class="cur-stats"><span>1 modules</span><span>' + total + ' lessons</span><span>' + fmt(totalMins()) + '</span></div>' +
       '<button class="btn primary" type="button" data-view="overview">' + I.play + 'Continue Learning</button></div></div>' +
       '<h2>Syllabus</h2><div class="cur-syl"><button class="mh" type="button" id="curToggle" aria-expanded="' + state.open + '"><span><b>Module 1</b><small>' + esc(COURSE.module) + '</small></span><em>' + total + ' lessons · ' + totalMins() + 'm</em></button>' +
-      '<ul' + (state.open ? '' : ' hidden') + '>' + COURSE.lessons.map(function (l) { return '<li>' + esc(l[0]) + '<span>' + l[1] + ' · ' + MINS + 'm</span></li>'; }).join('') + '</ul></div>' +
+      '<ul' + (state.open ? '' : ' hidden') + '>' + COURSE.lessons.map(function (l) { return '<li>' + esc(l[0]) + '<span>' + l[1] + ' · ' + lessonMins(l) + 'm</span></li>'; }).join('') + '</ul></div>' +
       '</div>';
     return h2;
   }
@@ -552,8 +587,8 @@ a { color: inherit; }
       }
       h += '<div class="pn' + (st ? ' ' + st : '') + (opt ? ' opt' : '') + '" style="--dx:' + dx + 'px">' +
         (st === 'now' ? '<span class="pn-bubble">' + (state.prog === 'none' ? 'START' : 'YOU ARE HERE') + '</span>' : '') +
-        '<button class="coin" type="button" data-lesson="' + i + '" aria-label="Lesson ' + (i + 1) + ': ' + esc(l[0]) + '. ' + type + ', ' + MINS + ' minutes' + (status ? '. ' + status : '') + '">' + (st === 'done' ? '✓' : TYPE_ICON[l[1]]) + '</button>' +
-        '<div class="pn-label">' + esc(l[0]) + '<small>' + type + ' · ' + MINS + ' min</small>' + (opt ? '<span class="pn-pill">Optional for you</span>' : '') + '</div></div></li>';
+        '<button class="coin" type="button" data-lesson="' + i + '" aria-label="Lesson ' + (i + 1) + ': ' + esc(l[0]) + '. ' + type + ', ' + lessonMins(l) + ' minutes' + (status ? '. ' + status : '') + '">' + (st === 'done' ? '✓' : TYPE_ICON[l[1]]) + '</button>' +
+        '<div class="pn-label">' + esc(l[0]) + '<small>' + type + ' · ' + lessonMins(l) + ' min</small>' + (opt ? '<span class="pn-pill">Optional for you</span>' : '') + '</div></div></li>';
     });
 
     h += '<li class="pr"><div class="pn end' + (allDone ? ' done' : '') + '" style="--dx:0px"><span class="coin" role="img" aria-label="Course complete">' + (allDone ? '✓' : FLAG) + '</span>' +
@@ -605,6 +640,7 @@ a { color: inherit; }
     var sy = e.target.closest('[data-syl]');
     if (sy) { state.syl = sy.dataset.syl; var y0 = window.scrollY; render(); window.scrollTo(0, y0); return; }
     var ls = e.target.closest('[data-lesson]');
+    if (ls && EXT) { window.location.href = PLAYER + '?course=' + CID + '&lesson=' + (+ls.dataset.lesson + 1); return; }
     if (ls) { toast('Opens lesson ' + (+ls.dataset.lesson + 1) + ' in the lesson player'); return; }
     var ts = e.target.closest('[data-toast]');
     if (ts) { e.preventDefault(); toast(ts.dataset.toast); }
@@ -616,6 +652,7 @@ a { color: inherit; }
     if (['none', 'some', 'done'].indexOf(q.get('prog')) !== -1) state.prog = q.get('prog');
     if (q.get('syl') === 'path' || q.get('syl') === 'list') state.syl = q.get('syl');
     if (q.get('mode') === 'old' || q.get('mode') === 'new') { state.mode = q.get('mode'); state.open = state.mode === 'new'; }
+    if (EXT) { state.prog = extProg(); var sw = document.querySelector('[aria-label="Learner progress"]'); if (sw) sw.style.display = 'none'; }
   })();
 
   render();

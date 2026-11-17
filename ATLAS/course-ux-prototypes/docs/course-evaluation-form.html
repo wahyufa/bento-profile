@@ -1,0 +1,258 @@
+<title>Course Redesign Feedback</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Inter:wght@400;500;600&display=swap">
+<style>
+  /* Layout: one centred column; a short brief, then the sheet, with a team summary on its own tab */
+  :root {
+    --bg: #F4F7FA;
+    --surface: #FFFFFF;
+    --ink: #1E2A3B;
+    --muted: #5B6B80;
+    --line: #DCE4EC;
+    --navy: #31425D;
+    --teal: #0D719A;
+    --teal-soft: #E3F1F7;
+    --amber: #F5A623;
+    --good: #1E7F4F;
+    --bad: #B42318;
+    --display: "Montserrat", "Segoe UI", system-ui, sans-serif;
+    --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #121923; --surface: #1A2431; --ink: #E7EDF4; --muted: #9AABBF; --line: #2C3A4B;
+      --navy: #A9BCDA; --teal: #4FB3DA; --teal-soft: #17344A; --amber: #F5B84A; --good: #5CCB8F; --bad: #F08A80;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #121923; --surface: #1A2431; --ink: #E7EDF4; --muted: #9AABBF; --line: #2C3A4B;
+    --navy: #A9BCDA; --teal: #4FB3DA; --teal-soft: #17344A; --amber: #F5B84A; --good: #5CCB8F; --bad: #F08A80;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  body { background: var(--bg); color: var(--ink); font: 400 15px/1.55 var(--body); }
+  .wrap { max-width: 760px; margin: 0 auto; padding-block: 28px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 20px; }
+  h1, h2, h3 { font-family: var(--display); color: var(--navy); text-wrap: balance; margin: 0; }
+  h1 { font-size: clamp(24px, 4vw, 30px); font-weight: 800; letter-spacing: -.01em; }
+  h2 { font-size: 18px; font-weight: 700; }
+  p { margin: 0; }
+  .eyebrow { font: 700 11.5px/1 var(--display); letter-spacing: .1em; text-transform: uppercase; color: var(--teal); }
+  .muted { color: var(--muted); }
+  .head { display: grid; gap: 10px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 22px; display: grid; gap: 16px; min-width: 0; }
+  .steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; }
+  .steps a { color: var(--teal); font-weight: 600; }
+  .tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); }
+  .tabs a { padding: 10px 14px; font: 600 14px var(--display); color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent; margin-bottom: -1px; }
+  .tabs a[aria-current="page"] { color: var(--navy); border-color: var(--teal); }
+  .tabs a:focus-visible, button:focus-visible, textarea:focus-visible, input:focus-visible + span { outline: 3px solid var(--amber); outline-offset: 2px; }
+  .notice { background: var(--teal-soft); border-radius: 10px; padding: 12px 14px; font-size: 14px; }
+  .notice.err { background: transparent; border: 1px solid var(--bad); color: var(--bad); }
+  .q { display: grid; gap: 8px; padding-block: 14px; border-top: 1px solid var(--line); }
+  .q:first-of-type { border-top: 0; padding-top: 0; }
+  .q legend, .q label.ql { font-weight: 600; padding: 0; }
+  .q small { color: var(--muted); font-size: 13.5px; }
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  .scale { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 8px; }
+  .scale label { position: relative; }
+  .scale input { position: absolute; opacity: 0; inset: 0; }
+  .scale span { display: grid; place-items: center; gap: 2px; height: 54px; border: 1.5px solid var(--line); border-radius: 10px; cursor: pointer; font: 700 17px var(--display); color: var(--navy); background: var(--surface); }
+  .scale span small { font: 500 10.5px var(--body); color: var(--muted); }
+  .scale input:checked + span { background: var(--teal); border-color: var(--teal); color: #fff; }
+  .scale input:checked + span small { color: #fff; }
+  .scale input:disabled + span { cursor: not-allowed; opacity: .55; }
+  textarea { width: 100%; min-height: 84px; resize: vertical; font: inherit; color: var(--ink); background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+  .actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .btn { font: 700 14.5px var(--display); border: 0; border-radius: 10px; padding: 12px 20px; background: var(--teal); color: #fff; cursor: pointer; }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .status { font-size: 14px; color: var(--muted); }
+  .status.ok { color: var(--good); font-weight: 600; }
+  .status.err { color: var(--bad); }
+  .stats { display: flex; flex-wrap: wrap; gap: 10px 22px; }
+  .stats b { font: 800 26px var(--display); color: var(--navy); font-variant-numeric: tabular-nums; display: block; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 14px; align-items: center; padding-block: 10px; border-top: 1px solid var(--line); }
+  .row:first-child { border-top: 0; }
+  .row .avg { font: 700 16px var(--display); font-variant-numeric: tabular-nums; color: var(--navy); }
+  .row .avg.low { color: var(--bad); }
+  .dist { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 4px; }
+  .dist i { display: block; height: 26px; border-radius: 5px; background: var(--line); position: relative; overflow: hidden; }
+  .dist i b { position: absolute; inset: auto 0 0; background: var(--teal); }
+  .dist i em { position: absolute; inset: 0; display: grid; place-items: center; font: 600 11px var(--body); font-style: normal; color: var(--ink); }
+  .quotes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .quotes li { background: var(--bg); border-radius: 10px; padding: 10px 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .empty { color: var(--muted); font-style: italic; }
+  @media (prefers-reduced-motion: no-preference) { .scale span { transition: background .15s, border-color .15s; } }
+</style>
+
+<main class="wrap">
+  <header class="head">
+    <span class="eyebrow">ATLAS course redesign · Product townhall</span>
+    <h1>Course Redesign Feedback</h1>
+    <p class="muted">Go through the sample course as a learner, then tell us how it felt. It takes about 40 minutes for the course and 3 minutes for this sheet.</p>
+  </header>
+
+  <section class="card" aria-labelledby="howTitle">
+    <h2 id="howTitle">How to take part</h2>
+    <ol class="steps">
+      <li>Open the <a href="https://random-three-dun.vercel.app/clean/index.html" target="_blank" rel="noopener">learner prototype</a> and start <b>Customer Service Essentials</b> (8 lessons, about 44 minutes).</li>
+      <li>Go through it as a learner would: read, try the activities, take each lesson review and the final quiz.</li>
+      <li>If you can, open one or two lessons on your phone as well.</li>
+      <li>Optional: see how the course was made in the <a href="https://random-three-dun.vercel.app/atlas-authoring-v3-prototype.html" target="_blank" rel="noopener">admin prototype</a>.</li>
+      <li>Fill in this sheet. You can come back and change your answers until Friday.</li>
+    </ol>
+    <p class="muted" style="font-size:13.5px">The course content is a sample written for this review. Please rate the experience, not the subject.</p>
+  </section>
+
+  <nav class="tabs" aria-label="Sections">
+    <a href="#form" id="tabForm">Your feedback</a>
+    <a href="#summary" id="tabSummary">Team summary</a>
+  </nav>
+
+  <section class="card" id="formView" aria-labelledby="formTitle">
+    <h2 id="formTitle">Your feedback</h2>
+    <div class="notice" id="formNotice" role="status">Connecting…</div>
+    <form id="sheet" novalidate>
+      <div id="ratings"></div>
+      <div class="q"><label class="ql" for="good">What worked well?</label><textarea id="good" name="good" maxlength="2000" placeholder="e.g. The review after each lesson felt quick and fair"></textarea></div>
+      <div class="q"><label class="ql" for="confusing">What was confusing or slowed you down?</label><textarea id="confusing" name="confusing" maxlength="2000"></textarea></div>
+      <div class="q"><label class="ql" for="first">If we could change one thing first, what should it be?</label><textarea id="first" name="first" maxlength="2000"></textarea></div>
+      <div class="actions">
+        <button class="btn" type="submit" id="submitBtn" disabled>Send feedback</button>
+        <span class="status" id="status" role="status" aria-live="polite"></span>
+      </div>
+    </form>
+  </section>
+
+  <section class="card" id="summaryView" aria-labelledby="sumTitle" hidden>
+    <h2 id="sumTitle">Team summary</h2>
+    <p class="muted" style="font-size:13.5px">Answers are shown without names. Scores are 1 (poor) to 5 (excellent).</p>
+    <div id="summary"><p class="empty">Loading responses…</p></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  'use strict';
+  // The six areas rated on the sheet. Keys are stored in each response, so keep them stable.
+  var AREAS = [
+    ['impression', 'First impression', 'The course list and course page: did you know what the course is and how to start?'],
+    ['wayfinding', 'Finding your way', 'Outline, next and previous, knowing where you are and what is left.'],
+    ['reading', 'Reading a lesson', 'Layout, length and how easy the content was to take in.'],
+    ['activities', 'Activities', 'Journey stages, flashcards, exercises, Jen and the discussion.'],
+    ['assessment', 'Reviews and quiz', 'The short review after each lesson and the final quiz.'],
+    ['mobile', 'On a phone', 'Leave blank if you did not try it on a phone.']
+  ];
+  var OPEN = [['good', 'What worked well'], ['confusing', 'What was confusing'], ['first', 'What to change first']];
+  var LABELS = ['Poor', 'Weak', 'OK', 'Good', 'Great'];
+  var $ = function (id) { return document.getElementById(id); };
+
+  // ---------- Form ----------
+  $('ratings').innerHTML = AREAS.map(function (a) {
+    return '<fieldset class="q"><legend>' + a[1] + '</legend><small>' + a[2] + '</small><div class="scale">' +
+      [1, 2, 3, 4, 5].map(function (n) {
+        return '<label><input type="radio" name="' + a[0] + '" value="' + n + '" id="' + a[0] + n + '"><span>' + n + '<small>' + LABELS[n - 1] + '</small></span></label>';
+      }).join('') + '</div></fieldset>';
+  }).join('');
+
+  var form = $('sheet');
+  function setEnabled(on) { Array.prototype.forEach.call(form.elements, function (el) { el.disabled = !on; }); }
+  setEnabled(false);
+
+  function readForm() {
+    var out = { ratings: {} };
+    AREAS.forEach(function (a) { var c = form.querySelector('input[name="' + a[0] + '"]:checked'); if (c) out.ratings[a[0]] = +c.value; });
+    OPEN.forEach(function (o) { out[o[0]] = form.elements[o[0]].value.trim().slice(0, 2000); });
+    return out;
+  }
+  function fillForm(d) {
+    if (!d) return;
+    AREAS.forEach(function (a) { var v = d.ratings && d.ratings[a[0]]; var r = v && $(a[0] + v); if (r) r.checked = true; });
+    OPEN.forEach(function (o) { if (typeof d[o[0]] === 'string') form.elements[o[0]].value = d[o[0]]; });
+  }
+
+  // ---------- Views (#form, #summary) ----------
+  function route() {
+    var sum = location.hash === '#summary';
+    $('formView').hidden = sum; $('summaryView').hidden = !sum;
+    $('tabForm').setAttribute('aria-current', sum ? 'false' : 'page');
+    $('tabSummary').setAttribute('aria-current', sum ? 'page' : 'false');
+  }
+  window.addEventListener('hashchange', route); route();
+
+  // ---------- Summary ----------
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function renderSummary(docs) {
+    var box = $('summary');
+    if (!docs.length) { box.innerHTML = '<p class="empty">No responses yet. Answers appear here as soon as people send them.</p>'; return; }
+    var h = '<div class="stats"><div><b>' + docs.length + '</b><span class="muted">responses</span></div>';
+    var all = [];
+    docs.forEach(function (d) { AREAS.forEach(function (a) { var v = d.ratings && d.ratings[a[0]]; if (v >= 1 && v <= 5) all.push(v); }); });
+    if (all.length) h += '<div><b>' + (all.reduce(function (s, v) { return s + v; }, 0) / all.length).toFixed(1) + '</b><span class="muted">average across all areas</span></div>';
+    h += '</div><div>';
+    AREAS.forEach(function (a) {
+      var vals = docs.map(function (d) { return d.ratings && d.ratings[a[0]]; }).filter(function (v) { return v >= 1 && v <= 5; });
+      var avg = vals.length ? vals.reduce(function (s, v) { return s + v; }, 0) / vals.length : null;
+      var counts = [0, 0, 0, 0, 0]; vals.forEach(function (v) { counts[v - 1]++; });
+      var max = Math.max.apply(null, counts) || 1;
+      h += '<div class="row"><span><b>' + a[1] + '</b> <span class="muted" style="font-size:13px">· ' + vals.length + ' rated</span></span><span class="avg' + (avg !== null && avg < 3 ? ' low' : '') + '">' + (avg === null ? '–' : avg.toFixed(1)) + '</span>' +
+        '<div class="dist" aria-label="' + counts.map(function (c, i) { return c + ' rated ' + (i + 1); }).join(', ') + '">' +
+        counts.map(function (c, i) { return '<i><b style="height:' + Math.round(c / max * 100) + '%"></b><em>' + (i + 1) + ': ' + c + '</em></i>'; }).join('') + '</div></div>';
+    });
+    h += '</div>';
+    OPEN.forEach(function (o) {
+      var items = docs.map(function (d) { return d[o[0]]; }).filter(function (t) { return typeof t === 'string' && t.trim(); });
+      h += '<div style="display:grid;gap:8px"><h3 style="font-size:15px">' + o[1] + ' <span class="muted" style="font:500 13px var(--body)">· ' + items.length + '</span></h3>' +
+        (items.length ? '<ul class="quotes">' + items.map(function (t) { return '<li>' + esc(t) + '</li>'; }).join('') + '</ul>' : '<p class="empty">Nothing yet.</p>') + '</div>';
+    });
+    box.innerHTML = h;
+  }
+
+  // ---------- Shared storage: one response per person ----------
+  function notice(text, err) { var n = $('formNotice'); n.textContent = text; n.className = 'notice' + (err ? ' err' : ''); n.hidden = !text; }
+  var timer = setTimeout(function () { notice('Could not connect. Open this page on claude.ai while signed in to send feedback.', true); }, 10000);
+
+  Promise.all([claude.use('db'), claude.use('user')]).then(function (res) {
+    var db = res[0], user = res[1];
+    clearTimeout(timer);
+    if (!db || !user) {
+      notice('Sign in to claude.ai to send feedback. You can still read the brief above.', true);
+      $('summary').innerHTML = '<p class="empty">Sign in to see the team summary.</p>';
+      return;
+    }
+    var col = db.collection('responses');
+    var loaded = false;
+    var subTimer = setTimeout(function () { if (!loaded) $('summary').innerHTML = '<p class="empty">Responses are taking a while to load. Refresh the page to try again.</p>'; }, 10000);
+    col.onSnapshot(function (snap) {
+      loaded = true; clearTimeout(subTimer);
+      renderSummary(snap.docs.map(function (d) { return d.data() || {}; }));
+    }, function () { clearTimeout(subTimer); $('summary').innerHTML = '<p class="empty">Could not load responses.</p>'; });
+
+    user.id().then(function (id) {
+      var mine = col.doc(id);
+      return mine.get().then(function (snap) {
+        if (snap.exists) { fillForm(snap.data()); $('submitBtn').textContent = 'Update my feedback'; notice('You already sent feedback. Change anything and update it.'); }
+        else notice('');
+        if (user.can && user.can('data.write') === false) { notice('You can read the summary, but your access does not allow sending feedback. Ask the owner for edit or interact access.', true); return; }
+        setEnabled(true);
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          var data = readForm();
+          if (!Object.keys(data.ratings).length && !data.good && !data.confusing && !data.first) { $('status').textContent = 'Add at least one rating or comment first.'; $('status').className = 'status err'; return; }
+          data.updatedAt = new Date().toISOString();
+          var btn = $('submitBtn'); btn.disabled = true; $('status').textContent = 'Sending…'; $('status').className = 'status';
+          mine.set(data).then(function () {
+            btn.disabled = false; btn.textContent = 'Update my feedback';
+            $('status').textContent = 'Sent. Thank you!'; $('status').className = 'status ok';
+          }, function (err) {
+            btn.disabled = false;
+            $('status').textContent = err && err.code === 'not_granted' ? 'Your access does not allow sending feedback. Ask the owner for interact access.' : 'Could not send. Check your connection and try again.';
+            $('status').className = 'status err';
+          });
+        });
+      });
+    }).catch(function () { notice('Could not load your earlier answers. Refresh the page to try again.', true); });
+  });
+})();
+</script>
