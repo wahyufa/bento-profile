@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<!--
+  IELTS Listening result (tutor view) — tidied copy of the live page
+  demo.heyhi.sg/onlinequizv2/tutor/quiz-result-ielts.
+
+  Structure, fonts, colours and sizes follow the live page. The page
+  opens at the tutor "Larger" text size (zoom 1.25), like the live
+  account; add ?size=standard or ?size=large to compare.
+
+  Tidy changes (search "TIDY"):
+    1. Sub bar: symmetric padding; labels and pills never wrap inside
+       themselves; the pill row wraps as a whole when space runs out.
+    2. Answer blanks: number shown once; the answer flows inline with
+       the sentence; "(Marks Given: [x])" stays together; the marks
+       dropdown fits inside one text line.
+    3. Columns: audio column 4/12, questions 8/12 (was 6/6).
+-->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <title>HeyHi — IELTS Listening Result</title>
+  <script>
+    // Same mechanism as the live app: tutor text size = zoom on <html>
+    (function () {
+      var sizes = { standard: 1, large: 1.125, larger: 1.25 };
+      var key = new URLSearchParams(location.search).get("size") || "larger";
+      var zoom = sizes[key] || 1.25;
+      if (zoom !== 1) document.documentElement.style.zoom = String(zoom);
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Nunito+Sans:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    :root {
+      --amber: #fec53c;
+      --orange: #ffb300;
+      --blue: #0fb0f8;
+      --green: #16d8a7;
+      --red: #ff1744;
+      --ink: #12263f;
+      --text: #616161;
+      --tab-muted: #95aac9;
+      --line: #e0e0e0;
+      --page-bg: #f6f8fa;
+
+      --font-ui: "Montserrat", sans-serif;
+      --font-content: "Nunito Sans", sans-serif;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    button, select { font: inherit; color: inherit; }
+    body {
+      font-family: var(--font-ui);
+      font-size: 15px;
+      line-height: 1.5;
+      color: var(--ink);
+      background: var(--page-bg);
+      padding-bottom: 70px; /* room for the fixed section bar */
+    }
+
+    /* ---------- Header (as live) ---------- */
+    .new-head {
+      position: relative;
+      height: 54px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--amber) url("https://demo.heyhi.sg/images/bg-smartjen.png") repeat;
+    }
+    .header-title { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; color: #fff; }
+    .exit-quiz {
+      position: absolute;
+      right: 46px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 16px;
+      border: none;
+      border-radius: 16px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* ---------- Sub bar ---------- */
+    .info-result {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;             /* TIDY 1: wrap whole groups, never squeeze them */
+      gap: 12px 28px;
+      padding: 14px 46px;          /* TIDY 1: was 5px 70px 5px 150px */
+      background: #fff url("https://demo.heyhi.sg/images/bg-smartjen-color.png") repeat;
+    }
+    .info-group { display: flex; align-items: center; gap: 12px; }
+    .info-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--ink);
+      white-space: nowrap;         /* TIDY 1: "Student Name" on one line */
+    }
+    .student-select {
+      appearance: none;
+      width: 216px;
+      height: 49px;
+      padding: 0 30px 0 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='%23888'%3E%3Cpath d='M5 8h14l-7 9z'/%3E%3C/svg%3E") no-repeat right 12px center;
+      font-family: var(--font-content);
+      font-size: 16px;
+      color: #6e84a3;
+      cursor: pointer;
+    }
+    .attempts { display: flex; align-items: center; gap: 2px; font-weight: 700; font-size: 14px; }
+    .attempts button { border: none; background: none; cursor: pointer; padding: 2px; display: grid; }
+
+    .pills { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .pill {
+      flex-shrink: 0;              /* TIDY 1: was shrinking to ~86px and wrapping to 3 lines */
+      white-space: nowrap;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 42px;
+      padding: 0 16px;
+      border: 2px solid currentColor;
+      border-radius: 16px;
+      background: #fff;
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .pill--orange { color: var(--orange); }
+    .pill--green { color: var(--green); }
+    .pill--blue { color: var(--blue); }
+
+    /* ---------- Card + tabs (as live) ---------- */
+    .question-content { padding: 40px 46px 24px; }
+    /* Wide: Group Results sits at the right end of the tab bar.
+       Narrow (< 992px layout width): it moves above the bar as a tab,
+       same as the live page. */
+    .tabs-head { position: relative; display: flex; flex-direction: column; align-items: flex-end; }
+    .tabs-bar {
+      width: 100%;
+      display: flex;
+      align-items: flex-end;
+      background: #e8e8e8;
+      border-radius: 16px 16px 0 0;
+      padding: 8px 0 0 46px;
+    }
+    .nav-link {
+      padding: 10px 24px;
+      border: none;
+      border-radius: 8px 8px 0 0;
+      background: transparent;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--tab-muted);
+      cursor: pointer;
+    }
+    .nav-link.active { background: #fff; color: var(--blue); }
+    .btn-group-results {
+      position: absolute;
+      top: 0; right: 0; bottom: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 0 16px 0 0;
+      background: var(--blue);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 700;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .card {
+      background: #fff url("https://cdn.heyhi.sg/images/main/bg_quiz.jpg") repeat;
+      border-radius: 0 0 19px 19px;
+      padding: 0 24px 32px;
+      font-family: var(--font-content);
+      color: var(--text);
+    }
+    .marks-obtained {
+      text-align: right;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 33px;
+      padding: 12px 0 16px;
+    }
+
+    .columns {
+      display: grid;
+      grid-template-columns: 4fr 8fr;   /* TIDY 3: was 6fr 6fr */
+      gap: 24px;
+      align-items: start;
+    }
+    .part-title { font-size: 18px; font-weight: 600; margin-bottom: 30px; }
+    .audio { width: 100%; max-width: 300px; display: block; }
+
+    .notes { font-size: 18px; line-height: 30px; }
+    .notes strong { font-weight: 700; }
+    .notes .center { text-align: center; }
+
+    /* ---------- Answer blanks ---------- */
+    /* TIDY 2: inline (not inline-block) so the answer flows with the
+       sentence instead of jumping to its own line. */
+    .fitb { display: inline; font-weight: 700; }
+    .fitb--pending { color: var(--text); }
+    .fitb--correct { color: var(--green); }
+    .fitb--wrong { color: var(--red); }
+    /* Empty student answer: a short underline slot instead of loose spaces */
+    .fitb__blank {
+      display: inline-block;
+      width: 48px;
+      border-bottom: 2px solid currentColor;
+      vertical-align: -3px;
+      margin: 0 2px;
+    }
+    /* "(Marks Given: [x])" never splits across lines */
+    .fitb__marks { white-space: nowrap; }
+
+    .dropdown-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      height: 28px;                /* TIDY 2: was 40px, taller than the 30px line */
+      padding: 0 8px;
+      margin: 0 1px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: #283e59;
+      font-family: var(--font-content);
+      font-size: 15px;
+      font-weight: 400;
+      line-height: 1;
+      vertical-align: 1px;
+      cursor: pointer;
+    }
+    .dropdown-mark img { width: 14px; }
+    .dropdown-mark::after {
+      content: "";
+      width: 8px; height: 8px;
+      margin-left: 2px;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23283e59' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat center / contain;
+    }
+
+    /* ---------- Section bar (as live) ---------- */
+    .section-bar {
+      position: fixed;
+      left: 0; right: 0; bottom: 0;
+      display: flex;
+      gap: 10px;
+      padding: 10px 24px;
+      background: #fff;
+      overflow-x: auto;
+    }
+    .section-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 14px;
+      border: none;
+      border-left: 3px solid #b7c3cf;
+      border-radius: 6px;
+      background: #f3f4f6;
+      font-size: 16px;
+      font-weight: 700;
+      color: #424242;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    .section-item.active { border-left-color: var(--blue); }
+    .section-item__count {
+      display: grid; place-items: center;
+      width: 24px; height: 24px;
+      border-radius: 50%;
+      background: #757575;
+      color: #fff;
+      font-size: 13px;
+    }
+
+    /* ---------- Narrow screens ---------- */
+    @media (max-width: 991px) {
+      .columns { grid-template-columns: 1fr; }
+      .question-content { padding: 20px 16px; }
+      .info-result { padding: 12px 16px; justify-content: flex-start; }
+      .btn-group-results {
+        position: static;
+        margin-right: 24px;
+        padding: 8px 16px;
+        border-radius: 16px 16px 0 0;
+        font-size: 14px;
+      }
+      .exit-quiz { right: 16px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="new-head">
+    <h1 class="header-title">Listening Set 1</h1>
+    <button class="exit-quiz" type="button">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      Exit
+    </button>
+  </header>
+
+  <div class="info-result">
+    <div class="info-group">
+      <label class="info-label" for="student">Student Name</label>
+      <select class="student-select" id="student"><option>Studentdemo Glenn</option></select>
+    </div>
+    <div class="info-group">
+      <span class="info-label">Attempts</span>
+      <div class="attempts">
+        <button type="button" aria-label="Previous attempt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 6l-6 6 6 6" /></svg></button>
+        <span>1/1</span>
+        <button type="button" aria-label="Next attempt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 6l6 6-6 6" /></svg></button>
+      </div>
+    </div>
+    <div class="pills">
+      <span class="pill pill--orange">CEFR Score: A2</span>
+      <span class="pill pill--orange">Band Score: 3.5</span>
+      <span class="pill pill--green">All Questions Marked</span>
+      <span class="pill pill--blue">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 7.5v.5" stroke-linecap="round" /></svg>
+        Score: 8/40 Marks (20%)
+      </span>
+    </div>
+  </div>
+
+  <main class="question-content">
+    <div class="tabs-head">
+      <button class="btn-group-results" type="button">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6" /><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14c2.2.6 3.5 2.7 3.5 6" /></svg>
+        Group Results
+      </button>
+      <nav class="tabs-bar">
+        <button class="nav-link active" type="button">Section 1</button>
+        <button class="nav-link" type="button">Notes</button>
+        <button class="nav-link" type="button">Video</button>
+        <button class="nav-link" type="button">Correction</button>
+      </nav>
+    </div>
+
+    <div class="card">
+      <p class="marks-obtained">Marks obtained : Pending Marking</p>
+
+      <div class="columns">
+        <section>
+          <p class="part-title">PART 1</p>
+          <audio class="audio" controls controlslist="nodownload" preload="none"></audio>
+        </section>
+
+        <section class="notes" id="notes">
+          <strong>Questions 1–10</strong><br /><br />
+          Complete the notes below.<br />
+          Write <strong>ONE WORD AND/OR A NUMBER</strong> for each answer.<br /><br />
+          <div class="center"><strong>Greenfield Discovery Centre Visit</strong></div><br />
+          <strong>The Centre</strong><br />
+          • Size of the grounds: {1} hectares.<br />
+          • Main areas include the meadow, woodland trail and the {2} garden.<br />
+          • More than 200 indigenous {3} have recently been planted in the woodland.<br />
+          • The site also contains a house resembling a {4}.<br /><br />
+          <strong>Educational activities</strong><br />
+          • In science lessons, pupils work with different kinds of {5} taken from the ground.<br />
+          • Geography activities involve following a {6}.<br />
+          • Recreation activities usually take place on the {7} trail.<br />
+          • In the music workshop, natural materials are used to compose {8}.<br /><br />
+          <strong>Benefits</strong><br />
+          • Many children discover adventure when spending the day outdoors.<br />
+          • Having an opportunity to have new {9}.<br />
+          • Groups larger than 50 pupils are charged £5.80 per child.<br />
+          • Adult helpers, such as {10}, do not pay.
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <nav class="section-bar" aria-label="Sections">
+    <button class="section-item active" type="button">SECTION 1 <span class="section-item__count">1</span></button>
+    <button class="section-item" type="button">SECTION 2</button>
+    <button class="section-item" type="button">SECTION 3</button>
+    <button class="section-item" type="button">SECTION 4</button>
+  </nav>
+
+  <script>
+    // Section 1 data as shown on the live attempt (student answer, key, mark, AI flag)
+    const answers = [
+      { status: "pending", student: "lkhlkhlkhwqe", key: "17", mark: "0" },
+      { status: "correct", student: "", key: "", mark: "0.5" },
+      { status: "wrong", student: "", key: "trees", mark: "0", ai: true },
+      { status: "wrong", student: "", key: "butterfly", mark: "0", ai: true },
+      { status: "correct", student: "", key: "", mark: "0.5" },
+      { status: "correct", student: "", key: "", mark: "1" },
+      { status: "correct", student: "", key: "", mark: "1" },
+      { status: "correct", student: "", key: "", mark: "0.5" },
+      { status: "correct", student: "", key: "", mark: "0.5" },
+      { status: "correct", student: "", key: "", mark: "1" },
+    ];
+    const AI_ICON = '<img src="https://elb-onlinequiz.heyhi.sg/images/adaptive-learning/ai-icon.png" alt="AI" />';
+    const escapeHtml = (s) =>
+      String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+    // TIDY 2: one "n)" label (live showed "1) 1)"), answer inline,
+    // marks group kept on one line.
+    function blankHtml(number) {
+      const a = answers[number - 1];
+      const student = a.student ? escapeHtml(a.student) : '<span class="fitb__blank"></span>';
+      const key = a.key ? ` (${escapeHtml(a.key)})` : "";
+      return `<span class="fitb fitb--${a.status}">${number}) ${student}${key} ` +
+        `<span class="fitb__marks">(Marks Given: <button type="button" class="dropdown-mark">${a.mark}${a.ai ? AI_ICON : ""}</button>)</span></span>`;
+    }
+
+    const notes = document.getElementById("notes");
+    notes.innerHTML = notes.innerHTML.replace(/\{(\d+)\}/g, (_, n) => blankHtml(Number(n)));
+  </script>
+</body>
+</html>
