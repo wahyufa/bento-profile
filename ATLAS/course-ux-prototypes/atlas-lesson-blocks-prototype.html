@@ -111,6 +111,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .ol-bar { margin: 0 6px 12px; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
 .ol-bar i { display: block; height: 100%; width: 0; background: var(--green); transition: width .3s; }
 .ol-list { list-style: none; padding: 0; display: grid; gap: 2px; }
+/* Sample course only: link to the team feedback sheet under the lesson list */
+.ol-feedback { position: sticky; bottom: -14px; z-index: 1; display: grid; gap: 2px; width: calc(100% + 24px); margin: 14px -12px -14px; padding: 12px 18px 14px; border: 0; border-top: 1px solid var(--line); background: var(--surface); font: inherit; font-size: 13px; color: var(--muted); text-align: left; cursor: pointer; border-radius: 0 0 var(--radius) var(--radius); }
+.ol-feedback b { color: var(--primary, #0D719A); font-size: 14px; }
+.ol-feedback:hover b { text-decoration: underline; }
+.fb-thanks { text-align: center; display: grid; gap: 10px; justify-items: center; padding-block: 8px 4px; }
+.fb-thanks .big { width: 56px; height: 56px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 28px; font-weight: 800; }
 .ol-item > button {
   display: flex; gap: 10px; align-items: flex-start; width: 100%; text-align: left; border: 0; background: none;
   padding: 8px 8px; border-radius: 10px; line-height: 1.35;
@@ -878,6 +884,23 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
 
 <!-- Optional first step -->
 <dialog class="fund" id="fundDialog" aria-labelledby="fundTitle"><div class="fund-in" id="fundBody"></div></dialog>
+
+<!-- Course feedback (sample course review). The form is filled in by assets/feedback/feedback.js -->
+<dialog class="fund" id="fbDialog" aria-labelledby="fbTitle">
+  <div class="fund-in">
+    <div class="fund-top">
+      <div class="tt"><small>Course redesign review</small><h2 id="fbTitle" tabindex="-1">How was the course?</h2><p>About 3 minutes. Rate the experience, not the subject: the content is a sample. Skip anything you have not tried yet.</p></div>
+      <button class="fund-x" type="button" data-fb-close aria-label="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    </div>
+    <form id="fbForm"></form>
+    <div class="fb-thanks" id="fbThanks" hidden tabindex="-1">
+      <div class="big" aria-hidden="true">✓</div>
+      <h2>Thank you</h2>
+      <p class="muted">Your feedback was sent.</p>
+      <div class="rv-actions" style="justify-content:center"><a class="btn" href="atlas-feedback-prototype.html#summary">See team summary</a><button class="btn primary" type="button" data-fb-close>Back to the lesson</button></div>
+    </div>
+  </div>
+</dialog>
 
 <!-- Community registration -->
 <dialog class="fund" id="regDialog" aria-labelledby="regTitle"><div class="fund-in" id="regBody"></div></dialog>
@@ -1981,6 +2004,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
 
 <!-- Sample course shared with the admin prototype. Opened with ?course=cs -->
 <script src="assets/courses/customer-service.js"></script>
+<script src="assets/feedback/feedback.js"></script>
 <script>
 (function () {
   'use strict';
@@ -2183,6 +2207,13 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       return '<button data-lesson="' + i + '" aria-pressed="' + (i === 0) + '" title="' + esc(c.title) + '" aria-label="Lesson ' + (i + 1) + ': ' + esc(c.title) + '">' + (i + 1) + '</button>';
     }).join('');
     document.querySelector('.ol-head h2').textContent = COURSE_TITLE;
+    // Team review of the sample course: a quiet way to the feedback sheet from any lesson
+    var feedbackLink = document.createElement('button');
+    feedbackLink.type = 'button';
+    feedbackLink.className = 'ol-feedback';
+    feedbackLink.setAttribute('data-fb-open', '');
+    feedbackLink.innerHTML = '<span>Reviewing this course?</span><b>Give feedback ›</b>';
+    document.getElementById('olList').insertAdjacentElement('afterend', feedbackLink);
   }
   function hasReview(i) { return !!(QUIZ[i] && QUIZ[i].length); }
   function lessonPass(i) { var r = EXT && EXT.lessons[i] && EXT.lessons[i].review; return r && r.pass ? +r.pass : 80; }
@@ -2325,6 +2356,25 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
   function progParam() { return isDone(QUIZ_IDX) ? 'done' : (doneCount() > 0 ? 'some' : 'none'); }
   // An external course's pages read its real progress, so only the course key is passed on
   function pageLink(page) { return CID ? page + (page === COURSE_PAGE ? '?course=' + CID : '') : page + '?prog=' + progParam(); }
+
+  // ---------- Feedback pop-up (sample course review) ----------
+  var fbMounted = false;
+  function openFeedback() {
+    var d = $('#fbDialog');
+    if (!window.AtlasFeedback) { toast('Feedback is not available right now'); return; }
+    if (!fbMounted) {
+      fbMounted = true;
+      window.AtlasFeedback.mount($('#fbForm'), { idPrefix: 'fbp-', onSent: function () { $('#fbForm').hidden = true; $('#fbThanks').hidden = false; $('#fbThanks').focus(); } });
+    }
+    $('#fbForm').hidden = false; $('#fbThanks').hidden = true;
+    closeDrawer();
+    if (!d.open) d.showModal();
+    $('#fbTitle').focus();
+  }
+  $('#fbDialog').addEventListener('click', function (e) {
+    if (e.target === this || e.target.closest('[data-fb-close]')) this.close();   // backdrop or close buttons
+  });
+  document.addEventListener('click', function (e) { if (e.target.closest('[data-fb-open]')) openFeedback(); });
 
   // ---------- Lessons built from blocks (external course) ----------
   // Uses the same markup and classes as the hand-built lessons, so both look alike. One interactive
@@ -2757,7 +2807,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       var sc = quizScore(quiz.answers);
       h += '<div class="rv-result good" role="status"><div class="big" aria-hidden="true">✓</div><h2 class="qz-title" id="qzH" tabindex="-1">Course complete</h2><p>You finished ' + esc(COURSE_TITLE) + '.</p>' +
         '<div class="chips-row" style="justify-content:center;margin:14px 0 4px"><span class="chip solid">' + COURSE.length + ' lessons</span><span class="chip solid">' + (quiz.answers.length ? 'Quiz ' + sc + '/' + n : 'Quiz passed') + '</span></div>' +
-        '<div class="rv-actions" style="justify-content:center;margin-top:20px"><button class="btn" type="button" data-qz="courses">Browse courses</button><button class="btn primary" type="button" data-qz="back-course">Back to course</button></div></div>';
+        '<div class="rv-actions" style="justify-content:center;margin-top:20px"><button class="btn" type="button" data-qz="courses">Browse courses</button>' + (EXT ? '<button class="btn" type="button" data-qz="back-course">Back to course</button><button class="btn primary" type="button" data-qz="feedback">Give feedback</button>' : '<button class="btn primary" type="button" data-qz="back-course">Back to course</button>') + '</div></div>';
     }
     root.innerHTML = h;
     jenRefresh();   // Jen steps aside while quiz questions are open
@@ -2773,6 +2823,7 @@ body.jen-open .jen-panel { transform: none; visibility: visible; transition: tra
       if (quizScore(quiz.answers) >= quizNeeded()) markDone(QUIZ_IDX);
     }
     else if (a === 'finish') { quiz.phase = 'complete'; focus = '#qzH'; }
+    else if (a === 'feedback') { openFeedback(); return; }   // team review of the sample course
     else if (a === 'lessons') { toast('Opens the lesson list (as in production)'); return; }
     else if (a === 'courses') { window.location.href = pageLink(COURSES_PAGE); return; }
     else if (a === 'back-course') { window.location.href = pageLink(COURSE_PAGE); return; }

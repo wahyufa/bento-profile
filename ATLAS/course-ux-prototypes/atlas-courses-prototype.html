@@ -322,10 +322,17 @@ a { color: inherit; }
       '<small>' + (started ? 'Lesson ' + (d + 1) + ' of ' + c.lessons + ': ' + esc(nextTitle) + '<br>About ' + fmt(left) + ' left' : c.lessons + ' lessons · about ' + fmt(c.mins)) + '</small></div></div></section>';
   }
 
+  // Team review of the sample course: a quiet link to the feedback sheet
+  function feedbackStrip() {
+    if (!SAMPLE) return '';
+    return '<a href="atlas-feedback-prototype.html" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:0 0 22px;padding:14px 18px;border-radius:12px;background:#E3F1F7;color:#31425D;text-decoration:none;font-weight:600">' +
+      '<span>Reviewing the course redesign? After the sample course, tell us how it felt.</span><span style="font-weight:700;color:#0D719A">Give feedback ›</span></a>';
+  }
+
   function renderNew() {
     return appbar() +
       '<div class="banner"><div class="in"><div><h1>Courses</h1><p>Your enrolled and available courses</p></div><div class="stats" id="stats"></div></div></div>' +
-      '<main class="page"><div id="upnext"></div>' +
+      '<main class="page">' + feedbackStrip() + '<div id="upnext"></div>' +
       '<div class="tabs" role="tablist" aria-label="Course lists"><button class="tab" role="tab" id="tabMine" data-tab="mine" aria-selected="true">My courses <em id="cMine"></em></button><button class="tab" role="tab" id="tabAvail" data-tab="avail" aria-selected="false">Available courses <em id="cAvail"></em></button></div>' +
       '<div class="toolbar" id="toolbar"><label class="search">' + I.search + '<input id="q" type="search" placeholder="Search courses" autocomplete="off" aria-label="Search courses"></label>' +
       '<div class="chips" role="group" aria-label="Filter by status" id="statusChips"></div>' +

@@ -410,6 +410,17 @@ Zhi: refine the redesign, build a full sample course (30–60 min) in the new UI
 - [x] `tools/build-clean.ps1`: `assets/` paths for `clean/`. Sample progress is kept in sessionStorage like the rest of the clean lesson, and the admin's saved copy is still read. Rebuilt `clean/`.
 - [x] Evaluation sheet (claude.ai page, `docs/course-evaluation-form.html`): https://claude.ai/artifact/NLniw6PEHsrNZTok6xjNuZ. Six 1–5 ratings and three open questions, one response per person that can be edited, and a team summary without names.
 - [x] Tested: full walk of all 8 lessons (reviews, quiz 5/5, course complete), funnel, flashcards, Jen, discussion, Current layout, admin edit reflected in the learner view, course page and list progress, clean build at 375px with no horizontal scroll, Digital Marketing unchanged. No console errors.
-- [ ] Deploy the changed files to Vercel. The links on the sheet point to random-three-dun.vercel.app.
+- [x] Deployed (pushed by the user). The Vercel project serves the repo root, so the prototypes live under `/ATLAS/course-ux-prototypes/`. Fixed the links on the sheet and republished it. Checked the live clean course list: the sample course and its cover load.
 - [ ] Share the sheet with the team with "can interact" access. Viewers with view-only access can read the summary but cannot send feedback.
 - [ ] Admin edits reach the learner pages only in the browser where they were made. A shared backend would be needed for the team to see each other's edits.
+
+### Feedback inside the prototype, stored in Supabase (17 Nov 2026)
+- [x] New Supabase project `atlas-proto` (free, ap-southeast-1). The user deleted `obelisk` to stay within the 2 free projects. It has one table, `course_feedback`, with a column per rating, three text columns and an optional name. RLS lets the page send and read; editing and deleting are refused, and the database checks every value (1–5, length limits). No security advisor warnings.
+- [x] `atlas-feedback-prototype.html`, built to `clean/feedback.html`: the same sheet as the claude.ai version plus an optional name. It has a thank-you screen and a "Team summary" tab (#summary) with averages, the spread of scores and comments.
+- [x] Entry points: a "Give feedback" strip on the course list, above Up next (shown while the sample course exists), and a "Give feedback" button on the sample course's Course complete screen.
+- [x] Lesson player: "Reviewing this course? Give feedback ›" is pinned to the bottom of the outline (always visible, also in the mobile drawer). It and the "Give feedback" button on Course complete open a pop-up with the same form instead of a new page. The thank-you step links to the team summary.
+- [x] The form lives in one shared file, `assets/feedback/feedback.js` (questions, Supabase send and read), used by both the pop-up and the feedback page. Tested: send from the pop-up (test row deleted), feedback page form and summary, Course complete button. No console errors.
+- [x] Tested against the real table: send → thank you → summary shows the row; the test row was deleted afterwards. No console errors.
+- [ ] No login, so anyone with the link can send (more than once) and read the summary. Fine for an internal review.
+- [ ] After the review: export the table to CSV from the Supabase dashboard (Table Editor → course_feedback → Export).
+- [ ] The claude.ai sheet (https://claude.ai/artifact/NLniw6PEHsrNZTok6xjNuZ) is no longer needed. Delete it, or keep it unused.

@@ -13,6 +13,7 @@ $map = [ordered]@{
   'atlas-courses-prototype.html'       = 'index.html'
   'atlas-course-page-prototype.html'   = 'course.html'
   'atlas-lesson-blocks-prototype.html' = 'lesson.html'
+  'atlas-feedback-prototype.html'      = 'feedback.html'
 }
 $neutralToast = 'Not available in this preview'
 
@@ -30,7 +31,7 @@ foreach ($src in $map.Keys) {
   foreach ($k in $map.Keys) { $t = $t.Replace($k, $map[$k]) }
 
   # 2. Page titles without the word "Prototype"
-  Apply 'titles' 'ATLAS (All Courses|Course Page|Lesson Blocks) Prototype' 'ATLAS Learn'
+  Apply 'titles' 'ATLAS (All Courses|Course Page|Lesson Blocks|Feedback) Prototype' 'ATLAS Learn'
 
   # 3. The top bar keeps only the Current / Enhanced switch
   Apply 'progress switch' '\s*<div class="seg" role="group" aria-label="[^"]*[Pp]rogress">.*?</div>' ''
