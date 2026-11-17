@@ -14,6 +14,12 @@
        the sentence; "(Marks Given: [x])" stays together; the marks
        dropdown fits inside one text line.
     3. Columns: audio column 4/12, questions 8/12 (was 6/6).
+
+  Header on scroll — two options to compare (live keeps header + sub
+  bar sticky, ~206px on screen at zoom 1.25):
+    ?header=compact (default): header + sub bar scroll away and a slim
+      bar with title, student, scores and Exit slides in at the top.
+    ?header=simple: only the yellow header stays; the sub bar scrolls away.
 -->
 <html lang="en">
 <head>
@@ -27,6 +33,11 @@
       var key = new URLSearchParams(location.search).get("size") || "larger";
       var zoom = sizes[key] || 1.25;
       if (zoom !== 1) document.documentElement.style.zoom = String(zoom);
+    })();
+    // Header-on-scroll option to compare: "compact" (default) or "simple"
+    (function () {
+      var mode = new URLSearchParams(location.search).get("header");
+      document.documentElement.dataset.header = mode === "simple" ? "simple" : "compact";
     })();
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -93,13 +104,20 @@
     .info-result {
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between; /* student info left, pills right */
       flex-wrap: wrap;             /* TIDY 1: wrap whole groups, never squeeze them */
       gap: 12px 28px;
       padding: 14px 46px;          /* TIDY 1: was 5px 70px 5px 150px */
       background: #fff url("https://demo.heyhi.sg/images/bg-smartjen-color.png") repeat;
     }
+    /* When the pills wrap under the student info (narrow window or
+       zoomed in), centre both rows instead of hugging the left edge. */
+    .info-result.is-wrapped { justify-content: center; }
+    .info-result.is-wrapped .pills { justify-content: center; }
+    .info-meta { display: flex; align-items: center; gap: 28px; }
     .info-group { display: flex; align-items: center; gap: 12px; }
+    /* As live: "Student / Name" on two lines, right-aligned to the select */
+    .info-label.info-label--stacked { white-space: normal; width: 60px; text-align: right; line-height: 1.3; }
     .info-label {
       font-size: 11px;
       font-weight: 700;
@@ -291,8 +309,59 @@
       font-size: 13px;
     }
 
+    /* ---------- Header on scroll ---------- */
+    /* Option "simple": only the yellow header stays at the top */
+    [data-header="simple"] .new-head { position: sticky; top: 0; z-index: 30; }
+
+    /* Option "compact": header + sub bar scroll away normally, and this
+       slim bar slides in once the sub bar is out of view. It is fixed
+       (not sticky) so showing it never shifts the page content. */
+    .compact-bar { display: none; }
+    [data-header="compact"] .compact-bar {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 40;
+      height: 54px;
+      padding: 0 46px;
+      background: var(--amber) url("https://demo.heyhi.sg/images/bg-smartjen.png") repeat;
+      box-shadow: 0 2px 12px rgba(18, 38, 63, 0.12);
+      transform: translateY(-100%);
+      transition: transform 0.2s ease;
+    }
+    [data-header="compact"] .compact-bar.is-visible { transform: none; }
+    .compact-bar__title {
+      min-width: 0;
+      font-size: 18px;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .compact-bar__info { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .compact-chip {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 12px;
+      background: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--ink);
+      white-space: nowrap;
+    }
+    .compact-chip--orange { color: var(--orange); }
+    .compact-chip--blue { color: var(--blue); }
+    .compact-bar .exit-quiz { position: static; flex-shrink: 0; font-size: 16px; }
+
     /* ---------- Narrow screens ---------- */
     @media (max-width: 991px) {
+      [data-header="compact"] .compact-bar { padding: 0 16px; gap: 10px; }
+      .compact-chip--optional { display: none; }
       .columns { grid-template-columns: 1fr; }
       .question-content { padding: 20px 16px; }
       .info-result { padding: 12px 16px; justify-content: flex-start; }
@@ -308,6 +377,21 @@
   </style>
 </head>
 <body>
+  <!-- Slim bar for the "compact" option; hidden until the sub bar scrolls away -->
+  <div class="compact-bar" id="compactBar" aria-hidden="true">
+    <span class="compact-bar__title">Listening Set 1</span>
+    <div class="compact-bar__info">
+      <span class="compact-chip">Studentdemo Glenn</span>
+      <span class="compact-chip compact-chip--orange compact-chip--optional">CEFR A2</span>
+      <span class="compact-chip compact-chip--orange compact-chip--optional">Band 3.5</span>
+      <span class="compact-chip compact-chip--blue">8/40 (20%)</span>
+    </div>
+    <button class="exit-quiz" type="button" tabindex="-1">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+      Exit
+    </button>
+  </div>
+
   <header class="new-head">
     <h1 class="header-title">Listening Set 1</h1>
     <button class="exit-quiz" type="button">
@@ -317,8 +401,9 @@
   </header>
 
   <div class="info-result">
+    <div class="info-meta">
     <div class="info-group">
-      <label class="info-label" for="student">Student Name</label>
+      <label class="info-label info-label--stacked" for="student">Student Name</label>
       <select class="student-select" id="student"><option>Studentdemo Glenn</option></select>
     </div>
     <div class="info-group">
@@ -328,6 +413,7 @@
         <span>1/1</span>
         <button type="button" aria-label="Next attempt"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M9 6l6 6-6 6" /></svg></button>
       </div>
+    </div>
     </div>
     <div class="pills">
       <span class="pill pill--orange">CEFR Score: A2</span>
@@ -421,6 +507,31 @@
       const key = a.key ? ` (${escapeHtml(a.key)})` : "";
       return `<span class="fitb fitb--${a.status}">${number}) ${student}${key} ` +
         `<span class="fitb__marks">(Marks Given: <button type="button" class="dropdown-mark">${a.mark}${a.ai ? AI_ICON : ""}</button>)</span></span>`;
+    }
+
+    // CSS can't tell when a flex row has wrapped, so check it on resize:
+    // pills starting lower than the student info means they wrapped.
+    const infoBar = document.querySelector(".info-result");
+    const infoMeta = infoBar.querySelector(".info-meta");
+    const infoPills = infoBar.querySelector(".pills");
+    function updateInfoWrap() {
+      infoBar.classList.remove("is-wrapped");
+      const wrapped = infoPills.getBoundingClientRect().top > infoMeta.getBoundingClientRect().bottom - 1;
+      infoBar.classList.toggle("is-wrapped", wrapped);
+    }
+    new ResizeObserver(updateInfoWrap).observe(infoBar);
+    document.fonts.ready.then(updateInfoWrap);
+
+    // "compact" option: show the slim bar once the sub bar has scrolled
+    // above the top of the screen, hide it again when scrolling back up.
+    if (document.documentElement.dataset.header === "compact") {
+      const compactBar = document.getElementById("compactBar");
+      new IntersectionObserver(([entry]) => {
+        const scrolledPast = !entry.isIntersecting && entry.boundingClientRect.top < 0;
+        compactBar.classList.toggle("is-visible", scrolledPast);
+        compactBar.setAttribute("aria-hidden", String(!scrolledPast));
+        compactBar.querySelector(".exit-quiz").tabIndex = scrolledPast ? 0 : -1;
+      }).observe(infoBar);
     }
 
     const notes = document.getElementById("notes");
