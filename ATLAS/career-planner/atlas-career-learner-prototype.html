@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATLAS My Career Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Career Planner, learner side: L1 My Career (path and active stage) and
+   L2 My skills + Learning record. Same tokens as the learner course prototypes.
+   Paths, skills and content come from assets/career-data.js, or from the admin
+   prototype's saved copy in this browser.
+   ========================================================================== */
+:root {
+  --navy: #31425D;
+  --primary: #0D719A; --primary-ink: #0A5A7B; --primary-soft: #E6F2F7;
+  --bg: #F6F7F9; --surface: #FFFFFF; --ink: #171A26; --muted: #5B6475; --line: #E1E5EB;
+  --accent: #F5A623; --accent-ink: #8A5600; --accent-soft: #FEF4E1;
+  --green: #1E8A5A; --green-soft: #E3F4EC; --red: #C43D2B; --red-soft: #FBE7E4;
+  --violet: #5B3FB5; --violet-soft: #EFE9FB;
+  --foundation: #0A5A7B; --role: #1E8A5A; --growth: #5B3FB5;
+  --radius-sm: 10px; --radius: 16px; --radius-lg: 22px;
+  --font: "Montserrat", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --proto-h: 48px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 15px; line-height: 1.55; }
+h1, h2, h3, h4, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+button, input, select { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: var(--primary-ink); }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+/* ---------- Prototype controls ---------- */
+.proto { position: sticky; top: 0; z-index: 90; min-height: var(--proto-h); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; padding: 6px 20px; background: #FFF8E6; border-bottom: 1px dashed var(--accent); font-size: 13px; font-family: system-ui, "Segoe UI", sans-serif; }
+.proto b { color: var(--accent-ink); font-weight: 600; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); overflow: hidden; }
+.seg button { border: 0; background: none; padding: 6px 14px; font-size: 13px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.proto .plain { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: 13px; }
+.proto .go { background: var(--navy); color: #fff; border-color: var(--navy); }
+.proto a { font-weight: 600; }
+
+/* ---------- App bar (as in ATLAS learner) ---------- */
+.appbar { background: var(--surface); border-bottom: 1px solid var(--line); height: 64px; display: flex; align-items: center; gap: 32px; padding: 0 24px; }
+.logo img { height: 42px; width: auto; display: block; }
+.appnav { display: flex; gap: 26px; margin: 0 auto; }
+.appnav a { text-decoration: none; color: var(--muted); font-weight: 500; font-size: 15px; padding: 20px 2px 18px; border-bottom: 3px solid transparent; white-space: nowrap; }
+.appnav a.on { color: var(--primary); font-weight: 600; border-bottom-color: var(--accent); }
+.appnav a em { font-style: normal; font-size: 10.5px; font-weight: 700; background: var(--accent-soft); color: var(--accent-ink); border-radius: 999px; padding: 1px 6px; margin-left: 4px; vertical-align: 2px; }
+.appright { display: flex; align-items: center; gap: 14px; margin-left: auto; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; background: #1FB6D6; color: #fff; display: grid; place-items: center; font-weight: 600; font-size: 14px; }
+
+/* ---------- Page ---------- */
+.page { max-width: 1120px; margin: 0 auto; padding: 24px 24px 80px; display: grid; gap: 18px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.muted { color: var(--muted); }
+.mini { font-size: 13px; color: var(--muted); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 9px 16px; font-weight: 600; font-size: 14px; white-space: nowrap; text-decoration: none; color: var(--ink); }
+.btn:hover { border-color: #b9c2d0; }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn.primary:hover { background: var(--primary-ink); }
+.btn.sm { padding: 6px 12px; font-size: 13px; border-radius: 10px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 10px; line-height: 1.6; background: var(--bg); color: var(--muted); white-space: nowrap; }
+.chip.ok { background: var(--green-soft); color: var(--green); }
+.chip.warn { background: var(--accent-soft); color: var(--accent-ink); }
+.chip.bad { background: var(--red-soft); color: var(--red); }
+.chip.info { background: var(--primary-soft); color: var(--primary-ink); }
+.kind { font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 6px; padding: 2px 8px; white-space: nowrap; }
+.k-Course { background: var(--primary-soft); color: var(--primary-ink); }
+.k-PALS { background: var(--green-soft); color: var(--green); }
+.k-CBL { background: var(--accent-soft); color: var(--accent-ink); }
+.k-Assessment { background: var(--violet-soft); color: var(--violet); }
+.k-Offline { background: #EEF0F4; color: #4A5468; }
+
+/* Header */
+.hero { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 22px 24px; }
+.hero .face { width: 64px; height: 64px; border-radius: 50%; background: linear-gradient(135deg, #1FB6D6, var(--primary)); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 24px; }
+.hero h1 { font-size: 24px; font-weight: 700; color: var(--navy); line-height: 1.25; }
+.hero .role { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; margin-top: 4px; font-size: 14.5px; color: var(--muted); }
+.hero .role b { color: var(--ink); font-weight: 600; }
+.hero .plan { text-align: right; min-width: 200px; }
+.hero .plan b { display: block; font-size: 22px; color: var(--navy); font-variant-numeric: tabular-nums; }
+.bar { height: 8px; border-radius: 999px; background: var(--line); overflow: hidden; margin-top: 6px; }
+.bar i { display: block; height: 100%; background: var(--green); border-radius: 999px; }
+
+/* Tabs */
+.tabs { display: flex; gap: 6px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+.tabs a { white-space: nowrap; text-decoration: none; padding: 10px 14px; font-weight: 600; font-size: 15px; color: var(--muted); border-bottom: 3px solid transparent; margin-bottom: -1px; }
+.tabs a[aria-current="page"] { color: var(--navy); border-bottom-color: var(--accent); }
+.tabs a .cnt { font-size: 12px; background: var(--red-soft); color: var(--red); border-radius: 999px; padding: 0 7px; margin-left: 6px; }
+
+/* Banners */
+.banner { display: flex; gap: 14px; align-items: center; padding: 14px 18px; border-radius: 14px; }
+.banner.due { background: var(--accent-soft); color: #5c3c00; }
+.banner.new { background: var(--green-soft); color: #134d33; }
+.banner b { font-weight: 700; }
+.banner .ic { width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; flex: none; }
+.banner.due .ic { background: var(--accent); color: #fff; }
+.banner.new .ic { background: var(--green); color: #fff; }
+.banner .x { margin-left: auto; border: 0; background: none; font-size: 20px; color: inherit; opacity: .7; }
+
+/* Journey strip: the paths in order */
+.journey { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 14px 18px; }
+.journey .lbl { font-size: 12.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-right: 6px; }
+.jp { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px 6px 8px; font-weight: 600; font-size: 14px; background: var(--surface); }
+.jp i { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; font-style: normal; font-size: 12px; font-weight: 800; color: #fff; background: var(--line); }
+.jp.done i { background: var(--green); }
+.jp.now { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.jp.now i { background: var(--primary); }
+.jp.lock { color: var(--muted); background: transparent; border-style: dashed; }
+.jp.due { border-color: var(--accent); }
+.jp.due i { background: var(--accent); }
+.jarr { color: var(--muted); }
+
+/* Current path */
+.path { padding: 0; overflow: hidden; }
+.path-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 10px 20px; padding: 20px 24px 14px; }
+.path-h small { font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.path-h h2 { font-size: 21px; color: var(--navy); }
+.t-foundation { color: var(--foundation); } .t-role { color: var(--role); } .t-growth { color: var(--growth); }
+.stages { display: grid; }
+.stg { border-top: 1px solid var(--line); }
+.stg-h { display: flex; align-items: center; gap: 14px; padding: 14px 24px; }
+.stg-h .no { width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 14px; flex: none; background: var(--line); color: var(--muted); }
+.stg.done .no { background: var(--green); color: #fff; }
+.stg.now .no { background: var(--primary); color: #fff; }
+.stg-h .t { flex: 1; min-width: 0; }
+.stg-h .t b { display: block; font-size: 16px; }
+.stg-h .t span { font-size: 13px; color: var(--muted); }
+.stg.lock { background: #FAFBFC; }
+.stg.lock .t b { color: var(--muted); }
+.stg.now { background: linear-gradient(180deg, #F7FBFD, var(--surface) 80px); }
+.stg-b { padding: 0 24px 20px 70px; display: grid; gap: 14px; }
+.items { display: grid; gap: 8px; }
+.item { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: center; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; background: var(--surface); }
+.item .st { width: 22px; height: 22px; border-radius: 50%; border: 2px solid #b9c2d0; display: grid; place-items: center; font-size: 12px; font-weight: 800; color: #fff; }
+.item.done .st { background: var(--green); border-color: var(--green); }
+.item.prog .st { border-color: var(--primary); background: conic-gradient(var(--primary) 0 50%, transparent 50% 100%); }
+.item .t b { display: block; font-weight: 600; }
+.item .t span { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font-size: 13px; color: var(--muted); margin-top: 2px; }
+.item.done .t b { color: var(--muted); }
+.item.renew { border-color: var(--accent); background: #FFFCF4; }
+
+/* Choose-from */
+.pickhead { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; }
+.pickhead b { font-size: 16px; color: var(--navy); }
+.dots { display: inline-flex; gap: 6px; }
+.dots i { width: 14px; height: 14px; border-radius: 50%; border: 2px solid #b9c2d0; }
+.dots i.picked { border-color: var(--primary); }
+.dots i.done { background: var(--green); border-color: var(--green); }
+.filters { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.filters button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.filters button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.filters select { border: 1px solid var(--line); border-radius: 999px; padding: 4px 10px; font-size: 13px; background: var(--surface); }
+.pool { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; }
+.pc { display: grid; gap: 8px; align-content: start; border: 1px solid var(--line); border-radius: 14px; padding: 14px; background: var(--surface); }
+.pc b { font-size: 14.5px; line-height: 1.35; }
+.pc .sk { display: flex; flex-wrap: wrap; gap: 4px; }
+.pc .sk span { font-size: 11.5px; color: var(--muted); background: var(--bg); border-radius: 6px; padding: 1px 6px; }
+.pc .ft { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 4px; }
+.pc.picked { border-color: var(--primary); box-shadow: 0 0 0 2px var(--primary-soft); }
+.pc.full { opacity: .55; }
+.locknote { display: flex; gap: 8px; align-items: center; font-size: 13.5px; color: var(--muted); padding: 0 24px 16px 70px; }
+
+/* Side lists */
+.cols { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 18px; align-items: start; }
+.side-card { padding: 16px 18px; display: grid; gap: 10px; }
+.side-card h3 { font-size: 15px; color: var(--navy); }
+.ln { display: flex; gap: 10px; align-items: flex-start; font-size: 13.5px; }
+.ln .ok { width: 20px; height: 20px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 800; flex: none; margin-top: 1px; }
+.ln b { display: block; font-weight: 600; }
+.ln span { color: var(--muted); font-size: 12.5px; }
+.src { font-size: 11.5px; font-weight: 700; color: var(--muted); background: var(--bg); border-radius: 6px; padding: 1px 6px; }
+
+/* L2 Skills */
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 12.5px; color: var(--muted); }
+.legend b { color: var(--ink); }
+.skills { display: grid; }
+.skr { display: grid; grid-template-columns: minmax(180px, 1.1fr) minmax(220px, 1.6fr) 112px; gap: 18px; align-items: center; padding: 14px 20px; border-top: 1px solid var(--line); background: none; border-left: 0; border-right: 0; border-bottom: 0; text-align: left; width: 100%; }
+.skr:first-child { border-top: 0; }
+.skr:hover { background: #FAFBFC; }
+.skr .nm b { display: block; font-size: 15px; }
+.skr .nm span { font-size: 12.5px; color: var(--muted); }
+.track { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding-top: 18px; }
+.track i { height: 10px; border-radius: 3px; background: var(--line); }
+.track i.f { background: var(--primary); }
+.track .tg { position: absolute; top: 0; transform: translateX(-50%); font-size: 11px; font-weight: 700; color: var(--accent-ink); white-space: nowrap; }
+.track .tg::after { content: ""; position: absolute; left: 50%; top: 15px; width: 2px; height: 16px; background: var(--accent); transform: translateX(-50%); }
+.track-l { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; font-size: 10.5px; color: var(--muted); margin-top: 4px; }
+.aux { display: flex; flex-wrap: wrap; gap: 8px; padding: 16px 20px; }
+.next-role { padding: 18px 20px; display: grid; gap: 8px; background: repeating-linear-gradient(135deg, #FAFBFC 0 10px, #F4F6F8 10px 20px); border-style: dashed; }
+.phase { display: inline-flex; font-size: 11.5px; font-weight: 700; color: var(--violet); background: var(--violet-soft); border-radius: 999px; padding: 1px 8px; }
+
+/* L2 Learning record */
+.rec-h { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; padding: 16px 20px; }
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font-size: 12px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); padding: 10px 20px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); background: #FAFBFC; white-space: nowrap; }
+td { padding: 12px 20px; border-bottom: 1px solid var(--line); vertical-align: top; }
+td b { font-weight: 600; }
+td .sub { display: block; font-size: 12.5px; color: var(--muted); }
+td.num { white-space: nowrap; font-variant-numeric: tabular-nums; }
+tr:last-child td { border-bottom: 0; }
+
+/* Dialog */
+dialog.dlg { border: 0; padding: 0; border-radius: 20px; width: min(600px, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow: auto; box-shadow: 0 24px 70px rgba(23,26,38,.35); color: var(--ink); }
+dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
+.dg { padding: 22px 24px; display: grid; gap: 14px; }
+.dg-h { display: flex; gap: 12px; align-items: flex-start; }
+.dg-h h2 { font-size: 20px; color: var(--navy); }
+.dg-h .x { margin-left: auto; border: 0; background: none; font-size: 22px; color: var(--muted); width: 36px; height: 36px; border-radius: 10px; }
+.dg-h .x:hover { background: var(--bg); }
+.dg h3 { font-size: 13px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); }
+.dg ul { display: grid; gap: 8px; }
+
+.celebrate { text-align: center; display: grid; gap: 10px; justify-items: center; padding: 8px 0 4px; }
+.celebrate .big { width: 64px; height: 64px; border-radius: 50%; background: var(--green); color: #fff; display: grid; place-items: center; font-size: 30px; font-weight: 800; }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 12px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 200; max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+@media (max-width: 900px) {
+  .appnav { display: none; }
+  .cols { grid-template-columns: minmax(0, 1fr); }
+  .hero { grid-template-columns: auto minmax(0, 1fr); }
+  .hero .plan { grid-column: 1 / -1; text-align: left; }
+  .skr { grid-template-columns: minmax(0, 1fr) 112px; }
+  .skr > .chip { justify-self: end; }
+  .skr .viz { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (max-width: 560px) {
+  .page { padding: 16px 16px 64px; }
+  .stg-b, .locknote { padding-left: 24px; }
+  .hero { padding: 18px; }
+  .hero .face { width: 48px; height: 48px; font-size: 19px; }
+  .tabs a { padding: 10px 10px; font-size: 14px; }
+  .path-h { padding: 18px 18px 12px; }
+  .stg-h { padding: 14px 18px; }
+  .stg-b { padding: 0 18px 18px; }
+  .locknote { padding: 0 18px 14px; }
+  .item { grid-template-columns: 22px minmax(0, 1fr); }
+  .item .btn { grid-column: 2; justify-self: start; }
+}
+</style>
+</head>
+<body>
+
+<div class="proto">
+  <b>Prototype</b>
+  <span>My Career · learner</span>
+  <div class="seg" role="group" aria-label="Learner situation">
+    <button type="button" data-scn="newjoiner" aria-pressed="false">New joiner</button>
+    <button type="button" data-scn="mid" aria-pressed="true">Mid-path</button>
+    <button type="button" data-scn="renewal" aria-pressed="false">Compliance due</button>
+  </div>
+  <button class="plain go" type="button" id="simBtn" title="Marks the next item in the learner's plan as complete">Complete next item ›</button>
+  <button class="plain" type="button" id="resetBtn">Reset</button>
+  <a href="atlas-career-admin-prototype.html#paths">Open the admin ↗</a>
+</div>
+
+<header class="appbar">
+  <a class="logo" href="#path" aria-label="ATLAS home"><img src="assets/atlas-logo-480.png" alt="ATLAS by HeyHi"></a>
+  <nav class="appnav" aria-label="Main">
+    <a href="#" data-toast="Dashboard (not part of this preview)">Dashboard</a>
+    <a href="#" data-toast="Courses (not part of this preview)">Courses</a>
+    <a href="#" data-toast="Assessments (not part of this preview)">Assessments</a>
+    <a href="#" data-toast="CBL (not part of this preview)">CBL</a>
+    <a href="#" data-toast="PALS (not part of this preview)">PALS</a>
+    <a href="#path" class="on" aria-current="page">My Career<em>New</em></a>
+  </nav>
+  <div class="appright"><span class="avatar" id="avatar">A</span></div>
+</header>
+
+<main class="page" id="content"></main>
+
+<dialog class="dlg" id="dlg" aria-labelledby="dlgTitle"><div id="dlgBody"></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/career-data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+
+  // ==========================================================================
+  // Organisation data: the admin prototype's saved copy, or the shared sample
+  // ==========================================================================
+  var ORG = (function () {
+    try { var v = localStorage.getItem(CAREER.STORE_KEY); var o = v ? JSON.parse(v) : null; if (o && o.paths && o.paths.length && o.roles && o.roles.length) return o; } catch (e) { /* use the sample */ }
+    return CAREER.seed();
+  })();
+  var BANDS = CAREER.BANDS, PATH_TYPES = CAREER.PATH_TYPES, CONTENT = CAREER.CONTENT;
+  function contentById(id) { for (var i = 0; i < CONTENT.length; i++) if (CONTENT[i].id === id) return CONTENT[i]; return null; }
+  function skillById(id) {
+    for (var i = 0; i < ORG.categories.length; i++) for (var j = 0; j < ORG.categories[i].skills.length; j++) {
+      var s = ORG.categories[i].skills[j]; if (s.id === id || (s.mergedIds || []).indexOf(id) !== -1) return { s: s, cat: ORG.categories[i] };
+    }
+    return null;
+  }
+  // Tags edited by admins (Skill tagging) win over the AI tags
+  function contentSkills(c) { var seen = {}; return (ORG.tags && ORG.tags[c.id] ? ORG.tags[c.id].map(function (x) { return x.s; }) : c.skills).map(function (id) { var r = skillById(id); return r && !r.s.archived ? r.s.id : null; }).filter(function (id) { if (!id || seen[id]) return false; seen[id] = 1; return true; }); }
+  function skillName(id) { var r = skillById(id); return r ? r.s.name : ''; }
+  function catContent(catId) { var cat = ORG.categories.filter(function (c) { return c.id === catId; })[0]; if (!cat) return []; var ids = cat.skills.map(function (s) { return s.id; }); return CONTENT.filter(function (c) { return contentSkills(c).some(function (s) { return ids.indexOf(s) !== -1; }); }); }
+  function poolItems(st) { return st.pool.mode === 'category' ? catContent(st.pool.cat) : st.pool.list.map(contentById).filter(Boolean); }
+
+  // ==========================================================================
+  // The learner and three situations to show. Dates are relative to today.
+  // ==========================================================================
+  var DAY = 86400000, NOW = Date.now();
+  function ago(d) { return new Date(NOW - d * DAY).toISOString(); }
+  // The learner is the first person in the staff list (Ayu Pratiwi); a role change in the admin shows here
+  var ME = (ORG.staff || []).filter(function (u) { return u.id === 'u1'; })[0];
+  var ROLE = ORG.roles.filter(function (r) { return r.id === (ME && ME.role ? ME.role : 'r1'); })[0] || ORG.roles[0];
+  var DEPT = ORG.departments.filter(function (d) { return d.id === ROLE.dept; })[0] || { name: '' };
+  // Records from before Career Planner and offline sessions sit in the same learning record
+  var EXTRA = {
+    x1: { kind: 'Offline', title: 'First aid workshop', mins: 180, skills: ['s_well'], offline: true },
+    x2: { kind: 'Course', title: 'Getting started with ATLAS', mins: 15, skills: [] }
+  };
+  var SCN = {
+    newjoiner: { name: 'Ayu Pratiwi', joined: 2, nominated: false, base: {},
+      done: {}, picks: {} },
+    mid: { name: 'Ayu Pratiwi', joined: 262, nominated: false, base: { s_enq: 2, s_diff: 2, s_write: 2 },
+      done: { x2: 260, c1: 250, c2: 250, c3: 249, c4: 249, a1: 248, x1: 200, c5: 120, b1: 101, b2: 90, p1: 30 },
+      picks: { st4: ['p1', 'p3'] } },
+    renewal: { name: 'Ayu Pratiwi', joined: 1130, nominated: true, base: { s_enq: 3, s_diff: 2, s_write: 3, s_pres: 2, s_recov: 2 },
+      done: { x2: 1125, c1: 1105, c2: 1080, c3: 1100, c4: 1100, a1: 1090, x1: 800, c5: 700, b1: 690, b2: 680, p1: 600, p2: 595, p6: 590, a2: 580 },
+      picks: { st4: ['p1', 'p2', 'p6'] } }
+  };
+
+  // ---------- Learner state (this browser) ----------
+  var KEY = 'atlas-career-learner-v1';
+  function fresh(scn) {
+    var s = SCN[scn], done = {};
+    Object.keys(s.done).forEach(function (k) { done[k] = ago(s.done[k]); });
+    return { scn: scn, done: done, picks: JSON.parse(JSON.stringify(s.picks)), seen: {}, event: null };
+  }
+  var L = (function () { try { var v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; } catch (e) { return null; } })() || fresh('mid');
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(L)); } catch (e) { /* fine without it */ } }
+  function me() { return SCN[L.scn]; }
+
+  // ==========================================================================
+  // Progress rules (sample): an item counts while it has not expired; renewal
+  // items come back when they expire. A path opens when the one before it is done.
+  // ==========================================================================
+  function renewYears(c) {
+    var y = 0;
+    ORG.paths.forEach(function (p) { p.stages.forEach(function (st) { (st.items || []).forEach(function (it) { if (it.c === c && it.renew) y = Math.max(y, +it.renew); }); }); });
+    return y;
+  }
+  function expiry(c) { var y = renewYears(c), d = L.done[c]; if (!y || !d) return null; var e = new Date(d); e.setFullYear(e.getFullYear() + y); return e; }
+  function daysTo(date) { return Math.round((date.getTime() - NOW) / DAY); }
+  function isDone(c) { if (!L.done[c]) return false; var e = expiry(c); return !e || e.getTime() > NOW; }
+  function isExpired(c) { var e = expiry(c); return !!(L.done[c] && e && e.getTime() <= NOW); }
+
+  function myPaths() {
+    var out = ORG.paths.filter(function (p) { return p.active && p.type === 'foundation'; })
+      .concat(ORG.paths.filter(function (p) { return p.active && p.type === 'role' && p.roles.indexOf(ROLE.id) !== -1; }));
+    if (me().nominated) out = out.concat(ORG.paths.filter(function (p) { return p.active && p.type === 'growth'; }));
+    return out;
+  }
+  function stageDone(st) {
+    if (st.type === 'choose') return (L.picks[st.id] || []).filter(isDone).length >= (st.n || 1);
+    return st.items.length > 0 && st.items.every(function (it) { return isDone(it.c); });
+  }
+  // Ignoring expiry: was the stage ever finished? Keeps later paths open while a renewal is due.
+  function stageEverDone(st) {
+    if (st.type === 'choose') return (L.picks[st.id] || []).filter(function (c) { return L.done[c]; }).length >= (st.n || 1);
+    return st.items.length > 0 && st.items.every(function (it) { return L.done[it.c]; });
+  }
+  function pathDone(p) { return p.stages.length > 0 && p.stages.every(stageDone); }
+  function pathEverDone(p) { return p.stages.length > 0 && p.stages.every(stageEverDone); }
+  function isOpen(p, list) {
+    if (p.type === 'foundation' || !p.after) return true;
+    var before = p.after === 'role' ? list.filter(function (x) { return x.type === 'role'; }) : list.filter(function (x) { return x.id === p.after; });
+    return before.every(pathEverDone);
+  }
+  function activeStageIndex(p) { for (var i = 0; i < p.stages.length; i++) if (!stageEverDone(p.stages[i])) return i; return -1; }
+  function stageItems(st) { return st.type === 'choose' ? (L.picks[st.id] || []).map(contentById).filter(Boolean) : st.items.map(function (it) { return contentById(it.c); }).filter(Boolean); }
+  // Items due again: completed once, now expired
+  function renewalsDue() {
+    var seen = {}, out = [];
+    myPaths().forEach(function (p) { p.stages.forEach(function (st) { (st.items || []).forEach(function (it) { if (isExpired(it.c) && !seen[it.c]) { seen[it.c] = 1; out.push(contentById(it.c)); } }); }); });
+    return out.filter(Boolean);
+  }
+  function dueSoon(days) {
+    return Object.keys(L.done).map(function (c) { return { c: c, e: expiry(c) }; }).filter(function (x) { return x.e && x.e.getTime() > NOW && daysTo(x.e) <= days; });
+  }
+
+  // Skill bands (sample rule until Skills Analytics scoring is settled): a starting band plus one band for
+  // every two completed items tagged with the skill, up to Advanced.
+  function band(skillId) {
+    var n = Object.keys(L.done).filter(function (c) { var x = contentById(c) || EXTRA[c]; if (!x) return false; var tags = contentById(c) ? contentSkills(x) : x.skills; return tags.indexOf(skillId) !== -1; }).length;
+    return Math.min(5, (me().base[skillId] || 1) + Math.floor(n / 2));
+  }
+
+  // ==========================================================================
+  // Rendering
+  // ==========================================================================
+  var VIEW = 'path', FILTER = { kind: 'All', skill: '' }, REC = 'all';
+  function fmtDate(d) { return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }); }
+  function fmtMins(m) { var h = Math.floor(m / 60), r = m % 60; return h ? h + 'h' + (r ? ' ' + r + 'm' : '') : r + 'm'; }
+
+  function header() {
+    var paths = myPaths(), done = paths.filter(pathDone).length;
+    var allItems = 0, doneItems = 0;
+    paths.forEach(function (p) { p.stages.forEach(function (st) { var n = st.type === 'choose' ? st.n || 1 : st.items.length; allItems += n; doneItems += Math.min(n, st.type === 'choose' ? (L.picks[st.id] || []).filter(isDone).length : st.items.filter(function (it) { return isDone(it.c); }).length); }); });
+    var pct = allItems ? Math.round(doneItems / allItems * 100) : 0;
+    var joined = me().joined;
+    return '<section class="card hero"><span class="face" aria-hidden="true">' + esc(me().name.charAt(0)) + '</span><div><h1>' + esc(me().name) + '</h1>' +
+      '<div class="role"><b>' + esc(ROLE.title) + '</b><span>·</span><span>' + esc(DEPT.name) + '</span><span>·</span><span>' + (joined < 30 ? 'Joined ' + plural(joined, 'day') + ' ago' : 'Joined ' + fmtDate(ago(joined))) + '</span></div></div>' +
+      '<div class="plan"><span class="mini">Your learning plan</span><b>' + pct + '%</b><div class="bar" role="progressbar" aria-label="Learning plan progress" aria-valuenow="' + pct + '" aria-valuemin="0" aria-valuemax="100"><i style="width:' + pct + '%"></i></div><span class="mini">' + done + ' of ' + plural(paths.length, 'path') + ' complete</span></div></section>';
+  }
+  function tabs() {
+    var due = renewalsDue().length;
+    return '<nav class="tabs" aria-label="My Career"><a href="#path"' + (VIEW === 'path' ? ' aria-current="page"' : '') + '>My path</a><a href="#skills"' + (VIEW === 'skills' ? ' aria-current="page"' : '') + '>My skills</a><a href="#record"' + (VIEW === 'record' ? ' aria-current="page"' : '') + '>Learning record' + (due ? '<span class="cnt">' + due + ' due</span>' : '') + '</a></nav>';
+  }
+
+  // ---------- L1 My path ----------
+  function viewPath() {
+    var paths = myPaths(), h = '';
+    if (L.event) h += '<div class="banner new" role="status"><span class="ic" aria-hidden="true">✓</span><div>' + L.event + '</div><button class="x" type="button" data-act="dismiss" aria-label="Dismiss">×</button></div>';
+    var due = renewalsDue();
+    if (due.length) h += '<div class="banner due"><span class="ic" aria-hidden="true">!</span><div><b>' + plural(due.length, 'compliance item') + ' due again.</b> ' + esc(due.map(function (c) { return c.title; }).join(', ')) + (due.length === 1 ? ' is' : ' are') + ' back in your plan below. Your other learning carries on as normal.</div></div>';
+
+    // Journey: paths in order
+    var current = null;
+    h += '<section class="card journey" aria-label="Your paths in order"><span class="lbl">Your paths</span>' + paths.map(function (p, i) {
+      var open = isOpen(p, paths), done = pathEverDone(p), cls = done && !pathDone(p) ? 'due' : (done ? 'done' : (open ? 'now' : 'lock'));
+      if (cls === 'now' && !current) current = p;
+      return (i ? '<span class="jarr" aria-hidden="true">→</span>' : '') + '<span class="jp ' + cls + '"><i aria-hidden="true">' + (cls === 'done' ? '✓' : (cls === 'lock' ? '🔒' : (cls === 'due' ? '!' : i + 1))) + '</i>' + esc(p.name) + (cls === 'due' ? '<span class="chip warn" style="margin-left:2px">Renewal due</span>' : '') + '<span class="sr">' + (cls === 'done' ? ', complete' : (cls === 'lock' ? ', locked' : (cls === 'due' ? '' : ', in progress'))) + '</span></span>';
+    }).join('') + (me().nominated ? '' : '<span class="mini" style="margin-left:auto">Growth paths open when HR nominates you.</span>') + '</section>';
+
+    h += '<div class="cols"><div style="display:grid;gap:18px">';
+    // Renewals first, as their own short block
+    if (due.length) h += '<section class="card path"><div class="path-h"><div><small class="t-foundation">Due again</small><h2>Renew your compliance</h2></div><span class="mini">Required by school policy</span></div><div class="stages"><div class="stg now"><div class="stg-b" style="padding-top:16px">' +
+      '<div class="items">' + due.map(function (c) { return itemRow(c, true); }).join('') + '</div></div></div></div></section>';
+    // Every open, unfinished path (usually one)
+    var openPaths = paths.filter(function (p) { return isOpen(p, paths) && !pathEverDone(p); });
+    openPaths.forEach(function (p) { h += pathCard(p, paths); });
+    if (!openPaths.length && !due.length) h += '<section class="card" style="padding:28px;text-align:center"><div class="celebrate"><div class="big" aria-hidden="true">✓</div><h2 style="color:var(--navy)">You are up to date</h2><p class="muted">Everything in your plan is complete. Your skills page shows where to grow next.</p><a class="btn primary" href="#skills">See my skills</a></div></section>';
+    h += '</div><aside style="display:grid;gap:18px">' + sideDone(paths) + sideGroups() + '</aside></div>';
+    return h;
+  }
+
+  function pathCard(p, paths) {
+    var ai = activeStageIndex(p);
+    var h = '<section class="card path" aria-label="' + esc(p.name) + '"><div class="path-h"><div><small class="t-' + p.type + '">' + PATH_TYPES[p.type].label + ' path</small><h2>' + esc(p.name) + '</h2></div><span class="mini">Stage ' + (ai + 1) + ' of ' + p.stages.length + '</span></div><div class="stages">';
+    p.stages.forEach(function (st, i) {
+      if (i < ai) {
+        var items = stageItems(st), last = items.map(function (c) { return L.done[c.id]; }).filter(Boolean).sort().pop();
+        h += '<div class="stg done"><div class="stg-h"><span class="no" aria-hidden="true">✓</span><div class="t"><b>' + esc(st.name) + '</b><span>' + plural(items.length, 'item') + ' · finished ' + (last ? fmtDate(last) : '') + '</span></div></div></div>';
+      } else if (i === ai) {
+        h += '<div class="stg now"><div class="stg-h"><span class="no">' + (i + 1) + '</span><div class="t"><b>' + esc(st.name) + '</b><span>' + (st.type === 'choose' ? 'Choose ' + (st.n || 1) + ' that suit you' : 'Complete all ' + plural(st.items.length, 'item')) + '</span></div><span class="chip info">Now</span></div><div class="stg-b">' +
+          (st.type === 'choose' ? chooseStage(st) : '<div class="items">' + st.items.map(function (it) { return itemRow(contentById(it.c)); }).join('') + '</div>') + '</div></div>';
+      } else {
+        // Later stages: learners only see their name, not their content
+        h += '<div class="stg lock"><div class="stg-h"><span class="no" aria-hidden="true">' + (i + 1) + '</span><div class="t"><b>' + esc(st.name) + '</b><span>Opens when stage ' + i + ' is complete</span></div><span aria-hidden="true">🔒</span></div></div>';
+      }
+    });
+    h += '</div>';
+    var later = paths.filter(function (x) { return !isOpen(x, paths); });
+    if (later.length && p === paths.filter(function (x) { return isOpen(x, paths) && !pathEverDone(x); })[0]) h += '<p class="locknote" style="padding-top:12px">🔒 Next: <b>' + esc(later[0].name) + '</b> opens when you finish this path.</p>';
+    return h + '</section>';
+  }
+
+  function itemRow(c, renewal) {
+    if (!c) return '';
+    var done = isDone(c.id), prog = !done && L.seen[c.id];
+    var e = expiry(c.id);
+    return '<div class="item' + (done ? ' done' : (prog ? ' prog' : '')) + (renewal ? ' renew' : '') + '"><span class="st" aria-hidden="true">' + (done ? '✓' : '') + '</span>' +
+      '<div class="t"><b>' + esc(c.title) + '</b><span><span class="kind k-' + c.kind + '">' + c.kind + '</span>' + c.mins + ' min' +
+      (renewal ? ' · <span class="chip warn">Expired ' + fmtDate(e) + '</span>' : (done ? ' · Done ' + fmtDate(L.done[c.id]) + (e ? ' · renews ' + fmtDate(e) : '') : (renewYears(c.id) ? ' · renews every ' + plural(renewYears(c.id), 'year') : ''))) + '</span></div>' +
+      (done ? '<button class="btn sm" type="button" data-open="' + c.id + '">Review</button>' : '<button class="btn primary sm" type="button" data-open="' + c.id + '">' + (prog ? 'Continue' : (renewal ? 'Renew' : 'Start')) + '</button>') + '</div>';
+  }
+
+  function chooseStage(st) {
+    var pool = poolItems(st), picks = (L.picks[st.id] || []).filter(function (c) { return contentById(c); }), n = st.n || 1;
+    var doneN = picks.filter(isDone).length, full = picks.length >= n;
+    var h = '<div class="pickhead"><div><b>Your picks: ' + picks.length + ' of ' + n + '</b><div class="mini">' + doneN + ' done. Pick from ' + plural(pool.length, 'item') + ' about ' + esc((ORG.categories.filter(function (c) { return c.id === st.pool.cat; })[0] || {}).name || st.name) + '. You can swap picks you have not started.</div></div>' +
+      '<span class="dots" aria-hidden="true">' + Array.apply(null, Array(n)).map(function (_, i) { var c = picks[i]; return '<i class="' + (c ? (isDone(c) ? 'done' : 'picked') : '') + '"></i>'; }).join('') + '</span></div>';
+    if (picks.length) h += '<div class="items">' + picks.map(function (id) {
+      var c = contentById(id), started = isDone(id) || L.seen[id];
+      return itemRow(c) +
+        (started ? '' : '<div style="margin:-4px 0 0 34px"><button class="btn sm" type="button" data-unpick="' + id + '" data-st="' + st.id + '" style="border:0;padding:2px 0;color:var(--muted)">Remove from my picks</button></div>');
+    }).join('') + '</div>';
+    if (doneN >= n) return h;
+    var kinds = ['All'].concat(CAREER.KINDS.filter(function (k) { return pool.some(function (c) { return c.kind === k; }); }));
+    var skills = {}; pool.forEach(function (c) { contentSkills(c).forEach(function (s) { skills[s] = 1; }); });
+    var list = pool.filter(function (c) { return picks.indexOf(c.id) === -1 && (FILTER.kind === 'All' || c.kind === FILTER.kind) && (!FILTER.skill || contentSkills(c).indexOf(FILTER.skill) !== -1); });
+    h += '<div class="filters" role="group" aria-label="Filter the pool">' + kinds.map(function (k) { return '<button type="button" data-fk="' + k + '" aria-pressed="' + (FILTER.kind === k) + '">' + k + '</button>'; }).join('') +
+      '<label class="sr" for="fSkill">Skill</label><select id="fSkill"><option value="">Any skill</option>' + Object.keys(skills).map(function (s) { return '<option value="' + s + '"' + (FILTER.skill === s ? ' selected' : '') + '>' + esc(skillName(s)) + '</option>'; }).join('') + '</select></div>';
+    if (full) h += '<p class="mini">You have picked ' + n + '. Remove a pick you have not started to swap it.</p>';
+    h += '<div class="pool">' + (list.length ? list.map(function (c) {
+      return '<div class="pc' + (full ? ' full' : '') + '"><span><span class="kind k-' + c.kind + '">' + c.kind + '</span></span><b>' + esc(c.title) + '</b><div class="sk">' + contentSkills(c).map(function (s) { return '<span>' + esc(skillName(s)) + '</span>'; }).join('') + '</div>' +
+        '<div class="ft"><span class="mini">' + c.mins + ' min</span><button class="btn sm" type="button" data-pick="' + c.id + '" data-st="' + st.id + '"' + (full ? ' disabled' : '') + '>+ Pick</button></div></div>';
+    }).join('') : '<p class="mini">Nothing matches this filter.</p>') + '</div>';
+    return h;
+  }
+
+  function sideDone(paths) {
+    var done = paths.filter(pathEverDone);
+    var h = '<section class="card side-card"><h3>Completed paths</h3>';
+    if (!done.length) h += '<p class="mini">Paths you finish appear here, with any renewal dates.</p>';
+    done.forEach(function (p) {
+      var last = []; p.stages.forEach(function (st) { stageItems(st).forEach(function (c) { if (L.done[c.id]) last.push(L.done[c.id]); }); });
+      var renews = p.stages.reduce(function (a, st) { return a.concat((st.items || []).map(function (it) { return expiry(it.c); }).filter(Boolean)); }, []).sort(function (a, b) { return a - b; });
+      h += '<div class="ln"><span class="ok" aria-hidden="true">✓</span><div><b>' + esc(p.name) + '</b><span>Finished ' + fmtDate(last.sort().pop()) + (renews.length ? ' · next renewal ' + fmtDate(renews[0]) : '') + '</span></div></div>';
+    });
+    return h + '<a href="#record" class="mini" style="font-weight:600;color:var(--primary-ink)">See your full learning record</a></section>';
+  }
+  function sideGroups() {
+    return '<section class="card side-card"><h3>Also assigned to you</h3><p class="mini" style="margin-top:-4px">From groups, outside your career paths.</p>' +
+      '<div class="ln"><span class="kind k-Course" style="margin-top:2px">Course</span><div><b>Open Day 2027 briefing</b><span>Group: Open Day volunteers · due 12 Dec</span></div></div>' +
+      '<div class="ln"><span class="kind k-PALS" style="margin-top:2px">PALS</span><div><b>New enrolment system</b><span>Group: All staff · no due date</span></div></div>' +
+      '<p class="mini"><span style="font-weight:700;color:var(--accent-ink)">Open question:</span> one combined page for all learning, or each feature separately?</p></section>';
+  }
+
+  // ---------- L2 My skills ----------
+  function viewSkills() {
+    var req = ROLE.skills.map(function (rs) { var k = skillById(rs.s); return k && !k.s.archived ? { s: k.s, cat: k.cat, t: rs.t } : null; }).filter(Boolean);
+    var met = req.filter(function (x) { return band(x.s.id) >= x.t; }).length;
+    var h = '<section class="card" style="padding:18px 20px;display:grid;gap:8px"><div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;align-items:baseline"><h2 style="font-size:19px;color:var(--navy)">Skills for ' + esc(ROLE.title) + '</h2><span class="mini"><b style="color:var(--ink)">' + met + ' of ' + req.length + '</b> at the level your role needs</span></div>' +
+      '<p class="mini">Your band rises as you complete learning tagged with each skill. Select a skill to see what builds it.</p>' +
+      '<div class="legend">' + BANDS.map(function (b, i) { return '<span><b>' + (i + 1) + '</b> ' + b + '</span>'; }).join('') + '<span style="color:var(--accent-ink);font-weight:700">| Target for your role</span></div></section>';
+    h += '<section class="card"><div class="skills">' + (req.length ? req.map(function (x) {
+      var b = band(x.s.id), gap = x.t - b;
+      return '<button class="skr" type="button" data-skill="' + x.s.id + '"><span class="nm"><b>' + esc(x.s.name) + '</b><span>' + esc(x.cat.name) + ' · you: ' + BANDS[b - 1] + '</span></span>' +
+        '<span class="viz"><span class="track" aria-label="' + BANDS[b - 1] + ', target ' + BANDS[x.t - 1] + '">' + [1, 2, 3, 4, 5].map(function (n) { return '<i class="' + (n <= b ? 'f' : '') + '"></i>'; }).join('') +
+        '<span class="tg" style="left:' + ((x.t - 0.5) / 5 * 100) + '%">Target</span></span><span class="track-l" aria-hidden="true">' + BANDS.map(function (bn) { return '<span>' + bn + '</span>'; }).join('') + '</span></span>' +
+        (gap <= 0 ? '<span class="chip ok">On target</span>' : '<span class="chip warn">' + plural(gap, 'band') + ' to go</span>') + '</button>';
+    }).join('') : '<p class="mini" style="padding:18px 20px">Your role has no required skills yet.</p>') + '</div></section>';
+    // Auxiliary skills: from other completed learning
+    var reqIds = req.map(function (x) { return x.s.id; }), aux = {};
+    Object.keys(L.done).forEach(function (c) { var x = contentById(c); var tags = x ? contentSkills(x) : (EXTRA[c] || { skills: [] }).skills; tags.forEach(function (s) { if (reqIds.indexOf(s) === -1 && skillById(s)) aux[s] = 1; }); });
+    h += '<section class="card"><div style="padding:16px 20px 0"><h3 style="font-size:16px;color:var(--navy)">Other skills you are building</h3><p class="mini">From learning outside your role\'s requirements.</p></div><div class="aux">' +
+      (Object.keys(aux).length ? Object.keys(aux).map(function (s) { return '<button class="chip info" type="button" data-skill="' + s + '" style="border:0;padding:4px 12px;font-size:13px">' + esc(skillName(s)) + ' · ' + BANDS[band(s) - 1] + '</button>'; }).join('') : '<span class="mini">None yet.</span>') + '</div></section>';
+    h += '<section class="card next-role"><span class="phase">Phase 2 preview</span><h3 style="font-size:17px;color:var(--navy)">Your next role: Senior Admissions Officer</h3><p class="mini">See the skills the next role on your pathway needs, how close you are, and learning that closes the gap. Coming with career pathways.</p></section>';
+    h += '<p class="mini"><span style="font-weight:700;color:var(--accent-ink)">Open question:</span> bands by completion (as shown) or weighted by assessment scores? Depends on Skills Analytics.</p>';
+    return h;
+  }
+  function openSkill(id) {
+    var k = skillById(id); if (!k) return;
+    var rs = ROLE.skills.filter(function (x) { var s = skillById(x.s); return s && s.s.id === id; })[0];
+    var tagged = CONTENT.filter(function (c) { return contentSkills(c).indexOf(id) !== -1; });
+    var done = tagged.filter(function (c) { return L.done[c.id]; });
+    var planned = {}; myPaths().forEach(function (p) { p.stages.forEach(function (st) { stageItems(st).forEach(function (c) { planned[c.id] = 1; }); }); });
+    var inPlan = tagged.filter(function (c) { return !L.done[c.id] && planned[c.id]; });
+    var more = tagged.filter(function (c) { return !L.done[c.id] && !planned[c.id]; });
+    var b = band(id);
+    var h = '<div class="dg"><div class="dg-h"><div><h2 id="dlgTitle">' + esc(k.s.name) + '</h2><p class="mini">' + esc(k.cat.name) + ' · you: <b>' + BANDS[b - 1] + '</b>' + (rs ? ' · target: <b>' + BANDS[rs.t - 1] + '</b>' : '') + '</p></div><button class="x" type="button" data-close aria-label="Close">×</button></div>' +
+      '<h3>Completed</h3>' + (done.length ? '<ul>' + done.map(function (c) { return '<li class="ln"><span class="ok" aria-hidden="true">✓</span><div><b>' + esc(c.title) + '</b><span>' + c.kind + ' · ' + fmtDate(L.done[c.id]) + '</span></div></li>'; }).join('') + '</ul>' : '<p class="mini">Nothing yet.</p>') +
+      '<h3>In your plan</h3>' + (inPlan.length ? '<ul>' + inPlan.map(function (c) { return '<li class="ln"><span class="kind k-' + c.kind + '">' + c.kind + '</span><div><b>' + esc(c.title) + '</b><span>' + c.mins + ' min</span></div></li>'; }).join('') + '</ul>' : '<p class="mini">Nothing else in your current plan builds this skill.</p>') +
+      '<h3>More to explore (optional)</h3>' + (more.length ? '<ul>' + more.slice(0, 4).map(function (c) { return '<li class="ln"><span class="kind k-' + c.kind + '">' + c.kind + '</span><div><b>' + esc(c.title) + '</b><span>' + c.mins + ' min · outside your assigned paths</span></div></li>'; }).join('') + '</ul>' : '<p class="mini">You have seen everything tagged with this skill.</p>') +
+      '<div style="display:flex;justify-content:flex-end"><button class="btn primary" type="button" data-close>Close</button></div></div>';
+    $('#dlgBody').innerHTML = h; $('#dlg').showModal();
+  }
+
+  // ---------- L2 Learning record ----------
+  function viewRecord() {
+    var rows = Object.keys(L.done).map(function (c) {
+      var x = contentById(c) || EXTRA[c]; if (!x) return null;
+      var e = expiry(c);
+      return { c: c, x: x, d: L.done[c], e: e, st: !e ? 'none' : (e.getTime() <= NOW ? 'expired' : (daysTo(e) <= 90 ? 'soon' : 'ok')) };
+    }).filter(Boolean).sort(function (a, b) { return a.d < b.d ? 1 : -1; });
+    var exp = rows.filter(function (r) { return r.st === 'expired'; }).length, soon = rows.filter(function (r) { return r.st === 'soon'; }).length;
+    var list = rows.filter(function (r) { return REC === 'all' || (REC === 'renew' ? r.st === 'soon' || r.st === 'expired' : r.x.offline); });
+    var h = '<section class="card"><div class="rec-h"><div><h2 style="font-size:19px;color:var(--navy)">Learning record</h2><p class="mini">Everything you have completed since you joined, online and offline. It stays with you for as long as you work here. HR sees the same record.</p></div>' +
+      '<div class="filters" role="group" aria-label="Show"><button type="button" data-rec="all" aria-pressed="' + (REC === 'all') + '">All (' + rows.length + ')</button><button type="button" data-rec="renew" aria-pressed="' + (REC === 'renew') + '">Renewals (' + (exp + soon) + ')</button><button type="button" data-rec="offline" aria-pressed="' + (REC === 'offline') + '">Offline</button></div></div>';
+    if (exp || soon) h += '<div style="padding:0 20px 14px;display:flex;flex-wrap:wrap;gap:8px">' + (exp ? '<span class="chip bad">' + exp + ' expired · back in your plan</span>' : '') + (soon ? '<span class="chip warn">' + soon + ' due in the next 90 days</span>' : '') + '</div>';
+    h += '<div class="tbl-wrap"><table><thead><tr><th scope="col">Learning</th><th scope="col">Completed</th><th scope="col">Where</th><th scope="col">Renewal</th></tr></thead><tbody>';
+    h += list.length ? list.map(function (r) {
+      var skills = contentById(r.c) ? contentSkills(r.x).map(skillName) : (r.x.skills || []).map(skillName).filter(Boolean);
+      var ren = r.st === 'none' ? '<span class="muted">—</span>' : (r.st === 'expired' ? '<span class="chip bad">Expired ' + fmtDate(r.e) + '</span><span class="sub">Back in your plan</span>' : (r.st === 'soon' ? '<span class="chip warn">Due in ' + plural(daysTo(r.e), 'day') + '</span><span class="sub">' + fmtDate(r.e) + '</span>' : fmtDate(r.e)));
+      return '<tr><td><b>' + esc(r.x.title) + '</b><span class="sub"><span class="kind k-' + r.x.kind + '">' + r.x.kind + '</span> ' + esc(skills.join(', ')) + '</span></td><td class="num">' + fmtDate(r.d) + '</td><td>' + (r.x.offline ? 'Offline<span class="sub">Recorded by HR</span>' : 'Online') + '</td><td class="num">' + ren + '</td></tr>';
+    }).join('') : '<tr><td colspan="4" class="muted" style="text-align:center;padding:28px">' + (rows.length ? 'Nothing in this view.' : 'Nothing completed yet. Your first completions appear here.') + '</td></tr>';
+    h += '</tbody></table></div></section>';
+    h += '<p class="mini">Offline sessions are recorded by HR today. QR check-in comes with the Offline-Online Tracker (Phase 3).</p>';
+    return h;
+  }
+
+  function render() {
+    var v = VIEW === 'skills' ? viewSkills() : (VIEW === 'record' ? viewRecord() : viewPath());
+    $('#content').innerHTML = header() + tabs() + v;
+    $('#avatar').textContent = me().name.charAt(0);
+    $$('[data-scn]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.scn === L.scn)); });
+    document.title = { path: 'My path', skills: 'My skills', record: 'Learning record' }[VIEW] + ' · ATLAS My Career Prototype';
+  }
+  function route() { var h = (location.hash || '').replace('#', ''); VIEW = ['path', 'skills', 'record'].indexOf(h) !== -1 ? h : 'path'; }
+  window.addEventListener('hashchange', function () { route(); render(); });
+
+  // ==========================================================================
+  // Completing items (prototype): unlocks and messages
+  // ==========================================================================
+  function complete(c) {
+    var paths = myPaths();
+    var before = paths.map(function (p) { return { p: p, open: isOpen(p, paths), done: pathEverDone(p), ai: activeStageIndex(p) }; });
+    L.done[c] = new Date().toISOString(); delete L.seen[c];
+    var msg = '';
+    before.forEach(function (b) {
+      var nowDone = pathEverDone(b.p), ai = activeStageIndex(b.p);
+      if (!b.done && nowDone) msg = '<b>You finished ' + esc(b.p.name) + '.</b>';
+      else if (b.ai !== -1 && ai !== b.ai && ai !== -1) msg = '<b>Stage ' + (b.ai + 1) + ' complete.</b> Stage ' + (ai + 1) + ', ' + esc(b.p.stages[ai].name) + ', is now open.';
+    });
+    before.forEach(function (b) { if (!b.open && isOpen(b.p, paths)) msg += ' <b>' + esc(b.p.name) + ' is now open.</b>'; });
+    var x = contentById(c);
+    L.event = msg || null;
+    persist(); render();
+    toast((x ? x.title : 'Item') + ' complete');
+  }
+  // Next item a learner would do: renewals first, then the active stage of the first open path
+  function nextItem() {
+    var due = renewalsDue(); if (due.length) return { c: due[0].id };
+    var paths = myPaths();
+    for (var i = 0; i < paths.length; i++) {
+      var p = paths[i]; if (!isOpen(p, paths) || pathEverDone(p)) continue;
+      var st = p.stages[activeStageIndex(p)];
+      if (st.type === 'choose') {
+        var picks = L.picks[st.id] = L.picks[st.id] || [];
+        var todo = picks.filter(function (c) { return !L.done[c]; })[0];
+        if (todo) return { c: todo };
+        var avail = poolItems(st).filter(function (c) { return picks.indexOf(c.id) === -1 && !L.done[c.id]; })[0];
+        if (avail) { picks.push(avail.id); return { c: avail.id }; }
+      } else {
+        var it = st.items.filter(function (x) { return !L.done[x.c]; })[0]; if (it) return { c: it.c };
+      }
+    }
+    return null;
+  }
+
+  // ---------- Events ----------
+  var toastTimer;
+  function toast(m) { var t = $('#toast'); t.textContent = m; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2400); }
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-toast]'); if (t) { e.preventDefault(); toast(t.dataset.toast); return; }
+    if (e.target.closest('[data-close]')) { $('#dlg').close(); return; }
+    var s = e.target.closest('[data-scn]'); if (s) { L = fresh(s.dataset.scn); FILTER = { kind: 'All', skill: '' }; persist(); location.hash = '#path'; render(); toast({ newjoiner: 'New joiner, first week', mid: 'Eight months in, on the role path', renewal: 'Three years in, compliance renewal due' }[s.dataset.scn]); return; }
+    var o = e.target.closest('[data-open]');
+    if (o) {
+      var c = contentById(o.dataset.open);
+      if (isDone(o.dataset.open)) { toast('Opens ' + c.title + ' to review (not part of this preview)'); return; }
+      if (!L.seen[o.dataset.open]) { L.seen[o.dataset.open] = true; persist(); render(); toast('Opens ' + c.title + ' (' + c.kind + '). Select Continue again to finish it.'); return; }
+      complete(o.dataset.open); return;
+    }
+    var p = e.target.closest('[data-pick]');
+    if (p) { var arr = L.picks[p.dataset.st] = L.picks[p.dataset.st] || []; arr.push(p.dataset.pick); persist(); render(); toast('Added to your picks'); return; }
+    var u = e.target.closest('[data-unpick]');
+    if (u) { L.picks[u.dataset.st] = (L.picks[u.dataset.st] || []).filter(function (c) { return c !== u.dataset.unpick; }); persist(); render(); toast('Removed from your picks'); return; }
+    var fk = e.target.closest('[data-fk]'); if (fk) { FILTER.kind = fk.dataset.fk; render(); return; }
+    var sk = e.target.closest('[data-skill]'); if (sk) { openSkill(sk.dataset.skill); return; }
+    var rc = e.target.closest('[data-rec]'); if (rc) { REC = rc.dataset.rec; render(); return; }
+    if (e.target.closest('[data-act="dismiss"]')) { L.event = null; persist(); render(); return; }
+  });
+  document.addEventListener('change', function (e) { if (e.target.id === 'fSkill') { FILTER.skill = e.target.value; render(); } });
+  $('#dlg').addEventListener('click', function (e) { if (e.target === this) this.close(); });
+  $('#simBtn').addEventListener('click', function () {
+    var n = nextItem();
+    if (!n) { toast('Everything in this plan is complete. Try another situation.'); return; }
+    if (location.hash !== '#path' && location.hash !== '') location.hash = '#path';
+    complete(n.c);
+  });
+  $('#resetBtn').addEventListener('click', function () { L = fresh(L.scn); persist(); render(); toast('Reset'); });
+
+  route(); render();
+})();
+</script>
+</body>
+</html>

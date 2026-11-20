@@ -1,0 +1,8 @@
+# Files Vercel leaves out of the deployment (the GitHub repo still contains them).
+# Internal notes, briefs and task lists stay off the public prototype site.
+docs/
+**/docs/
+
+# Local secrets and tooling
+.env
+.claude/

@@ -1,0 +1,1678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ATLAS Career Planner Admin Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Career Planner, admin side (A1 Skills framework, A2 Departments & roles, A3 Learning paths).
+   The shell follows demo.atlaslearn.ai/admin (Inter, teal, soft grey inputs), the same as
+   the authoring prototypes. Sample data is illustrative until Tunas Muda sends their lists.
+   ========================================================================== */
+:root {
+  --navy: #31425D;
+  --primary: #0D719A; --primary-ink: #0A5A7B; --primary-soft: #E6F2F7;
+  --bg: #F6F7F9; --surface: #FFFFFF; --ink: #171A26; --muted: #5B6475; --line: #E1E5EB; --field: #F3F5F8;
+  --accent: #F5A623; --accent-ink: #8A5600; --accent-soft: #FEF4E1;
+  --green: #1E8A5A; --green-soft: #E3F4EC; --red: #C43D2B; --red-soft: #FBE7E4;
+  --violet: #5B3FB5; --violet-soft: #EFE9FB;
+  /* Path types */
+  --foundation: #0A5A7B; --foundation-soft: #E6F2F7;
+  --role: #1E8A5A; --role-soft: #E3F4EC;
+  --growth: #5B3FB5; --growth-soft: #EFE9FB;
+  --radius: 16px; --radius-sm: 12px;
+  --ui: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --proto-h: 48px; --side-w: 232px;
+}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--ui); font-size: 14.5px; line-height: 1.55; }
+h1, h2, h3, h4, p, ul, ol { margin: 0; }
+ul, ol { padding: 0; list-style: none; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid var(--primary); outline-offset: 2px; border-radius: 6px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+
+/* ---------- Prototype controls ---------- */
+.proto { position: sticky; top: 0; z-index: 90; min-height: var(--proto-h); display: flex; flex-wrap: wrap; align-items: center; gap: 8px 18px; padding: 6px 20px; background: #FFF8E6; border-bottom: 1px dashed var(--accent); font-size: 13px; }
+.proto b { color: var(--accent-ink); font-weight: 600; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); overflow: hidden; }
+.seg button { border: 0; background: none; padding: 6px 14px; font-size: 13px; font-weight: 500; }
+.seg button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.proto .plain { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 6px 14px; font-size: 13px; }
+
+/* ---------- Shell ---------- */
+.shell { display: grid; grid-template-columns: var(--side-w) minmax(0, 1fr); min-height: calc(100vh - var(--proto-h)); }
+.side { background: var(--surface); border-right: 1px solid var(--line); padding: 16px 12px; display: flex; flex-direction: column; position: sticky; top: var(--proto-h); height: calc(100vh - var(--proto-h)); overflow-y: auto; }
+.side img { height: 42px; width: auto; align-self: flex-start; margin: 0 6px 18px; }
+.side small { font-size: 11.5px; font-weight: 600; letter-spacing: .06em; color: var(--muted); margin: 0 10px 8px; }
+.side nav { display: grid; gap: 2px; }
+.side nav a { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; color: #3a4252; text-decoration: none; font-size: 14px; font-weight: 500; }
+.side nav a:hover { background: var(--bg); }
+.side nav a.on { background: #DCEBF2; color: var(--primary-ink); font-weight: 600; }
+.side nav svg { flex: none; opacity: .85; }
+.side .grp { margin: 6px 0 2px; padding: 6px 4px 4px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.side .grp-h { display: flex; align-items: center; gap: 8px; padding: 4px 6px 6px; font-size: 11.5px; font-weight: 700; letter-spacing: .06em; color: var(--navy); }
+.side .grp-h em { font-style: normal; font-size: 10.5px; letter-spacing: .02em; background: var(--accent-soft); color: var(--accent-ink); border-radius: 999px; padding: 0 8px; }
+.side .grp a { padding-left: 14px; }
+.side .me { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px 8px 4px; font-size: 13.5px; line-height: 1.3; }
+.side .me i { width: 34px; height: 34px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-style: normal; font-weight: 600; }
+.side .me span { display: block; font-size: 12px; color: var(--muted); }
+.main { min-width: 0; }
+.bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--line); }
+.bar .crumb { font-size: 13px; color: var(--muted); }
+.bar .crumb a { color: var(--muted); text-decoration: none; }
+.bar .crumb a:hover { color: var(--primary-ink); text-decoration: underline; }
+.bar .r { display: flex; gap: 12px; align-items: center; }
+.menu-btn { display: none; place-items: center; width: 38px; height: 38px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; color: var(--ink); flex: none; }
+.nav-scrim { display: none; position: fixed; inset: 0; z-index: 140; background: rgba(23,26,38,.4); }
+.help { border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 6px 14px; font-weight: 600; font-size: 13.5px; }
+.page { padding: 22px 24px 80px; max-width: 1320px; margin: 0 auto; }
+
+/* ---------- Buttons, chips, fields ---------- */
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 8px 16px; font-weight: 600; font-size: 14px; white-space: nowrap; text-decoration: none; color: var(--ink); }
+.btn:hover { border-color: #b9c2d0; }
+.btn.primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn.primary:hover { background: var(--primary-ink); }
+.btn.danger { color: var(--red); }
+.btn.sm { padding: 5px 12px; font-size: 13px; border-radius: 10px; }
+.btn.link { border: 0; background: none; padding: 4px 6px; color: var(--primary-ink); }
+.btn.link:hover { text-decoration: underline; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.ico { border: 0; background: none; width: 32px; height: 32px; border-radius: 8px; color: var(--muted); display: inline-grid; place-items: center; flex: none; }
+.ico:hover { background: var(--bg); color: var(--ink); }
+.ico.dng:hover { color: var(--red); background: var(--red-soft); }
+.ico:disabled { opacity: .3; cursor: not-allowed; }
+.chip { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 10px; line-height: 1.6; background: var(--bg); color: var(--muted); white-space: nowrap; }
+.chip.ok { background: var(--green-soft); color: var(--green); }
+.chip.warn { background: var(--accent-soft); color: var(--accent-ink); }
+.chip.info { background: var(--primary-soft); color: var(--primary-ink); }
+.chip.sfw { background: #EEF0F4; color: #4A5468; }
+.chip.t-foundation { background: var(--foundation-soft); color: var(--foundation); }
+.chip.t-role { background: var(--role-soft); color: var(--role); }
+.chip.t-growth { background: var(--growth-soft); color: var(--growth); }
+.in, .sel, .ta { width: 100%; border: 1px solid transparent; background: var(--field); border-radius: var(--radius-sm); padding: 9px 12px; font-size: 14px; line-height: 1.5; }
+.in:focus, .sel:focus, .ta:focus { outline: none; border-color: var(--primary); background: #fff; box-shadow: 0 0 0 3px var(--primary-soft); }
+.in.sm, .sel.sm { padding: 6px 10px; font-size: 13.5px; border-radius: 10px; }
+.ta { resize: vertical; min-height: 70px; }
+.lbl { display: block; font-size: 12.5px; font-weight: 600; color: #3a4252; margin: 0 0 4px; }
+.hint { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+.fld { display: grid; gap: 0; margin-bottom: 14px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.muted { color: var(--muted); }
+.mini { font-size: 12.5px; color: var(--muted); }
+
+/* ---------- Page header ---------- */
+.ph { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 20px; margin-bottom: 18px; }
+.ph h1 { font-size: 24px; font-weight: 700; line-height: 1.25; }
+.ph p { color: var(--muted); margin-top: 4px; max-width: 70ch; }
+.ph .acts { display: flex; gap: 8px; flex-wrap: wrap; }
+.back { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13.5px; font-weight: 600; text-decoration: none; margin-bottom: 10px; }
+.back:hover { color: var(--primary-ink); }
+.stats { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 13.5px; color: var(--muted); margin-bottom: 16px; }
+.stats b { color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+.note { display: flex; gap: 12px; align-items: flex-start; background: var(--primary-soft); color: #20364A; border-radius: 14px; padding: 12px 16px; font-size: 13.5px; margin-bottom: 16px; }
+.note b { color: var(--primary-ink); }
+.note .x { margin-left: auto; }
+.oq { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--accent-ink); background: var(--accent-soft); border-radius: 8px; padding: 2px 8px; }
+
+/* ---------- A1 Skills framework ---------- */
+.fw-tools { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 14px; }
+.fw-tools .in { max-width: 320px; }
+.cat { margin-bottom: 14px; overflow: hidden; }
+.cat-h { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+.cat-h .nm { font-size: 16px; font-weight: 700; }
+.cat-h .ct { font-size: 13px; color: var(--muted); }
+.cat-h .acts { margin-left: auto; display: flex; gap: 2px; }
+.sk { display: grid; grid-template-columns: 28px minmax(0, 1fr) auto auto; align-items: center; gap: 12px; padding: 10px 18px; border-bottom: 1px solid var(--line); }
+.sk:last-child { border-bottom: 0; }
+.sk:hover { background: #FAFBFC; }
+.sk input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--primary); }
+.sk .nm { font-weight: 600; }
+.sk .nm small { display: block; font-weight: 400; font-size: 12.5px; color: var(--muted); }
+.sk .use { font-size: 12.5px; color: var(--muted); text-align: right; white-space: nowrap; }
+.sk .acts { display: flex; gap: 2px; }
+.sk.sel { background: var(--primary-soft); }
+.add-row { padding: 10px 18px 14px; display: flex; gap: 8px; align-items: center; }
+.add-row .in { max-width: 340px; }
+.selbar { position: sticky; bottom: 16px; z-index: 20; display: flex; align-items: center; gap: 12px; background: var(--navy); color: #fff; border-radius: 14px; padding: 10px 12px 10px 18px; margin-top: 12px; box-shadow: 0 10px 30px rgba(23,26,38,.25); }
+.selbar .btn { border-color: transparent; }
+.selbar .btn.ghost { background: transparent; color: #fff; border-color: rgba(255,255,255,.35); }
+.arch { margin-top: 18px; }
+.arch summary { cursor: pointer; font-weight: 600; color: var(--muted); padding: 6px 2px; }
+.empty { text-align: center; padding: 48px 24px; display: grid; gap: 10px; justify-items: center; }
+.empty h2 { font-size: 20px; }
+.empty p { color: var(--muted); max-width: 52ch; }
+.start2 { display: grid; grid-template-columns: repeat(2, minmax(0, 260px)); gap: 14px; margin-top: 10px; }
+.start2 button { text-align: left; border: 1px solid var(--line); background: var(--surface); border-radius: 14px; padding: 16px; display: grid; gap: 4px; }
+.start2 button:hover { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.start2 b { font-size: 15px; }
+.start2 span { font-size: 13px; color: var(--muted); }
+
+/* ---------- A2 Departments & roles ---------- */
+.dr { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 20px; align-items: start; }
+.depts { padding: 10px; display: grid; gap: 2px; position: sticky; top: calc(var(--proto-h) + 16px); }
+.depts h2 { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); padding: 6px 10px; }
+.depts button.d { display: flex; justify-content: space-between; align-items: center; gap: 8px; width: 100%; text-align: left; border: 0; background: none; border-radius: 10px; padding: 9px 10px; font-weight: 500; }
+.depts button.d:hover { background: var(--bg); }
+.depts button.d[aria-current="true"] { background: #DCEBF2; color: var(--primary-ink); font-weight: 600; }
+.depts button.d span { font-size: 12.5px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.roles { display: grid; gap: 12px; }
+.rc { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; padding: 16px 18px; text-decoration: none; color: inherit; }
+.rc:hover { border-color: #b9c2d0; box-shadow: 0 2px 10px rgba(23,26,38,.05); }
+.rc h3 { font-size: 16px; font-weight: 700; }
+.rc .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.rc .nums { display: flex; gap: 18px; font-size: 13px; color: var(--muted); align-self: center; }
+.rc .nums b { display: block; color: var(--ink); font-size: 16px; font-variant-numeric: tabular-nums; }
+.rc .paths { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+.legacy { padding: 14px 18px; display: flex; gap: 14px; align-items: center; background: #FAFBFC; border-style: dashed; }
+.legacy p { font-size: 13.5px; color: var(--muted); }
+
+.rd { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 20px; align-items: start; }
+.sec { padding: 18px 20px; margin-bottom: 16px; }
+.sec-h { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.sec-h h2 { font-size: 16px; font-weight: 700; }
+.sec-h p { font-size: 13px; color: var(--muted); }
+.title-in { font-size: 22px; font-weight: 700; border: 1px solid transparent; background: transparent; border-radius: 10px; padding: 2px 8px; margin-left: -8px; width: 100%; }
+.title-in:hover { background: var(--field); }
+.title-in:focus { outline: none; background: #fff; border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-soft); }
+.req { display: grid; gap: 0; }
+.rq { display: grid; grid-template-columns: minmax(0, 1fr) auto 32px; gap: 14px; align-items: center; padding: 12px 0; border-top: 1px solid var(--line); }
+.rq:first-child { border-top: 0; }
+.rq .nm { font-weight: 600; }
+.rq .nm small { display: block; font-weight: 400; font-size: 12.5px; color: var(--muted); }
+.band { display: inline-grid; grid-template-columns: repeat(5, auto); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.band button { border: 0; border-left: 1px solid var(--line); background: var(--surface); padding: 5px 9px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.band button:first-child { border-left: 0; }
+.band button.fill { background: var(--primary-soft); color: var(--primary-ink); }
+.band button.on { background: var(--primary); color: #fff; }
+.band-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); margin-top: 10px; }
+.band-key b { color: var(--ink); font-weight: 600; }
+.plist { display: grid; gap: 8px; }
+.pl { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; }
+.pl .n { width: 26px; height: 26px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-size: 12.5px; font-weight: 700; flex: none; }
+.pl .t { min-width: 0; flex: 1; }
+.pl .t b { display: block; }
+.pl .t span { font-size: 12.5px; color: var(--muted); }
+.pl-arrow { font-size: 12.5px; color: var(--muted); padding-left: 38px; }
+.side-card { padding: 16px 18px; margin-bottom: 14px; }
+.side-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+.avs { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 10px; }
+.av { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font-size: 11.5px; font-weight: 700; color: #fff; }
+
+/* ---------- A3 Learning paths ---------- */
+.ptype { margin-bottom: 22px; }
+.ptype-h { display: flex; align-items: baseline; gap: 10px; margin-bottom: 10px; }
+.ptype-h h2 { font-size: 16px; font-weight: 700; }
+.ptype-h p { font-size: 13px; color: var(--muted); }
+.pcards { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; }
+.pc { display: grid; gap: 10px; padding: 16px 18px; text-decoration: none; color: inherit; border-top: 4px solid var(--line); }
+.pc.foundation { border-top-color: var(--foundation); }
+.pc.role { border-top-color: var(--role); }
+.pc.growth { border-top-color: var(--growth); }
+.pc:hover { box-shadow: 0 2px 10px rgba(23,26,38,.06); }
+.pc h3 { font-size: 15.5px; font-weight: 700; }
+.pc .who { font-size: 13px; color: var(--muted); }
+.pc .stg { display: flex; gap: 4px; }
+.pc .stg i { flex: 1; height: 6px; border-radius: 3px; background: var(--line); }
+.pc .stg i.ch { background: repeating-linear-gradient(90deg, var(--line) 0 6px, transparent 6px 9px); }
+.pc .ft { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); }
+.order { padding: 14px 18px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; font-size: 13.5px; }
+.order b { font-weight: 700; }
+.order .arr { color: var(--muted); }
+
+.pb { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 20px; align-items: start; }
+.stage { padding: 0; margin-bottom: 0; overflow: hidden; }
+.stage-h { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding: 14px 18px; border-bottom: 1px solid var(--line); background: #FAFBFC; }
+.stage-h .no { width: 30px; height: 30px; border-radius: 50%; background: var(--navy); color: #fff; display: grid; place-items: center; font-weight: 700; font-size: 13.5px; flex: none; }
+.stage-h .nm { flex: 1; min-width: 180px; font-weight: 700; font-size: 15.5px; border: 1px solid transparent; background: transparent; border-radius: 8px; padding: 4px 8px; }
+.stage-h .nm:hover { background: var(--field); }
+.stage-h .nm:focus { outline: none; background: #fff; border-color: var(--primary); }
+.stype { display: inline-flex; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
+.stype button { border: 0; background: none; padding: 5px 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.stype button[aria-pressed="true"] { background: var(--navy); color: #fff; }
+.stage-b { padding: 6px 18px 14px; }
+.it { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto auto; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.it:last-child { border-bottom: 0; }
+.it .t b { display: block; font-weight: 600; }
+.it .t span { font-size: 12.5px; color: var(--muted); }
+.kind { font-size: 11.5px; font-weight: 700; letter-spacing: .03em; text-transform: uppercase; border-radius: 6px; padding: 2px 8px; text-align: center; }
+.k-Course { background: var(--primary-soft); color: var(--primary-ink); }
+.k-PALS { background: var(--green-soft); color: var(--green); }
+.k-CBL { background: var(--accent-soft); color: var(--accent-ink); }
+.k-Assessment { background: var(--violet-soft); color: var(--violet); }
+.it .ren { font-size: 12.5px; }
+.it .ren select { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 3px 6px; font-size: 12.5px; }
+.it .acts { display: flex; gap: 0; }
+.choose { display: grid; gap: 12px; padding: 12px 0 4px; }
+.choose .rule { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 600; }
+.choose .rule input { width: 64px; text-align: center; }
+.choose .modes { display: grid; gap: 8px; }
+.choose label.mode { display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+.choose label.mode:has(input:checked) { border-color: var(--primary); background: #F7FBFD; }
+.choose label.mode input { margin-top: 4px; accent-color: var(--primary); }
+.choose label.mode b { display: block; }
+.choose label.mode span { font-size: 12.5px; color: var(--muted); }
+.pool { display: flex; flex-wrap: wrap; gap: 6px; }
+.stage-f { display: flex; gap: 8px; padding: 0 18px 14px; flex-wrap: wrap; }
+.unlock { display: flex; align-items: center; gap: 10px; padding: 8px 0 8px 32px; font-size: 13px; color: var(--muted); }
+.unlock::before { content: ""; width: 2px; height: 26px; background: var(--line); margin-left: -18px; margin-right: 6px; }
+.addstage { width: 100%; border: 1.5px dashed #c6cedb; background: transparent; border-radius: 14px; padding: 14px; font-weight: 600; color: var(--primary-ink); margin-top: 12px; }
+.addstage:hover { border-color: var(--primary); background: #F7FBFD; }
+.sum dl { display: grid; grid-template-columns: auto 1fr; gap: 6px 14px; font-size: 13.5px; }
+.sum dt { color: var(--muted); }
+.sum dd { margin: 0; font-weight: 600; text-align: right; font-variant-numeric: tabular-nums; }
+.skl { display: flex; flex-wrap: wrap; gap: 6px; }
+.status { display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; font-weight: 600; }
+.switch { position: relative; width: 38px; height: 22px; border-radius: 999px; background: #c9d1dc; border: 0; flex: none; }
+.switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #fff; transition: left .15s; }
+.switch[aria-checked="true"] { background: var(--green); }
+.switch[aria-checked="true"]::after { left: 19px; }
+
+/* ---------- A4 staff, A5 tagging, R1 reports ---------- */
+.chip.bad { background: var(--red-soft); color: var(--red); }
+.tbl-wrap { overflow-x: auto; }
+table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
+.tbl th { text-align: left; font-size: 12px; font-weight: 600; letter-spacing: .03em; color: var(--muted); padding: 10px 14px; border-bottom: 1px solid var(--line); background: #FAFBFC; white-space: nowrap; }
+.tbl td { padding: 11px 14px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+.tbl tr:last-child td { border-bottom: 0; }
+.tbl td .sub { display: block; font-size: 12.5px; color: var(--muted); }
+.tbl input[type="checkbox"] { width: 17px; height: 17px; accent-color: var(--primary); }
+.who { display: flex; align-items: center; gap: 10px; }
+.who b { font-weight: 600; }
+.who .sub { display: block; font-size: 12.5px; color: var(--muted); }
+.ln2 { display: flex; justify-content: space-between; align-items: center; gap: 10px; font-size: 13.5px; padding: 6px 0; border-top: 1px solid var(--line); }
+.ln2:first-of-type { border-top: 0; }
+.ln2 b { font-weight: 600; }
+.drop { border: 2px dashed #c6cedb; border-radius: 14px; padding: 28px; display: grid; gap: 8px; justify-items: center; text-align: center; background: #FAFBFC; }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 16px; }
+.kpi { padding: 14px 16px; display: grid; gap: 2px; }
+.kpi b { font-size: 26px; font-weight: 700; color: var(--navy); font-variant-numeric: tabular-nums; }
+.kpi b.bad { color: var(--red); } .kpi b.warn { color: var(--accent-ink); }
+.kpi span { font-size: 13px; font-weight: 600; }
+.kpi small { font-size: 12px; color: var(--muted); }
+.legend2 { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
+.legend2 i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: 5px; vertical-align: -1px; }
+.c-done { background: var(--green); } .c-prog { background: var(--primary); } .c-late { background: var(--red); } .c-wait { background: #DDE2E9; }
+.rp-path { padding: 12px 0; border-top: 1px solid var(--line); }
+.rp-path:first-of-type { border-top: 0; }
+.rp-h { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 8px; }
+.rp-st { display: grid; grid-template-columns: minmax(140px, 220px) minmax(0, 1fr) 56px; gap: 12px; align-items: center; padding: 4px 0; font-size: 13.5px; }
+.rp-st .stack { display: flex; height: 14px; border-radius: 4px; overflow: hidden; background: #DDE2E9; }
+.rp-st .stack i { display: block; height: 100%; }
+.rp-st .nums { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); font-size: 12.5px; }
+@media (max-width: 900px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } .rp-st { grid-template-columns: minmax(0, 1fr) 48px; } .rp-st .stack { grid-column: 1 / -1; grid-row: 2; } }
+
+/* ---------- Phase 2 concepts ---------- */
+em.p2 { font-style: normal; font-size: 10px; font-weight: 700; background: var(--violet-soft); color: var(--violet); border-radius: 999px; padding: 0 6px; margin-left: 4px; }
+.pw { display: grid; gap: 12px; }
+.pw-track { padding: 16px 18px; }
+.pw-track h2 { font-size: 13px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+.pw-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.pw-node { display: grid; gap: 2px; text-align: left; min-width: 180px; border: 1px solid var(--line); background: var(--surface); border-radius: 12px; padding: 10px 14px; }
+.pw-node b { font-size: 14.5px; }
+.pw-node span { font-size: 12.5px; color: var(--muted); }
+.pw-node:disabled { cursor: default; background: #FAFBFC; color: var(--ink); }
+.pw-node.next { border-style: dashed; border-color: #b9a8ea; }
+.pw-node.next:hover { border-color: var(--violet); }
+.pw-node.on { border-style: solid; border-color: var(--violet); box-shadow: 0 0 0 3px var(--violet-soft); }
+.pw-arr { color: var(--muted); font-size: 18px; }
+.pw-lat { font-size: 13.5px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pw-lat b { color: var(--ink); }
+.hm-key { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); }
+.hm-key i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; margin-right: 5px; vertical-align: -2px; }
+table.hm { border-collapse: separate; border-spacing: 4px; font-size: 13px; }
+.hm thead th { vertical-align: bottom; height: 120px; padding: 0 2px 6px; font-weight: 600; color: var(--muted); }
+.hm thead th span { writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; font-size: 12px; }
+.hm thead th:first-child { text-align: left; }
+.hm tbody th, .hm tfoot th { text-align: left; padding: 4px 10px 4px 4px; white-space: nowrap; font-weight: 600; }
+.hm tbody th small { display: block; font-weight: 400; color: var(--muted); font-size: 11.5px; }
+.hm td { padding: 0; }
+.cell { display: grid; place-items: center; width: 38px; height: 34px; border-radius: 6px; font-weight: 700; font-size: 12px; color: #fff; }
+.b1 { background: #DCEAF1; color: #33536a !important; } .b2 { background: #A9CFE0; color: #1f4357 !important; } .b3 { background: #5FA6C6; } .b4 { background: #1E82AC; } .b5 { background: #0A5A7B; }
+.cell.gap, .hm-key i.gap { box-shadow: inset 0 0 0 2.5px var(--red); }
+.hm-key i.gap { background: #fff; }
+.cell.na { opacity: .35; }
+
+/* ---------- Dialogs ---------- */
+dialog.dlg { border: 0; padding: 0; border-radius: 18px; width: min(640px, calc(100vw - 32px)); max-height: calc(100vh - 48px); overflow: hidden; box-shadow: 0 24px 70px rgba(23,26,38,.35); color: var(--ink); }
+dialog.dlg.wide { width: min(860px, calc(100vw - 32px)); }
+dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
+.dg { display: flex; flex-direction: column; max-height: calc(100vh - 48px); }
+.dg-h { display: flex; align-items: flex-start; gap: 12px; padding: 20px 22px 12px; }
+.dg-h h2 { font-size: 19px; font-weight: 700; }
+.dg-h p { font-size: 13.5px; color: var(--muted); margin-top: 2px; }
+.dg-h .ico { margin-left: auto; }
+.dg-b { padding: 4px 22px 16px; overflow: auto; }
+.dg-f { display: flex; justify-content: flex-end; align-items: center; gap: 8px; padding: 14px 22px; border-top: 1px solid var(--line); background: #FAFBFC; }
+.dg-f .l { margin-right: auto; font-size: 13px; color: var(--muted); }
+.steps { display: flex; gap: 6px; font-size: 12.5px; font-weight: 600; color: var(--muted); margin-top: 8px; }
+.steps span.on { color: var(--primary-ink); }
+.opt-list { display: grid; gap: 6px; }
+.opt { display: flex; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; cursor: pointer; }
+.opt:hover { border-color: #b9c2d0; }
+.opt:has(input:checked) { border-color: var(--primary); background: #F7FBFD; }
+.opt input { accent-color: var(--primary); width: 17px; height: 17px; flex: none; }
+.opt .t { flex: 1; min-width: 0; }
+.opt .t b { display: block; font-weight: 600; }
+.opt .t span { font-size: 12.5px; color: var(--muted); }
+.ptabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 10px; }
+.ptabs button { border: 1px solid var(--line); background: var(--surface); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; color: var(--muted); }
+.ptabs button[aria-pressed="true"] { background: var(--navy); border-color: var(--navy); color: #fff; }
+.grp-t { font-size: 12px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--muted); margin: 12px 0 6px; }
+.impact { background: var(--bg); border-radius: 12px; padding: 12px 14px; font-size: 13.5px; display: grid; gap: 6px; }
+.impact li { display: flex; gap: 8px; }
+.impact li::before { content: "→"; color: var(--primary); font-weight: 700; }
+
+/* Learner preview inside a dialog */
+.lp { background: #F4F7FA; border-radius: 14px; padding: 18px; display: grid; gap: 12px; font-family: "Montserrat", var(--ui); }
+.lp-h small { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--primary); }
+.lp-h b { display: block; font-size: 18px; color: var(--navy); }
+.lps { background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; display: grid; gap: 8px; }
+.lps.lock { background: transparent; border-style: dashed; color: var(--muted); }
+.lps h4 { font-size: 14.5px; color: var(--navy); display: flex; justify-content: space-between; gap: 10px; }
+.lps li { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
+.lps li i { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #b9c2d0; flex: none; }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); background: var(--ink); color: #fff; padding: 10px 18px; border-radius: 12px; font-size: 14px; opacity: 0; pointer-events: none; transition: opacity .2s, transform .2s; z-index: 200; max-width: calc(100vw - 32px); }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast button { margin-left: 12px; border: 0; background: none; color: #9fd3ea; font-weight: 700; pointer-events: auto; }
+
+@media (max-width: 1100px) {
+  .rd, .pb { grid-template-columns: minmax(0, 1fr); }
+  .dr { grid-template-columns: minmax(0, 1fr); }
+  .depts { position: static; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+}
+@media (max-width: 820px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  /* On phones the sidebar becomes a drawer opened from the menu button */
+  .side { display: flex; position: fixed; z-index: 150; left: 0; top: 0; height: 100vh; width: min(280px, 85vw); transform: translateX(-100%); transition: transform .25s ease; box-shadow: 0 0 40px rgba(23,26,38,.25); }
+  body.nav-open .side { transform: none; }
+  .menu-btn { display: inline-grid; }
+  body.nav-open .nav-scrim { display: block; }
+  .bar { padding: 10px 16px; }
+  .bar .crumb { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .page { padding: 16px; }
+  .sk { grid-template-columns: 24px minmax(0, 1fr) auto; }
+  .sk .use { display: none; }
+  .rq { grid-template-columns: minmax(0, 1fr) 32px; }
+  .rq .band { grid-column: 1 / -1; grid-row: 2; }
+  .it { grid-template-columns: 84px minmax(0, 1fr) auto; }
+  .it .ren { grid-column: 2 / -1; }
+  .row2 { grid-template-columns: minmax(0, 1fr); }
+  .start2 { grid-template-columns: minmax(0, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="proto">
+  <b>Prototype</b>
+  <span>Career Planner · admin. Sample data for Tunas Muda, illustrative only.</span>
+  <div class="seg" role="group" aria-label="Starting point">
+    <button type="button" data-start="setup" aria-pressed="true">Set up</button>
+    <button type="button" data-start="empty" aria-pressed="false">Empty org</button>
+  </div>
+  <button class="plain" type="button" id="resetBtn">Reset demo</button>
+</div>
+
+<div class="shell">
+  <aside class="side" aria-label="Admin navigation">
+    <img src="assets/atlas-logo-480.png" alt="ATLAS by HeyHi">
+    <small>NAVIGATION</small>
+    <nav id="sideNav"></nav>
+    <div class="me"><i>H</i><div>HR Admin<span>Org Admin</span></div></div>
+  </aside>
+  <div class="main">
+    <div class="bar"><span style="display:flex;align-items:center;gap:10px;min-width:0"><button class="menu-btn" id="menuBtn" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="sideNav"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button><span class="crumb" id="crumb"></span></span><div class="r"><button class="help" type="button" data-toast="Help (not part of this preview)">Help</button></div></div>
+    <main class="page" id="content"></main>
+  </div>
+</div>
+
+<div class="nav-scrim" id="navScrim"></div>
+<dialog class="dlg" id="dlg"><div class="dg" id="dlgBody"></div></dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="assets/career-data.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+  function uid(p) { return (p || 'x') + Date.now().toString(36) + Math.random().toString(36).slice(2, 5); }
+  function clone(o) { return JSON.parse(JSON.stringify(o)); }
+  function nPeople(n, pre) { return n + ' ' + (pre || '') + (n === 1 ? 'person' : 'people'); }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+
+  // ==========================================================================
+  // Sample data (illustrative). Bands follow Skills Analytics.
+  // ==========================================================================
+  // Sample data lives in assets/career-data.js, shared with the learner prototype
+  var BANDS = CAREER.BANDS, PATH_TYPES = CAREER.PATH_TYPES, CONTENT = CAREER.CONTENT, KINDS = CAREER.KINDS;
+  var SFW = CAREER.SFW, SFW_SECTORS = CAREER.SFW_SECTORS, S = CAREER.S, seed = CAREER.seed;
+  var LEVELS = ['', 'Junior', 'Senior', 'Manager'];
+  var RENEW = [['', 'No renewal'], ['1', 'Every year'], ['2', 'Every 2 years'], ['3', 'Every 3 years'], ['5', 'Every 5 years']];
+  function emptyOrg() { return { categories: [], departments: [], roles: [], paths: [], tags: {}, customTags: {}, staff: CAREER.staff().map(function (u) { u.role = ''; u.dept = ''; u.nominated = false; return u; }) }; }
+
+  // ---------- State (kept in this browser; Reset demo restores the sample) ----------
+  var KEY = 'atlas-career-admin-v1';
+  var memory = null;
+  function load() { if (memory) return memory; try { var v = localStorage.getItem(KEY); return v ? JSON.parse(v) : null; } catch (e) { return null; } }
+  function persist() { memory = D; try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { /* in-memory copy is enough */ } }
+  var D = load() || seed();
+  if (!D.staff) D.staff = CAREER.staff();
+  if (!D.tags) D.tags = {};
+  if (!D.customTags) D.customTags = CAREER.seed().customTags;
+  var UI = { q: '', selected: {}, dept: 'all', ptab: 'All', pq: '', pskill: '' };
+
+  // ---------- Lookups ----------
+  function allSkills(includeArchived) { var out = []; D.categories.forEach(function (c) { c.skills.forEach(function (s) { if (includeArchived || !s.archived) out.push({ s: s, cat: c }); }); }); return out; }
+  function skillById(id) {
+    for (var i = 0; i < D.categories.length; i++) for (var j = 0; j < D.categories[i].skills.length; j++) { var s = D.categories[i].skills[j]; if (s.id === id) return { s: s, cat: D.categories[i] }; }
+    // A merged skill resolves through its alias
+    for (i = 0; i < D.categories.length; i++) for (j = 0; j < D.categories[i].skills.length; j++) { s = D.categories[i].skills[j]; if ((s.mergedIds || []).indexOf(id) !== -1) return { s: s, cat: D.categories[i] }; }
+    return null;
+  }
+  function skillName(id) { var r = skillById(id); return r ? r.s.name : 'Removed skill'; }
+  function contentById(id) { for (var i = 0; i < CONTENT.length; i++) if (CONTENT[i].id === id) return CONTENT[i]; return null; }
+  function contentSkills(c) { var seen = {}; return (D.tags && D.tags[c.id] ? D.tags[c.id].map(function (x) { return x.s; }) : c.skills).map(function (id) { var r = skillById(id); return r ? r.s.id : null; }).filter(function (id) { if (!id || seen[id]) return false; seen[id] = 1; return true; }); }
+  function deptById(id) { for (var i = 0; i < D.departments.length; i++) if (D.departments[i].id === id) return D.departments[i]; return null; }
+  function roleById(id) { for (var i = 0; i < D.roles.length; i++) if (D.roles[i].id === id) return D.roles[i]; return null; }
+  function pathById(id) { for (var i = 0; i < D.paths.length; i++) if (D.paths[i].id === id) return D.paths[i]; return null; }
+  function rolesUsing(skillId) { return D.roles.filter(function (r) { return r.skills.some(function (x) { var k = skillById(x.s); return k && k.s.id === skillId; }); }); }
+  function contentUsing(skillId) { return CONTENT.filter(function (c) { return contentSkills(c).indexOf(skillId) !== -1; }); }
+  function catContent(catId) { var cat = D.categories.filter(function (c) { return c.id === catId; })[0]; if (!cat) return []; var ids = cat.skills.filter(function (s) { return !s.archived; }).map(function (s) { return s.id; }); return CONTENT.filter(function (c) { return contentSkills(c).some(function (s) { return ids.indexOf(s) !== -1; }); }); }
+  function poolItems(st) { return st.pool.mode === 'category' ? catContent(st.pool.cat) : st.pool.list.map(contentById).filter(Boolean); }
+  function rolePaths(roleId) { return D.paths.filter(function (p) { return p.type === 'role' && p.roles.indexOf(roleId) !== -1; }); }
+  function staffTotal() { return D.staff.filter(function (u) { return u.role; }).length; }
+  function enrolled(p) {
+    if (p.type === 'foundation') return staffTotal();
+    if (p.type === 'growth') return D.staff.filter(function (u) { return u.role && u.nominated; }).length;
+    return p.roles.reduce(function (n, id) { var r = roleById(id); return n + (r ? staffCount(r.id) : 0); }, 0);
+  }
+  function stageMins(st) {
+    if (st.type === 'choose') { var pool = poolItems(st); if (!pool.length) return 0; var avg = pool.reduce(function (n, c) { return n + c.mins; }, 0) / pool.length; return Math.round(avg * Math.min(st.n || 1, pool.length)); }
+    return st.items.reduce(function (n, it) { var c = contentById(it.c); return n + (c ? c.mins : 0); }, 0);
+  }
+  function fmtMins(m) { var h = Math.floor(m / 60), r = m % 60; return h ? h + 'h' + (r ? ' ' + r + 'm' : '') : r + 'm'; }
+  var AVC = ['#0D719A', '#1E8A5A', '#8A5600', '#5B3FB5', '#B4236B', '#3F6FB5'];
+  var PEOPLE = ['Ayu', 'Rizky', 'Dewi', 'Hendra', 'Nina', 'Fajar', 'Putri', 'Agus', 'Lina', 'Yusuf', 'Rani', 'Teguh'];
+
+  // ---------- Icons ----------
+  function svg(d, s) { return '<svg width="' + (s || 16) + '" height="' + (s || 16) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="' + d + '"/></svg>'; }
+  var I = {
+    edit: svg('M12 20h9M16.5 3.5a2.1 2.1 0 013 3L7 19l-4 1 1-4z'),
+    archive: svg('M3 4h18v4H3zM5 8v12h14V8M10 12h4'),
+    restore: svg('M3 12a9 9 0 109-9 9.7 9.7 0 00-6.7 2.7L3 8M3 3v5h5'),
+    del: svg('M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6'),
+    up: svg('M12 19V5M5 12l7-7 7 7'),
+    down: svg('M12 5v14M19 12l-7 7-7-7'),
+    x: svg('M6 6l12 12M18 6L6 18', 18),
+    back: svg('M19 12H5M12 19l-7-7 7-7'),
+    lock: svg('M5 11h14v10H5zM8 11V7a4 4 0 018 0v4', 14),
+    eye: svg('M1 12s4-7 11-7 11 7 11 7-4 7-11 7S1 12 1 12zM12 15a3 3 0 100-6 3 3 0 000 6')
+  };
+
+  // ==========================================================================
+  // Navigation. The Career Planner group replaces the single "Job Roles" item.
+  // ==========================================================================
+  var NAV_TOP = [['Dashboard', 'M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z'], ['Users', 'M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8M22 21v-2a4 4 0 00-3-3.9M16 3.1a4 4 0 010 7.8'], ['Courses', 'M4 5a2 2 0 012-2h13v16H6a2 2 0 00-2 2zM4 19a2 2 0 012-2h13'], ['Content Sharing', 'M18 8a3 3 0 100-6 3 3 0 000 6M6 15a3 3 0 100-6 3 3 0 000 6M18 22a3 3 0 100-6 3 3 0 000 6M8.6 13.5l6.8 4M15.4 6.5l-6.8 4']];
+  var NAV_CP = [['skills', 'Skills framework', 'M4 6h16M4 12h10M4 18h6'], ['roles', 'Departments & roles', 'M3 7h18v13H3zM8 7V4h8v3'], ['paths', 'Learning paths', 'M5 19c4 0 4-14 8-14s4 14 8 14M5 19h.01M21 19h.01'], ['staff', 'Staff assignments', 'M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8 4 4 0 000 8'], ['tagging', 'Skill tagging', 'M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L3 13V3h10l7.6 7.6a2 2 0 010 2.8zM7.5 7.5h.01'], ['pathways', 'Career pathways', 'M4 19h4V9h4V5h8M16 2l4 3-4 3']];
+  var NAV_BOTTOM = [['CBL', 'M6 4h12v4a6 6 0 01-12 0zM12 14v4M8 21h8'], ['PALS Course', 'M4 6h16M4 12h16M4 18h10'], ['Groups', 'M16 21v-2a4 4 0 00-4-4H6a4 4 0 00-4 4v2M9 11a4 4 0 100-8'], ['Assessments', 'M9 3h6v4H9zM6 5H5a2 2 0 00-2 2v13a2 2 0 002 2h14a2 2 0 002-2V7a2 2 0 00-2-2h-1M8 13l2.5 2.5L16 10'], ['Question Bank', 'M5 3h14v18l-7-4-7 4z'], ['Knowledge Base', 'M3 5c0-1.7 4-3 9-3s9 1.3 9 3-4 3-9 3-9-1.3-9-3zM3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5'], ['Analytics', 'M4 20V10M10 20V4M16 20v-7M22 20H2'], ['Settings', 'M12 15a3 3 0 100-6 3 3 0 000 6M4 12h2M18 12h2M12 4v2M12 18v2']];
+  function navLink(label, path, href, on) {
+    return '<a href="' + href + '"' + (on ? ' class="on" aria-current="page"' : '') + (href === '#' ? ' data-toast="' + esc(label) + ' (not part of this preview)"' : '') + '>' + svg(path, 18) + esc(label) + '</a>';
+  }
+  function renderNav(section) {
+    $('#sideNav').innerHTML = NAV_TOP.map(function (n) { return navLink(n[0], n[1], '#', false); }).join('') +
+      '<div class="grp" role="group" aria-label="Career Planner"><div class="grp-h">CAREER PLANNER <em>New</em></div>' +
+      NAV_CP.map(function (n) { return navLink(n[1], n[2], '#' + n[0], section === n[0]).replace('</a>', n[0] === 'pathways' ? ' <em class="p2">P2</em></a>' : '</a>'); }).join('') + '</div>' +
+      NAV_BOTTOM.map(function (n) { return n[0] === 'Analytics' ? navLink('Analytics · Career & skills', n[1], '#reports', section === 'reports') : navLink(n[0], n[1], '#', false); }).join('');
+  }
+
+  // ==========================================================================
+  // A1 Skills framework
+  // ==========================================================================
+  function viewSkills() {
+    if (!D.categories.length) {
+      return '<div class="ph"><div><h1>Skills framework</h1><p>Your organisation\'s own categories and skills. Roles, learning paths and reports all use this list.</p></div></div>' +
+        '<section class="card empty"><h2>Start your skills framework</h2><p>Keep it short to begin with: a few categories with a handful of skills each. You can add, rename and merge skills any time.</p>' +
+        '<div class="start2"><button type="button" data-act="addcat-first"><b>Start from scratch</b><span>Add your own categories, such as Compliance or Communication.</span></button>' +
+        '<button type="button" data-act="import"><b>Import from SkillsFuture</b><span>Copy categories and skills from a SkillsFuture sector, then make them your own.</span></button></div></section>';
+    }
+    var skills = allSkills(false), archived = allSkills(true).filter(function (x) { return x.s.archived; });
+    var fromSfw = skills.filter(function (x) { return x.s.from; }).length;
+    var q = UI.q.trim().toLowerCase();
+    var selCount = Object.keys(UI.selected).filter(function (k) { return UI.selected[k]; }).length;
+    var h = '<div class="ph"><div><h1>Skills framework</h1><p>Your organisation\'s own categories and skills. Roles, learning paths and reports all use this list, and learners see these categories.</p></div>' +
+      '<div class="acts"><button class="btn" type="button" data-act="import">Import from SkillsFuture</button><button class="btn primary" type="button" data-act="addcat">+ Add category</button></div></div>';
+    h += '<div class="stats"><span><b>' + D.categories.length + '</b> categories</span><span><b>' + skills.length + '</b> skills</span><span><b>' + fromSfw + '</b> copied from SkillsFuture</span>' + (archived.length ? '<span><b>' + archived.length + '</b> archived</span>' : '') + '</div>';
+    h += '<div class="fw-tools"><label class="sr" for="skillSearch">Search skills</label><input class="in" id="skillSearch" type="search" placeholder="Search skills" value="' + esc(UI.q) + '"><span class="mini">Select two or more skills to merge them.</span></div>';
+    D.categories.forEach(function (cat) {
+      var list = cat.skills.filter(function (s) { return !s.archived && (!q || s.name.toLowerCase().indexOf(q) !== -1 || cat.name.toLowerCase().indexOf(q) !== -1); });
+      if (q && !list.length) return;
+      h += '<section class="card cat" aria-label="' + esc(cat.name) + '"><div class="cat-h"><span class="nm">' + esc(cat.name) + '</span><span class="ct">' + plural(list.length, 'skill') + '</span>' +
+        '<span class="acts"><button class="ico" type="button" data-act="renamecat" data-id="' + cat.id + '" aria-label="Rename ' + esc(cat.name) + '" title="Rename">' + I.edit + '</button>' +
+        '<button class="ico dng" type="button" data-act="delcat" data-id="' + cat.id + '" aria-label="Remove ' + esc(cat.name) + '" title="Remove category">' + I.del + '</button></span></div>';
+      list.forEach(function (s) {
+        var r = rolesUsing(s.id).length, c = contentUsing(s.id).length, sel = !!UI.selected[s.id];
+        h += '<div class="sk' + (sel ? ' sel' : '') + '"><input type="checkbox" data-pick="' + s.id + '"' + (sel ? ' checked' : '') + ' aria-label="Select ' + esc(s.name) + '">' +
+          '<div class="nm">' + esc(s.name) + (s.from ? ' <span class="chip sfw" title="Copied from the SkillsFuture ' + esc(s.from) + ' sector. It is your copy: change it freely.">From SkillsFuture</span>' : '') +
+          (s.aliases.length ? '<small>Also known as: ' + esc(s.aliases.join(', ')) + '</small>' : '') + '</div>' +
+          '<div class="use">' + (r || c ? plural(r, 'role') + ' · ' + plural(c, 'content item') : 'Not used yet') + '</div>' +
+          '<div class="acts"><button class="ico" type="button" data-act="renameskill" data-id="' + s.id + '" aria-label="Rename ' + esc(s.name) + '" title="Rename">' + I.edit + '</button>' +
+          '<button class="ico" type="button" data-act="archive" data-id="' + s.id + '" aria-label="Archive ' + esc(s.name) + '" title="Archive">' + I.archive + '</button></div></div>';
+      });
+      h += '<div class="add-row"><label class="sr" for="add-' + cat.id + '">New skill in ' + esc(cat.name) + '</label><input class="in sm" id="add-' + cat.id + '" placeholder="Add a skill to ' + esc(cat.name) + '" data-addskill="' + cat.id + '"><button class="btn sm" type="button" data-act="addskill" data-id="' + cat.id + '">Add</button></div></section>';
+    });
+    if (q && !D.categories.some(function (cat) { return cat.skills.some(function (s) { return !s.archived && (s.name.toLowerCase().indexOf(q) !== -1 || cat.name.toLowerCase().indexOf(q) !== -1); }); })) {
+      h += '<div class="card empty"><h2>No skills match "' + esc(UI.q) + '"</h2><p>Try another word, or add it as a new skill in one of the categories.</p></div>';
+    }
+    if (archived.length) {
+      h += '<details class="arch"><summary>Archived skills (' + archived.length + ')</summary><div class="card" style="margin-top:8px">' + archived.map(function (x) {
+        return '<div class="sk"><span></span><div class="nm">' + esc(x.s.name) + '<small>' + esc(x.cat.name) + ' · hidden from new roles and paths; past records keep it</small></div><div class="use"></div><div class="acts"><button class="btn sm" type="button" data-act="unarchive" data-id="' + x.s.id + '">Restore</button></div></div>';
+      }).join('') + '</div></details>';
+    }
+    if (selCount) {
+      h += '<div class="selbar" role="region" aria-label="Selected skills"><b>' + plural(selCount, 'skill') + ' selected</b><span style="margin-left:auto"></span>' +
+        '<button class="btn ghost sm" type="button" data-act="clearsel">Clear</button><button class="btn sm" type="button" data-act="merge"' + (selCount < 2 ? ' disabled title="Select at least two skills"' : '') + '>Merge into one skill</button></div>';
+    }
+    return h;
+  }
+
+  // ---------- Import from SkillsFuture ----------
+  var IMP = { step: 1, sector: '', picks: {}, target: 'new' };
+  function openImport() { IMP = { step: 1, sector: '', picks: {}, target: 'new' }; renderImport(); openDlg(); }
+  function renderImport() {
+    var h = '<div class="dg-h"><div><h2 id="dlgTitle">Import from SkillsFuture</h2><p>Copies skills into your framework. The copies are yours: rename, merge or archive them. Later SkillsFuture changes do not affect them.</p>' +
+      '<div class="steps"><span class="' + (IMP.step === 1 ? 'on' : '') + '">1. Sector</span><span>›</span><span class="' + (IMP.step === 2 ? 'on' : '') + '">2. Skills</span></div></div>' +
+      '<button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">';
+    if (IMP.step === 1) {
+      h += '<p class="mini" style="margin-bottom:8px">Pick the sector closest to your organisation. Most schools start with Training and Adult Education or Critical Core Skills.</p><div class="opt-list">' +
+        SFW_SECTORS.map(function (s) {
+          var has = !!SFW[s];
+          return '<label class="opt"><input type="radio" name="sfwsec" value="' + esc(s) + '"' + (IMP.sector === s ? ' checked' : '') + (has ? '' : ' disabled') + '><span class="t"><b>' + esc(s) + '</b><span>' + (has ? SFW[s].reduce(function (n, c) { return n + c[1].length; }, 0) + ' skills in this preview' : 'Not loaded in this preview') + '</span></span></label>';
+        }).join('') + '</div></div><div class="dg-f"><span class="l">SkillsFuture Framework, Singapore</span><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-imp="next"' + (IMP.sector ? '' : ' disabled') + '>Next</button></div>';
+    } else {
+      var n = Object.keys(IMP.picks).filter(function (k) { return IMP.picks[k]; }).length;
+      h += SFW[IMP.sector].map(function (cat) {
+        return '<div class="grp-t">' + esc(cat[0]) + '</div><div class="opt-list">' + cat[1].map(function (sk) {
+          var key = cat[0] + '|' + sk, exists = allSkills(true).some(function (x) { return x.s.name.toLowerCase() === sk.toLowerCase(); });
+          return '<label class="opt"><input type="checkbox" data-imppick="' + esc(key) + '"' + (IMP.picks[key] ? ' checked' : '') + (exists ? ' disabled' : '') + '><span class="t"><b>' + esc(sk) + '</b>' + (exists ? '<span>Already in your framework</span>' : '') + '</span></label>';
+        }).join('') + '</div>';
+      }).join('');
+      h += '<div class="fld" style="margin-top:14px"><label class="lbl" for="impTarget">Put them in</label><select class="sel" id="impTarget"><option value="new"' + (IMP.target === 'new' ? ' selected' : '') + '>New categories named after SkillsFuture</option>' +
+        D.categories.map(function (c) { return '<option value="' + c.id + '"' + (IMP.target === c.id ? ' selected' : '') + '>Existing category: ' + esc(c.name) + '</option>'; }).join('') + '</select></div>';
+      h += '</div><div class="dg-f"><button class="btn" type="button" data-imp="back">Back</button><button class="btn primary" type="button" data-imp="do"' + (n ? '' : ' disabled') + '>Import ' + plural(n, 'skill') + '</button></div>';
+    }
+    $('#dlgBody').innerHTML = h;
+  }
+  function doImport() {
+    var count = 0;
+    SFW[IMP.sector].forEach(function (cat) {
+      var picks = cat[1].filter(function (sk) { return IMP.picks[cat[0] + '|' + sk]; });
+      if (!picks.length) return;
+      var target;
+      if (IMP.target === 'new') {
+        target = D.categories.filter(function (c) { return c.name === cat[0]; })[0];
+        if (!target) { target = { id: uid('k'), name: cat[0], skills: [] }; D.categories.push(target); }
+      } else target = D.categories.filter(function (c) { return c.id === IMP.target; })[0];
+      picks.forEach(function (sk) { target.skills.push(S(uid('s'), sk, IMP.sector)); count++; });
+    });
+    persist(); closeDlg(); render(); toast(plural(count, 'skill') + ' imported as your own copies');
+  }
+
+  // ---------- Merge ----------
+  var MRG = { keep: '', name: '' };
+  function selectedSkills() { return Object.keys(UI.selected).filter(function (k) { return UI.selected[k]; }).map(skillById).filter(Boolean); }
+  function openMerge() { var sel = selectedSkills(); MRG = { keep: sel[0].s.id, name: '' }; renderMerge(); openDlg(); }
+  function renderMerge() {
+    var sel = selectedSkills();
+    var roles = {}, content = {};
+    sel.forEach(function (x) { rolesUsing(x.s.id).forEach(function (r) { roles[r.id] = r.title; }); contentUsing(x.s.id).forEach(function (c) { content[c.id] = 1; }); });
+    var keepName = MRG.keep === 'new' ? (MRG.name.trim() || 'the new skill') : skillName(MRG.keep);
+    var h = '<div class="dg-h"><div><h2 id="dlgTitle">Merge ' + plural(sel.length, 'skill') + '</h2><p>Combine skills that mean the same thing for your organisation, for example several SkillsFuture compliance skills into one.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">' +
+      '<div class="lbl">Keep this name</div><div class="opt-list">' + sel.map(function (x) {
+        return '<label class="opt"><input type="radio" name="keep" value="' + x.s.id + '"' + (MRG.keep === x.s.id ? ' checked' : '') + '><span class="t"><b>' + esc(x.s.name) + '</b><span>' + esc(x.cat.name) + '</span></span></label>';
+      }).join('') + '<label class="opt"><input type="radio" name="keep" value="new"' + (MRG.keep === 'new' ? ' checked' : '') + '><span class="t"><b>A new name</b><input class="in sm" id="mergeName" style="margin-top:6px" placeholder="e.g. Compliance" value="' + esc(MRG.name) + '"></span></label></div>' +
+      '<div class="lbl" style="margin-top:14px">What happens</div><ul class="impact">' +
+      '<li>' + (Object.keys(roles).length ? plural(Object.keys(roles).length, 'role') + ' (' + esc(Object.keys(roles).map(function (k) { return roles[k]; }).join(', ')) + ') now require "' + esc(keepName) + '". Where targets differ, the higher one is kept.' : 'No roles use these skills yet.') + '</li>' +
+      '<li>' + plural(Object.keys(content).length, 'content item') + ' tagged with any of them are tagged "' + esc(keepName) + '".</li>' +
+      '<li>Learners\' progress on the old skills counts towards "' + esc(keepName) + '".</li>' +
+      '<li>The old names stay as aliases, so earlier reports still show the right skill.</li></ul></div>' +
+      '<div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-act="domerge">Merge</button></div>';
+    $('#dlgBody').innerHTML = h;
+  }
+  function doMerge() {
+    var sel = selectedSkills(); if (sel.length < 2) return;
+    var before = clone(D);
+    var keep;
+    if (MRG.keep === 'new') {
+      var nm = ($('#mergeName') ? $('#mergeName').value : MRG.name).trim();
+      if (!nm) { toast('Type a name for the merged skill'); return; }
+      keep = S(uid('s'), nm); sel[0].cat.skills.push(keep);
+    } else keep = skillById(MRG.keep).s;
+    keep.mergedIds = keep.mergedIds || [];
+    sel.forEach(function (x) {
+      if (x.s === keep) return;
+      keep.aliases.push(x.s.name); keep.mergedIds.push(x.s.id); (x.s.mergedIds || []).forEach(function (id) { keep.mergedIds.push(id); }); x.s.aliases.forEach(function (a) { keep.aliases.push(a); });
+      x.cat.skills.splice(x.cat.skills.indexOf(x.s), 1);
+    });
+    // Role requirements point at the kept skill; duplicates keep the higher target
+    D.roles.forEach(function (r) {
+      var out = [];
+      r.skills.forEach(function (rs) {
+        var k = skillById(rs.s), id = k ? k.s.id : rs.s;
+        var ex = out.filter(function (o) { return o.s === id; })[0];
+        if (ex) ex.t = Math.max(ex.t, rs.t); else out.push({ s: id, t: rs.t });
+      });
+      r.skills = out;
+    });
+    UI.selected = {};
+    persist(); closeDlg(); render();
+    toastUndo('Merged into "' + keep.name + '"', before);
+  }
+
+  // ==========================================================================
+  // A2 Departments & roles
+  // ==========================================================================
+  function deptCount(id) { return D.staff.filter(function (u) { return u.role && (id === 'all' || u.dept === id); }).length; }
+  function viewRoles() {
+    var h = '<div class="ph"><div><h1>Departments &amp; roles</h1><p>Each role sits in a department and lists the skills it needs. Assigning someone to a role enrols them in its learning paths.</p></div>' +
+      '<div class="acts"><button class="btn" type="button" data-act="adddept">+ Add department</button><button class="btn primary" type="button" data-act="addrole"' + (D.departments.length ? '' : ' disabled title="Add a department first"') + '>+ Add role</button></div></div>';
+    if (!D.departments.length) {
+      return h + '<section class="card empty"><h2>Add your departments first</h2><p>Start with the departments you have today, for example Admissions, Administration and HR. Roles go inside them, and reports can be filtered by department.</p><button class="btn primary" type="button" data-act="adddept">+ Add department</button></section>';
+    }
+    h += '<div class="dr"><nav class="card depts" aria-label="Departments"><h2>Departments</h2>' +
+      '<button class="d" type="button" data-dept="all" aria-current="' + (UI.dept === 'all') + '">All departments<span>' + D.roles.length + '</span></button>' +
+      D.departments.map(function (d) {
+        var n = D.roles.filter(function (r) { return r.dept === d.id; }).length;
+        return '<button class="d" type="button" data-dept="' + d.id + '" aria-current="' + (UI.dept === d.id) + '">' + esc(d.name) + '<span>' + n + '</span></button>';
+      }).join('') + '</nav><div>';
+    var dep = deptById(UI.dept);
+    if (dep) h += '<div class="stats"><span>Head: <b>' + esc(dep.head || 'Not set') + '</b></span><span><b>' + deptCount(dep.id) + '</b> staff</span><button class="btn link sm" type="button" data-act="editdept" data-id="' + dep.id + '">Edit department</button></div>';
+    var roles = D.roles.filter(function (r) { return UI.dept === 'all' || r.dept === UI.dept; });
+    h += '<div class="roles">';
+    if (!roles.length) h += '<section class="card empty"><h2>No roles in ' + esc(dep ? dep.name : 'this department') + ' yet</h2><p>Start with one role per department. You can split it into junior, senior and manager later.</p><button class="btn primary" type="button" data-act="addrole">+ Add role</button></section>';
+    roles.forEach(function (r) {
+      var d = deptById(r.dept), ps = rolePaths(r.id), f = D.paths.filter(function (p) { return p.type === 'foundation'; });
+      h += '<a class="card rc" href="#role/' + r.id + '"><div><h3>' + esc(r.title) + '</h3><div class="meta"><span class="chip info">' + esc(d ? d.name : 'No department') + '</span>' + (r.level ? '<span class="chip">' + esc(r.level) + '</span>' : '') + '</div></div>' +
+        '<div class="nums"><span><b>' + r.skills.length + '</b>skills</span><span><b>' + staffCount(r.id) + '</b>staff</span></div>' +
+        '<div class="paths">Paths: ' + (f.concat(ps).length ? f.concat(ps).map(function (p) { return '<span class="chip t-' + p.type + '">' + esc(p.name) + '</span>'; }).join('<span aria-hidden="true">→</span>') : '<span class="chip warn">No role path yet</span>') + '</div></a>';
+    });
+    h += '</div>';
+    h += '<div class="card legacy" style="margin-top:16px"><div><b>4 job roles from SkillsFuture</b><p>Roles created before Career Planner (e.g. Cabin Crew) keep working as they are. Move each into a department when you are ready.</p></div><button class="btn sm" type="button" data-toast="Migration of existing job roles is not part of this preview" style="margin-left:auto">Review</button></div>';
+    return h + '</div></div>';
+  }
+
+  function viewRole(id) {
+    var r = roleById(id);
+    if (!r) return '<a class="back" href="#roles">' + I.back + 'Departments &amp; roles</a><div class="card empty"><h2>This role no longer exists</h2></div>';
+    var f = D.paths.filter(function (p) { return p.type === 'foundation'; }), ps = rolePaths(r.id), g = D.paths.filter(function (p) { return p.type === 'growth'; });
+    var h = '<a class="back" href="#roles">' + I.back + 'Departments &amp; roles</a><div class="rd"><div>';
+    h += '<section class="card sec"><label class="sr" for="roleTitle">Role title</label><input class="title-in" id="roleTitle" data-rf="title" value="' + esc(r.title) + '">' +
+      '<div class="row2" style="margin-top:12px"><div class="fld"><label class="lbl" for="roleDept">Department</label><select class="sel" id="roleDept" data-rf="dept">' + D.departments.map(function (d) { return '<option value="' + d.id + '"' + (d.id === r.dept ? ' selected' : '') + '>' + esc(d.name) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="fld"><label class="lbl" for="roleLevel">Level <span class="muted" style="font-weight:400">(optional)</span></label><select class="sel" id="roleLevel" data-rf="level">' + LEVELS.map(function (l) { return '<option value="' + l + '"' + (l === r.level ? ' selected' : '') + '>' + (l || 'No level') + '</option>'; }).join('') + '</select><span class="hint">Start without levels. Split into junior, senior and manager later.</span></div></div>' +
+      '<div class="fld" style="margin-bottom:0"><label class="lbl" for="roleDesc">Description</label><textarea class="ta" id="roleDesc" data-rf="desc" rows="2">' + esc(r.desc) + '</textarea></div></section>';
+
+    h += '<section class="card sec"><div class="sec-h"><div><h2>Required skills</h2><p>What good looks like in this role. Learners see their progress against these targets.</p></div><button class="btn sm" type="button" data-act="addreq">+ Add skills</button></div>';
+    if (!r.skills.length) h += '<div class="empty" style="padding:24px"><p>No skills yet. Add the few skills that matter most for this role.</p><button class="btn primary sm" type="button" data-act="addreq">+ Add skills</button></div>';
+    else h += '<div class="req">' + r.skills.map(function (rs, i) {
+      var k = skillById(rs.s);
+      return '<div class="rq"><div class="nm">' + esc(k ? k.s.name : 'Removed skill') + '<small>' + esc(k ? k.cat.name : '') + '</small></div>' +
+        '<div class="band" role="radiogroup" aria-label="Target for ' + esc(k ? k.s.name : '') + '">' + BANDS.map(function (b, j) {
+          return '<button type="button" role="radio" aria-checked="' + (rs.t === j + 1) + '" data-band="' + i + '" data-v="' + (j + 1) + '" class="' + (rs.t === j + 1 ? 'on' : (j + 1 < rs.t ? 'fill' : '')) + '" title="' + b + '">' + b + '</button>';
+        }).join('') + '</div><button class="ico dng" type="button" data-act="rmreq" data-i="' + i + '" aria-label="Remove ' + esc(k ? k.s.name : 'skill') + '" title="Remove">' + I.x + '</button></div>';
+    }).join('') + '</div>';
+    h += '<div class="band-key"><span>Target band, from Skills Analytics:</span>' + BANDS.map(function (b, i) { return '<span><b>' + (i + 1) + '</b> ' + b + '</span>'; }).join('') + '</div>';
+    h += '<p class="mini" style="margin-top:8px"><span class="oq">Open question</span> Bands or completion only for now? Depends on Skills Analytics scoring.</p></section>';
+
+    h += '<section class="card sec"><div class="sec-h"><div><h2>Learning paths</h2><p>Everyone in this role is enrolled in these, in this order.</p></div></div><div class="plist">';
+    var seq = f.concat(ps), n = 0;
+    seq.forEach(function (p, i) {
+      n++;
+      h += (i ? '<div class="pl-arrow">↓ Opens when the path above is complete</div>' : '') +
+        '<div class="pl"><span class="n">' + n + '</span><span class="t"><b>' + esc(p.name) + '</b><span>' + PATH_TYPES[p.type].label + ' path · ' + plural(p.stages.length, 'stage') + (p.type === 'foundation' ? ' · everyone' : '') + (p.active ? '' : ' · Draft') + '</span></span>' +
+        '<span class="chip t-' + p.type + '">' + PATH_TYPES[p.type].label + '</span><a class="btn sm" href="#path/' + p.id + '">Open</a></div>';
+    });
+    if (!ps.length) h += '<div class="pl" style="border-style:dashed"><span class="n" style="background:var(--line);color:var(--muted)">' + (n + 1) + '</span><span class="t"><b>No role path yet</b><span>Create one so people in this role get role-specific learning.</span></span><button class="btn primary sm" type="button" data-act="newrolepath">Create role path</button></div>';
+    h += '</div>';
+    if (g.length) h += '<p class="mini" style="margin-top:12px">Growth paths (' + esc(g.map(function (p) { return p.name; }).join(', ')) + ') are for nominated staff only, so they are not attached to roles.</p>';
+    h += '</section></div>';
+
+    var inRole = D.staff.filter(function (u) { return u.role === r.id; });
+    h += '<aside><div class="card side-card"><h3>People in this role</h3><p class="mini">' + plural(inRole.length, 'staff member') + ' · ' + esc((deptById(r.dept) || {}).name || '') + '</p><div class="avs">' +
+      inRole.slice(0, 8).map(function (u) { return '<a href="#person/' + u.id + '" title="' + esc(u.name) + '" style="text-decoration:none">' + avatar(u) + '</a>'; }).join('') + (inRole.length > 8 ? '<span class="av" style="background:var(--line);color:var(--muted)">+' + (inRole.length - 8) + '</span>' : '') +
+      '</div><a class="btn sm" href="#staff" data-a4role="' + r.id + '">Manage in Staff assignments</a></div>' +
+      '<div class="card side-card"><h3>Skills this role\'s paths cover</h3>' + coverage(r) + '</div>' +
+      '<div class="card side-card"><h3>Remove this role</h3><p class="mini" style="margin-bottom:10px">People keep their learning records. Their role paths stop.</p><button class="btn danger sm" type="button" data-act="delrole">Remove role</button></div></aside></div>';
+    return h;
+  }
+  // Which required skills the attached paths actually teach. Gaps show where content is missing.
+  function coverage(r) {
+    if (!r.skills.length) return '<p class="mini">Add required skills to see coverage.</p>';
+    var taught = {};
+    D.paths.filter(function (p) { return p.type === 'foundation' || (p.type === 'role' && p.roles.indexOf(r.id) !== -1); }).forEach(function (p) {
+      p.stages.forEach(function (st) {
+        var items = st.type === 'choose' ? poolItems(st) : st.items.map(function (it) { return contentById(it.c); }).filter(Boolean);
+        items.forEach(function (c) { contentSkills(c).forEach(function (s) { taught[s] = 1; }); });
+      });
+    });
+    var miss = r.skills.filter(function (rs) { var k = skillById(rs.s); return !k || !taught[k.s.id]; });
+    return '<p class="mini" style="margin-bottom:8px">' + (r.skills.length - miss.length) + ' of ' + r.skills.length + ' required skills are taught by its paths.</p>' +
+      (miss.length ? '<div class="skl">' + miss.map(function (rs) { return '<span class="chip warn" title="No content in this role\'s paths is tagged with this skill">' + esc(skillName(rs.s)) + '</span>'; }).join('') + '</div><p class="mini" style="margin-top:8px">Add content tagged with these skills to a path.</p>' : '<span class="chip ok">All covered</span>');
+  }
+
+  function openAddReq() {
+    var r = roleById(ROUTE.id), have = r.skills.map(function (x) { var k = skillById(x.s); return k ? k.s.id : x.s; });
+    var h = '<div class="dg-h"><div><h2 id="dlgTitle">Add skills to ' + esc(r.title) + '</h2><p>From your skills framework. New targets start at Competent; change them on the role.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">';
+    D.categories.forEach(function (cat) {
+      var list = cat.skills.filter(function (s) { return !s.archived; });
+      if (!list.length) return;
+      h += '<div class="grp-t">' + esc(cat.name) + '</div><div class="opt-list">' + list.map(function (s) {
+        var on = have.indexOf(s.id) !== -1;
+        return '<label class="opt"><input type="checkbox" data-reqpick="' + s.id + '"' + (on ? ' checked disabled' : '') + '><span class="t"><b>' + esc(s.name) + '</b>' + (on ? '<span>Already required</span>' : '') + '</span></label>';
+      }).join('') + '</div>';
+    });
+    h += '<p class="mini" style="margin-top:14px">Skill missing? <a href="#skills" data-close>Add it to the skills framework</a> first.</p></div>' +
+      '<div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-act="doaddreq">Add skills</button></div>';
+    $('#dlgBody').innerHTML = h; openDlg();
+  }
+
+  function openForm(kind, id) {
+    var h, d;
+    if (kind === 'dept') {
+      d = id ? deptById(id) : { name: '', head: '' };
+      h = '<div class="dg-h"><div><h2 id="dlgTitle">' + (id ? 'Edit department' : 'Add department') + '</h2><p>Departments are used for assignment and reporting. Department heads can see their team\'s progress.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">' +
+        '<div class="fld"><label class="lbl" for="fName">Name</label><input class="in" id="fName" value="' + esc(d.name) + '" placeholder="e.g. Admissions"></div>' +
+        '<div class="fld"><label class="lbl" for="fHead">Department head <span class="muted" style="font-weight:400">(optional)</span></label><input class="in" id="fHead" value="' + esc(d.head) + '" placeholder="Name"></div></div>' +
+        '<div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-save="dept" data-id="' + (id || '') + '">' + (id ? 'Save' : 'Add department') + '</button></div>';
+    } else if (kind === 'role') {
+      h = '<div class="dg-h"><div><h2 id="dlgTitle">Add role</h2><p>You add its skills and learning paths next.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">' +
+        '<div class="fld"><label class="lbl" for="fName">Role title</label><input class="in" id="fName" placeholder="e.g. Admissions Officer"></div>' +
+        '<div class="row2"><div class="fld"><label class="lbl" for="fDept">Department</label><select class="sel" id="fDept">' + D.departments.map(function (x) { return '<option value="' + x.id + '"' + (x.id === UI.dept ? ' selected' : '') + '>' + esc(x.name) + '</option>'; }).join('') + '</select></div>' +
+        '<div class="fld"><label class="lbl" for="fLevel">Level <span class="muted" style="font-weight:400">(optional)</span></label><select class="sel" id="fLevel">' + LEVELS.map(function (l) { return '<option value="' + l + '">' + (l || 'No level') + '</option>'; }).join('') + '</select></div></div></div>' +
+        '<div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-save="role">Create role</button></div>';
+    } else if (kind === 'cat') {
+      d = id ? D.categories.filter(function (c) { return c.id === id; })[0] : { name: '' };
+      h = '<div class="dg-h"><div><h2 id="dlgTitle">' + (id ? 'Rename category' : 'Add category') + '</h2><p>Learners see these categories, so use names they recognise.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">' +
+        '<div class="fld"><label class="lbl" for="fName">Category name</label><input class="in" id="fName" value="' + esc(d.name) + '" placeholder="e.g. Communication"></div></div>' +
+        '<div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-save="cat" data-id="' + (id || '') + '">' + (id ? 'Save' : 'Add category') + '</button></div>';
+    } else if (kind === 'skill') {
+      d = skillById(id).s;
+      h = '<div class="dg-h"><div><h2 id="dlgTitle">Rename skill</h2><p>Roles, paths and reports update everywhere. The old name stays as an alias.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">' +
+        '<div class="fld"><label class="lbl" for="fName">Skill name</label><input class="in" id="fName" value="' + esc(d.name) + '"></div></div>' +
+        '<div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-save="skill" data-id="' + id + '">Save</button></div>';
+    } else if (kind === 'path') {
+      var preset = id || '';
+      h = '<div class="dg-h"><div><h2 id="dlgTitle">New learning path</h2><p>A path is a sequence of stages. Learners only see the stage they are on.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">' +
+        '<div class="lbl">Type</div><div class="opt-list" style="margin-bottom:14px">' + Object.keys(PATH_TYPES).map(function (t, i) {
+          return '<label class="opt"><input type="radio" name="ptype" value="' + t + '"' + ((preset ? t === 'role' : i === 0) ? ' checked' : '') + '><span class="t"><b>' + PATH_TYPES[t].label + '</b><span>' + PATH_TYPES[t].who + ' ' + PATH_TYPES[t].eg + '.</span></span><span class="chip t-' + t + '">' + PATH_TYPES[t].label + '</span></label>';
+        }).join('') + '</div>' +
+        '<div class="fld"><label class="lbl" for="fName">Path name</label><input class="in" id="fName" placeholder="e.g. Admissions Officer path" value="' + (preset ? esc((roleById(preset) || {}).title + ' path') : '') + '"></div>' +
+        '<div class="fld" id="fRoleWrap"' + (preset ? '' : ' hidden') + '><label class="lbl" for="fRole">For role</label><select class="sel" id="fRole">' + D.roles.map(function (x) { return '<option value="' + x.id + '"' + (x.id === preset ? ' selected' : '') + '>' + esc(x.title) + '</option>'; }).join('') + '</select></div></div>' +
+        '<div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-save="path">Create path</button></div>';
+    }
+    $('#dlgBody').innerHTML = h; openDlg();
+    var f = $('#fName'); if (f) { f.focus(); f.select(); }
+  }
+
+  // ==========================================================================
+  // A3 Learning paths
+  // ==========================================================================
+  function viewPaths() {
+    var h = '<div class="ph"><div><h1>Learning paths</h1><p>Ordered stages across Courses, PALS, CBL and Assessments. Learners see only the stage they are on; the next opens when it is complete.</p></div>' +
+      '<div class="acts"><button class="btn primary" type="button" data-act="newpath">+ New path</button></div></div>';
+    if (!D.paths.length) return h + '<section class="card empty"><h2>No learning paths yet</h2><p>Most organisations start with one Foundation path for compliance, then one Role path per role.</p><button class="btn primary" type="button" data-act="newpath">+ New path</button></section>';
+    var f = D.paths.filter(function (p) { return p.type === 'foundation'; });
+    h += '<div class="card order"><b>Order for a new joiner:</b>' + (f.length ? f.map(function (p) { return '<span class="chip t-foundation">' + esc(p.name) + '</span>'; }).join('') : '<span class="chip warn">No Foundation path</span>') +
+      '<span class="arr">→</span><span class="chip t-role">Their role path</span><span class="arr">→</span><span class="chip t-growth">Growth, if nominated</span>' +
+      '<span class="mini" style="margin-left:auto">Groups still work alongside paths for one-off assignments.</span></div>';
+    Object.keys(PATH_TYPES).forEach(function (t) {
+      var list = D.paths.filter(function (p) { return p.type === t; });
+      h += '<section class="ptype"><div class="ptype-h"><h2>' + PATH_TYPES[t].label + ' paths</h2><p>' + PATH_TYPES[t].who + '</p></div><div class="pcards">';
+      list.forEach(function (p) {
+        var items = p.stages.reduce(function (n, st) { return n + (st.type === 'choose' ? (st.n || 0) : st.items.length); }, 0);
+        var mins = p.stages.reduce(function (n, st) { return n + stageMins(st); }, 0);
+        var who = t === 'foundation' ? 'Everyone' : (t === 'growth' ? enrolled(p) + ' nominated staff' : (p.roles.map(function (id) { return (roleById(id) || {}).title; }).filter(Boolean).join(', ') || 'No role attached'));
+        h += '<a class="card pc ' + t + '" href="#path/' + p.id + '"><div style="display:flex;justify-content:space-between;gap:10px"><h3>' + esc(p.name) + '</h3>' + (p.active ? '<span class="chip ok">Active</span>' : '<span class="chip">Draft</span>') + '</div>' +
+          '<span class="who">' + esc(who) + '</span><div class="stg" aria-hidden="true">' + p.stages.map(function (st) { return '<i class="' + (st.type === 'choose' ? 'ch' : '') + '"></i>'; }).join('') + '</div>' +
+          '<div class="ft"><span>' + plural(p.stages.length, 'stage') + ' · ' + plural(items, 'item') + ' · about ' + fmtMins(mins) + '</span><span>' + (p.active ? enrolled(p) + ' enrolled' : enrolled(p) + ' when active') + '</span></div></a>';
+      });
+      if (!list.length) h += '<button class="card pc ' + t + '" type="button" data-act="newpath" style="text-align:left;border-style:dashed"><h3>+ New ' + PATH_TYPES[t].label.toLowerCase() + ' path</h3><span class="who">' + PATH_TYPES[t].eg + '</span></button>';
+      h += '</div></section>';
+    });
+    return h;
+  }
+
+  function viewPath(id) {
+    var p = pathById(id);
+    if (!p) return '<a class="back" href="#paths">' + I.back + 'Learning paths</a><div class="card empty"><h2>This path no longer exists</h2></div>';
+    var h = '<a class="back" href="#paths">' + I.back + 'Learning paths</a>';
+    h += '<div class="ph" style="align-items:center"><div style="flex:1;min-width:260px"><div style="display:flex;gap:8px;align-items:center;margin-bottom:4px"><span class="chip t-' + p.type + '">' + PATH_TYPES[p.type].label + ' path</span></div>' +
+      '<label class="sr" for="pathName">Path name</label><input class="title-in" id="pathName" data-pf="name" value="' + esc(p.name) + '"></div>' +
+      '<div class="acts" style="align-items:center"><span class="status"><button class="switch" type="button" role="switch" aria-checked="' + !!p.active + '" data-act="toggleactive" aria-label="Active"></button>' + (p.active ? 'Active' : 'Draft') + '</span>' +
+      '<button class="btn" type="button" data-act="preview">' + I.eye + 'Preview as learner</button></div></div>';
+    h += '<div class="pb"><div>';
+    p.stages.forEach(function (st, i) {
+      if (i) h += '<div class="unlock">' + I.lock + 'Stage ' + (i + 1) + ' opens when stage ' + i + ' is complete</div>';
+      h += stageCard(p, st, i);
+    });
+    if (!p.stages.length) h += '<div class="card empty" style="padding:28px"><p>Add the first stage. A stage is a step learners finish before the next one opens.</p></div>';
+    h += '<button class="addstage" type="button" data-act="addstage">+ Add stage</button></div>';
+    h += '<aside>' + pathSide(p) + '</aside></div>';
+    return h;
+  }
+
+  function stageCard(p, st, i) {
+    var h = '<section class="card stage" aria-label="Stage ' + (i + 1) + '"><div class="stage-h"><span class="no">' + (i + 1) + '</span>' +
+      '<label class="sr" for="sn-' + st.id + '">Stage name</label><input class="nm" id="sn-' + st.id + '" data-sf="name" data-st="' + st.id + '" value="' + esc(st.name) + '" placeholder="Stage name">' +
+      '<div class="stype" role="group" aria-label="Stage type"><button type="button" data-stype="required" data-st="' + st.id + '" aria-pressed="' + (st.type === 'required') + '" title="Learners complete every item">Required</button><button type="button" data-stype="choose" data-st="' + st.id + '" aria-pressed="' + (st.type === 'choose') + '" title="Learners pick items from a pool">Choose-from</button></div>' +
+      '<span style="display:flex"><button class="ico" type="button" data-act="stageup" data-st="' + st.id + '" aria-label="Move stage up"' + (i ? '' : ' disabled') + '>' + I.up + '</button><button class="ico" type="button" data-act="stagedown" data-st="' + st.id + '" aria-label="Move stage down"' + (i < p.stages.length - 1 ? '' : ' disabled') + '>' + I.down + '</button><button class="ico dng" type="button" data-act="delstage" data-st="' + st.id + '" aria-label="Remove stage ' + (i + 1) + '">' + I.del + '</button></span></div><div class="stage-b">';
+    if (st.type === 'required') {
+      if (!st.items.length) h += '<p class="mini" style="padding:10px 0">No content yet. Learners finish every item in this stage.</p>';
+      st.items.forEach(function (it, j) { h += itemRow(p, st, it, j); });
+      h += '</div><div class="stage-f"><button class="btn sm" type="button" data-act="additems" data-st="' + st.id + '">+ Add content</button><span class="mini" style="align-self:center">Learners complete all ' + plural(st.items.length, 'item') + '. About ' + fmtMins(stageMins(st)) + '.</span></div>';
+    } else {
+      var pool = poolItems(st);
+      h += '<div class="choose"><div class="rule"><label for="n-' + st.id + '">Learners complete</label><input class="in sm" type="number" min="1" max="' + Math.max(1, pool.length) + '" id="n-' + st.id + '" data-sf="n" data-st="' + st.id + '" value="' + (st.n || 1) + '"><span>of ' + plural(pool.length, 'item') + ' in the pool</span></div>' +
+        '<div class="modes" role="radiogroup" aria-label="Pool for stage ' + (i + 1) + '">' +
+        '<label class="mode"><input type="radio" name="pm-' + st.id + '" value="category" data-pmode="' + st.id + '"' + (st.pool.mode === 'category' ? ' checked' : '') + '><span><b>Everything tagged with a category</b><span>New content tagged later joins the pool automatically.</span>' +
+        (st.pool.mode === 'category' ? '<select class="sel sm" style="margin-top:8px;max-width:280px" data-pcat="' + st.id + '" aria-label="Category">' + D.categories.map(function (c) { return '<option value="' + c.id + '"' + (c.id === st.pool.cat ? ' selected' : '') + '>' + esc(c.name) + ' (' + catContent(c.id).length + ')</option>'; }).join('') + '</select>' : '') + '</span></label>' +
+        '<label class="mode"><input type="radio" name="pm-' + st.id + '" value="list" data-pmode="' + st.id + '"' + (st.pool.mode === 'list' ? ' checked' : '') + '><span><b>A list you pick</b><span>Only the items you choose.</span></span></label></div>';
+      if (pool.length) h += '<div><div class="lbl">In the pool</div><div class="pool">' + pool.map(function (c) { return '<span class="chip" title="' + c.kind + ' · ' + c.mins + ' min">' + esc(c.title) + (st.pool.mode === 'list' ? ' <button class="ico" style="width:18px;height:18px" type="button" data-act="rmpool" data-st="' + st.id + '" data-c="' + c.id + '" aria-label="Remove ' + esc(c.title) + '">×</button>' : '') + '</span>'; }).join('') + '</div></div>';
+      else h += '<p class="mini">The pool is empty. ' + (st.pool.mode === 'category' ? 'No content is tagged with this category yet.' : 'Add items to the list.') + '</p>';
+      h += '<p class="mini"><span class="oq">Open question</span> Count items (as shown) or "cover these skills"? To decide in scoping.</p></div></div>';
+      h += '<div class="stage-f">' + (st.pool.mode === 'list' ? '<button class="btn sm" type="button" data-act="additems" data-st="' + st.id + '">+ Add to pool</button>' : '') + '<span class="mini" style="align-self:center">About ' + fmtMins(stageMins(st)) + ' for a learner.</span></div>';
+    }
+    return h + '</section>';
+  }
+  function itemRow(p, st, it, j) {
+    var c = contentById(it.c); if (!c) return '';
+    return '<div class="it"><span class="kind k-' + c.kind + '">' + c.kind + '</span><div class="t"><b>' + esc(c.title) + '</b><span>' + c.mins + ' min · ' + esc(contentSkills(c).map(skillName).join(', ') || 'No skills tagged') + '</span></div>' +
+      '<label class="ren">' + '<span class="sr">Renewal for ' + esc(c.title) + '</span><select data-renew="' + j + '" data-st="' + st.id + '" title="Compliance renewal: the item comes back to the learner\'s path when it expires">' + RENEW.map(function (r) { return '<option value="' + r[0] + '"' + (r[0] === (it.renew || '') ? ' selected' : '') + '>' + r[1] + '</option>'; }).join('') + '</select></label>' +
+      '<span class="acts"><button class="ico" type="button" data-act="itemup" data-st="' + st.id + '" data-j="' + j + '" aria-label="Move up"' + (j ? '' : ' disabled') + '>' + I.up + '</button><button class="ico" type="button" data-act="itemdown" data-st="' + st.id + '" data-j="' + j + '" aria-label="Move down"' + (j < st.items.length - 1 ? '' : ' disabled') + '>' + I.down + '</button><button class="ico dng" type="button" data-act="rmitem" data-st="' + st.id + '" data-j="' + j + '" aria-label="Remove ' + esc(c.title) + '">' + I.x + '</button></span></div>';
+  }
+  function pathSide(p) {
+    var h = '<div class="card side-card"><h3>Who gets this path</h3>';
+    if (p.type === 'foundation') h += '<p class="mini">Everyone in the organisation, and new staff as soon as they join. ' + enrolled(p) + ' enrolled.</p>';
+    else if (p.type === 'growth') h += '<p class="mini">Staff HR nominates. Managers can recommend people.</p><p style="margin:8px 0"><b>' + enrolled(p) + '</b> nominated</p><a class="btn sm" href="#staff">Nominate in Staff assignments</a>';
+    else h += '<p class="mini" style="margin-bottom:8px">Everyone in these roles, now and when they join the role.</p><div class="opt-list">' + D.roles.map(function (r) {
+      return '<label class="opt" style="padding:8px 10px"><input type="checkbox" data-prole="' + r.id + '"' + (p.roles.indexOf(r.id) !== -1 ? ' checked' : '') + '><span class="t"><b>' + esc(r.title) + '</b><span>' + esc((deptById(r.dept) || {}).name || '') + ' · ' + staffCount(r.id) + ' staff</span></span></label>';
+    }).join('') + '</div>';
+    h += '</div>';
+    if (p.type !== 'foundation') {
+      var f = D.paths.filter(function (x) { return x.type === 'foundation'; });
+      h += '<div class="card side-card"><h3>When it opens</h3><label class="sr" for="pAfter">Opens after</label><select class="sel sm" id="pAfter" data-pf="after"><option value="">Straight away</option>' +
+        f.map(function (x) { return '<option value="' + x.id + '"' + (p.after === x.id ? ' selected' : '') + '>After ' + esc(x.name) + '</option>'; }).join('') +
+        (p.type === 'growth' ? '<option value="role"' + (p.after === 'role' ? ' selected' : '') + '>After the person\'s role path</option>' : '') + '</select>' +
+        '<p class="mini" style="margin-top:6px">Unlocks automatically when the earlier path is complete.</p></div>';
+    }
+    var items = 0, mins = 0, skills = {};
+    p.stages.forEach(function (st) {
+      items += st.type === 'choose' ? (st.n || 0) : st.items.length; mins += stageMins(st);
+      (st.type === 'choose' ? poolItems(st) : st.items.map(function (it) { return contentById(it.c); }).filter(Boolean)).forEach(function (c) { contentSkills(c).forEach(function (s) { skills[s] = 1; }); });
+    });
+    var renew = p.stages.reduce(function (n, st) { return n + st.items.filter(function (it) { return it.renew; }).length; }, 0);
+    h += '<div class="card side-card sum"><h3>Summary</h3><dl><dt>Stages</dt><dd>' + p.stages.length + '</dd><dt>Items a learner completes</dt><dd>' + items + '</dd><dt>Time for a learner</dt><dd>about ' + fmtMins(mins) + '</dd><dt>Items that renew</dt><dd>' + renew + '</dd><dt>Enrolled</dt><dd>' + enrolled(p) + '</dd></dl>' +
+      '<div class="lbl" style="margin-top:12px">Skills it builds</div><div class="skl">' + (Object.keys(skills).length ? Object.keys(skills).map(function (s) { return '<span class="chip info">' + esc(skillName(s)) + '</span>'; }).join('') : '<span class="mini">None yet</span>') + '</div></div>';
+    h += '<div class="card side-card"><h3>Remove this path</h3><p class="mini" style="margin-bottom:10px">Learners keep what they completed. Nobody new is enrolled.</p><button class="btn danger sm" type="button" data-act="delpath">Remove path</button></div>';
+    return h;
+  }
+
+  // ---------- Content picker: one list across Courses, PALS, CBL, Assessments ----------
+  var PICK = { st: '', picks: {} };
+  function openPicker(stId) { PICK = { st: stId, picks: {} }; UI.ptab = 'All'; UI.pq = ''; UI.pskill = ''; renderPicker(); openDlg(true); }
+  function renderPicker() {
+    var p = pathById(ROUTE.id), st = p.stages.filter(function (s) { return s.id === PICK.st; })[0];
+    var have = st.type === 'choose' ? st.pool.list : st.items.map(function (it) { return it.c; });
+    var q = UI.pq.trim().toLowerCase();
+    var list = CONTENT.filter(function (c) { return (UI.ptab === 'All' || c.kind === UI.ptab) && (!q || c.title.toLowerCase().indexOf(q) !== -1) && (!UI.pskill || contentSkills(c).indexOf(UI.pskill) !== -1); });
+    var n = Object.keys(PICK.picks).filter(function (k) { return PICK.picks[k]; }).length;
+    var h = '<div class="dg-h"><div><h2 id="dlgTitle">Add content to "' + esc(st.name || 'stage') + '"</h2><p>One list across Courses, PALS, CBL and Assessments.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">' +
+      '<div class="ptabs" role="group" aria-label="Content type">' + ['All'].concat(KINDS).map(function (k) { return '<button type="button" data-ptab="' + k + '" aria-pressed="' + (UI.ptab === k) + '">' + (k === 'All' ? 'All' : k + (k === 'Assessment' ? 's' : (k === 'Course' ? 's' : ''))) + '</button>'; }).join('') + '</div>' +
+      '<div class="row2" style="margin-bottom:10px"><div><label class="sr" for="pq">Search content</label><input class="in sm" id="pq" type="search" placeholder="Search" value="' + esc(UI.pq) + '"></div><div><label class="sr" for="pskill">Filter by skill</label><select class="sel sm" id="pskill"><option value="">Any skill</option>' +
+      allSkills(false).map(function (x) { return '<option value="' + x.s.id + '"' + (UI.pskill === x.s.id ? ' selected' : '') + '>' + esc(x.s.name) + '</option>'; }).join('') + '</select></div></div><div class="opt-list">' +
+      (list.length ? list.map(function (c) {
+        var on = have.indexOf(c.id) !== -1;
+        return '<label class="opt"><input type="checkbox" data-cpick="' + c.id + '"' + (on ? ' checked disabled' : (PICK.picks[c.id] ? ' checked' : '')) + '><span class="kind k-' + c.kind + '" style="width:92px">' + c.kind + '</span><span class="t"><b>' + esc(c.title) + '</b><span>' + c.mins + ' min · ' + esc(contentSkills(c).map(skillName).join(', ') || 'No skills tagged') + (on ? ' · already in this stage' : '') + '</span></span></label>';
+      }).join('') : '<p class="mini" style="padding:16px 0">Nothing matches. Try another type, word or skill.</p>') + '</div></div>' +
+      '<div class="dg-f"><span class="l">' + plural(n, 'item') + ' selected</span><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-act="doadditems"' + (n ? '' : ' disabled') + '>Add ' + plural(n, 'item') + '</button></div>';
+    $('#dlgBody').innerHTML = h;
+  }
+
+  // ---------- Preview as learner ----------
+  function openPreview() {
+    var p = pathById(ROUTE.id);
+    var h = '<div class="dg-h"><div><h2 id="dlgTitle">Preview as learner</h2><p>What someone on this path sees on My Career, before they start.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b"><div class="lp">' +
+      '<div class="lp-h"><small>' + PATH_TYPES[p.type].label + ' path</small><b>' + esc(p.name) + '</b></div>';
+    p.stages.forEach(function (st, i) {
+      if (i === 0) {
+        h += '<div class="lps"><h4><span>Stage 1 · ' + esc(st.name) + '</span><span style="font-weight:500;font-size:12.5px">In progress</span></h4>';
+        if (st.type === 'choose') { var pool = poolItems(st); h += '<p style="font-size:13px">Pick ' + (st.n || 1) + ' of ' + pool.length + '. Choose what fits you best.</p><ul style="display:grid;gap:6px">' + pool.slice(0, 5).map(function (c) { return '<li><i></i>' + esc(c.title) + ' <span class="kind k-' + c.kind + '" style="margin-left:auto">' + c.kind + '</span></li>'; }).join('') + (pool.length > 5 ? '<li style="color:var(--muted)">+ ' + (pool.length - 5) + ' more</li>' : '') + '</ul>'; }
+        else h += '<ul style="display:grid;gap:6px">' + st.items.map(function (it) { var c = contentById(it.c); return c ? '<li><i></i>' + esc(c.title) + ' <span class="kind k-' + c.kind + '" style="margin-left:auto">' + c.kind + '</span></li>' : ''; }).join('') + '</ul>';
+        h += '</div>';
+      } else h += '<div class="lps lock"><h4 style="color:var(--muted)"><span>' + I.lock + ' Stage ' + (i + 1) + ' · ' + esc(st.name) + '</span></h4><p style="font-size:13px">Opens when stage ' + i + ' is complete.</p></div>';
+    });
+    if (!p.stages.length) h += '<p class="mini">This path has no stages yet.</p>';
+    h += '</div><p class="mini" style="margin-top:10px">The full learner experience is designed in L1 My Career.</p></div><div class="dg-f"><button class="btn primary" type="button" data-close>Close</button></div>';
+    $('#dlgBody').innerHTML = h; openDlg(true);
+  }
+
+  // ==========================================================================
+  // Progress model (sample). Real progress comes from completion events; here each person's
+  // place in a path is derived from their sample profile so the reports have something to show.
+  // ==========================================================================
+  function staffCount(roleId) { return D.staff.filter(function (u) { return u.role === roleId; }).length; }
+  function personById(id) { for (var i = 0; i < D.staff.length; i++) if (D.staff[i].id === id) return D.staff[i]; return null; }
+  function personPaths(u) {
+    if (!u.role) return [];
+    return D.paths.filter(function (p) { return p.active && (p.type === 'foundation' || (p.type === 'role' && (p.roles.indexOf(u.role) !== -1 || (u.kept || []).indexOf(p.id) !== -1)) || (p.type === 'growth' && u.nominated)); });
+  }
+  function foundationDone(u) { return u.joined >= 14; }
+  // { state: done | progress | overdue | locked, stage: index of the active stage, of: stage count }
+  function pstate(u, p) {
+    var n = p.stages.length;
+    if (!n) return { state: 'locked', stage: 0, of: 0 };
+    if (p.type === 'foundation') return foundationDone(u) ? { state: 'done', stage: n, of: n } : { state: 'progress', stage: u.joined < 5 ? 0 : Math.min(1, n - 1), of: n };
+    if (!foundationDone(u)) return { state: 'locked', stage: 0, of: n };
+    var roleIdx = u.joined > 700 ? n : (u.seed * 7 + 1) % (n + 1);
+    if (p.type === 'role') return roleIdx >= n ? { state: 'done', stage: n, of: n } : { state: u.seed % 4 === 1 ? 'overdue' : 'progress', stage: roleIdx, of: n };
+    var rp = D.paths.filter(function (x) { return x.active && x.type === 'role' && x.roles.indexOf(u.role) !== -1; })[0];
+    if (rp && pstate(u, rp).state !== 'done') return { state: 'locked', stage: 0, of: n };
+    return { state: 'progress', stage: u.seed % n, of: n };
+  }
+  // Compliance items (renewing items in Foundation paths) and when each expires for this person
+  function renewItems() {
+    var out = [];
+    D.paths.filter(function (p) { return p.active && p.type === 'foundation'; }).forEach(function (p) { p.stages.forEach(function (st) { (st.items || []).forEach(function (it) { if (it.renew && contentById(it.c)) out.push({ c: contentById(it.c), years: +it.renew }); }); }); });
+    return out;
+  }
+  function compliance(u) {
+    if (!u.role || !foundationDone(u)) return [];
+    return renewItems().map(function (r, j) { return { c: r.c, days: ((u.seed * 53 + j * 97 + 400) % 700) - 40 }; });
+  }
+  function dueLabel(days) { return days < 0 ? 'Expired ' + (-days) + ' days ago' : 'Due in ' + plural(days, 'day'); }
+  var STATE_LABEL = { done: 'Complete', progress: 'In progress', overdue: 'Overdue', locked: 'Not open yet' };
+  function stateChip(u, p) {
+    var s = pstate(u, p), short = PATH_TYPES[p.type].label;
+    if (s.state === 'done') return '<span class="chip ok" title="' + esc(p.name) + ': complete">' + short + ' ✓</span>';
+    if (s.state === 'locked') return '<span class="chip" title="' + esc(p.name) + ': opens later">' + short + ' · later</span>';
+    return '<span class="chip ' + (s.state === 'overdue' ? 'bad' : 'info') + '" title="' + esc(p.name) + ': stage ' + (s.stage + 1) + ' of ' + s.of + (s.state === 'overdue' ? ', overdue' : '') + '">' + short + ' ' + (s.stage + 1) + '/' + s.of + (s.state === 'overdue' ? ' · overdue' : '') + '</span>';
+  }
+  function avatar(u, size) { return '<span class="av" style="background:' + AVC[(u.seed || 0) % AVC.length] + (size ? ';width:' + size + 'px;height:' + size + 'px;font-size:' + Math.round(size * .4) + 'px' : '') + '" aria-hidden="true">' + esc(u.name.charAt(0)) + '</span>'; }
+  function joinedLabel(d) { return d < 30 ? 'Joined ' + plural(d, 'day') + ' ago' : (d < 365 ? 'Joined ' + Math.round(d / 30) + ' months ago' : 'Joined ' + (d / 365).toFixed(1).replace('.0', '') + ' years ago'); }
+
+  // ==========================================================================
+  // A4 Staff assignments
+  // ==========================================================================
+  var SF = { q: '', dept: '', role: '', nom: false, sel: {} };
+  function viewStaff() {
+    var un = D.staff.filter(function (u) { return !u.role; });
+    var h = '<div class="ph"><div><h1>Staff assignments</h1><p>Put each person in a department and role, and ATLAS enrols them in the role\'s paths. Groups still work for one-off assignments.</p></div>' +
+      '<div class="acts"><button class="btn" type="button" data-a4="bulk">Bulk upload</button></div></div>';
+    if (!D.roles.length) return h + '<section class="card empty"><h2>Create roles first</h2><p>People are assigned to roles, and roles decide their paths. Set up departments and roles, then come back here.</p><a class="btn primary" href="#roles">Go to Departments &amp; roles</a></section>';
+    if (un.length) h += '<div class="note"><span><b>' + nPeople(un.length) + ' without a role.</b> They are not enrolled in any path yet: ' + esc(un.map(function (u) { return u.name; }).join(', ')) + '.</span><button class="btn sm x" type="button" data-a4="onlyun">Show them</button></div>';
+    h += '<div class="fw-tools"><label class="sr" for="sfq">Search staff</label><input class="in sm" id="sfq" type="search" placeholder="Search staff" value="' + esc(SF.q) + '" style="max-width:240px">' +
+      '<label class="sr" for="sfd">Department</label><select class="sel sm" id="sfd" style="width:auto"><option value="">All departments</option>' + D.departments.map(function (d) { return '<option value="' + d.id + '"' + (SF.dept === d.id ? ' selected' : '') + '>' + esc(d.name) + '</option>'; }).join('') + '<option value="none"' + (SF.dept === 'none' ? ' selected' : '') + '>No department</option></select>' +
+      '<label class="sr" for="sfr">Role</label><select class="sel sm" id="sfr" style="width:auto"><option value="">All roles</option>' + D.roles.map(function (r) { return '<option value="' + r.id + '"' + (SF.role === r.id ? ' selected' : '') + '>' + esc(r.title) + '</option>'; }).join('') + '</select>' +
+      '<label class="mini" style="display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="sfn"' + (SF.nom ? ' checked' : '') + '> Nominated for Growth only</label></div>';
+    var q = SF.q.trim().toLowerCase();
+    var list = D.staff.filter(function (u) {
+      return (!q || u.name.toLowerCase().indexOf(q) !== -1) && (!SF.dept || (SF.dept === 'none' ? !u.dept : u.dept === SF.dept)) && (!SF.role || u.role === SF.role) && (!SF.nom || u.nominated);
+    });
+    var selN = Object.keys(SF.sel).filter(function (k) { return SF.sel[k]; }).length;
+    h += '<section class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th scope="col" style="width:36px"><span class="sr">Select</span></th><th scope="col">Person</th><th scope="col">Department · role</th><th scope="col">Learning plan</th><th scope="col">Growth</th><th scope="col"><span class="sr">Open</span></th></tr></thead><tbody>';
+    h += list.length ? list.map(function (u) {
+      var r = roleById(u.role), d = deptById(u.dept), ps = personPaths(u);
+      return '<tr><td><input type="checkbox" data-a4sel="' + u.id + '"' + (SF.sel[u.id] ? ' checked' : '') + ' aria-label="Select ' + esc(u.name) + '"></td>' +
+        '<td><div class="who">' + avatar(u) + '<div><b>' + esc(u.name) + '</b><span class="sub">' + joinedLabel(u.joined) + '</span></div></div></td>' +
+        '<td>' + (r ? esc(d ? d.name : '') + '<span class="sub">' + esc(r.title) + '</span>' : '<span class="chip warn">No role yet</span>') + '</td>' +
+        '<td><div class="skl">' + (ps.length ? ps.map(function (p) { return stateChip(u, p); }).join('') : '<span class="mini">Not enrolled</span>') + (u.groups.length ? '<span class="chip" title="From Groups">+ ' + plural(u.groups.length, 'group') + '</span>' : '') + '</div></td>' +
+        '<td>' + (u.nominated ? '<span class="chip t-growth">Nominated</span>' : (u.role ? '<button class="btn link sm" type="button" data-a4="nominate" data-id="' + u.id + '">Nominate</button>' : '')) + '</td>' +
+        '<td><a class="btn sm" href="#person/' + u.id + '">' + (u.role ? 'Open' : 'Assign') + '</a></td></tr>';
+    }).join('') : '<tr><td colspan="6" class="mini" style="text-align:center;padding:28px">No staff match these filters.</td></tr>';
+    h += '</tbody></table></div></section>';
+    if (selN) h += '<div class="selbar" role="region" aria-label="Selected staff"><b>' + nPeople(selN) + ' selected</b><span style="margin-left:auto"></span><button class="btn ghost sm" type="button" data-a4="clearsel">Clear</button><button class="btn sm" type="button" data-a4="bulkrole">Change role</button><button class="btn sm" type="button" data-a4="bulknom">Nominate for Growth</button></div>';
+    return h;
+  }
+
+  function viewPerson(id) {
+    var u = personById(id);
+    if (!u) return '<a class="back" href="#staff">' + I.back + 'Staff assignments</a><div class="card empty"><h2>This person is not in the list</h2></div>';
+    var r = roleById(u.role), ps = personPaths(u);
+    var h = '<a class="back" href="#staff">' + I.back + 'Staff assignments</a><div class="rd"><div>';
+    h += '<section class="card sec"><div class="who" style="margin-bottom:14px">' + avatar(u, 46) + '<div><h1 style="font-size:22px">' + esc(u.name) + '</h1><span class="mini">' + joinedLabel(u.joined) + '</span></div></div>' +
+      '<div class="row2"><div class="fld"><label class="lbl" for="pDept">Department</label><select class="sel" id="pDept" data-a4f="dept"><option value="">No department</option>' + D.departments.map(function (d) { return '<option value="' + d.id + '"' + (u.dept === d.id ? ' selected' : '') + '>' + esc(d.name) + '</option>'; }).join('') + '</select></div>' +
+      '<div class="fld"><label class="lbl" for="pRole">Role</label><select class="sel" id="pRole" data-a4f="role"><option value="">No role</option>' + D.roles.map(function (x) { return '<option value="' + x.id + '"' + (u.role === x.id ? ' selected' : '') + '>' + esc(x.title) + '</option>'; }).join('') + '</select><span class="hint">Changing the role shows what happens before anything changes.</span></div></div>' +
+      '<div class="pl" style="margin-top:4px"><span class="t"><b>Growth path</b><span>' + (u.nominated ? 'Nominated. Opens after their role path.' : 'For staff HR nominates, such as high-potential staff. Managers can recommend people.') + '</span></span>' +
+      (u.role ? '<button class="btn sm" type="button" data-a4="togglenom" data-id="' + u.id + '">' + (u.nominated ? 'Remove nomination' : 'Nominate') + '</button>' : '') + '</div></section>';
+
+    h += '<section class="card sec"><div class="sec-h"><div><h2>Everything assigned to ' + esc(u.name.split(' ')[0]) + '</h2><p>Career paths and groups in one view. The source shows why each one is there.</p></div></div>';
+    if (!ps.length && !u.groups.length) h += '<p class="mini">Nothing yet. Choose a role to enrol them in its paths.</p>';
+    else h += '<div class="tbl-wrap"><table class="tbl"><thead><tr><th scope="col">Assignment</th><th scope="col">Source</th><th scope="col">Status</th></tr></thead><tbody>' +
+      ps.map(function (p) {
+        var s = pstate(u, p), src = p.type === 'foundation' ? 'Everyone' : (p.type === 'role' ? (p.roles.indexOf(u.role) === -1 ? 'Kept from previous role' : 'Role: ' + (r ? r.title : '')) : 'Nominated by HR');
+        var st = s.state === 'done' ? '<span class="chip ok">Complete</span>' : (s.state === 'locked' ? '<span class="chip">Opens after the path before it</span>' : '<span class="chip ' + (s.state === 'overdue' ? 'bad' : 'info') + '">Stage ' + (s.stage + 1) + ' of ' + s.of + (s.state === 'overdue' ? ' · overdue' : '') + '</span><span class="sub">' + esc((p.stages[s.stage] || {}).name || '') + '</span>');
+        return '<tr><td><b>' + esc(p.name) + '</b><span class="sub">' + PATH_TYPES[p.type].label + ' path</span></td><td><span class="chip t-' + p.type + '">' + esc(src) + '</span></td><td>' + st + '</td></tr>';
+      }).join('') +
+      u.groups.map(function (g) { return '<tr><td><b>Open Day 2027 briefing</b><span class="sub">Course</span></td><td><span class="chip">Group: ' + esc(g) + '</span></td><td><span class="chip info">Not started</span><span class="sub">Due 12 Dec</span></td></tr>'; }).join('') +
+      '</tbody></table></div>';
+    h += '</section></div>';
+
+    var comp = compliance(u).sort(function (a, b) { return a.days - b.days; });
+    h += '<aside><div class="card side-card"><h3>Compliance</h3>' + (comp.length ? comp.map(function (x) {
+      return '<div class="ln2"><b>' + esc(x.c.title) + '</b><span class="chip ' + (x.days < 0 ? 'bad' : (x.days <= 90 ? 'warn' : 'ok')) + '">' + (x.days < 0 ? 'Expired · re-enrolled' : (x.days <= 90 ? dueLabel(x.days) : 'Valid')) + '</span></div>';
+    }).join('') : '<p class="mini">' + (u.role ? 'Compliance is still in progress.' : 'Not enrolled yet.') + '</p>') + '</div>' +
+      '<div class="card side-card"><h3>Their view</h3><p class="mini" style="margin-bottom:10px">See My Career the way ' + esc(u.name.split(' ')[0]) + ' sees it.</p>' +
+      (u.id === 'u1' ? '<a class="btn sm" href="atlas-career-learner-prototype.html#path" target="_blank" rel="noopener">View as learner ↗</a>' : '<button class="btn sm" type="button" data-toast="In this prototype only Ayu Pratiwi has a learner view">View as learner</button>') + '</div></aside></div>';
+    return h;
+  }
+
+  // Changing a role: show what happens first
+  var RC = { ids: [], to: '', keep: 'keep' };
+  function openRoleChange(ids, to) {
+    RC = { ids: ids, to: to, keep: 'keep' };
+    var people = ids.map(personById), toRole = roleById(to);
+    var fromRoles = {}; people.forEach(function (u) { if (u.role && u.role !== to) fromRoles[u.role] = 1; });
+    var oldPaths = D.paths.filter(function (p) { return p.type === 'role' && p.roles.some(function (r) { return fromRoles[r]; }); });
+    var newPaths = to ? D.paths.filter(function (p) { return p.active && p.type === 'role' && p.roles.indexOf(to) !== -1; }) : [];
+    var h = '<div class="dg-h"><div><h2 id="dlgTitle">' + (people.length === 1 ? 'Change ' + esc(people[0].name) + '\'s role' : 'Change role for ' + nPeople(people.length)) + '</h2><p>' + (toRole ? 'New role: <b>' + esc(toRole.title) + '</b>' : 'Remove the role') + '</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b"><ul class="impact">' +
+      '<li>Their learning record, completed items and skill progress stay.</li>' +
+      '<li>Foundation paths carry on as before.</li>' +
+      (newPaths.length ? '<li>They are enrolled in ' + esc(newPaths.map(function (p) { return p.name; }).join(', ')) + '. It opens straight away if their Foundation path is done.</li>' : (toRole ? '<li>' + esc(toRole.title) + ' has no active role path yet, so nothing new is added.</li>' : '')) + '</ul>';
+    if (oldPaths.length) h += '<div class="lbl" style="margin-top:14px">Their current role path (' + esc(oldPaths.map(function (p) { return p.name; }).join(', ')) + ')</div><div class="opt-list">' +
+      '<label class="opt"><input type="radio" name="rckeep" value="keep" checked><span class="t"><b>Keep it open so they can finish</b><span>It stays on their plan next to the new role path.</span></span></label>' +
+      '<label class="opt"><input type="radio" name="rckeep" value="archive"><span class="t"><b>Archive it</b><span>It leaves their plan. What they completed stays in the record.</span></span></label></div>' +
+      '<p class="mini" style="margin-top:8px"><span class="oq">Open question</span> What should be the default when a role changes? To decide in scoping.</p>';
+    h += '</div><div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-a4="dorole">Change role</button></div>';
+    $('#dlgBody').innerHTML = h; openDlg();
+  }
+
+  // Bulk upload: template, preview with problems to fix, then import
+  var BU = { step: 1, rows: [] };
+  function sampleUpload() {
+    return [
+      { name: 'Sari Wulandari', dept: 'Admissions', role: 'Admissions Officer' },
+      { name: 'Ahmad Fauzi', dept: 'Administration', role: 'Administration Executive' },
+      { name: 'Lestari Ningsih', dept: 'HR', role: 'HR Executive' },
+      { name: 'Joko Susilo', dept: 'Admissions', role: 'Admission Officer' },
+      { name: 'Ratna Sari', dept: '', role: 'Administration Executive' }
+    ].map(function (x) {
+      var d = D.departments.filter(function (y) { return y.name.toLowerCase() === x.dept.toLowerCase(); })[0];
+      var r = D.roles.filter(function (y) { return y.title.toLowerCase() === x.role.toLowerCase(); })[0];
+      var guess = r ? null : D.roles.filter(function (y) { return y.title.toLowerCase().replace(/s\b/g, '') === x.role.toLowerCase().replace(/s\b/g, ''); })[0];
+      return { name: x.name, deptIn: x.dept, roleIn: x.role, dept: d ? d.id : '', role: r ? r.id : '', guess: guess ? guess.id : '' };
+    });
+  }
+  function openBulk() { BU = { step: 1, rows: [] }; renderBulk(); openDlg(true); }
+  function renderBulk() {
+    var h = '<div class="dg-h"><div><h2 id="dlgTitle">Bulk upload staff</h2><p>One row per person: name, email, department and role. ATLAS enrols everyone in their paths when you import.</p>' +
+      '<div class="steps"><span class="' + (BU.step === 1 ? 'on' : '') + '">1. File</span><span>›</span><span class="' + (BU.step === 2 ? 'on' : '') + '">2. Check and fix</span></div></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">';
+    if (BU.step === 1) {
+      h += '<div class="drop"><b>Drop a CSV or Excel file here</b><span class="mini">or</span><button class="btn sm" type="button" data-a4="usesample">Use a sample file (5 people)</button></div>' +
+        '<p class="mini" style="margin-top:10px">Need the columns? <button class="btn link sm" type="button" data-a4="template">Download the template</button> Department and role names must match the ones in Career Planner.</p></div>' +
+        '<div class="dg-f"><button class="btn" type="button" data-close>Cancel</button></div>';
+    } else {
+      var bad = BU.rows.filter(function (r) { return !r.dept || !r.role; }).length;
+      h += '<div class="stats" style="margin-bottom:10px"><span><b>' + (BU.rows.length - bad) + '</b> ready</span>' + (bad ? '<span style="color:var(--red)"><b style="color:var(--red)">' + bad + '</b> need a fix</span>' : '') + '</div>' +
+        '<div class="tbl-wrap"><table class="tbl"><thead><tr><th scope="col">Name</th><th scope="col">Department</th><th scope="col">Role</th><th scope="col">Check</th></tr></thead><tbody>' +
+        BU.rows.map(function (r, i) {
+          var ok = r.dept && r.role;
+          return '<tr><td><b>' + esc(r.name) + '</b></td>' +
+            '<td>' + (r.dept && r.deptIn ? esc(r.deptIn) : '<select class="sel sm" data-bu="dept" data-i="' + i + '" aria-label="Department for ' + esc(r.name) + '"><option value="">' + (r.deptIn ? '"' + esc(r.deptIn) + '" not found' : 'Missing: choose') + '</option>' + D.departments.map(function (d) { return '<option value="' + d.id + '"' + (r.dept === d.id ? ' selected' : '') + '>' + esc(d.name) + '</option>'; }).join('') + '</select>') + '</td>' +
+            '<td>' + (r.role && !r.fixedRole ? esc(roleById(r.role).title) : '<select class="sel sm" data-bu="role" data-i="' + i + '" aria-label="Role for ' + esc(r.name) + '"><option value="">"' + esc(r.roleIn) + '" not found</option>' + D.roles.map(function (x) { return '<option value="' + x.id + '"' + (r.role === x.id ? ' selected' : '') + '>' + esc(x.title) + (x.id === r.guess && !r.role ? ' (did you mean?)' : '') + '</option>'; }).join('') + '</select>') + '</td>' +
+            '<td>' + (ok ? '<span class="chip ok">Ready</span>' : '<span class="chip bad">Fix</span>') + '</td></tr>';
+        }).join('') + '</tbody></table></div>' +
+        (bad ? '' : '<ul class="impact" style="margin-top:12px"><li>' + BU.rows.length + ' people added and enrolled in the Foundation path.</li><li>Each is enrolled in their role\'s path, which opens after Foundation.</li></ul>') + '</div>' +
+        '<div class="dg-f"><span class="l">' + (bad ? 'Fix the highlighted rows, or import only the ready ones.' : '') + '</span><button class="btn" type="button" data-a4="buback">Back</button><button class="btn primary" type="button" data-a4="buimport"' + (BU.rows.length - bad ? '' : ' disabled') + '>Import ' + nPeople(BU.rows.length - bad) + '</button></div>';
+    }
+    $('#dlgBody').innerHTML = h;
+  }
+  function download(name, text) {
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'text/csv;charset=utf-8' }));
+    a.download = name; document.body.appendChild(a); a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+  }
+  function csv(rows) { return rows.map(function (r) { return r.map(function (v) { v = String(v == null ? '' : v); return /[",\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; }).join(','); }).join('\n'); }
+
+  // ==========================================================================
+  // A5 Skill tagging
+  // ==========================================================================
+  var TG = { kind: 'All', filter: 'all', q: '', custom: '' };
+  function tagsOf(c) { return D.tags[c.id] || c.skills.map(function (s) { return { s: s, src: 'ai', conf: CAREER.aiConfidence(c.id, s) }; }); }
+  function needsReview(c) { var t = tagsOf(c).filter(function (x) { return skillById(x.s); }); return !t.length || t.some(function (x) { return x.src === 'ai' && x.conf < 70; }); }
+  function viewTagging() {
+    var all = CONTENT, review = all.filter(needsReview).length, edited = Object.keys(D.tags).length;
+    var customs = {}; Object.keys(D.customTags).forEach(function (k) { D.customTags[k].forEach(function (t) { customs[t] = 1; }); });
+    var h = '<div class="ph"><div><h1>Skill tagging</h1><p>ATLAS tags content with skills from your framework when it is uploaded. Check the tags, fix them or add your own. Your changes are never overwritten by AI tagging.</p></div>' +
+      '<div class="acts"><button class="btn" type="button" data-a5="retag">Re-run AI tagging</button></div></div>';
+    h += '<div class="stats"><span><b>' + all.length + '</b> content items</span><span><b>' + review + '</b> to review</span><span><b>' + edited + '</b> edited by admins</span></div>';
+    h += '<div class="fw-tools"><div class="ptabs" role="group" aria-label="Show" style="margin:0">' + [['all', 'All'], ['review', 'To review (' + review + ')'], ['edited', 'Edited']].map(function (x) { return '<button type="button" data-a5f="' + x[0] + '" aria-pressed="' + (TG.filter === x[0]) + '">' + x[1] + '</button>'; }).join('') + '</div>' +
+      '<label class="sr" for="tgk">Type</label><select class="sel sm" id="tgk" style="width:auto"><option value="All">All types</option>' + KINDS.map(function (k) { return '<option' + (TG.kind === k ? ' selected' : '') + '>' + k + '</option>'; }).join('') + '</select>' +
+      '<label class="sr" for="tgc">Custom tag</label><select class="sel sm" id="tgc" style="width:auto"><option value="">Any custom tag</option>' + Object.keys(customs).sort().map(function (t) { return '<option' + (TG.custom === t ? ' selected' : '') + '>' + esc(t) + '</option>'; }).join('') + '</select>' +
+      '<label class="sr" for="tgq">Search content</label><input class="in sm" id="tgq" type="search" placeholder="Search content" value="' + esc(TG.q) + '" style="max-width:220px"></div>';
+    var q = TG.q.trim().toLowerCase();
+    var list = all.filter(function (c) {
+      return (TG.kind === 'All' || c.kind === TG.kind) && (!q || c.title.toLowerCase().indexOf(q) !== -1) && (TG.filter === 'all' || (TG.filter === 'review' ? needsReview(c) : !!D.tags[c.id])) && (!TG.custom || (D.customTags[c.id] || []).indexOf(TG.custom) !== -1);
+    });
+    h += '<section class="card"><div class="tbl-wrap"><table class="tbl"><thead><tr><th scope="col">Content</th><th scope="col">Skills</th><th scope="col">Custom tags</th><th scope="col"><span class="sr">Edit</span></th></tr></thead><tbody>' +
+      (list.length ? list.map(function (c) {
+        var tags = tagsOf(c).filter(function (x) { return skillById(x.s); });
+        return '<tr><td><span class="kind k-' + c.kind + '">' + c.kind + '</span><b style="display:block;margin-top:4px">' + esc(c.title) + '</b></td>' +
+          '<td><div class="skl">' + (tags.length ? tags.map(function (x) { return '<span class="chip ' + (x.src === 'manual' ? 'info' : (x.conf < 70 ? 'warn' : '')) + '" title="' + (x.src === 'manual' ? 'Added or confirmed by an admin' : 'AI, ' + x.conf + '% confident') + '">' + esc(skillName(x.s)) + ' <small style="font-weight:500;opacity:.8">' + (x.src === 'manual' ? 'Manual' : 'AI ' + x.conf + '%') + '</small></span>'; }).join('') : '<span class="chip bad">No skills</span>') + '</div></td>' +
+          '<td>' + (c.kind === 'PALS' ? '<div class="skl">' + ((D.customTags[c.id] || []).map(function (t) { return '<span class="chip">#' + esc(t) + '</span>'; }).join('') || '<span class="mini">None</span>') + '</div>' : '<span class="mini">PALS only</span>') + '</td>' +
+          '<td><button class="btn sm" type="button" data-a5="edit" data-id="' + c.id + '">Edit</button></td></tr>';
+      }).join('') : '<tr><td colspan="4" class="mini" style="text-align:center;padding:28px">Nothing matches these filters.</td></tr>') + '</tbody></table></div></section>';
+    h += '<p class="mini">Skills come from your skills framework, so learners see the same categories they are tracked on. Custom tags reuse the Knowledge Spaces tags and are for organising PALS content.</p>';
+    return h;
+  }
+  var TE = { id: '', tags: [], custom: [] };
+  function openTagEdit(id) { var c = contentById(id); TE = { id: id, tags: clone(tagsOf(c)), custom: clone(D.customTags[id] || []) }; renderTagEdit(); openDlg(); }
+  function renderTagEdit() {
+    var c = contentById(TE.id), have = TE.tags.map(function (x) { return x.s; });
+    var h = '<div class="dg-h"><div><h2 id="dlgTitle">Tags for "' + esc(c.title) + '"</h2><p>' + c.kind + ' · ' + c.mins + ' min</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b">' +
+      '<div class="lbl">Skills</div><div class="opt-list">' + (TE.tags.filter(function (x) { return skillById(x.s); }).map(function (x) {
+        return '<div class="opt" style="cursor:default"><span class="t"><b>' + esc(skillName(x.s)) + '</b><span>' + (x.src === 'manual' ? 'Manual · kept when AI tagging runs again' : 'AI · ' + x.conf + '% confident') + '</span></span>' +
+          (x.src === 'ai' ? '<button class="btn sm" type="button" data-a5="confirm" data-s="' + x.s + '">Confirm</button>' : '') + '<button class="ico dng" type="button" data-a5="rmtag" data-s="' + x.s + '" aria-label="Remove ' + esc(skillName(x.s)) + '">' + I.x + '</button></div>';
+      }).join('') || '<p class="mini">No skills yet.</p>') + '</div>' +
+      '<div style="display:flex;gap:8px;margin-top:10px"><label class="sr" for="addTag">Add a skill</label><select class="sel sm" id="addTag"><option value="">Add a skill from your framework…</option>' +
+      D.categories.map(function (cat) { var opts = cat.skills.filter(function (s) { return !s.archived && have.indexOf(s.id) === -1; }); return opts.length ? '<optgroup label="' + esc(cat.name) + '">' + opts.map(function (s) { return '<option value="' + s.id + '">' + esc(s.name) + '</option>'; }).join('') + '</optgroup>' : ''; }).join('') + '</select></div>';
+    if (c.kind === 'PALS') h += '<div class="lbl" style="margin-top:16px">Custom tags</div><div class="skl" style="margin-bottom:8px">' + (TE.custom.map(function (t, i) { return '<span class="chip">#' + esc(t) + ' <button class="ico" style="width:18px;height:18px" type="button" data-a5="rmcustom" data-i="' + i + '" aria-label="Remove ' + esc(t) + '">×</button></span>'; }).join('') || '<span class="mini">None</span>') + '</div>' +
+      '<div style="display:flex;gap:8px"><label class="sr" for="addCustom">New custom tag</label><input class="in sm" id="addCustom" placeholder="e.g. Onboarding"><button class="btn sm" type="button" data-a5="addcustom">Add</button></div>';
+    h += '</div><div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-a5="savetags">Save</button></div>';
+    $('#dlgBody').innerHTML = h;
+  }
+
+  // ==========================================================================
+  // R1 Reports: path progress and compliance (Analytics › Career & skills)
+  // ==========================================================================
+  var RP = { dept: '', role: '', period: 'pilot', as: 'hr' };
+  function reportStaff() {
+    var dept = RP.as === 'head' ? 'd1' : RP.dept;
+    return D.staff.filter(function (u) { return u.role && (!dept || u.dept === dept) && (!RP.role || u.role === RP.role); });
+  }
+  function viewReports() {
+    var people = reportStaff(), head = RP.as === 'head', hd = deptById('d1');
+    var h = '<div class="ph"><div><h1>Career &amp; skills</h1><p>How staff are moving through their paths, and whose compliance is due.</p></div>' +
+      '<div class="acts"><div class="seg" role="group" aria-label="Viewing as"><button type="button" data-r1as="hr" aria-pressed="' + !head + '">HR</button><button type="button" data-r1as="head" aria-pressed="' + head + '">Department head</button></div><button class="btn" type="button" data-r1="export">Export CSV</button></div></div>';
+    h += '<div class="ptabs" role="group" aria-label="Report" style="margin:-4px 0 14px"><span class="btn sm" style="background:var(--navy);color:#fff;border-color:var(--navy)">Path progress</span><a class="btn sm" href="#heatmap">Skills heatmap <em class="p2">P2</em></a></div>';
+    if (head) h += '<div class="note"><span><b>Viewing as ' + esc(hd ? hd.head + ', head of ' + hd.name : 'a department head') + '.</b> Department heads see only their own department. <span class="oq">Open question</span> What else stays HR-only?</span></div>';
+    h += '<div class="fw-tools">' +
+      '<label class="sr" for="rpd">Department</label><select class="sel sm" id="rpd" style="width:auto"' + (head ? ' disabled' : '') + '><option value="">All departments</option>' + D.departments.map(function (d) { return '<option value="' + d.id + '"' + ((head ? 'd1' : RP.dept) === d.id ? ' selected' : '') + '>' + esc(d.name) + '</option>'; }).join('') + '</select>' +
+      '<label class="sr" for="rpr">Role</label><select class="sel sm" id="rpr" style="width:auto"><option value="">All roles</option>' + D.roles.filter(function (r) { return !head || r.dept === 'd1'; }).map(function (r) { return '<option value="' + r.id + '"' + (RP.role === r.id ? ' selected' : '') + '>' + esc(r.title) + '</option>'; }).join('') + '</select>' +
+      '<label class="sr" for="rpp">Period</label><select class="sel sm" id="rpp" style="width:auto">' + [['pilot', 'Pilot year'], ['q', 'This quarter'], ['30', 'Last 30 days']].map(function (x) { return '<option value="' + x[0] + '"' + (RP.period === x[0] ? ' selected' : '') + '>' + x[1] + '</option>'; }).join('') + '</select></div>';
+
+    var fPaths = D.paths.filter(function (p) { return p.active && p.type === 'foundation'; });
+    var fDone = people.filter(function (u) { return fPaths.every(function (p) { return pstate(u, p).state === 'done'; }); }).length;
+    var overdue = people.filter(function (u) { return personPaths(u).some(function (p) { return pstate(u, p).state === 'overdue'; }); }).length;
+    var due = []; people.forEach(function (u) { compliance(u).forEach(function (x) { if (x.days <= 90) due.push({ u: u, c: x.c, days: x.days }); }); });
+    due.sort(function (a, b) { return a.days - b.days; });
+    h += '<div class="kpis">' +
+      kpi(people.length, 'staff on a learning path', D.staff.length - D.staff.filter(function (u) { return u.role; }).length && !head ? (D.staff.length - D.staff.filter(function (u) { return u.role; }).length) + ' without a role' : '') +
+      kpi(people.length ? Math.round(fDone / people.length * 100) + '%' : '–', 'finished Foundation', fDone + ' of ' + people.length) +
+      kpi(overdue, 'with an overdue stage', overdue ? 'Late by more than 30 days' : 'Everyone on time', overdue ? 'bad' : '') +
+      kpi(due.length, 'compliance items due in 90 days', due.filter(function (x) { return x.days < 0; }).length + ' already expired', due.length ? 'warn' : '') + '</div>';
+
+    h += '<section class="card sec"><div class="sec-h"><div><h2>Path progress</h2><p>Where people are in each path, stage by stage.</p></div><div class="legend2"><span><i class="c-done"></i>Completed</span><span><i class="c-prog"></i>In progress</span><span><i class="c-late"></i>Overdue</span><span><i class="c-wait"></i>Not reached</span></div></div>';
+    D.paths.filter(function (p) { return p.active; }).forEach(function (p) {
+      var who = people.filter(function (u) { return personPaths(u).indexOf(p) !== -1; });
+      if (!who.length) return;
+      h += '<div class="rp-path"><div class="rp-h"><b>' + esc(p.name) + '</b><span class="chip t-' + p.type + '">' + PATH_TYPES[p.type].label + '</span><span class="mini">' + who.length + ' enrolled · ' + who.filter(function (u) { return pstate(u, p).state === 'done'; }).length + ' complete</span></div>';
+      p.stages.forEach(function (st, i) {
+        var c = { done: 0, prog: 0, late: 0, wait: 0 };
+        who.forEach(function (u) { var s = pstate(u, p); if (s.state === 'done' || s.stage > i) c.done++; else if (s.stage === i && s.state !== 'locked') c[s.state === 'overdue' ? 'late' : 'prog']++; else c.wait++; });
+        var n = who.length;
+        h += '<div class="rp-st"><span class="nm">' + (i + 1) + '. ' + esc(st.name) + '</span><span class="stack" role="img" aria-label="' + c.done + ' completed, ' + c.prog + ' in progress, ' + c.late + ' overdue, ' + c.wait + ' not reached">' +
+          ['done', 'prog', 'late', 'wait'].map(function (k) { return c[k] ? '<i class="c-' + k + '" style="width:' + (c[k] / n * 100) + '%" title="' + c[k] + '"></i>' : ''; }).join('') + '</span><span class="nums">' + c.done + '/' + n + '</span></div>';
+      });
+      h += '</div>';
+    });
+    h += '</section>';
+
+    h += '<section class="card sec"><div class="sec-h"><div><h2>Compliance due</h2><p>Expired items are back on the person\'s path automatically. HR gets this list every day.</p></div></div>';
+    h += due.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th scope="col">Person</th><th scope="col">Item</th><th scope="col">Status</th><th scope="col"><span class="sr">Action</span></th></tr></thead><tbody>' + due.map(function (x) {
+      return '<tr><td><div class="who">' + avatar(x.u) + '<div><b>' + esc(x.u.name) + '</b><span class="sub">' + esc((deptById(x.u.dept) || {}).name || '') + ' · ' + esc((roleById(x.u.role) || {}).title || '') + '</span></div></div></td><td>' + esc(x.c.title) + '</td>' +
+        '<td><span class="chip ' + (x.days < 0 ? 'bad' : 'warn') + '">' + dueLabel(x.days) + '</span>' + (x.days < 0 ? '<span class="sub">Re-enrolled</span>' : '') + '</td><td><button class="btn sm" type="button" data-toast="Reminder sent to ' + esc(x.u.name) + ' (not in this preview)">Remind</button></td></tr>';
+    }).join('') + '</tbody></table></div>' : '<p class="mini">Nothing due in the next 90 days.</p>';
+    h += '</section><p class="mini">Phase 2 adds the <a href="#heatmap">department skills heatmap</a> and <a href="#pathways">role readiness</a>.</p>';
+    return h;
+  }
+  function kpi(v, label, sub, tone) { return '<div class="card kpi"><b class="' + (tone || '') + '">' + v + '</b><span>' + label + '</span>' + (sub ? '<small>' + sub + '</small>' : '') + '</div>'; }
+  function exportReport() {
+    var rows = [['Person', 'Department', 'Role', 'Path', 'Path type', 'Status', 'Current stage']];
+    reportStaff().forEach(function (u) {
+      personPaths(u).forEach(function (p) {
+        var s = pstate(u, p);
+        rows.push([u.name, (deptById(u.dept) || {}).name || '', (roleById(u.role) || {}).title || '', p.name, PATH_TYPES[p.type].label, STATE_LABEL[s.state], s.state === 'done' || s.state === 'locked' ? '' : (s.stage + 1) + ' of ' + s.of + ': ' + ((p.stages[s.stage] || {}).name || '')]);
+      });
+    });
+    download('career-path-progress.csv', csv(rows));
+    toast('Exported ' + (rows.length - 1) + ' rows');
+  }
+
+  // ---------- Events for A4, A5, R1 ----------
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('[data-a4]'), b = e.target.closest('[data-a5]'), f = e.target.closest('[data-a5f]'), r = e.target.closest('[data-r1]'), ras = e.target.closest('[data-r1as]');
+    if (ras) { RP.as = ras.dataset.r1as; render(); return; }
+    if (f) { TG.filter = f.dataset.a5f; render(); return; }
+    if (r && r.dataset.r1 === 'export') { exportReport(); return; }
+    if (a) {
+      var u, id = a.dataset.id;
+      switch (a.dataset.a4) {
+        case 'onlyun': SF = { q: '', dept: 'none', role: '', nom: false, sel: {} }; render(); break;
+        case 'nominate': u = personById(id); u.nominated = true; persist(); render(); toast(u.name + ' nominated. Growth opens after their role path.'); break;
+        case 'togglenom': u = personById(id); u.nominated = !u.nominated; persist(); render(); toast(u.nominated ? 'Nominated for Growth' : 'Nomination removed. Progress stays in the record.'); break;
+        case 'clearsel': SF.sel = {}; render(); break;
+        case 'bulknom':
+          var ids = Object.keys(SF.sel).filter(function (k) { return SF.sel[k]; }), n = 0;
+          ids.forEach(function (k) { var p = personById(k); if (p && p.role && !p.nominated) { p.nominated = true; n++; } });
+          SF.sel = {}; persist(); render(); toast(nPeople(n) + ' nominated for Growth'); break;
+        case 'bulkrole':
+          var h = '<div class="dg-h"><div><h2 id="dlgTitle">Change role</h2><p>For ' + nPeople(Object.keys(SF.sel).filter(function (k) { return SF.sel[k]; }).length, 'selected ') + '.</p></div><button class="ico" type="button" data-close aria-label="Close">' + I.x + '</button></div><div class="dg-b"><label class="lbl" for="bulkTo">New role</label><select class="sel" id="bulkTo">' + D.roles.map(function (x) { return '<option value="' + x.id + '">' + esc(x.title) + ' · ' + esc((deptById(x.dept) || {}).name || '') + '</option>'; }).join('') + '</select></div>' +
+            '<div class="dg-f"><button class="btn" type="button" data-close>Cancel</button><button class="btn primary" type="button" data-a4="bulkrolenext">Next</button></div>';
+          $('#dlgBody').innerHTML = h; openDlg(); break;
+        case 'bulkrolenext': openRoleChange(Object.keys(SF.sel).filter(function (k) { return SF.sel[k]; }), $('#bulkTo').value); break;
+        case 'dorole':
+          var keep = ($('input[name="rckeep"]:checked') || {}).value || 'keep', to = roleById(RC.to);
+          RC.ids.forEach(function (k) {
+            var p = personById(k), old = D.paths.filter(function (x) { return x.type === 'role' && x.roles.indexOf(p.role) !== -1 && x.roles.indexOf(RC.to) === -1; }).map(function (x) { return x.id; });
+            // 'Keep it open': the old role path stays on their plan until they finish it
+            p.kept = keep === 'keep' ? (p.kept || []).concat(old) : (p.kept || []).filter(function (id) { return old.indexOf(id) === -1; });
+            p.role = RC.to; if (to) p.dept = to.dept;
+          });
+          SF.sel = {}; persist(); closeDlg(); render(); toast(RC.ids.length === 1 ? 'Role changed. New paths are on their plan.' : 'Roles changed for ' + nPeople(RC.ids.length)); break;
+        case 'bulk': openBulk(); break;
+        case 'template': download('staff-upload-template.csv', csv([['Name', 'Email', 'Department', 'Role'], ['Example Person', 'name@school.edu', D.departments[0] ? D.departments[0].name : 'Admissions', D.roles[0] ? D.roles[0].title : 'Admissions Officer']])); toast('Template downloaded'); break;
+        case 'usesample': BU = { step: 2, rows: sampleUpload() }; renderBulk(); break;
+        case 'buback': BU.step = 1; renderBulk(); break;
+        case 'buimport':
+          var ok = BU.rows.filter(function (x) { return x.dept && x.role; });
+          ok.forEach(function (x, i) { D.staff.push({ id: 'n' + Date.now().toString(36) + i, name: x.name, role: x.role, dept: x.dept, joined: 0, nominated: false, seed: D.staff.length + i, groups: [] }); });
+          persist(); closeDlg(); render(); toast(nPeople(ok.length) + ' added and enrolled in Foundation first'); break;
+      }
+      return;
+    }
+    if (b) {
+      switch (b.dataset.a5) {
+        case 'retag': toast('Re-tagged ' + CONTENT.length + ' items against your ' + allSkills(false).length + ' skills. Manual tags were kept.'); break;
+        case 'edit': openTagEdit(b.dataset.id); break;
+        case 'confirm': TE.tags.forEach(function (x) { if (x.s === b.dataset.s) x.src = 'manual'; }); renderTagEdit(); break;
+        case 'rmtag': TE.tags = TE.tags.filter(function (x) { return x.s !== b.dataset.s; }); renderTagEdit(); break;
+        case 'rmcustom': TE.custom.splice(+b.dataset.i, 1); renderTagEdit(); break;
+        case 'addcustom': var v = ($('#addCustom').value || '').trim().replace(/^#/, ''); if (v && TE.custom.indexOf(v) === -1) TE.custom.push(v); renderTagEdit(); var ac = $('#addCustom'); if (ac) ac.focus(); break;
+        case 'savetags': D.tags[TE.id] = TE.tags; if (contentById(TE.id).kind === 'PALS') D.customTags[TE.id] = TE.custom; persist(); closeDlg(); render(); toast('Tags saved. Paths and reports use them straight away.'); break;
+      }
+    }
+  });
+  document.addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.dataset.a4sel) { SF.sel[el.dataset.a4sel] = el.checked; render(); return; }
+    if (el.id === 'sfd') { SF.dept = el.value; render(); return; }
+    if (el.id === 'sfr') { SF.role = el.value; render(); return; }
+    if (el.id === 'sfn') { SF.nom = el.checked; render(); return; }
+    if (el.dataset.a4f === 'dept') { var u = personById(ROUTE.id); u.dept = el.value; persist(); render(); toast('Department saved'); return; }
+    // Nothing changes until the dialog is confirmed, so the select goes back to the current role
+    if (el.dataset.a4f === 'role') { var p = personById(ROUTE.id), to = el.value; el.value = p.role; openRoleChange([p.id], to); return; }
+    if (el.dataset.bu) { var row = BU.rows[+el.dataset.i]; row[el.dataset.bu] = el.value; if (el.dataset.bu === 'role') row.fixedRole = true; renderBulk(); return; }
+    if (el.id === 'addTag' && el.value) { TE.tags.push({ s: el.value, src: 'manual', conf: 100 }); renderTagEdit(); return; }
+    if (el.id === 'tgk') { TG.kind = el.value; render(); return; }
+    if (el.id === 'tgc') { TG.custom = el.value; render(); return; }
+    if (el.id === 'rpd') { RP.dept = el.value; render(); return; }
+    if (el.id === 'rpr') { RP.role = el.value; render(); return; }
+    if (el.id === 'rpp') { RP.period = el.value; render(); toast('Period filter is illustrative in this prototype'); return; }
+  });
+  document.addEventListener('input', function (e) {
+    var el = e.target, pos;
+    if (el.id === 'sfq') { SF.q = el.value; pos = el.selectionStart; render(); var s = $('#sfq'); s.focus(); s.setSelectionRange(pos, pos); }
+    if (el.id === 'tgq') { TG.q = el.value; pos = el.selectionStart; render(); var t = $('#tgq'); t.focus(); t.setSelectionRange(pos, pos); }
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Enter' && e.target.id === 'addCustom') { e.preventDefault(); $('[data-a5="addcustom"]').click(); } });
+
+  // ==========================================================================
+  // Phase 2 concepts: C1 Career pathways (with role readiness), C2 Department skills heatmap.
+  // Concept screens to show direction. Next roles and skill bands are sample data, not set up by the admin.
+  // ==========================================================================
+  var NEXT_ROLES = {
+    n1: { title: 'Senior Admissions Officer', dept: 'd1', from: 'r1', skills: [{ s: 's_enq', t: 5 }, { s: 's_recov', t: 4 }, { s: 's_diff', t: 4 }, { s: 's_coach', t: 3 }, { s: 's_pres', t: 3 }] },
+    n2: { title: 'Admissions Manager', dept: 'd1', from: 'n1', skills: [{ s: 's_lead', t: 4 }, { s: 's_coach', t: 4 }, { s: 's_diff', t: 4 }, { s: 's_pres', t: 4 }] },
+    n3: { title: 'Office Manager', dept: 'd2', from: 'r2', skills: [{ s: 's_lead', t: 3 }, { s: 's_write', t: 4 }, { s: 's_data', t: 4 }, { s: 's_diff', t: 3 }] },
+    n4: { title: 'HR Manager', dept: 'd3', from: 'r3', skills: [{ s: 's_lead', t: 4 }, { s: 's_coach', t: 4 }, { s: 's_code', t: 4 }, { s: 's_diff', t: 4 }] }
+  };
+  var LATERAL = [['r1', 'r2', 'both roles share front-office skills, so staff can move either way']];
+  // Sample skill band for a person (1-5). Real bands come from Skills Analytics.
+  function personBand(u, skillId) {
+    var h = 0; for (var i = 0; i < skillId.length; i++) h = (h * 17 + skillId.charCodeAt(i)) % 101;
+    var base = 1 + ((u.seed * 3 + h) % 4) + (u.joined > 700 ? 1 : 0);
+    return Math.max(1, Math.min(5, base));
+  }
+  function readiness(u, target) {
+    var met = target.skills.filter(function (x) { return personBand(u, x.s) >= x.t; }).length;
+    return { met: met, of: target.skills.length, gaps: target.skills.filter(function (x) { return personBand(u, x.s) < x.t; }) };
+  }
+  function roleTitle(id) { return (roleById(id) || NEXT_ROLES[id] || {}).title || ''; }
+  var PW = { sel: 'n1' };
+  function phase2Tag() { return '<span class="chip" style="background:var(--violet-soft);color:var(--violet)">Phase 2 concept</span>'; }
+
+  function viewPathways() {
+    var h = '<div class="ph"><div><div style="margin-bottom:6px">' + phase2Tag() + '</div><h1>Career pathways</h1><p>Link roles into progression routes, so staff can see where they could go next and HR can see who is ready. HeyHi proposal, not yet discussed with Tunas Muda.</p></div>' +
+      '<div class="acts"><button class="btn" type="button" data-toast="Concept only: building routes comes in Phase 2">+ Link roles</button></div></div>';
+    h += '<div class="pw">';
+    D.departments.forEach(function (d) {
+      var start = D.roles.filter(function (r) { return r.dept === d.id; });
+      if (!start.length) return;
+      h += '<section class="card pw-track"><h2>' + esc(d.name) + '</h2><div class="pw-row">';
+      start.forEach(function (r) {
+        var chain = [r.id], cur = r.id, guard = 0;
+        while (guard++ < 5) { var nx = Object.keys(NEXT_ROLES).filter(function (k) { return NEXT_ROLES[k].from === cur; })[0]; if (!nx) break; chain.push(nx); cur = nx; }
+        chain.forEach(function (id, i) {
+          var isNext = !!NEXT_ROLES[id], people = isNext ? 0 : staffCount(id);
+          var ready = 0;
+          if (isNext) { var from = NEXT_ROLES[id].from; D.staff.filter(function (u) { return u.role === from; }).forEach(function (u) { var rd = readiness(u, NEXT_ROLES[id]); if (rd.met / rd.of >= .75) ready++; }); }
+          h += (i ? '<span class="pw-arr" aria-hidden="true">→</span>' : '') + '<button type="button" class="pw-node' + (isNext ? ' next' : '') + (PW.sel === id ? ' on' : '') + '" data-pw="' + id + '"' + (isNext ? '' : ' disabled title="Starting role"') + '><b>' + esc(roleTitle(id)) + '</b><span>' + (isNext ? (NEXT_ROLES[NEXT_ROLES[id].from] ? 'After ' + roleTitle(NEXT_ROLES[id].from) : (ready ? ready + ' ready now' : 'Nobody ready yet')) : people + ' staff') + '</span></button>';
+        });
+      });
+      h += '</div></section>';
+    });
+    h += '<div class="pw-lat">' + LATERAL.map(function (l) { return '<span class="chip info">↔ Lateral move</span> <b>' + esc(roleTitle(l[0])) + '</b> and <b>' + esc(roleTitle(l[1])) + '</b>: ' + esc(l[2]) + '.'; }).join('') + '</div></div>';
+
+    var t = NEXT_ROLES[PW.sel];
+    if (t) {
+      var from = roleById(t.from) || NEXT_ROLES[t.from];
+      var cand = D.staff.filter(function (u) { return u.role === t.from; }).map(function (u) { return { u: u, r: readiness(u, t) }; }).sort(function (a, b) { return b.r.met - a.r.met; });
+      var fromSkills = from ? from.skills.map(function (x) { var k = skillById(x.s); return k ? k.s.id : x.s; }) : [];
+      h += '<div class="rd" style="margin-top:16px"><section class="card sec"><div class="sec-h"><div><h2>Role readiness: ' + esc(t.title) + '</h2><p>Who in ' + esc(from ? from.title : 'the role before it') + ' meets most of this role\'s targets. For policy and eligibility discussions, not promotion decisions.</p></div><button class="btn sm" type="button" data-toast="Concept only: export comes with Phase 2">Export</button></div>' +
+        (cand.length ? '<div class="tbl-wrap"><table class="tbl"><thead><tr><th scope="col">Person</th><th scope="col">Targets met</th><th scope="col">Gaps</th></tr></thead><tbody>' + cand.map(function (c) {
+          var pct = Math.round(c.r.met / c.r.of * 100);
+          return '<tr><td><div class="who">' + avatar(c.u) + '<div><b>' + esc(c.u.name) + '</b><span class="sub">' + joinedLabel(c.u.joined) + '</span></div></div></td>' +
+            '<td><span class="chip ' + (pct >= 75 ? 'ok' : (pct >= 50 ? 'warn' : '')) + '">' + c.r.met + ' of ' + c.r.of + '</span>' + (pct >= 75 ? '<span class="sub">Ready now</span>' : '') + '</td>' +
+            '<td><div class="skl">' + (c.r.gaps.length ? c.r.gaps.map(function (g) { return '<span class="chip" title="Now ' + BANDS[personBand(c.u, g.s) - 1] + ', needs ' + BANDS[g.t - 1] + '">' + esc(skillName(g.s)) + '</span>'; }).join('') : '<span class="mini">None</span>') + '</div></td></tr>';
+        }).join('') + '</tbody></table></div>' : '<p class="mini">Nobody holds the role before it yet.</p>') + '</section>' +
+        '<aside><div class="card side-card"><h3>What this role adds</h3><p class="mini" style="margin-bottom:8px">Compared with ' + esc(from ? from.title : '') + '.</p>' + t.skills.map(function (x) {
+          var isNew = fromSkills.indexOf(x.s) === -1, prev = from ? from.skills.filter(function (y) { var k = skillById(y.s); return (k ? k.s.id : y.s) === x.s; })[0] : null;
+          return '<div class="ln2"><b>' + esc(skillName(x.s)) + '</b><span class="chip ' + (isNew ? 'info' : '') + '">' + (isNew ? 'New · ' : (prev ? BANDS[prev.t - 1] + ' → ' : '')) + BANDS[x.t - 1] + '</span></div>';
+        }).join('') + '</div><div class="card side-card"><h3>What learners see</h3><p class="mini">On My Career, staff see this as their next role, the skills it needs, how close they are, and learning that closes the gap.</p><a class="btn sm" href="atlas-career-learner-prototype.html#skills" target="_blank" rel="noopener">Open My skills ↗</a></div></aside></div>';
+    }
+    return h;
+  }
+
+  var HM = { dept: 'd1' };
+  function viewHeatmap() {
+    var dep = deptById(HM.dept) || D.departments[0];
+    var h = '<div class="ph"><div><div style="margin-bottom:6px">' + phase2Tag() + '</div><h1>Career &amp; skills</h1><p>Skills across a department, coloured by band, with gaps against each person\'s role target.</p></div></div>' +
+      '<div class="ptabs" role="group" aria-label="Report" style="margin-bottom:14px"><a class="btn sm" href="#reports">Path progress</a><span class="btn sm" style="background:var(--navy);color:#fff;border-color:var(--navy)">Skills heatmap</span></div>';
+    if (!dep) return h + '<section class="card empty"><h2>No departments yet</h2></section>';
+    var people = D.staff.filter(function (u) { return u.role && u.dept === dep.id; });
+    var skills = {}; people.forEach(function (u) { var r = roleById(u.role); (r ? r.skills : []).forEach(function (x) { var k = skillById(x.s); if (k) skills[k.s.id] = 1; }); });
+    var cols = Object.keys(skills);
+    h += '<div class="fw-tools"><label class="sr" for="hmd">Department</label><select class="sel sm" id="hmd" style="width:auto">' + D.departments.map(function (d) { return '<option value="' + d.id + '"' + (d.id === dep.id ? ' selected' : '') + '>' + esc(d.name) + '</option>'; }).join('') + '</select>' +
+      '<div class="hm-key">' + BANDS.map(function (b, i) { return '<span><i class="b' + (i + 1) + '"></i>' + b + '</span>'; }).join('') + '<span><i class="gap"></i>Below role target</span></div></div>';
+    if (!people.length || !cols.length) return h + '<section class="card empty"><h2>Nothing to show for ' + esc(dep.name) + '</h2><p>People in this department need roles with required skills.</p></section>';
+    var gaps = {};
+    h += '<section class="card"><div class="tbl-wrap"><table class="hm"><thead><tr><th scope="col">Person</th>' + cols.map(function (s) { return '<th scope="col"><span>' + esc(skillName(s)) + '</span></th>'; }).join('') + '</tr></thead><tbody>' +
+      people.map(function (u) {
+        var r = roleById(u.role);
+        return '<tr><th scope="row"><b>' + esc(u.name) + '</b><small>' + esc(r ? r.title : '') + '</small></th>' + cols.map(function (s) {
+          var b = personBand(u, s), req = r ? r.skills.filter(function (x) { var k = skillById(x.s); return k && k.s.id === s; })[0] : null, gap = req && b < req.t;
+          if (gap) gaps[s] = (gaps[s] || 0) + 1;
+          return '<td><span class="cell b' + b + (gap ? ' gap' : '') + (req ? '' : ' na') + '" title="' + esc(u.name) + ' · ' + esc(skillName(s)) + ': ' + BANDS[b - 1] + (req ? ', target ' + BANDS[req.t - 1] : ', not required for their role') + '">' + b + '</span></td>';
+        }).join('') + '</tr>';
+      }).join('') + '</tbody><tfoot><tr><th scope="row">Below target</th>' + cols.map(function (s) { return '<td class="mini" style="text-align:center">' + (gaps[s] || 0) + '</td>'; }).join('') + '</tr></tfoot></table></div></section>';
+    var worst = cols.slice().sort(function (a, b) { return (gaps[b] || 0) - (gaps[a] || 0); })[0];
+    if (worst && gaps[worst]) h += '<div class="note"><span><b>Biggest gap in ' + esc(dep.name) + ': ' + esc(skillName(worst)) + '</b> (' + nPeople(gaps[worst]) + ' below target). In Phase 2, ATLAS suggests content that builds it.</span></div>';
+    h += '<p class="mini">Cells for skills a person\'s role does not require are faded. Bands are sample values until Skills Analytics scoring is settled.</p>';
+    return h;
+  }
+
+  document.addEventListener('click', function (e) { var n = e.target.closest('[data-pw]'); if (n && !n.disabled) { PW.sel = n.dataset.pw; render(); } });
+  document.addEventListener('change', function (e) { if (e.target.id === 'hmd') { HM.dept = e.target.value; render(); } });
+
+  // ==========================================================================
+  // Routing and rendering
+  // ==========================================================================
+  var ROUTE = { name: 'skills', id: '' };
+  function parseRoute() {
+    var m = (location.hash || '').replace(/^#/, '').split('/');
+    var name = ['skills', 'roles', 'role', 'paths', 'path', 'staff', 'person', 'tagging', 'reports', 'pathways', 'heatmap'].indexOf(m[0]) !== -1 ? m[0] : 'skills';
+    ROUTE = { name: name, id: m[1] || '' };
+  }
+  function render() {
+    var v = ROUTE.name, section = v === 'role' ? 'roles' : (v === 'path' ? 'paths' : (v === 'person' ? 'staff' : (v === 'heatmap' ? 'reports' : v))), h;
+    if (v === 'skills') h = viewSkills();
+    else if (v === 'roles') h = viewRoles();
+    else if (v === 'role') h = viewRole(ROUTE.id);
+    else if (v === 'paths') h = viewPaths();
+    else if (v === 'path') h = viewPath(ROUTE.id);
+    else if (v === 'staff') h = viewStaff();
+    else if (v === 'person') h = viewPerson(ROUTE.id);
+    else if (v === 'tagging') h = viewTagging();
+    else if (v === 'pathways') h = viewPathways();
+    else if (v === 'heatmap') h = viewHeatmap();
+    else h = viewReports();
+    $('#content').innerHTML = h;
+    renderNav(section);
+    var label = { skills: 'Skills framework', roles: 'Departments & roles', paths: 'Learning paths', staff: 'Staff assignments', tagging: 'Skill tagging', reports: 'Career & skills', pathways: 'Career pathways' }[section];
+    var leaf = v === 'role' ? (roleById(ROUTE.id) || {}).title : (v === 'path' ? (pathById(ROUTE.id) || {}).name : (v === 'person' ? (personById(ROUTE.id) || {}).name : ''));
+    $('#crumb').innerHTML = (section === 'reports' ? 'Analytics › ' : 'Career Planner › ') + (leaf ? '<a href="#' + section + '">' + esc(label) + '</a> › ' + esc(leaf) : esc(label));
+    document.title = (leaf || label) + ' · ATLAS Career Planner Admin Prototype';
+  }
+  function go(hash) { if (location.hash === hash) render(); else location.hash = hash; }
+  window.addEventListener('hashchange', function () { parseRoute(); render(); window.scrollTo(0, 0); });
+
+  // ---------- Dialog and toast helpers ----------
+  var lastFocus = null;
+  function openDlg(wide) { var d = $('#dlg'); d.classList.toggle('wide', !!wide); d.setAttribute('aria-labelledby', 'dlgTitle'); if (!d.open) { lastFocus = document.activeElement; d.showModal(); } }
+  function closeDlg() { var d = $('#dlg'); if (d.open) d.close(); }
+  $('#dlg').addEventListener('close', function () { if (lastFocus && document.contains(lastFocus)) lastFocus.focus(); });
+  $('#dlg').addEventListener('click', function (e) { if (e.target === this) closeDlg(); });
+  var toastTimer;
+  function toast(msg) { var t = $('#toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 2600); }
+  function toastUndo(msg, before) {
+    var t = $('#toast'); t.innerHTML = esc(msg) + '<button type="button" id="undoBtn">Undo</button>'; t.classList.add('show');
+    $('#undoBtn').onclick = function () { D = before; persist(); render(); t.classList.remove('show'); };
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.classList.remove('show'); }, 6000);
+  }
+
+  // ==========================================================================
+  // Events
+  // ==========================================================================
+  function curPath() { return pathById(ROUTE.id); }
+  function stageOf(stId) { var p = curPath(); return p ? p.stages.filter(function (s) { return s.id === stId; })[0] : null; }
+
+  document.addEventListener('click', function (e) {
+    var t = e.target.closest('[data-toast]');
+    if (t) { e.preventDefault(); toast(t.dataset.toast); return; }
+    if (e.target.closest('[data-close]')) { closeDlg(); return; }
+    var st = e.target.closest('[data-start]');
+    if (st) {
+      D = st.dataset.start === 'empty' ? emptyOrg() : seed(); UI.selected = {}; UI.dept = 'all'; persist();
+      $$('[data-start]').forEach(function (b) { b.setAttribute('aria-pressed', String(b === st)); });
+      go('#skills'); toast(st.dataset.start === 'empty' ? 'Showing an organisation that has not set anything up' : 'Showing Tunas Muda after setup (sample data)'); return;
+    }
+    var ar = e.target.closest('[data-a4role]'); if (ar) { SF = { q: '', dept: '', role: ar.dataset.a4role, nom: false, sel: {} }; }
+    var dp = e.target.closest('[data-dept]');
+    if (dp) { UI.dept = dp.dataset.dept; render(); return; }
+    var bd = e.target.closest('[data-band]');
+    if (bd) { var r0 = roleById(ROUTE.id); r0.skills[+bd.dataset.band].t = +bd.dataset.v; persist(); render(); return; }
+    var stp = e.target.closest('[data-stype]');
+    if (stp) {
+      var s1 = stageOf(stp.dataset.st); if (!s1 || s1.type === stp.dataset.stype) return;
+      s1.type = stp.dataset.stype;
+      if (s1.type === 'choose') { s1.n = s1.n || 2; s1.pool = s1.pool || { mode: 'list', cat: '', list: [] }; if (s1.pool.mode === 'list' && !s1.pool.list.length) s1.pool.list = s1.items.map(function (it) { return it.c; }); }
+      else if (!s1.items.length && s1.pool && s1.pool.mode === 'list') s1.items = s1.pool.list.map(function (c) { return { c: c, renew: '' }; });
+      persist(); render(); return;
+    }
+    var pt = e.target.closest('[data-ptab]');
+    if (pt) { UI.ptab = pt.dataset.ptab; renderPicker(); return; }
+    var imp = e.target.closest('[data-imp]');
+    if (imp) {
+      if (imp.dataset.imp === 'next') { IMP.step = 2; renderImport(); }
+      else if (imp.dataset.imp === 'back') { IMP.step = 1; renderImport(); }
+      else doImport();
+      return;
+    }
+    var sv = e.target.closest('[data-save]');
+    if (sv) { save(sv.dataset.save, sv.dataset.id); return; }
+    var a = e.target.closest('[data-act]'); if (!a) return;
+    act(a.dataset.act, a);
+  });
+
+  function save(kind, id) {
+    var name = ($('#fName') || {}).value; name = (name || '').trim();
+    if (!name) { toast('Add a name first'); $('#fName').focus(); return; }
+    if (kind === 'dept') {
+      if (id) { var d = deptById(id); d.name = name; d.head = $('#fHead').value.trim(); }
+      else { var nd = { id: uid('d'), name: name, head: $('#fHead').value.trim() }; D.departments.push(nd); UI.dept = nd.id; }
+      persist(); closeDlg(); render(); toast(id ? 'Department saved' : 'Department added');
+    } else if (kind === 'role') {
+      var r = { id: uid('r'), title: name, dept: $('#fDept').value, level: $('#fLevel').value, desc: '', skills: [] };
+      D.roles.push(r); persist(); closeDlg(); go('#role/' + r.id); toast('Role created. Add the skills it needs.');
+    } else if (kind === 'cat') {
+      if (id) D.categories.filter(function (c) { return c.id === id; })[0].name = name;
+      else D.categories.push({ id: uid('k'), name: name, skills: [] });
+      persist(); closeDlg(); render(); toast(id ? 'Category renamed' : 'Category added. Add its skills below.');
+      if (!id) setTimeout(function () { var inputs = $$('[data-addskill]'); if (inputs.length) inputs[inputs.length - 1].focus(); }, 50);
+    } else if (kind === 'skill') {
+      var k = skillById(id).s; if (k.name !== name) { k.aliases.push(k.name); k.name = name; }
+      persist(); closeDlg(); render(); toast('Skill renamed everywhere');
+    } else if (kind === 'path') {
+      var type = ($('input[name="ptype"]:checked') || {}).value || 'role';
+      var p = { id: uid('p'), type: type, name: name, active: false, roles: type === 'role' ? [$('#fRole').value] : [], after: type === 'foundation' ? '' : (D.paths.filter(function (x) { return x.type === 'foundation'; })[0] || {}).id || '', nominated: 0,
+        stages: [{ id: uid('st'), name: 'Stage 1', type: 'required', items: [] }] };
+      D.paths.push(p); persist(); closeDlg(); go('#path/' + p.id); toast('Path created as a draft. Add content to stage 1.');
+    }
+  }
+
+  function act(name, el) {
+    var p, st, i, j, before;
+    switch (name) {
+      // A1
+      case 'import': openImport(); break;
+      case 'addcat': case 'addcat-first': openForm('cat'); break;
+      case 'renamecat': openForm('cat', el.dataset.id); break;
+      case 'delcat':
+        var cat = D.categories.filter(function (c) { return c.id === el.dataset.id; })[0];
+        var used = cat.skills.some(function (s) { return rolesUsing(s.id).length || contentUsing(s.id).length; });
+        if (used) { toast('Move or archive its skills first: some are used by roles or content'); break; }
+        before = clone(D); D.categories.splice(D.categories.indexOf(cat), 1); persist(); render(); toastUndo('Category "' + cat.name + '" removed', before); break;
+      case 'addskill': addSkill(el.dataset.id); break;
+      case 'renameskill': openForm('skill', el.dataset.id); break;
+      case 'archive':
+        before = clone(D); var k = skillById(el.dataset.id).s; k.archived = true; delete UI.selected[k.id]; persist(); render();
+        toastUndo('"' + k.name + '" archived. Past records keep it.', before); break;
+      case 'unarchive': skillById(el.dataset.id).s.archived = false; persist(); render(); toast('Skill restored'); break;
+      case 'clearsel': UI.selected = {}; render(); break;
+      case 'merge': openMerge(); break;
+      case 'domerge': doMerge(); break;
+      // A2
+      case 'adddept': openForm('dept'); break;
+      case 'editdept': openForm('dept', el.dataset.id); break;
+      case 'addrole': if (D.departments.length) openForm('role'); break;
+      case 'addreq': openAddReq(); break;
+      case 'doaddreq':
+        var r = roleById(ROUTE.id), n = 0;
+        $$('[data-reqpick]:checked:not(:disabled)').forEach(function (c) { r.skills.push({ s: c.dataset.reqpick, t: 3 }); n++; });
+        persist(); closeDlg(); render(); if (n) toast(plural(n, 'skill') + ' added at Competent'); break;
+      case 'rmreq': before = clone(D); roleById(ROUTE.id).skills.splice(+el.dataset.i, 1); persist(); render(); toastUndo('Skill removed from this role', before); break;
+      case 'newrolepath': openForm('path', ROUTE.id); break;
+      case 'delrole':
+        before = clone(D); var rr = roleById(ROUTE.id); D.roles.splice(D.roles.indexOf(rr), 1); D.paths.forEach(function (x) { x.roles = x.roles.filter(function (id) { return id !== rr.id; }); });
+        persist(); go('#roles'); toastUndo('Role "' + rr.title + '" removed', before); break;
+      // A3
+      case 'newpath': openForm('path'); break;
+      case 'toggleactive': p = curPath(); p.active = !p.active; persist(); render(); toast(p.active ? 'Active: enrolment starts for ' + enrolled(p) + ' people' : 'Back to draft: nobody new is enrolled'); break;
+      case 'preview': openPreview(); break;
+      case 'addstage': p = curPath(); p.stages.push({ id: uid('st'), name: 'Stage ' + (p.stages.length + 1), type: 'required', items: [] }); persist(); render(); var ins = $$('.stage-h .nm'); if (ins.length) ins[ins.length - 1].focus(); break;
+      case 'delstage': before = clone(D); p = curPath(); st = stageOf(el.dataset.st); p.stages.splice(p.stages.indexOf(st), 1); persist(); render(); toastUndo('Stage removed', before); break;
+      case 'stageup': case 'stagedown':
+        p = curPath(); st = stageOf(el.dataset.st); i = p.stages.indexOf(st); j = name === 'stageup' ? i - 1 : i + 1;
+        if (j < 0 || j >= p.stages.length) break; p.stages.splice(i, 1); p.stages.splice(j, 0, st); persist(); render(); break;
+      case 'additems': openPicker(el.dataset.st); break;
+      case 'doadditems':
+        st = stageOf(PICK.st); var ids = Object.keys(PICK.picks).filter(function (k2) { return PICK.picks[k2]; });
+        ids.forEach(function (id) { if (st.type === 'choose') st.pool.list.push(id); else st.items.push({ c: id, renew: '' }); });
+        persist(); closeDlg(); render(); toast(plural(ids.length, 'item') + ' added'); break;
+      case 'rmitem': before = clone(D); st = stageOf(el.dataset.st); st.items.splice(+el.dataset.j, 1); persist(); render(); toastUndo('Item removed from the stage', before); break;
+      case 'itemup': case 'itemdown':
+        st = stageOf(el.dataset.st); i = +el.dataset.j; j = name === 'itemup' ? i - 1 : i + 1;
+        if (j < 0 || j >= st.items.length) break; var mv = st.items.splice(i, 1)[0]; st.items.splice(j, 0, mv); persist(); render(); break;
+      case 'rmpool': st = stageOf(el.dataset.st); st.pool.list = st.pool.list.filter(function (c) { return c !== el.dataset.c; }); persist(); render(); break;
+      case 'delpath': before = clone(D); p = curPath(); D.paths.splice(D.paths.indexOf(p), 1); persist(); go('#paths'); toastUndo('Path "' + p.name + '" removed', before); break;
+    }
+  }
+
+  function addSkill(catId) {
+    var input = $('[data-addskill="' + catId + '"]'), name = input.value.trim();
+    if (!name) { input.focus(); return; }
+    if (allSkills(true).some(function (x) { return x.s.name.toLowerCase() === name.toLowerCase(); })) { toast('"' + name + '" is already in the framework'); return; }
+    D.categories.filter(function (c) { return c.id === catId; })[0].skills.push(S(uid('s'), name));
+    persist(); render(); toast('"' + name + '" added');
+    var again = $('[data-addskill="' + catId + '"]'); if (again) again.focus();
+  }
+
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' && e.target.matches('[data-addskill]')) { e.preventDefault(); addSkill(e.target.dataset.addskill); }
+    if (e.key === 'Enter' && e.target.matches('#dlg .in') && $('#dlg [data-save]')) { e.preventDefault(); $('#dlg [data-save]').click(); }
+  });
+
+  document.addEventListener('input', function (e) {
+    var el = e.target;
+    if (el.id === 'skillSearch') { UI.q = el.value; var pos = el.selectionStart; render(); var s = $('#skillSearch'); s.focus(); s.setSelectionRange(pos, pos); return; }
+    if (el.id === 'pq') { UI.pq = el.value; renderPicker(); var q = $('#pq'); q.focus(); q.setSelectionRange(q.value.length, q.value.length); return; }
+    if (el.id === 'mergeName') { MRG.name = el.value; return; }
+    // Text fields save as you type, without re-rendering (keeps focus)
+    if (el.dataset.rf) { roleById(ROUTE.id)[el.dataset.rf] = el.value; persist(); if (el.dataset.rf === 'title') $('#crumb').lastChild.textContent = ' ' + el.value; return; }
+    if (el.dataset.pf === 'name') { curPath().name = el.value; persist(); return; }
+    if (el.dataset.sf === 'name') { stageOf(el.dataset.st).name = el.value; persist(); return; }
+  });
+
+  document.addEventListener('change', function (e) {
+    var el = e.target;
+    if (el.dataset.pick) { UI.selected[el.dataset.pick] = el.checked; render(); return; }
+    if (el.name === 'sfwsec') { IMP.sector = el.value; IMP.picks = {}; renderImport(); return; }
+    if (el.dataset.imppick) { IMP.picks[el.dataset.imppick] = el.checked; renderImport(); return; }
+    if (el.id === 'impTarget') { IMP.target = el.value; return; }
+    if (el.name === 'keep') { MRG.keep = el.value; renderMerge(); if (el.value === 'new') $('#mergeName').focus(); return; }
+    if (el.dataset.cpick) { PICK.picks[el.dataset.cpick] = el.checked; var n = Object.keys(PICK.picks).filter(function (k) { return PICK.picks[k]; }).length; var b = $('[data-act="doadditems"]'); b.disabled = !n; b.textContent = 'Add ' + plural(n, 'item'); $('.dg-f .l').textContent = plural(n, 'item') + ' selected'; return; }
+    if (el.id === 'pskill') { UI.pskill = el.value; renderPicker(); return; }
+    if (el.name === 'ptype') { $('#fRoleWrap').hidden = el.value !== 'role'; return; }
+    if (el.dataset.rf === 'dept' || el.dataset.rf === 'level') { roleById(ROUTE.id)[el.dataset.rf] = el.value; persist(); render(); return; }
+    if (el.dataset.pf === 'after') { curPath().after = el.value; persist(); toast('Saved'); return; }
+    if (el.dataset.prole) { var p = curPath(); if (el.checked) p.roles.push(el.dataset.prole); else p.roles = p.roles.filter(function (id) { return id !== el.dataset.prole; }); persist(); render(); return; }
+    if (el.dataset.renew) { stageOf(el.dataset.st).items[+el.dataset.renew].renew = el.value; persist(); render(); toast(el.value ? 'Renews ' + el.options[el.selectedIndex].text.toLowerCase() + '. HR sees who is due.' : 'No renewal'); return; }
+    if (el.dataset.sf === 'n') { var st = stageOf(el.dataset.st), max = Math.max(1, poolItems(st).length); st.n = Math.min(max, Math.max(1, parseInt(el.value, 10) || 1)); persist(); render(); return; }
+    if (el.dataset.pmode) { var s2 = stageOf(el.dataset.pmode); s2.pool.mode = el.value; if (el.value === 'category' && !s2.pool.cat && D.categories[0]) s2.pool.cat = D.categories[0].id; persist(); render(); return; }
+    if (el.dataset.pcat) { stageOf(el.dataset.pcat).pool.cat = el.value; persist(); render(); return; }
+  });
+
+  $('#resetBtn').addEventListener('click', function () {
+    D = seed(); UI.selected = {}; UI.dept = 'all'; persist();
+    $$('[data-start]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.start === 'setup')); });
+    go('#skills'); toast('Demo reset to the sample data');
+  });
+
+  // ---------- Phone menu ----------
+  function setNav(open) {
+    document.body.classList.toggle('nav-open', open);
+    $('#menuBtn').setAttribute('aria-expanded', String(open));
+    $('#menuBtn').setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    if (open) { var on = $('.side nav a.on') || $('.side nav a'); if (on) on.focus(); }
+  }
+  $('#menuBtn').addEventListener('click', function () { setNav(!document.body.classList.contains('nav-open')); });
+  $('#navScrim').addEventListener('click', function () { setNav(false); });
+  $('#sideNav').addEventListener('click', function (e) { if (e.target.closest('a')) setNav(false); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && document.body.classList.contains('nav-open')) { setNav(false); $('#menuBtn').focus(); } });
+
+  parseRoute(); render();
+})();
+</script>
+</body>
+</html>
