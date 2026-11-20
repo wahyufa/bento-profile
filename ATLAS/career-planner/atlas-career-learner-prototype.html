@@ -286,6 +286,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script src="assets/career-data.js"></script>
+<script src="assets/open-questions.js"></script>
 <script>
 (function () {
   'use strict';
@@ -525,7 +526,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     return '<section class="card side-card"><h3>Also assigned to you</h3><p class="mini" style="margin-top:-4px">From groups, outside your career paths.</p>' +
       '<div class="ln"><span class="kind k-Course" style="margin-top:2px">Course</span><div><b>Open Day 2027 briefing</b><span>Group: Open Day volunteers · due 12 Dec</span></div></div>' +
       '<div class="ln"><span class="kind k-PALS" style="margin-top:2px">PALS</span><div><b>New enrolment system</b><span>Group: All staff · no due date</span></div></div>' +
-      '<p class="mini"><span style="font-weight:700;color:var(--accent-ink)">Open question:</span> one combined page for all learning, or each feature separately?</p></section>';
+      '<p class="mini">' + OQ.tag('combined') + ' One combined page for all learning, or each feature separately?</p></section>';
   }
 
   // ---------- L2 My skills ----------
@@ -548,7 +549,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     h += '<section class="card"><div style="padding:16px 20px 0"><h3 style="font-size:16px;color:var(--navy)">Other skills you are building</h3><p class="mini">From learning outside your role\'s requirements.</p></div><div class="aux">' +
       (Object.keys(aux).length ? Object.keys(aux).map(function (s) { return '<button class="chip info" type="button" data-skill="' + s + '" style="border:0;padding:4px 12px;font-size:13px">' + esc(skillName(s)) + ' · ' + BANDS[band(s) - 1] + '</button>'; }).join('') : '<span class="mini">None yet.</span>') + '</div></section>';
     h += '<section class="card next-role"><span class="phase">Phase 2 preview</span><h3 style="font-size:17px;color:var(--navy)">Your next role: Senior Admissions Officer</h3><p class="mini">See the skills the next role on your pathway needs, how close you are, and learning that closes the gap. Coming with career pathways.</p></section>';
-    h += '<p class="mini"><span style="font-weight:700;color:var(--accent-ink)">Open question:</span> bands by completion (as shown) or weighted by assessment scores? Depends on Skills Analytics.</p>';
+    h += '<p class="mini">' + OQ.tag('scoring') + ' Bands by completion (as shown) or weighted by assessment scores? Depends on Skills Analytics.</p>';
     return h;
   }
   function openSkill(id) {
@@ -579,6 +580,7 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     var list = rows.filter(function (r) { return REC === 'all' || (REC === 'renew' ? r.st === 'soon' || r.st === 'expired' : r.x.offline); });
     var h = '<section class="card"><div class="rec-h"><div><h2 style="font-size:19px;color:var(--navy)">Learning record</h2><p class="mini">Everything you have completed since you joined, online and offline. It stays with you for as long as you work here. HR sees the same record.</p></div>' +
       '<div class="filters" role="group" aria-label="Show"><button type="button" data-rec="all" aria-pressed="' + (REC === 'all') + '">All (' + rows.length + ')</button><button type="button" data-rec="renew" aria-pressed="' + (REC === 'renew') + '">Renewals (' + (exp + soon) + ')</button><button type="button" data-rec="offline" aria-pressed="' + (REC === 'offline') + '">Offline</button></div></div>';
+    h += '<div style="padding:0 20px 12px" class="mini">' + OQ.tag('phase') + ' Renewals and expiry: Phase 1 (scoping brief) or Phase 2 (design brief)?</div>';
     if (exp || soon) h += '<div style="padding:0 20px 14px;display:flex;flex-wrap:wrap;gap:8px">' + (exp ? '<span class="chip bad">' + exp + ' expired · back in your plan</span>' : '') + (soon ? '<span class="chip warn">' + soon + ' due in the next 90 days</span>' : '') + '</div>';
     h += '<div class="tbl-wrap"><table><thead><tr><th scope="col">Learning</th><th scope="col">Completed</th><th scope="col">Where</th><th scope="col">Renewal</th></tr></thead><tbody>';
     h += list.length ? list.map(function (r) {
@@ -672,6 +674,8 @@ dialog.dlg::backdrop { background: rgba(23,26,38,.5); }
     complete(n.c);
   });
   $('#resetBtn').addEventListener('click', function () { L = fresh(L.scn); persist(); render(); toast('Reset'); });
+
+  OQ.init({ app: 'learner', go: function (q) { if (location.hash === q.hash) render(); else location.hash = q.hash; } });
 
   route(); render();
 })();
